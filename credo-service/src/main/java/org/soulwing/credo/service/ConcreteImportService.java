@@ -58,7 +58,7 @@ public class ConcreteImportService implements ImportService {
    * {@inheritDoc}
    */
   @Override
-  public Set<Tag> resolveTags(List<String> values) {
+  public Set<Tag> resolveTags(String[] tokens) {
     // TODO Auto-generated method stub
     return null;
   }

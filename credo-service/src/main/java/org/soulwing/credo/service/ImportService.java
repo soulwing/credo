@@ -56,5 +56,12 @@ public interface ImportService {
   void saveCredential(Credential credential, Errors errors) 
       throws ImportException;
 
-  Set<Tag> resolveTags(List<String> values);
+  /**
+   * Resolves an array of textual tag representations into a set of tag
+   * entities.
+   * @param tokens the array of tokens to resolve
+   * @return set of tags
+   */
+  Set<Tag> resolveTags(String[] tokens);
+
 }
