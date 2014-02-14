@@ -19,8 +19,10 @@
 package org.soulwing.credo.service;
 
 import java.util.List;
+import java.util.Set;
 
 import org.soulwing.credo.Credential;
+import org.soulwing.credo.Tag;
 
 /**
  * A service that imports credentials using the contents of uploaded files.
@@ -54,4 +56,5 @@ public interface ImportService {
   void saveCredential(Credential credential, Errors errors) 
       throws ImportException;
 
+  Set<Tag> resolveTags(List<String> values);
 }

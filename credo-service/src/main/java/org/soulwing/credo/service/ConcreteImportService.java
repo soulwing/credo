@@ -19,10 +19,12 @@
 package org.soulwing.credo.service;
 
 import java.util.List;
+import java.util.Set;
 
 import javax.enterprise.context.ApplicationScoped;
 
 import org.soulwing.credo.Credential;
+import org.soulwing.credo.Tag;
 
 /**
  * A concrete implementation of {@link ImportService}.
@@ -51,5 +53,15 @@ public class ConcreteImportService implements ImportService {
     // TODO Auto-generated method stub
     
   }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public Set<Tag> resolveTags(List<String> values) {
+    // TODO Auto-generated method stub
+    return null;
+  }
+  
 }
 
