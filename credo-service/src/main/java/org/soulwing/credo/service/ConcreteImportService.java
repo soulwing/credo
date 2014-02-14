@@ -42,4 +42,14 @@ public class ConcreteImportService implements ImportService {
     return null;
   }
 
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public void saveCredential(Credential credential, Errors errors)
+      throws ImportException {
+    // TODO Auto-generated method stub
+    
+  }
 }
+

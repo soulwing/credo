@@ -41,5 +41,17 @@ public interface ImportService {
    */
   Credential importCredential(List<FileContentModel> files, Errors errors)
       throws ImportException;
+
   
+  /**
+   * Save the given (transient) credential making it persistent.
+   * @param credential the credential to save
+   * @param errors an errors object that will be updated if a recoverable
+   *    error occurs
+   * @return credential the imported credential
+   * @throws ImportException if a recoverable error occurs
+   */
+  void saveCredential(Credential credential, Errors errors) 
+      throws ImportException;
+
 }
