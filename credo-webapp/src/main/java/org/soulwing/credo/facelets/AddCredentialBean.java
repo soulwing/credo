@@ -22,6 +22,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.enterprise.context.Conversation;
 import javax.enterprise.context.ConversationScoped;
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -51,6 +52,9 @@ public class AddCredentialBean implements Serializable {
   private static final long serialVersionUID = -5565484780336702769L;
   
   @Inject
+  protected Conversation conversation;
+  
+  @Inject
   protected Errors errors;
   
   @Inject
@@ -59,6 +63,10 @@ public class AddCredentialBean implements Serializable {
   private Part file0;
   private Part file1;
   private Part file2;
+  
+  private String name;
+  private String description;
+  private String tags;
   
   private Credential credential;
   
@@ -111,6 +119,54 @@ public class AddCredentialBean implements Serializable {
   }
 
   /**
+   * Gets the {@code name} property.
+   * @return
+   */
+  public String getName() {
+    return name;
+  }
+
+  /**
+   * Sets the {@code name} property.
+   * @param name
+   */
+  public void setName(String name) {
+    this.name = name;
+  }
+
+  /**
+   * Gets the {@code description} property.
+   * @return
+   */
+  public String getDescription() {
+    return description;
+  }
+
+  /**
+   * Sets the {@code description} property.
+   * @param description
+   */
+  public void setDescription(String description) {
+    this.description = description;
+  }
+
+  /**
+   * Gets the {@code tags} property.
+   * @return
+   */
+  public String getTags() {
+    return tags;
+  }
+
+  /**
+   * Sets the {@code tags} property.
+   * @param tags
+   */
+  public void setTags(String tags) {
+    this.tags = tags;
+  }
+
+  /**
    * Gets the credential that was produced by the import service.
    * @return credential
    */
@@ -124,6 +180,9 @@ public class AddCredentialBean implements Serializable {
    * @return outcome ID
    */
   public String upload() {
+    if (conversation.isTransient()) {
+      conversation.begin();
+    }
     if (getFile0() == null && getFile1() == null && getFile2() == null) {
       errors.addError(FILE_REQUIRED_MESSAGE);
       return null;
@@ -137,6 +196,19 @@ public class AddCredentialBean implements Serializable {
     }
   }
   
+  /**
+   * Action that is fired when the form containing credential details is
+   * submitted.
+   * @return outcome ID
+   */
+  public String save() {
+    throw new UnsupportedOperationException();
+  }
+  
+  /**
+   * Produces a list containing the files that were uploaded by the user.
+   * @return list of file content models
+   */
   private List<FileContentModel> fileList() {
     List<FileContentModel> files = new ArrayList<FileContentModel>();
     if (getFile0() != null) {

@@ -27,6 +27,7 @@ import static org.hamcrest.Matchers.sameInstance;
 
 import java.util.List;
 
+import javax.enterprise.context.Conversation;
 import javax.servlet.http.Part;
 
 import org.jmock.Expectations;
@@ -52,6 +53,9 @@ public class AddCredentialBeanTest {
   public JUnitRuleMockery context = new JUnitRuleMockery();
   
   @Mock
+  public Conversation conversation;
+  
+  @Mock
   public Errors errors;
   
   @Mock
@@ -64,8 +68,14 @@ public class AddCredentialBeanTest {
 
   @Before
   public void setUp() throws Exception {
+    bean.conversation = conversation;
     bean.errors = errors;
     bean.importService = importService;
+    context.checking(new Expectations() { { 
+      oneOf(conversation).isTransient();
+      will(returnValue(true));
+      oneOf(conversation).begin();
+    } });
   }
   
   @Test
