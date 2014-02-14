@@ -198,13 +198,22 @@ public class AddCredentialBean implements Serializable {
   
   /**
    * Action that is fired when the form containing credential details is
-   * submitted.
+   * submitted with the save action.
    * @return outcome ID
    */
   public String save() {
-    throw new UnsupportedOperationException();
+    throw new UnsupportedOperationException("not implemented");
   }
   
+  /**
+   * Action that is fired when the form containing credential details is
+   * submitted with the cancel action.
+   * @return outcome ID
+   */
+  public String cancel() {
+    throw new UnsupportedOperationException("not implemented");
+  }
+
   /**
    * Produces a list containing the files that were uploaded by the user.
    * @return list of file content models
