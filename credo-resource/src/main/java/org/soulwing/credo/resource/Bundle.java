@@ -18,6 +18,7 @@
  */
 package org.soulwing.credo.resource;
 
+import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
 /**
@@ -34,6 +35,21 @@ public class Bundle {
   public static ResourceBundle get() {
     String base = Bundle.class.getPackage().getName() + ".messages";
     return ResourceBundle.getBundle(base);
+  }
+  
+  /**
+   * Gets a string from the resource bundle.
+   * @param key key of the string to retrieve
+   * @return string mapped to {@code code} or a placeholder if {@code key}
+   *   does not exist in the bundle
+   */
+  public static String getString(String key) {
+    try {
+      return get().getString(key);
+    }
+    catch (MissingResourceException ex) {
+      return "??" + key + "??";
+    }
   }
   
 }
