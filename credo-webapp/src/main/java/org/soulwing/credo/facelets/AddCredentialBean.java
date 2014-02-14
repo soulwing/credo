@@ -47,13 +47,15 @@ import org.soulwing.credo.service.ImportService;
 @ConversationScoped
 public class AddCredentialBean implements Serializable {
 
-  public static final String FILE_REQUIRED_MESSAGE = "requiresAtLeastOneFile";
+  static final String FILE_REQUIRED_MESSAGE = "requiresAtLeastOneFile";
 
-  public static final String DETAILS_OUTCOME_ID = "details";
+  static final String DETAILS_OUTCOME_ID = "details";
 
-  public static final String WARNINGS_OUTCOME_ID = "warnings";
+  static final String WARNINGS_OUTCOME_ID = "warnings";
 
-  public static final String SUCCESS_OUTCOME_ID = "success";
+  static final String SUCCESS_OUTCOME_ID = "success";
+  
+  static final String CANCEL_OUTCOME_ID = "cancel";
   
   private static final long serialVersionUID = -5565484780336702769L;
   
@@ -246,7 +248,8 @@ public class AddCredentialBean implements Serializable {
    * @return outcome ID
    */
   public String cancel() {
-    throw new UnsupportedOperationException("not implemented");
+    conversation.end();
+    return CANCEL_OUTCOME_ID;
   }
 
   /**

@@ -310,5 +310,13 @@ public class AddCredentialBeanTest {
     assertThat(bean.save(), nullValue());    
   }
   
-
+  @Test
+  public void testCancel() throws Exception {
+    context.checking(new Expectations() { { 
+      oneOf(conversation).end();
+    } });
+    
+    assertThat(bean.cancel(), equalTo(AddCredentialBean.CANCEL_OUTCOME_ID));
+  }
+  
 }
