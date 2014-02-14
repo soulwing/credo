@@ -1,8 +1,8 @@
 Add Credential By PEM Import
 ----------------------------
 
-Add a credential to a repository by importing PEM-encoded file(s) containing 
-a private key, corresponding certificate, and CA certificates.
+A user can add a credential to the repository by importing its constituent 
+parts from one or more PEM-encoded files.
 
 * The key, certificate, and CA certificates may be in any combination of up 
   to five files.
@@ -10,6 +10,15 @@ a private key, corresponding certificate, and CA certificates.
 * Allow the user to enter a description of the certificate
 * Allow the user to apply any number of tags to the certificate, defining
   new tags as desired
+
+Display Credentials in Repository
+---------------------------------
+
+A user can view a table containing all of the credentials stored in the
+repository.
+
+* Table columns must include the short name for the credential and the
+  date it was added or last modified.
 
 Validate Credential on Import
 -----------------------------
@@ -37,26 +46,13 @@ the ZIP archive.
 * Use Apache httpd naming conventions for the component PEM files.
     * Put the private key in a file named server.key
     * Put the subject certificate in a file name server.crt
-    * Put the CA certificates a file named server-ca.crt, in order starting 
-      with the subject's issuer, then that CA's issuer, etc.
+    * Put the CA certificates a file named server-ca.crt.
 * If the private key is protected, allow the user to indicate that the 
   private key should be exported in unprotected form in the ZIP archive.
   Prompt the user to enter the passphrase for the private key if this option 
   is selected. 
 
 
-Display Credentials in Repository
----------------------------------
-
-Display a simple table that includes all credentials stored in the repository,
-with the ability to sort and filter.
-
-* Columns should include subject short name, validity start and end dates, 
-  issuer common name, key length, time of last update, and should be sortable
-* Clicking a table row should reveal more details: full subject name, subject
-  names of each CA in the chain, serial number, X509v3 extensions and 
-  attributes (e.g. key usage, extended usage, etc),
- 
 
 Apply Passphrase to Unprotected Private Key
 -------------------------------------------
