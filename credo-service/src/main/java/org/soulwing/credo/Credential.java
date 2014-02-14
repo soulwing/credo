@@ -18,6 +18,8 @@
  */
 package org.soulwing.credo;
 
+import java.util.Set;
+
 
 /**
  * An abstract representation of an X.509 credential.
@@ -38,4 +40,28 @@ public interface Credential {
    */
   void setName(String name);
 
+  /**
+   * Gets the description assigned to this credential.
+   * @return description
+   */
+  String getDescription();
+  
+  /**
+   * Sets the description assigned to this credential.
+   * @param description the description to set
+   */
+  void setDescription(String description);
+  
+  /**
+   * Gets the collection of tags assigned to this credential.
+   * @return tag set
+   */
+  Set<Tag> getTags();
+  
+  /**
+   * Sets (replaces) the collection of tags assigned to this credential.
+   * @param tags the tags to set
+   */
+  void setTags(Set<Tag> tags);
+  
 }
