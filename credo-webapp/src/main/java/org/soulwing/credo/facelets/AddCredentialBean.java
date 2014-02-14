@@ -20,6 +20,7 @@ package org.soulwing.credo.facelets;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
@@ -29,6 +30,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.servlet.http.Part;
 
+import org.apache.commons.lang.StringUtils;
 import org.soulwing.credo.Credential;
 import org.soulwing.credo.Tag;
 import org.soulwing.credo.service.Errors;
@@ -171,7 +173,13 @@ public class AddCredentialBean implements Serializable {
    * @param tags
    */
   public void setTags(String tags) {
-    throw new UnsupportedOperationException();
+    if (StringUtils.isBlank(tags)) {
+      Set<Tag> tagSet = Collections.emptySet();
+      credential.setTags(tagSet);
+      return;
+    }
+    String[] tokens = tags.split("\\s*,\\s*");
+    credential.setTags(importService.resolveTags(tokens));
   }
 
   /**

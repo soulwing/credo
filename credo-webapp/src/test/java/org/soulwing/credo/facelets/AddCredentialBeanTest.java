@@ -19,9 +19,12 @@
 package org.soulwing.credo.facelets;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.emptyArray;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasItemInArray;
 import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.Matchers.sameInstance;
 
@@ -230,5 +233,58 @@ public class AddCredentialBeanTest {
     bean.setCredential(credential);
     assertThat(bean.getTags(), equalTo("tag0,tag1"));
   }
+
+  @Test
+  @SuppressWarnings("unchecked")
+  public void testSetTagsWithNull() throws Exception {
+    context.checking(new Expectations() { { 
+      oneOf(credential).setTags((Set<Tag>) with(empty()));
+    } });
+    
+    bean.setCredential(credential);
+    bean.setTags(null);
+  }
+
+  @Test
+  @SuppressWarnings("unchecked")
+  public void testSetTagsWithBlank() throws Exception {
+    context.checking(new Expectations() { { 
+      oneOf(credential).setTags((Set<Tag>) with(empty()));
+    } });
+    
+    bean.setCredential(credential);
+    bean.setTags(" ");
+  }
+
+
+  @Test
+  public void testSetTagsWithOneTag() throws Exception {
+    final Set<Tag> tags = Collections.emptySet();
+    context.checking(new Expectations() { { 
+      oneOf(importService).resolveTags(with(
+          hasItemInArray(equalTo("tag"))));
+      will(returnValue(tags));
+      oneOf(credential).setTags(with(same(tags)));
+    } });
+    
+    bean.setCredential(credential);
+    bean.setTags("tag");
+  }
+
+  @Test
+  public void testSetTagsWithTwoTags() throws Exception {
+    final Set<Tag> tags = Collections.emptySet();
+    context.checking(new Expectations() { { 
+      oneOf(importService).resolveTags(with(allOf(
+          hasItemInArray(equalTo("tag0")), 
+          hasItemInArray(equalTo("tag1")))));
+      will(returnValue(tags));
+      oneOf(credential).setTags(with(same(tags)));
+    } });
+    
+    bean.setCredential(credential);
+    bean.setTags("tag0, tag1");
+  }
+
 
 }
