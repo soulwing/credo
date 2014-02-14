@@ -286,5 +286,29 @@ public class AddCredentialBeanTest {
     bean.setTags("tag0, tag1");
   }
 
+  @Test
+  public void testSaveSuccess() throws Exception {
+    context.checking(new Expectations() { { 
+      oneOf(importService).saveCredential(with(same(credential)), 
+          with(same(errors)));
+      oneOf(conversation).end();
+    } });
+    
+    bean.setCredential(credential);
+    assertThat(bean.save(), equalTo(AddCredentialBean.SUCCESS_OUTCOME_ID));    
+  }
+
+  @Test
+  public void testSaveError() throws Exception {
+    context.checking(new Expectations() { { 
+      oneOf(importService).saveCredential(with(same(credential)), 
+          with(same(errors)));
+      will(throwException(new ImportException()));
+    } });
+    
+    bean.setCredential(credential);
+    assertThat(bean.save(), nullValue());    
+  }
+  
 
 }

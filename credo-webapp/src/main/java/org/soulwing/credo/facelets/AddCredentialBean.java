@@ -52,6 +52,8 @@ public class AddCredentialBean implements Serializable {
   public static final String DETAILS_OUTCOME_ID = "details";
 
   public static final String WARNINGS_OUTCOME_ID = "warnings";
+
+  public static final String SUCCESS_OUTCOME_ID = "success";
   
   private static final long serialVersionUID = -5565484780336702769L;
   
@@ -228,7 +230,14 @@ public class AddCredentialBean implements Serializable {
    * @return outcome ID
    */
   public String save() {
-    throw new UnsupportedOperationException("not implemented");
+    try {
+      importService.saveCredential(credential, errors);
+      conversation.end();
+      return SUCCESS_OUTCOME_ID;
+    }
+    catch (ImportException ex) {
+      return null;
+    }
   }
   
   /**
