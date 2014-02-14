@@ -23,6 +23,7 @@ import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.emptyArray;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.nullValue;
+import static org.hamcrest.Matchers.sameInstance;
 
 import java.util.List;
 
@@ -96,6 +97,7 @@ public class AddCredentialBeanTest {
     
     bean.setFile0(file);
     assertThat(bean.upload(), equalTo(AddCredentialBean.DETAILS_OUTCOME_ID));
+    assertThat(bean.getCredential(), sameInstance(credential));
   }
 
   @Test
@@ -113,6 +115,7 @@ public class AddCredentialBeanTest {
     
     bean.setFile1(file);
     assertThat(bean.upload(), equalTo(AddCredentialBean.DETAILS_OUTCOME_ID));
+    assertThat(bean.getCredential(), sameInstance(credential));
   }
     
   @Test
@@ -130,6 +133,7 @@ public class AddCredentialBeanTest {
     
     bean.setFile2(file);
     assertThat(bean.upload(), equalTo(AddCredentialBean.DETAILS_OUTCOME_ID));
+    assertThat(bean.getCredential(), sameInstance(credential));
   }
 
   @Test
@@ -155,12 +159,14 @@ public class AddCredentialBeanTest {
       oneOf(importService).importCredential(
           (List<FileContentModel>) with(contains(new PartContent(file))), 
           with(errors));
+      will(returnValue(credential));
       oneOf(errors).hasWarnings();
       will(returnValue(true));
     } });
     
     bean.setFile0(file);
     assertThat(bean.upload(), equalTo(AddCredentialBean.WARNINGS_OUTCOME_ID));
+    assertThat(bean.getCredential(), sameInstance(credential));
   }
 
 }

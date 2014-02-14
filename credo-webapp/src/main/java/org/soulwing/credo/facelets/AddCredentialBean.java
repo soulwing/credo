@@ -27,6 +27,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.servlet.http.Part;
 
+import org.soulwing.credo.Credential;
 import org.soulwing.credo.service.Errors;
 import org.soulwing.credo.service.FileContentModel;
 import org.soulwing.credo.service.ImportException;
@@ -58,6 +59,8 @@ public class AddCredentialBean implements Serializable {
   private Part file0;
   private Part file1;
   private Part file2;
+  
+  private Credential credential;
   
   /**
    * Gets the {@code file0} property.
@@ -108,6 +111,14 @@ public class AddCredentialBean implements Serializable {
   }
 
   /**
+   * Gets the credential that was produced by the import service.
+   * @return credential
+   */
+  public Credential getCredential() {
+    return credential;
+  }
+
+  /**
    * Action that is fired when the form containing the files to import
    * has been submitted. 
    * @return outcome ID
@@ -118,7 +129,7 @@ public class AddCredentialBean implements Serializable {
       return null;
     }
     try {
-      importService.importCredential(fileList(), errors);
+      credential = importService.importCredential(fileList(), errors);
       return errors.hasWarnings() ? WARNINGS_OUTCOME_ID : DETAILS_OUTCOME_ID;
     }
     catch (ImportException ex) {
