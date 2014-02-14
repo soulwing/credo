@@ -31,7 +31,7 @@
           <span class="icon-bar"></span> 
           <span class="icon-bar"></span>
         </button>
-        <a class="navbar-brand" href="#"><ui:insert name="applicationName"/></a>
+        <a class="navbar-brand" href="#">#{messages.applicationName}</a>
       </div>
       <div class="collapse navbar-collapse">
         <ui:insert name="navbarLinks">
@@ -41,9 +41,7 @@
     </div>
   </div>
   <div class="container">
-	  <div class="starter-template" id="content">
-	    <ui:insert name="content"/>
-	  </div>
+	  <ui:insert name="content"/>
   </div>
   <h:outputScript library="js" name="jquery.js"/>
   <h:outputScript library="js" name="bootstrap.js"/>
