@@ -312,7 +312,9 @@ public class AddCredentialBeanTest {
   
   @Test
   public void testCancel() throws Exception {
-    context.checking(new Expectations() { { 
+    context.checking(new Expectations() { {
+      oneOf(conversation).isTransient();
+      will(returnValue(false));
       oneOf(conversation).end();
     } });
     

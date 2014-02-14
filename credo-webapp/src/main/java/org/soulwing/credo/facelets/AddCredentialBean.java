@@ -159,7 +159,7 @@ public class AddCredentialBean implements Serializable {
    * @return
    */
   public String getTags() {
-    Set<Tag> tags = credential.getTags();
+    Set<? extends Tag> tags = credential.getTags();
     if (tags == null || tags.isEmpty()) return "";
     int i = 0;
     StringBuilder sb = new StringBuilder();
@@ -248,7 +248,9 @@ public class AddCredentialBean implements Serializable {
    * @return outcome ID
    */
   public String cancel() {
-    conversation.end();
+    if (!conversation.isTransient()) {
+      conversation.end();
+    }
     return CANCEL_OUTCOME_ID;
   }
 
