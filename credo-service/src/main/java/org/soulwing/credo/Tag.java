@@ -26,4 +26,10 @@ package org.soulwing.credo;
  */
 public interface Tag {
 
+  /**
+   * Gets the textual representation of this tag.
+   * @return textual tag representation
+   */
+  String getText();
+  
 }

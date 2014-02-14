@@ -21,6 +21,7 @@ package org.soulwing.credo.facelets;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import javax.enterprise.context.Conversation;
 import javax.enterprise.context.ConversationScoped;
@@ -29,6 +30,7 @@ import javax.inject.Named;
 import javax.servlet.http.Part;
 
 import org.soulwing.credo.Credential;
+import org.soulwing.credo.Tag;
 import org.soulwing.credo.service.Errors;
 import org.soulwing.credo.service.FileContentModel;
 import org.soulwing.credo.service.ImportException;
@@ -63,10 +65,6 @@ public class AddCredentialBean implements Serializable {
   private Part file0;
   private Part file1;
   private Part file2;
-  
-  private String name;
-  private String description;
-  private String tags;
   
   private Credential credential;
   
@@ -123,7 +121,7 @@ public class AddCredentialBean implements Serializable {
    * @return
    */
   public String getName() {
-    return name;
+    return credential.getName();
   }
 
   /**
@@ -131,7 +129,7 @@ public class AddCredentialBean implements Serializable {
    * @param name
    */
   public void setName(String name) {
-    this.name = name;
+    credential.setName(name);
   }
 
   /**
@@ -139,7 +137,7 @@ public class AddCredentialBean implements Serializable {
    * @return
    */
   public String getDescription() {
-    return description;
+    return credential.getDescription();
   }
 
   /**
@@ -147,7 +145,7 @@ public class AddCredentialBean implements Serializable {
    * @param description
    */
   public void setDescription(String description) {
-    this.description = description;
+    credential.setDescription(description);
   }
 
   /**
@@ -155,7 +153,17 @@ public class AddCredentialBean implements Serializable {
    * @return
    */
   public String getTags() {
-    return tags;
+    Set<Tag> tags = credential.getTags();
+    if (tags == null || tags.isEmpty()) return "";
+    int i = 0;
+    StringBuilder sb = new StringBuilder();
+    for (Tag tag : tags) {
+      sb.append(tag.getText());
+      if (++i < tags.size()) {
+        sb.append(',');
+      }
+    }
+    return sb.toString();
   }
 
   /**
@@ -163,7 +171,7 @@ public class AddCredentialBean implements Serializable {
    * @param tags
    */
   public void setTags(String tags) {
-    this.tags = tags;
+    throw new UnsupportedOperationException();
   }
 
   /**
@@ -172,6 +180,16 @@ public class AddCredentialBean implements Serializable {
    */
   public Credential getCredential() {
     return credential;
+  }
+  
+  /**
+   * Sets the credential.
+   * <p>
+   * This method is exposed principally to support unit testing.
+   * @param credential the credential to set
+   */
+  void setCredential(Credential credential) {
+    this.credential = credential;
   }
 
   /**

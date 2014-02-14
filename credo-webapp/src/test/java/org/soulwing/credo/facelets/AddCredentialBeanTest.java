@@ -25,7 +25,10 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.Matchers.sameInstance;
 
+import java.util.Collections;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.enterprise.context.Conversation;
 import javax.servlet.http.Part;
@@ -37,6 +40,7 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.soulwing.credo.Credential;
+import org.soulwing.credo.Tag;
 import org.soulwing.credo.service.Errors;
 import org.soulwing.credo.service.FileContentModel;
 import org.soulwing.credo.service.ImportException;
@@ -71,15 +75,11 @@ public class AddCredentialBeanTest {
     bean.conversation = conversation;
     bean.errors = errors;
     bean.importService = importService;
-    context.checking(new Expectations() { { 
-      oneOf(conversation).isTransient();
-      will(returnValue(true));
-      oneOf(conversation).begin();
-    } });
   }
-  
+
   @Test
   public void testUploadWithNoFilesSelected() throws Exception {
+    context.checking(conversationExpectations());
     context.checking(new Expectations() { { 
       oneOf(errors).addError( 
           with(AddCredentialBean.FILE_REQUIRED_MESSAGE),
@@ -93,17 +93,10 @@ public class AddCredentialBeanTest {
   }
   
   @Test
-  @SuppressWarnings("unchecked")
   public void testUploadSuccessWithFile0Selected() throws Exception {
     final Part file = context.mock(Part.class);
-    context.checking(new Expectations() { {
-      oneOf(importService).importCredential(
-          (List<FileContentModel>) with(contains(new PartContent(file))), 
-          with(errors));
-      will(returnValue(credential));
-      oneOf(errors).hasWarnings();
-      will(returnValue(false));
-    } });
+    context.checking(conversationExpectations());
+    context.checking(uploadSuccessExpectations(file, false));
     
     bean.setFile0(file);
     assertThat(bean.upload(), equalTo(AddCredentialBean.DETAILS_OUTCOME_ID));
@@ -111,17 +104,10 @@ public class AddCredentialBeanTest {
   }
 
   @Test
-  @SuppressWarnings("unchecked")
   public void testUploadSuccessWithFile1Selected() throws Exception {
     final Part file = context.mock(Part.class);
-    context.checking(new Expectations() { {
-      oneOf(importService).importCredential(
-          (List<FileContentModel>) with(contains(new PartContent(file))), 
-          with(errors));
-      will(returnValue(credential));
-      oneOf(errors).hasWarnings();
-      will(returnValue(false));
-    } });
+    context.checking(conversationExpectations());
+    context.checking(uploadSuccessExpectations(file, false));
     
     bean.setFile1(file);
     assertThat(bean.upload(), equalTo(AddCredentialBean.DETAILS_OUTCOME_ID));
@@ -129,17 +115,10 @@ public class AddCredentialBeanTest {
   }
     
   @Test
-  @SuppressWarnings("unchecked")
   public void testUploadSuccessWithFile2Selected() throws Exception {
     final Part file = context.mock(Part.class);
-    context.checking(new Expectations() { {
-      oneOf(importService).importCredential(
-          (List<FileContentModel>) with(contains(new PartContent(file))), 
-          with(errors));
-      will(returnValue(credential));
-      oneOf(errors).hasWarnings();
-      will(returnValue(false));
-    } });
+    context.checking(conversationExpectations());
+    context.checking(uploadSuccessExpectations(file, false));
     
     bean.setFile2(file);
     assertThat(bean.upload(), equalTo(AddCredentialBean.DETAILS_OUTCOME_ID));
@@ -150,6 +129,7 @@ public class AddCredentialBeanTest {
   @SuppressWarnings("unchecked")
   public void testUploadError() throws Exception {
     final Part file = context.mock(Part.class);
+    context.checking(conversationExpectations());
     context.checking(new Expectations() { {
       oneOf(importService).importCredential(
           (List<FileContentModel>) with(contains(new PartContent(file))), 
@@ -162,21 +142,93 @@ public class AddCredentialBeanTest {
   }
 
   @Test
-  @SuppressWarnings("unchecked")
   public void testUploadWarning() throws Exception {
     final Part file = context.mock(Part.class);
-    context.checking(new Expectations() { {
-      oneOf(importService).importCredential(
-          (List<FileContentModel>) with(contains(new PartContent(file))), 
-          with(errors));
-      will(returnValue(credential));
-      oneOf(errors).hasWarnings();
-      will(returnValue(true));
-    } });
+    context.checking(conversationExpectations());
+    context.checking(uploadSuccessExpectations(file, true));
     
     bean.setFile0(file);
     assertThat(bean.upload(), equalTo(AddCredentialBean.WARNINGS_OUTCOME_ID));
     assertThat(bean.getCredential(), sameInstance(credential));
+  }
+
+  @SuppressWarnings("unchecked")
+  private Expectations uploadSuccessExpectations(final Part file,
+      final boolean hasWarnings) 
+      throws Exception {
+    return new Expectations() { {
+      oneOf(importService).importCredential(
+          (List<FileContentModel>) with(contains(new PartContent(file))), 
+          with(errors));    
+      will(returnValue(credential));
+      oneOf(errors).hasWarnings();
+      will(returnValue(hasWarnings));
+    } };
+  }
+    
+  private Expectations conversationExpectations() {
+    return new Expectations() { { 
+      oneOf(conversation).isTransient();
+      will(returnValue(true));
+      oneOf(conversation).begin();
+    } };
+  }
+  
+  @Test
+  public void testGetTagsWhenNull() throws Exception {
+    context.checking(new Expectations() { { 
+      oneOf(credential).getTags();
+      will(returnValue(null));
+    } });
+    
+    bean.setCredential(credential);
+    assertThat(bean.getTags().isEmpty(), equalTo(true));
+  }
+
+  @Test
+  public void testGetTagsWhenEmpty() throws Exception {
+    context.checking(new Expectations() { { 
+      oneOf(credential).getTags();
+      will(returnValue(Collections.emptySet()));
+    } });
+    
+    bean.setCredential(credential);
+    assertThat(bean.getTags().isEmpty(), equalTo(true));
+  }
+
+  @Test
+  public void testGetTagsWithOneTag() throws Exception {
+    final Tag tag = context.mock(Tag.class);
+    context.checking(new Expectations() { { 
+      oneOf(credential).getTags();
+      will(returnValue(Collections.singleton(tag)));
+      oneOf(tag).getText();
+      will(returnValue("tag"));
+    } });
+    
+    bean.setCredential(credential);
+    assertThat(bean.getTags(), equalTo("tag"));
+  }
+
+  @Test
+  public void testGetTagsWithTwoTag() throws Exception {
+    final Tag tag0 = context.mock(Tag.class, "tag0");
+    final Tag tag1 = context.mock(Tag.class, "tag1");
+    final Set<Tag> tags = new LinkedHashSet<Tag>();
+    tags.add(tag0);
+    tags.add(tag1);
+    
+    context.checking(new Expectations() { { 
+      oneOf(credential).getTags();
+      will(returnValue(tags));
+      oneOf(tag0).getText();
+      will(returnValue("tag0"));
+      oneOf(tag1).getText();
+      will(returnValue("tag1"));
+    } });
+    
+    bean.setCredential(credential);
+    assertThat(bean.getTags(), equalTo("tag0,tag1"));
   }
 
 }
