@@ -42,8 +42,8 @@ public class FacesContextErrors implements Errors {
    * @return {@code true} if the context contains at least one error
    */
   public boolean hasErrors() {
-    return FacesContext.getCurrentInstance().getMaximumSeverity().equals(
-        FacesMessage.SEVERITY_ERROR);
+    return FacesMessage.SEVERITY_ERROR.equals(
+        getContext().getMaximumSeverity());
   }
 
   /**
@@ -51,8 +51,16 @@ public class FacesContextErrors implements Errors {
    * @return {@code true} if the context contains at least one warning
    */
   public boolean hasWarnings() {
-    return FacesContext.getCurrentInstance().getMaximumSeverity().equals(
-        FacesMessage.SEVERITY_WARN);
+    return FacesMessage.SEVERITY_WARN.equals(
+        getContext().getMaximumSeverity());
+  }
+
+  private FacesContext getContext() {
+    FacesContext context = FacesContext.getCurrentInstance();
+    if (context == null) {
+      throw new NullPointerException("FacesContext is not available");
+    }
+    return context;
   }
 
   /**
@@ -60,7 +68,7 @@ public class FacesContextErrors implements Errors {
    */
   @Override
   public void addError(String message, Object... args) {
-    FacesContext.getCurrentInstance().addMessage(null, 
+    getContext().addMessage(null, 
         createMessage(FacesMessage.SEVERITY_ERROR, message, args));
   }
 
@@ -69,7 +77,7 @@ public class FacesContextErrors implements Errors {
    */
   @Override
   public void addWarning(String message, Object... args) {
-    FacesContext.getCurrentInstance().addMessage(null, 
+    getContext().addMessage(null, 
         createMessage(FacesMessage.SEVERITY_WARN, message, args));
   }
 
