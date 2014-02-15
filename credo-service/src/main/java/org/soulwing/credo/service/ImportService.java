@@ -62,6 +62,6 @@ public interface ImportService {
    * @param tokens the array of tokens to resolve
    * @return set of tags
    */
-  Set<Tag> resolveTags(String[] tokens);
+  Set<? extends Tag> resolveTags(String[] tokens);
 
 }

@@ -18,6 +18,7 @@
  */
 package org.soulwing.credo.service;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
@@ -25,6 +26,7 @@ import javax.enterprise.context.ApplicationScoped;
 
 import org.soulwing.credo.Credential;
 import org.soulwing.credo.Tag;
+import org.soulwing.credo.domain.CredentialEntity;
 
 /**
  * A concrete implementation of {@link ImportService}.
@@ -40,8 +42,7 @@ public class ConcreteImportService implements ImportService {
   @Override
   public Credential importCredential(List<FileContentModel> files,
       Errors errors) throws ImportException {
-    // TODO Auto-generated method stub
-    return null;
+    return new CredentialEntity();
   }
 
   /**
@@ -58,9 +59,8 @@ public class ConcreteImportService implements ImportService {
    * {@inheritDoc}
    */
   @Override
-  public Set<Tag> resolveTags(String[] tokens) {
-    // TODO Auto-generated method stub
-    return null;
+  public Set<? extends Tag> resolveTags(String[] tokens) {
+    return Collections.emptySet();
   }
   
 }

@@ -56,12 +56,12 @@ public interface Credential {
    * Gets the collection of tags assigned to this credential.
    * @return tag set
    */
-  Set<Tag> getTags();
+  Set<? extends Tag> getTags();
   
   /**
    * Sets (replaces) the collection of tags assigned to this credential.
    * @param tags the tags to set
    */
-  void setTags(Set<Tag> tags);
+  void setTags(Set<? extends Tag> tags);
   
 }
