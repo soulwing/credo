@@ -241,7 +241,7 @@ public class AddCredentialBean implements Serializable {
       conversation.begin();
     }
     try {
-      preparation = importService.importCredential(fileList(), errors);
+      preparation = importService.prepareImport(fileList(), errors);
       if (!preparation.isPassphraseRequired()) {
         return validate();
       }

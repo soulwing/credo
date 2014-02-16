@@ -88,7 +88,7 @@ public class AddCredentialBeanTest {
   public void testUploadWithNoFilesSelected() throws Exception {
     context.checking(conversationExpectations());
     context.checking(new Expectations() { {
-      oneOf(importService).importCredential(
+      oneOf(importService).prepareImport(
           (List<FileContentModel>) with(any(List.class)),
           with(errors));
       will(throwException(new ImportException()));
@@ -154,7 +154,7 @@ public class AddCredentialBeanTest {
     final Part file = context.mock(Part.class);
     context.checking(conversationExpectations());
     context.checking(new Expectations() { {
-      oneOf(importService).importCredential(
+      oneOf(importService).prepareImport(
           (List<FileContentModel>) with(contains(new PartContent(file))), 
           with(errors));
       will(throwException(new ImportException()));
@@ -169,7 +169,7 @@ public class AddCredentialBeanTest {
       final boolean passphraseRequired) 
       throws Exception {
     return new Expectations() { {
-      oneOf(importService).importCredential(
+      oneOf(importService).prepareImport(
           (List<FileContentModel>) with(contains(new PartContent(file))), 
           with(errors));    
       will(returnValue(preparation));

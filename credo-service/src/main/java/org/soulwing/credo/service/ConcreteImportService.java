@@ -18,15 +18,16 @@
  */
 package org.soulwing.credo.service;
 
+import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
 import javax.enterprise.context.ApplicationScoped;
+import javax.inject.Inject;
 
 import org.soulwing.credo.Credential;
 import org.soulwing.credo.Tag;
-import org.soulwing.credo.domain.CredentialEntity;
 
 /**
  * A concrete implementation of {@link ImportService}.
@@ -36,13 +37,56 @@ import org.soulwing.credo.domain.CredentialEntity;
 @ApplicationScoped
 public class ConcreteImportService implements ImportService {
 
+  @Inject
+  protected CredentialBuilderFactory credentialBuilderFactory;
+  
   /**
    * {@inheritDoc}
    */
   @Override
-  public Credential importCredential(List<FileContentModel> files,
+  public ImportPreparation prepareImport(List<FileContentModel> files,
       Errors errors) throws ImportException {
-    return new CredentialEntity();
+    if (files.isEmpty()) {
+      errors.addError(ImportService.FILE_REQUIRED_MESSAGE);
+      throw new ImportException();
+    }
+    CredentialBuilder builder = credentialBuilderFactory.newInstance();
+    int i = 0;
+    for (FileContentModel file : files) {
+      try {
+        builder.loadFile(file.getInputStream());
+        
+        i++;
+      }
+      catch (NoPertinentContentException ex) {
+        errors.addError("file" + i, ImportService.FILE_NOT_PERTINENT_MESSAGE, 
+            file.getName());
+      }
+      catch (IOException ex) {
+        errors.addError("file" + i, ImportService.FILE_IO_ERROR_MESSAGE,
+            file.getName());
+      }
+    }
+    if (errors.hasErrors()) {
+      throw new ImportException();
+    }
+    
+    return builder;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public Credential createCredential(ImportPreparation preparation,
+      Errors errors) throws ImportException {
+    if (!(preparation instanceof CredentialBuilder)) {
+      throw new IllegalArgumentException(
+          "preparation was not created by this service");
+    }
+
+    
+    return null;
   }
 
   /**

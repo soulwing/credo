@@ -39,8 +39,7 @@ public interface ImportService {
   String FILE_IO_ERROR_MESSAGE = "importErrorReadingFile";
   
   /**
-   * Creates a new (transient) credential from the file contents in
-   * the given model.
+   * Prepares the contents of a collection of files for import as a credential.
    * @param files files whose contents will be imported
    * @param errors an errors object that will be updated during the
    *   import as necessary
@@ -48,7 +47,7 @@ public interface ImportService {
    * @throws ImportException if a validation error occurs; warnings do
    *    not result in an exception
    */
-  ImportPreparation importCredential(List<FileContentModel> files, 
+  ImportPreparation prepareImport(List<FileContentModel> files, 
       Errors errors) throws ImportException;
   
   /**
