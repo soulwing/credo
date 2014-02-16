@@ -21,6 +21,7 @@ package org.soulwing.credo.service;
 import java.util.List;
 import java.util.Set;
 
+
 import org.soulwing.credo.Credential;
 import org.soulwing.credo.Tag;
 
@@ -31,19 +32,35 @@ import org.soulwing.credo.Tag;
  */
 public interface ImportService {
 
+  String FILE_REQUIRED_MESSAGE = "requiresAtLeastOneFile";
+  
+  String FILE_NOT_PERTINENT_MESSAGE = "importErrorNoPertinentContent";
+  
+  String FILE_IO_ERROR_MESSAGE = "importErrorReadingFile";
+  
   /**
    * Creates a new (transient) credential from the file contents in
    * the given model.
    * @param files files whose contents will be imported
    * @param errors an errors object that will be updated during the
-   *   import to report validation issues
-   * @return credential the imported credential
+   *   import as necessary
+   * @return prepared credential content
    * @throws ImportException if a validation error occurs; warnings do
    *    not result in an exception
    */
-  Credential importCredential(List<FileContentModel> files, Errors errors)
+  ImportPreparation importCredential(List<FileContentModel> files, 
+      Errors errors) throws ImportException;
+  
+  /**
+   * Creates the credential from the prepared imported contents. 
+   * @param preparation prepared contents
+   * @param errors an errors object that will be updated during 
+   *   credential validation and creation
+   * @return fully validated credential
+   * @throws ValidationException
+   */
+  Credential createCredential(ImportPreparation preparation, Errors errors)
       throws ImportException;
-
   
   /**
    * Save the given (transient) credential making it persistent.

@@ -22,7 +22,6 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.empty;
-import static org.hamcrest.Matchers.emptyArray;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasItemInArray;
 import static org.hamcrest.Matchers.nullValue;
@@ -47,6 +46,7 @@ import org.soulwing.credo.Tag;
 import org.soulwing.credo.service.Errors;
 import org.soulwing.credo.service.FileContentModel;
 import org.soulwing.credo.service.ImportException;
+import org.soulwing.credo.service.ImportPreparation;
 import org.soulwing.credo.service.ImportService;
 
 /**
@@ -69,6 +69,9 @@ public class AddCredentialBeanTest {
   public ImportService importService;
     
   @Mock
+  public ImportPreparation preparation;
+  
+  @Mock
   public Credential credential;
   
   private AddCredentialBean bean = new AddCredentialBean();
@@ -81,12 +84,14 @@ public class AddCredentialBeanTest {
   }
 
   @Test
+  @SuppressWarnings("unchecked")
   public void testUploadWithNoFilesSelected() throws Exception {
     context.checking(conversationExpectations());
-    context.checking(new Expectations() { { 
-      oneOf(errors).addError( 
-          with(AddCredentialBean.FILE_REQUIRED_MESSAGE),
-          with(emptyArray()));
+    context.checking(new Expectations() { {
+      oneOf(importService).importCredential(
+          (List<FileContentModel>) with(any(List.class)),
+          with(errors));
+      will(throwException(new ImportException()));
     } });
     
     bean.setFile0(null);
@@ -99,33 +104,48 @@ public class AddCredentialBeanTest {
   public void testUploadSuccessWithFile0Selected() throws Exception {
     final Part file = context.mock(Part.class);
     context.checking(conversationExpectations());
-    context.checking(uploadSuccessExpectations(file, false));
+    context.checking(uploadSuccessExpectations(file, true));
     
     bean.setFile0(file);
-    assertThat(bean.upload(), equalTo(AddCredentialBean.DETAILS_OUTCOME_ID));
-    assertThat(bean.getCredential(), sameInstance(credential));
+    assertThat(bean.upload(), equalTo(AddCredentialBean.PASSPHRASE_OUTCOME_ID));
+    assertThat(bean.getPreparation(), sameInstance(preparation));
   }
 
   @Test
   public void testUploadSuccessWithFile1Selected() throws Exception {
     final Part file = context.mock(Part.class);
     context.checking(conversationExpectations());
-    context.checking(uploadSuccessExpectations(file, false));
+    context.checking(uploadSuccessExpectations(file, true));
     
     bean.setFile1(file);
-    assertThat(bean.upload(), equalTo(AddCredentialBean.DETAILS_OUTCOME_ID));
-    assertThat(bean.getCredential(), sameInstance(credential));
+    assertThat(bean.upload(), equalTo(AddCredentialBean.PASSPHRASE_OUTCOME_ID));
+    assertThat(bean.getPreparation(), sameInstance(preparation));
   }
     
   @Test
   public void testUploadSuccessWithFile2Selected() throws Exception {
     final Part file = context.mock(Part.class);
     context.checking(conversationExpectations());
-    context.checking(uploadSuccessExpectations(file, false));
+    context.checking(uploadSuccessExpectations(file, true));
     
     bean.setFile2(file);
-    assertThat(bean.upload(), equalTo(AddCredentialBean.DETAILS_OUTCOME_ID));
-    assertThat(bean.getCredential(), sameInstance(credential));
+    assertThat(bean.upload(), equalTo(AddCredentialBean.PASSPHRASE_OUTCOME_ID));
+    assertThat(bean.getPreparation(), sameInstance(preparation));
+  }
+
+  @Test
+  public void testUploadWhenNoPassphraseRequired() throws Exception {
+    final Part file = context.mock(Part.class);
+    context.checking(conversationExpectations());
+    context.checking(uploadSuccessExpectations(file, false));
+    context.checking(new Expectations() { { 
+      oneOf(importService).createCredential(with(preparation), 
+          with(errors));
+      will(throwException(new ImportException()));
+    } });
+      
+    bean.setFile0(file);
+    assertThat(bean.upload(), equalTo(AddCredentialBean.FAILURE_OUTCOME_ID));
   }
 
   @Test
@@ -144,28 +164,17 @@ public class AddCredentialBeanTest {
     assertThat(bean.upload(), nullValue());
   }
 
-  @Test
-  public void testUploadWarning() throws Exception {
-    final Part file = context.mock(Part.class);
-    context.checking(conversationExpectations());
-    context.checking(uploadSuccessExpectations(file, true));
-    
-    bean.setFile0(file);
-    assertThat(bean.upload(), equalTo(AddCredentialBean.WARNINGS_OUTCOME_ID));
-    assertThat(bean.getCredential(), sameInstance(credential));
-  }
-
   @SuppressWarnings("unchecked")
   private Expectations uploadSuccessExpectations(final Part file,
-      final boolean hasWarnings) 
+      final boolean passphraseRequired) 
       throws Exception {
     return new Expectations() { {
       oneOf(importService).importCredential(
           (List<FileContentModel>) with(contains(new PartContent(file))), 
           with(errors));    
-      will(returnValue(credential));
-      oneOf(errors).hasWarnings();
-      will(returnValue(hasWarnings));
+      will(returnValue(preparation));
+      oneOf(preparation).isPassphraseRequired();
+      will(returnValue(passphraseRequired));
     } };
   }
     

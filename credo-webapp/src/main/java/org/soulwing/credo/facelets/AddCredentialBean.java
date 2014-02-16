@@ -36,6 +36,7 @@ import org.soulwing.credo.Tag;
 import org.soulwing.credo.service.Errors;
 import org.soulwing.credo.service.FileContentModel;
 import org.soulwing.credo.service.ImportException;
+import org.soulwing.credo.service.ImportPreparation;
 import org.soulwing.credo.service.ImportService;
 
 /**
@@ -47,15 +48,17 @@ import org.soulwing.credo.service.ImportService;
 @ConversationScoped
 public class AddCredentialBean implements Serializable {
 
-  static final String FILE_REQUIRED_MESSAGE = "requiresAtLeastOneFile";
-
   static final String DETAILS_OUTCOME_ID = "details";
 
   static final String WARNINGS_OUTCOME_ID = "warnings";
+  
+  static final String FAILURE_OUTCOME_ID = "failure";
 
   static final String SUCCESS_OUTCOME_ID = "success";
   
   static final String CANCEL_OUTCOME_ID = "cancel";
+  
+  static final String PASSPHRASE_OUTCOME_ID = "passphrase";
   
   private static final long serialVersionUID = -5565484780336702769L;
   
@@ -72,6 +75,8 @@ public class AddCredentialBean implements Serializable {
   private Part file1;
   private Part file2;
   
+  private ImportPreparation preparation;
+
   private Credential credential;
   
   /**
@@ -187,10 +192,32 @@ public class AddCredentialBean implements Serializable {
   }
 
   /**
+   * Gets the import preparation produced by the import service.
+   * <p>
+   * This method is exposed principally to support unit testing.
+   * @return preparation
+   */
+  ImportPreparation getPreparation() {
+    return preparation;
+  }
+
+  /**
+   * Sets the import preparation produced by the import service.
+   * <p>
+   * This method is exposed principally to support unit testing.
+   * @param preparation the preparation to set
+   */
+  void setPreparation(ImportPreparation preparation) {
+    this.preparation = preparation;
+  }
+
+  /**
    * Gets the credential that was produced by the import service.
+   * <p>
+   * This method is exposed principally to support unit testing.
    * @return credential
    */
-  public Credential getCredential() {
+  Credential getCredential() {
     return credential;
   }
   
@@ -213,16 +240,28 @@ public class AddCredentialBean implements Serializable {
     if (conversation.isTransient()) {
       conversation.begin();
     }
-    if (getFile0() == null && getFile1() == null && getFile2() == null) {
-      errors.addError(FILE_REQUIRED_MESSAGE);
-      return null;
-    }
     try {
-      credential = importService.importCredential(fileList(), errors);
-      return errors.hasWarnings() ? WARNINGS_OUTCOME_ID : DETAILS_OUTCOME_ID;
+      preparation = importService.importCredential(fileList(), errors);
+      if (!preparation.isPassphraseRequired()) {
+        return validate();
+      }
+      return PASSPHRASE_OUTCOME_ID;
     }
     catch (ImportException ex) {
       return null;
+    }
+  }
+  
+  public String validate() {
+    if (preparation == null) {
+      throw new IllegalStateException("import not prepared");
+    }
+    try {
+      importService.createCredential(preparation, errors);
+      return errors.hasWarnings() ? WARNINGS_OUTCOME_ID : DETAILS_OUTCOME_ID;
+    }
+    catch (ImportException ex) {
+      return FAILURE_OUTCOME_ID;
     }
   }
   
