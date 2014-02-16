@@ -32,12 +32,6 @@ import org.soulwing.credo.Tag;
  */
 public interface ImportService {
 
-  String FILE_REQUIRED_MESSAGE = "requiresAtLeastOneFile";
-  
-  String FILE_NOT_PERTINENT_MESSAGE = "importErrorNoPertinentContent";
-  
-  String FILE_IO_ERROR_MESSAGE = "importErrorReadingFile";
-  
   /**
    * Prepares the contents of a collection of files for import as a credential.
    * @param files files whose contents will be imported

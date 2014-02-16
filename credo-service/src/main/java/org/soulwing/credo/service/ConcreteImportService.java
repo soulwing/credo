@@ -47,7 +47,7 @@ public class ConcreteImportService implements ImportService {
   public ImportPreparation prepareImport(List<FileContentModel> files,
       Errors errors) throws ImportException {
     if (files.isEmpty()) {
-      errors.addError(ImportService.FILE_REQUIRED_MESSAGE);
+      errors.addError("importFileRequired");
       throw new ImportException();
     }
     CredentialBuilder builder = credentialBuilderFactory.newInstance();
@@ -58,12 +58,12 @@ public class ConcreteImportService implements ImportService {
         
         i++;
       }
-      catch (NoPertinentContentException ex) {
-        errors.addError("file" + i, ImportService.FILE_NOT_PERTINENT_MESSAGE, 
+      catch (NoContentException ex) {
+        errors.addError("file" + i, "importNoContent",
             file.getName());
       }
       catch (IOException ex) {
-        errors.addError("file" + i, ImportService.FILE_IO_ERROR_MESSAGE,
+        errors.addError("file" + i, "importReadError",
             file.getName());
       }
     }
