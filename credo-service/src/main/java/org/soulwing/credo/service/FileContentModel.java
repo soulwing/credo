@@ -29,6 +29,12 @@ import java.io.InputStream;
 public interface FileContentModel {
 
   /**
+   * Gets the name of the file.
+   * @return file name
+   */
+  String getName();
+  
+  /**
    * Gets the content type of the receiver.
    * @return MIME content type
    */

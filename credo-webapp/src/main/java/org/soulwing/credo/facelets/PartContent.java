@@ -54,6 +54,14 @@ public class PartContent implements FileContentModel {
    * {@inheritDoc}
    */
   @Override
+  public String getName() {
+    return part.getSubmittedFileName();
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
   public String getContentType() {
     return part.getContentType();
   }
