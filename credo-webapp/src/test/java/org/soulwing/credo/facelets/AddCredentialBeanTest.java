@@ -330,4 +330,46 @@ public class AddCredentialBeanTest {
     assertThat(bean.cancel(), equalTo(AddCredentialBean.CANCEL_OUTCOME_ID));
   }
   
+  @Test
+  public void testValidateWhenSuccess() throws Exception {
+    context.checking(new Expectations() { { 
+      oneOf(importService).createCredential(with(same(preparation)), 
+          with(same(errors)));
+      will(returnValue(credential));
+      oneOf(errors).hasWarnings();
+      will(returnValue(false));
+    } });
+    
+    bean.setPreparation(preparation);
+    assertThat(bean.validate(), equalTo(AddCredentialBean.DETAILS_OUTCOME_ID));
+    assertThat(bean.getCredential(), sameInstance(credential));
+  }
+
+  @Test
+  public void testValidateWhenWarnings() throws Exception {
+    context.checking(new Expectations() { { 
+      oneOf(importService).createCredential(with(same(preparation)), 
+          with(same(errors)));
+      will(returnValue(credential));
+      oneOf(errors).hasWarnings();
+      will(returnValue(true));
+    } });
+    
+    bean.setPreparation(preparation);
+    assertThat(bean.validate(), equalTo(AddCredentialBean.WARNINGS_OUTCOME_ID));
+    assertThat(bean.getCredential(), sameInstance(credential));
+  }
+
+  @Test
+  public void testValidateWhenError() throws Exception {
+    context.checking(new Expectations() { { 
+      oneOf(importService).createCredential(with(same(preparation)), 
+          with(same(errors)));
+      will(throwException(new ImportException()));
+    } });
+    
+    bean.setPreparation(preparation);
+    assertThat(bean.validate(), equalTo(AddCredentialBean.FAILURE_OUTCOME_ID));
+  }
+
 }

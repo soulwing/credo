@@ -38,6 +38,7 @@ import org.soulwing.credo.service.FileContentModel;
 import org.soulwing.credo.service.ImportException;
 import org.soulwing.credo.service.ImportPreparation;
 import org.soulwing.credo.service.ImportService;
+import org.soulwing.credo.service.PassphraseException;
 
 /**
  * A bean that supports the Add Credential interaction.
@@ -257,8 +258,11 @@ public class AddCredentialBean implements Serializable {
       throw new IllegalStateException("import not prepared");
     }
     try {
-      importService.createCredential(preparation, errors);
+      credential = importService.createCredential(preparation, errors);
       return errors.hasWarnings() ? WARNINGS_OUTCOME_ID : DETAILS_OUTCOME_ID;
+    }
+    catch (PassphraseException ex) {
+      return PASSPHRASE_OUTCOME_ID;
     }
     catch (ImportException ex) {
       return FAILURE_OUTCOME_ID;
