@@ -68,7 +68,15 @@ public class FacesContextErrors implements Errors {
    */
   @Override
   public void addError(String message, Object... args) {
-    getContext().addMessage(null, 
+    addError(null, message, args);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public void addError(String clientId, String message, Object... args) {
+    getContext().addMessage(clientId, 
         createMessage(FacesMessage.SEVERITY_ERROR, message, args));
   }
 
@@ -77,7 +85,15 @@ public class FacesContextErrors implements Errors {
    */
   @Override
   public void addWarning(String message, Object... args) {
-    getContext().addMessage(null, 
+    addWarning(null, message, args);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public void addWarning(String clientId, String message, Object... args) {
+    getContext().addMessage(clientId, 
         createMessage(FacesMessage.SEVERITY_WARN, message, args));
   }
 

@@ -45,7 +45,16 @@ public interface Errors extends Serializable {
    * @param args arguments for the message
    */
   void addError(String message, Object... args);
-  
+
+  /**
+   * Adds an error message to the receiver pertaining to a particular
+   * component.
+   * @param identifier for the client component where the error occurred
+   * @param message the message to add
+   * @param args arguments for the message
+   */
+  void addError(String clientId, String message, Object... args);
+ 
   /**
    * Adds a warning message to the receiver.
    * @param message the message to add
@@ -53,4 +62,14 @@ public interface Errors extends Serializable {
    */
   void addWarning(String message, Object... args);
   
+  /**
+   * Adds an warning message to the receiver pertaining to a particular
+   * component.
+   * @param identifier for the client component where the error occurred
+   * @param message the message to add
+   * @param args arguments for the message
+   */
+  void addWarning(String clientId, String message, Object... args);
+  
+
 }
