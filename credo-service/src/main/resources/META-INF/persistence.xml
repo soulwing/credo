@@ -11,8 +11,7 @@
       <property name="javax.persistence.schema-generation.drop-source"
         value="metadata" />
       <!-- property name="javax.persistence.sql-load-script-source"
-        value="META-INF/load-script.sql" />
-      <property name="eclipselink.logging.level" value="FINE" / -->
+        value="META-INF/load-script.sql" /-->
     </properties>
   </persistence-unit>
 </persistence>
