@@ -19,21 +19,15 @@
 package org.soulwing.credo.repository;
 
 import org.soulwing.credo.Tag;
+import org.soulwing.credo.TagFactory;
 
 /**
  * A repository of persistent {@link Tag} entities.
  *
  * @author Carl Harris
  */
-public interface TagRepository {
+public interface TagRepository extends TagFactory {
 
-  /**
-   * Creates a new transient tag instance.
-   * @param text text for the tag.
-   * @return tag instance
-   */
-  Tag newInstance(String text);
-  
   /**
    * Finds a tag by searching for an exact match of its text.
    * @param text the text to search

@@ -1,5 +1,5 @@
 /*
- * File created on Feb 16, 2014 
+ * File created on Feb 17, 2014 
  *
  * Copyright (c) 2014 Virginia Polytechnic Institute and State University
  *
@@ -16,18 +16,19 @@
  * limitations under the License.
  *
  */
-package org.soulwing.credo.repository;
-
-import org.soulwing.credo.Credential;
-import org.soulwing.credo.CredentialFactory;
+package org.soulwing.credo;
 
 /**
- * A repository of persistent {@link Credential} objects.
+ * A factory that produces {@link Credential} objects.
  *
  * @author Carl Harris
  */
-public interface CredentialRepository extends CredentialFactory {
+public interface CredentialFactory {
 
-  void add(Credential credential);
+  /**
+   * Creates a new (transient) credential object.
+   * @return credential object
+   */
+  Credential newCredential();
   
 }
