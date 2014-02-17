@@ -41,7 +41,7 @@ public class TagEntity extends AbstractEntity implements Tag {
    * {@inheritDoc}
    */
   @Override
-  @Column(unique = true, length = 50)
+  @Column(unique = true, nullable = false, length = 50)
   public String getText() {
     return text;
   }

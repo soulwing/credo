@@ -52,7 +52,7 @@ public class CredentialEntity extends AbstractEntity implements Credential {
    * {@inheritDoc}
    */
   @Override
-  @Column(unique = true, length = 100)
+  @Column(unique = true, nullable = false, length = 100)
   public String getName() {
     return name;
   }
