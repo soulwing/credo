@@ -27,7 +27,7 @@ import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.Lob;
-import javax.persistence.OneToMany;
+import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 
 import org.soulwing.credo.Credential;
@@ -86,7 +86,7 @@ public class CredentialEntity extends AbstractEntity implements Credential {
    * {@inheritDoc}
    */
   @Override
-  @OneToMany(fetch = FetchType.LAZY)
+  @ManyToMany(fetch = FetchType.LAZY)
   @JoinTable(name = "credential_tag", inverseJoinColumns = { 
       @JoinColumn(name = "tag_id")
   })
