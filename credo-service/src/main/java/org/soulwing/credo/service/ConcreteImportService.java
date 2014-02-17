@@ -19,26 +19,38 @@
 package org.soulwing.credo.service;
 
 import java.io.IOException;
-import java.util.Collections;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
-import javax.enterprise.context.ApplicationScoped;
+import javax.ejb.ConcurrencyManagement;
+import javax.ejb.ConcurrencyManagementType;
+import javax.ejb.Singleton;
 import javax.inject.Inject;
+import javax.transaction.Transactional;
 
 import org.soulwing.credo.Credential;
 import org.soulwing.credo.Tag;
+import org.soulwing.credo.repository.CredentialRepository;
+import org.soulwing.credo.repository.TagRepository;
 
 /**
  * A concrete implementation of {@link ImportService}.
  *
  * @author Carl Harris
  */
-@ApplicationScoped
+@Singleton
+@ConcurrencyManagement(ConcurrencyManagementType.BEAN)
 public class ConcreteImportService implements ImportService {
 
   @Inject
   protected CredentialBuilderFactory credentialBuilderFactory;
+  
+  @Inject
+  protected CredentialRepository credentialRepository;
+  
+  @Inject
+  protected TagRepository tagRepository;
   
   /**
    * {@inheritDoc}
@@ -85,18 +97,19 @@ public class ConcreteImportService implements ImportService {
           "preparation was not created by this service");
     }
 
-    
-    return null;
+    CredentialBuilder builder = (CredentialBuilder) preparation;
+    builder.validate(errors);
+    return builder.build();
   }
 
   /**
    * {@inheritDoc}
    */
   @Override
+  @Transactional
   public void saveCredential(Credential credential, Errors errors)
       throws ImportException {
-    // TODO Auto-generated method stub
-    
+    credentialRepository.add(credential);
   }
 
   /**
@@ -104,7 +117,15 @@ public class ConcreteImportService implements ImportService {
    */
   @Override
   public Set<? extends Tag> resolveTags(String[] tokens) {
-    return Collections.emptySet();
+    Set<Tag> tags = new LinkedHashSet<>();
+    for (String token : tokens) {
+      Tag tag = tagRepository.findByTagText(token);
+      if (tag == null) {
+        tag = tagRepository.newInstance(token);
+      }
+      tags.add(tag);
+    }
+    return tags;
   }
   
 }

@@ -21,6 +21,8 @@ package org.soulwing.credo.service;
 import java.util.List;
 import java.util.Set;
 
+import javax.ejb.Local;
+
 import org.soulwing.credo.Credential;
 import org.soulwing.credo.Tag;
 
@@ -29,6 +31,7 @@ import org.soulwing.credo.Tag;
  *
  * @author Carl Harris
  */
+@Local
 public interface ImportService {
 
   /**
