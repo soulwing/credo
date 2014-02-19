@@ -19,6 +19,7 @@
 package org.soulwing.credo.facelets;
 
 import java.text.MessageFormat;
+import java.util.MissingResourceException;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.faces.application.FacesMessage;
@@ -106,9 +107,14 @@ public class FacesContextErrors implements Errors {
    */
   private FacesMessage createMessage(FacesMessage.Severity severity, 
       String message, Object... args) {
-    String pattern = Bundle.get().getString(message);
-    return new FacesMessage(severity,
-        MessageFormat.format(pattern, args), null);
+    try {
+      String pattern = Bundle.get().getString(message);
+      return new FacesMessage(severity,
+          MessageFormat.format(pattern, args), null);
+    }
+    catch (MissingResourceException ex) {
+      return new FacesMessage(severity, "???" + message + "???", null);
+    }
   }
 
 }
