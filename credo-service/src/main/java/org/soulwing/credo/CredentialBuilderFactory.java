@@ -19,16 +19,22 @@
 package org.soulwing.credo;
 
 /**
- * A factory that produces {@link Credential} objects.
+ * A factory that produces {@link CredentialBuilder} objects.
  *
  * @author Carl Harris
  */
-public interface CredentialFactory {
+public interface CredentialBuilderFactory {
 
   /**
-   * Creates a new (transient) credential object.
-   * @return credential object
+   * Creates a new credential builder.
+   * @return credential builder
    */
-  Credential newCredential();
+  CredentialBuilder newCredentialBuilder();
   
+  /**
+   * Creates a new certificate builder.
+   * @return certificate builder
+   */
+  CredentialCertificateBuilder newCertificateBuilder();
+
 }

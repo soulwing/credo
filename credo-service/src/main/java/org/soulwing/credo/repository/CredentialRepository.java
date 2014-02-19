@@ -19,14 +19,13 @@
 package org.soulwing.credo.repository;
 
 import org.soulwing.credo.Credential;
-import org.soulwing.credo.CredentialFactory;
 
 /**
  * A repository of persistent {@link Credential} objects.
  *
  * @author Carl Harris
  */
-public interface CredentialRepository extends CredentialFactory {
+public interface CredentialRepository {
 
   void add(Credential credential);
   

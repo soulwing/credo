@@ -1,4 +1,4 @@
-activeProfiles=wildfly-datasource
+activeProfiles=wildfly-datasource arquillian-wildfly-managed
 eclipse.preferences.version=1
 resolveWorkspaceProjects=true
 version=1

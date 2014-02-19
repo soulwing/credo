@@ -14,12 +14,18 @@
   <name>Credo Service Tier</name>
 
   <build>
+    <plugins>
+      <plugin>
+        <artifactId>maven-dependency-plugin</artifactId>
+      </plugin>
+    </plugins>
   </build>
 
   <dependencies>
     <dependency>
-      <groupId>javax</groupId>
-      <artifactId>javaee-api</artifactId>
+      <groupId>org.jboss.spec</groupId>
+      <artifactId>jboss-javaee-7.0</artifactId>
+      <type>pom</type>
     </dependency>
     <dependency>
       <groupId>org.bouncycastle</groupId>
@@ -40,6 +46,16 @@
     <dependency>
       <groupId>org.jmock</groupId>
       <artifactId>jmock-junit4</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.jboss.arquillian.junit</groupId>
+      <artifactId>arquillian-junit-container</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.jboss.shrinkwrap.resolver</groupId>
+      <artifactId>shrinkwrap-resolver-depchain</artifactId>
+      <type>pom</type>
     </dependency>
   </dependencies>
 </project>
