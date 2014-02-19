@@ -35,12 +35,6 @@ public interface FileContentModel {
   String getName();
   
   /**
-   * Gets the content type of the receiver.
-   * @return MIME content type
-   */
-  String getContentType();
-  
-  /**
    * Gets an input stream that can be used to retrieve the receiver's content.
    * @return input stream
    * @throws IOException
