@@ -20,13 +20,14 @@ package org.soulwing.credo.facelets;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.allOf;
-import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasItemInArray;
+import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.Matchers.sameInstance;
 
+import java.io.ByteArrayInputStream;
 import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -75,7 +76,7 @@ public class AddCredentialBeanTest {
   public Credential credential;
   
   private AddCredentialBean bean = new AddCredentialBean();
-
+  
   @Before
   public void setUp() throws Exception {
     bean.conversation = conversation;
@@ -139,8 +140,11 @@ public class AddCredentialBeanTest {
     context.checking(conversationExpectations());
     context.checking(uploadSuccessExpectations(file, false));
     context.checking(new Expectations() { { 
+      allowing(preparation).isPassphraseRequired();
+      will(returnValue(false));
       oneOf(importService).createCredential(with(preparation), 
           with(errors));
+      // throw an exception here to avoid having to deal with credential creation
       will(throwException(new ImportException()));
     } });
       
@@ -154,8 +158,10 @@ public class AddCredentialBeanTest {
     final Part file = context.mock(Part.class);
     context.checking(conversationExpectations());
     context.checking(new Expectations() { {
+      allowing(file).getInputStream();
+      will(returnValue(new ByteArrayInputStream(new byte[0])));
       oneOf(importService).prepareImport(
-          (List<FileContentModel>) with(contains(new PartContent(file))), 
+          (List<FileContentModel>) with(not(empty())), 
           with(errors));
       will(throwException(new ImportException()));
     } });
@@ -169,8 +175,10 @@ public class AddCredentialBeanTest {
       final boolean passphraseRequired) 
       throws Exception {
     return new Expectations() { {
+      allowing(file).getInputStream();
+      will(returnValue(new ByteArrayInputStream(new byte[0])));
       oneOf(importService).prepareImport(
-          (List<FileContentModel>) with(contains(new PartContent(file))), 
+          (List<FileContentModel>) with(not(empty())), 
           with(errors));    
       will(returnValue(preparation));
       oneOf(preparation).isPassphraseRequired();
@@ -333,6 +341,8 @@ public class AddCredentialBeanTest {
   @Test
   public void testValidateWhenSuccess() throws Exception {
     context.checking(new Expectations() { { 
+      allowing(preparation).isPassphraseRequired();
+      will(returnValue(false));
       oneOf(importService).createCredential(with(same(preparation)), 
           with(same(errors)));
       will(returnValue(credential));
@@ -348,6 +358,8 @@ public class AddCredentialBeanTest {
   @Test
   public void testValidateWhenWarnings() throws Exception {
     context.checking(new Expectations() { { 
+      allowing(preparation).isPassphraseRequired();
+      will(returnValue(false));
       oneOf(importService).createCredential(with(same(preparation)), 
           with(same(errors)));
       will(returnValue(credential));
@@ -363,6 +375,8 @@ public class AddCredentialBeanTest {
   @Test
   public void testValidateWhenError() throws Exception {
     context.checking(new Expectations() { { 
+      allowing(preparation).isPassphraseRequired();
+      will(returnValue(false));
       oneOf(importService).createCredential(with(same(preparation)), 
           with(same(errors)));
       will(throwException(new ImportException()));
@@ -371,5 +385,38 @@ public class AddCredentialBeanTest {
     bean.setPreparation(preparation);
     assertThat(bean.validate(), equalTo(AddCredentialBean.FAILURE_OUTCOME_ID));
   }
+
+  @Test
+  @SuppressWarnings("unchecked")
+  public void testValidateAfterCollectingPassphrase() throws Exception {
+    final Part file = context.mock(Part.class);
+    final ImportPreparation preparation2 = context.mock(
+        ImportPreparation.class, "prepartion2");
+    final char[] passphrase = new char[0];
+    context.checking(new Expectations() { { 
+      allowing(file).getInputStream();
+      will(returnValue(new ByteArrayInputStream(new byte[0])));
+      allowing(preparation).isPassphraseRequired();
+      will(returnValue(true));
+      oneOf(importService).prepareImport(
+          (List<FileContentModel>) with(not(empty())), 
+          with(errors));
+      will(returnValue(preparation2));
+      oneOf(preparation).getPassphrase();
+      will(returnValue(passphrase));
+      oneOf(preparation2).setPassphrase(with(same(passphrase)));
+      oneOf(importService).createCredential(with(same(preparation2)), 
+          with(same(errors)));
+      will(returnValue(credential));
+      oneOf(errors).hasWarnings();
+      will(returnValue(false));
+    } });
+    
+    bean.setFile0(file);
+    bean.setPreparation(preparation);
+    assertThat(bean.validate(), equalTo(AddCredentialBean.DETAILS_OUTCOME_ID));
+    assertThat(bean.getCredential(), sameInstance(credential));
+  }
+
 
 }

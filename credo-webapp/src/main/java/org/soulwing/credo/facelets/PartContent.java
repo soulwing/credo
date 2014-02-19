@@ -18,11 +18,15 @@
  */
 package org.soulwing.credo.facelets;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.Serializable;
 
 import javax.servlet.http.Part;
 
+import org.apache.commons.lang.Validate;
 import org.soulwing.credo.service.FileContentModel;
 
 /**
@@ -30,18 +34,15 @@ import org.soulwing.credo.service.FileContentModel;
  *
  * @author Carl Harris
  */
-public class PartContent implements FileContentModel {
-
-  private final Part part;
+public class PartContent implements FileContentModel, Serializable {
   
-  /**
-   * Constructs a new instance.
-   * @param part the part delegate
-   */
-  public PartContent(Part part) {
-    this.part = part;
-  }
+  private static final long serialVersionUID = -8172871818481456381L;
 
+  private byte[] content;
+  
+  private transient Part part;
+  
+  
   /**
    * Gets the {@link Part} delegate.
    * @return part delegate
@@ -51,10 +52,20 @@ public class PartContent implements FileContentModel {
   }
 
   /**
+   * Sets the {@link Part} delegate.
+   * @param part the part delegate to set
+   */
+  public void setPart(Part part) {
+    this.part = part;
+    this.content = null;
+  }
+
+  /**
    * {@inheritDoc}
    */
   @Override
   public String getName() {
+    if (part == null) return null;
     return part.getSubmittedFileName();
   }
 
@@ -62,34 +73,37 @@ public class PartContent implements FileContentModel {
    * {@inheritDoc}
    */
   @Override
-  public String getContentType() {
-    return part.getContentType();
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
   public InputStream getInputStream() throws IOException {
-    return part.getInputStream();
+    Validate.notNull(content, "content not loaded");
+    return new ByteArrayInputStream(content);
   }
 
   /**
-   * {@inheritDoc}
+   * Tests whether the receiver has loadable content.
+   * @return {@code true} if the receiver has content to load
    */
-  @Override
-  public int hashCode() {
-    return part.hashCode();
+  public boolean isLoadable() {
+    return part != null;
   }
-
+  
   /**
-   * {@inheritDoc}
+   * Loads the uploaded content.
+   * @throws IOException
    */
-  @Override
-  public boolean equals(Object obj) {
-    if (obj == this) return true;
-    if (!(obj instanceof PartContent)) return false;
-    return this.part == ((PartContent) obj).part;
+  public void load() throws IOException {
+    if (content != null) return;
+    Validate.notNull(part, "part not set");
+    try (InputStream inputStream = part.getInputStream(); 
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
+      byte[] buf = new byte[8192];
+      int numRead = inputStream.read(buf);
+      while (numRead != -1) {
+        outputStream.write(buf, 0, numRead);
+        numRead = inputStream.read(buf);
+      }
+      outputStream.flush();
+      this.content = outputStream.toByteArray();
+    }
   }
-
+  
 }

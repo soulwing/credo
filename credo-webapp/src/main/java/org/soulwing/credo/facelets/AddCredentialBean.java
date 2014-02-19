@@ -18,6 +18,7 @@
  */
 package org.soulwing.credo.facelets;
 
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -64,6 +65,10 @@ public class AddCredentialBean implements Serializable {
   
   private static final long serialVersionUID = -5565484780336702769L;
   
+  private final PartContent file0 = new PartContent();
+  private final PartContent file1 = new PartContent();
+  private final PartContent file2 = new PartContent();
+
   @Inject
   protected Conversation conversation;
   
@@ -73,9 +78,6 @@ public class AddCredentialBean implements Serializable {
   @Inject
   protected ImportService importService;
   
-  private Part file0;
-  private Part file1;
-  private Part file2;
   
   private ImportPreparation preparation;
 
@@ -86,15 +88,15 @@ public class AddCredentialBean implements Serializable {
    * @return
    */
   public Part getFile0() {
-    return file0;
+    return file0.getPart();
   }
 
   /**
    * Sets the {@code file0} property.
    * @param file0
    */
-  public void setFile0(Part file0) {
-    this.file0 = file0;
+  public void setFile0(Part part) {
+    file0.setPart(part);
   }
 
   /**
@@ -102,15 +104,15 @@ public class AddCredentialBean implements Serializable {
    * @return
    */
   public Part getFile1() {
-    return file1;
+    return file1.getPart();
   }
 
   /**
    * Sets the {@code file1} property.
    * @param file1
    */
-  public void setFile1(Part file1) {
-    this.file1 = file1;
+  public void setFile1(Part part) {
+    file1.setPart(part);
   }
 
   /**
@@ -118,15 +120,15 @@ public class AddCredentialBean implements Serializable {
    * @return
    */
   public Part getFile2() {
-    return file2;
+    return file2.getPart();
   }
 
   /**
    * Sets the {@code file2} property.
    * @param file2
    */
-  public void setFile2(Part file2) {
-    this.file2 = file2;
+  public void setFile2(Part part) {
+    file2.setPart(part);
   }
 
   /**
@@ -271,6 +273,9 @@ public class AddCredentialBean implements Serializable {
     catch (ImportException ex) {
       return null;
     }
+    catch (IOException ex) {
+      throw new RuntimeException(ex);
+    }
   }
   
   public String validate() {
@@ -278,6 +283,11 @@ public class AddCredentialBean implements Serializable {
       throw new IllegalStateException("import not prepared");
     }
     try {
+      if (preparation.isPassphraseRequired()) {
+        ImportPreparation previous = preparation;
+        preparation = importService.prepareImport(fileList(), errors);
+        preparation.setPassphrase(previous.getPassphrase());
+      }
       credential = importService.createCredential(preparation, errors);
       return errors.hasWarnings() ? WARNINGS_OUTCOME_ID : DETAILS_OUTCOME_ID;
     }
@@ -286,6 +296,9 @@ public class AddCredentialBean implements Serializable {
     }
     catch (ImportException ex) {
       return FAILURE_OUTCOME_ID;
+    }
+    catch (IOException ex) {
+      throw new RuntimeException(ex);
     }
   }
   
@@ -320,17 +333,21 @@ public class AddCredentialBean implements Serializable {
   /**
    * Produces a list containing the files that were uploaded by the user.
    * @return list of file content models
+   * @throws IOException
    */
-  private List<FileContentModel> fileList() {
+  private List<FileContentModel> fileList() throws IOException {
     List<FileContentModel> files = new ArrayList<FileContentModel>();
-    if (getFile0() != null) {
-      files.add(new PartContent(getFile0()));
+    if (file0.isLoadable()) {
+      file0.load();
+      files.add(file0);
     }
-    if (getFile1() != null) {
-      files.add(new PartContent(getFile1()));
+    if (file1.isLoadable()) {
+      file1.load();
+      files.add(file1);
     }
-    if (getFile2() != null) {
-      files.add(new PartContent(getFile2()));
+    if (file2.isLoadable()) {
+      file2.load();
+      files.add(file2);
     }
     return files;
   }
