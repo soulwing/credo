@@ -20,33 +20,18 @@ package org.soulwing.credo.service;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.StringWriter;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import javax.security.auth.x500.X500Principal;
 
-import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
-import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.bouncycastle.cert.X509CertificateHolder;
 import org.bouncycastle.crypto.params.AsymmetricKeyParameter;
 import org.bouncycastle.crypto.params.RSAKeyParameters;
 import org.bouncycastle.crypto.params.RSAPrivateCrtKeyParameters;
-import org.bouncycastle.crypto.util.PrivateKeyFactory;
-import org.bouncycastle.crypto.util.PublicKeyFactory;
 import org.bouncycastle.openssl.PEMKeyPair;
-import org.bouncycastle.openssl.PEMParser;
-import org.bouncycastle.openssl.PEMWriter;
-import org.bouncycastle.openssl.PKCS8Generator;
-import org.bouncycastle.openssl.jcajce.JceOpenSSLPKCS8DecryptorProviderBuilder;
-import org.bouncycastle.openssl.jcajce.JceOpenSSLPKCS8EncryptorBuilder;
-import org.bouncycastle.operator.InputDecryptorProvider;
-import org.bouncycastle.operator.OperatorCreationException;
-import org.bouncycastle.operator.OutputEncryptor;
 import org.bouncycastle.pkcs.PKCS8EncryptedPrivateKeyInfo;
-import org.bouncycastle.pkcs.PKCSException;
 import org.soulwing.credo.Credential;
 import org.soulwing.credo.CredentialBuilder;
 import org.soulwing.credo.CredentialBuilderFactory;
@@ -61,15 +46,13 @@ import org.soulwing.credo.CredentialCertificateBuilder;
 public class BcCredentialImporter implements CredentialImporter {
   
   private final List<Object> objects = new ArrayList<Object>();
-
-  private final List<X509CertificateHolder> chain = 
-      new ArrayList<X509CertificateHolder>();
   
   private final CredentialBuilderFactory credentialBuilderFactory;
   
-  private char[] passphrase;
-  
+  private char[] passphrase;  
   private Object privateKey;
+  private X509CertificateHolder certificate;
+  private List<X509CertificateHolder> chain; 
   
   /**
    * Constructs a new instance.
@@ -86,19 +69,11 @@ public class BcCredentialImporter implements CredentialImporter {
   @Override
   public void loadFile(InputStream inputStream) 
       throws IOException, NoContentException {
-    int count = 0;
-    try (PEMParser parser = new PEMParser(
-        new InputStreamReader(inputStream, "UTF-8"))) {
-      Object obj = parser.readObject();
-      while (obj != null) {
-        count++;
-        objects.add(obj);
-        obj = parser.readObject();
-      }
-    }
-    if (count == 0) {
+    List<Object> objects = BcPemUtil.readAllObjects(inputStream);
+    if (objects.isEmpty()) {
       throw new NoContentException();
     }
+    this.objects.addAll(objects);
   }
 
   /**
@@ -107,30 +82,32 @@ public class BcCredentialImporter implements CredentialImporter {
   @Override
   public void validate(Errors errors) throws ImportException,
       PassphraseException {
+
     privateKey = findPrivateKey(errors);
     
-    X509CertificateHolder subjectCert = findSubjectCertificate(
-        extractPrivateKey(extractPrivateKeyInfo(privateKey), errors), errors);
-    chain.add(subjectCert);
-    
-    X509CertificateHolder issuerCert = findIssuerCertificate(subjectCert);
-    while (issuerCert != null
-        && !issuerCert.getSubject().equals(issuerCert.getIssuer())) {
-      chain.add(issuerCert);
-      issuerCert = findIssuerCertificate(issuerCert);
-    }
-    if (issuerCert != null) {
-      chain.add(issuerCert);
-    }
-    if (issuerCert == null) {
-      errors.addWarning("importIncompleteTrustChain");
-    }
-    
+    certificate = findSubjectCertificate(
+        extractPrivateKey(privateKey, errors), errors);
+        
+    chain = findAuthorityChain(certificate, errors);    
   }
 
-  private Object findPrivateKey(Errors errors) 
-      throws ImportException, PassphraseException {
+  private Object findPrivateKey(Errors errors) throws ImportException {
+    Object key = findPrivateKeyObject(null);
+    if (key == null) {
+      errors.addError("importNoPrivateKey");
+    }
+    else if (findPrivateKeyObject(key) != null) {
+      errors.addError("importMultiplePrivateKeys");
+    }
+    if (errors.hasErrors()) {
+      throw new ImportException();
+    }
+    return key;
+  }
+
+  private Object findPrivateKeyObject(Object key)  {
     for (Object obj : objects) {
+      if (key != null && obj == key) continue;
       if (obj instanceof PKCS8EncryptedPrivateKeyInfo) {
         return obj;
       }
@@ -138,75 +115,32 @@ public class BcCredentialImporter implements CredentialImporter {
         return obj;
       }
     }
-    errors.addError("importNoPrivateKey");
-    throw new ImportException();
+    return null;
   }
 
-  private PrivateKeyInfo extractPrivateKeyInfo(Object key) 
-      throws PassphraseException {
-    if (key instanceof PKCS8EncryptedPrivateKeyInfo) {
-      return decryptPrivateKey((PKCS8EncryptedPrivateKeyInfo) key);
-    }
-    else if (key instanceof PEMKeyPair) {
-      return ((PEMKeyPair) key).getPrivateKeyInfo();
-    }
-    else {
-      throw new AssertionError("unexpected key type " 
-            + key.getClass().getName());
-    }
-  }
-  
-  private RSAPrivateCrtKeyParameters extractPrivateKey(
-      PrivateKeyInfo privateKeyInfo, Errors errors) throws ImportException {
-    try {      
-      AsymmetricKeyParameter privateKey = PrivateKeyFactory.createKey(
-          privateKeyInfo);
-      if (!(privateKey instanceof RSAPrivateCrtKeyParameters)) {
+  private RSAPrivateCrtKeyParameters extractPrivateKey(Object key, 
+      Errors errors) throws ImportException {
+    try {
+      AsymmetricKeyParameter derivedKey = BcPemUtil.extractPrivateKey(
+          BcPemUtil.extractPrivateKeyInfo(key, passphrase));
+      if (!(derivedKey instanceof RSAPrivateCrtKeyParameters)) {
         errors.addError("importUnsupportedKeyType");
         throw new ImportException();
       }
-      return (RSAPrivateCrtKeyParameters) privateKey;
+      return (RSAPrivateCrtKeyParameters) derivedKey;
     }
-    catch (IOException ex) {
-      throw new RuntimeException(ex);
-    }
-  }
-  
-  private PrivateKeyInfo decryptPrivateKey(
-      PKCS8EncryptedPrivateKeyInfo encryptedPrivateKeyInfo) 
-      throws PassphraseException {
-    try {
-      return encryptedPrivateKeyInfo.decryptPrivateKeyInfo(
-          createPrivateKeyDecryptor());
-    }
-    catch (PKCSException ex) {
+    catch (IllegalArgumentException ex) {
       throw new PassphraseException();
     }
   }
 
-  private InputDecryptorProvider createPrivateKeyDecryptor() {
-    try {
-      assertPassphraseAvailable();
-      return new JceOpenSSLPKCS8DecryptorProviderBuilder().build(passphrase);
-    }
-    catch (OperatorCreationException ex) {
-      throw new RuntimeException(ex);
-    }
-  }
-
-  private void assertPassphraseAvailable() {
-    if (passphrase == null) {
-      throw new AssertionError("passphrase is required and not set");
-    }
-  }
-  
   private X509CertificateHolder findSubjectCertificate(
       RSAPrivateCrtKeyParameters privateKey, Errors errors) 
           throws ImportException {
     for (Object obj : objects) {
       if (obj instanceof X509CertificateHolder) {
         X509CertificateHolder cert = (X509CertificateHolder) obj;
-        AsymmetricKeyParameter key = createPublicKey(
+        AsymmetricKeyParameter key = BcPemUtil.createPublicKey(
             cert.getSubjectPublicKeyInfo());
         if (key instanceof RSAKeyParameters) {
           RSAKeyParameters publicKey = (RSAKeyParameters) key;
@@ -223,16 +157,25 @@ public class BcCredentialImporter implements CredentialImporter {
     throw new ImportException();
   }
   
-  private AsymmetricKeyParameter createPublicKey(
-      SubjectPublicKeyInfo publicKeyInfo) {
-    try {
-      return PublicKeyFactory.createKey(publicKeyInfo);
+  private List<X509CertificateHolder> findAuthorityChain(
+      X509CertificateHolder certificate, Errors errors) {
+    
+    List<X509CertificateHolder> chain = new ArrayList<>();
+    X509CertificateHolder issuerCert = findIssuerCertificate(certificate);
+    while (issuerCert != null
+        && !issuerCert.getSubject().equals(issuerCert.getIssuer())) {
+      chain.add(issuerCert);
+      issuerCert = findIssuerCertificate(issuerCert);
     }
-    catch (IOException ex) {
-      throw new RuntimeException(ex);
+    if (issuerCert != null) {
+      chain.add(issuerCert);
     }
+    if (issuerCert == null) {
+      errors.addWarning("importIncompleteTrustChain");
+    }
+    return chain;
   }
-  
+
   private X509CertificateHolder findIssuerCertificate(
       X509CertificateHolder subjectCert) {
     for (Object obj : objects) {
@@ -252,38 +195,14 @@ public class BcCredentialImporter implements CredentialImporter {
   @Override
   public Credential build() {
     CredentialBuilder builder = credentialBuilderFactory.newCredentialBuilder();
-    builder.setPrivateKey(createPrivateKeyContent());
-    Iterator<X509CertificateHolder> i = chain.iterator();
-    builder.setCertificate(createCertificate(i.next()));
-    while (i.hasNext()) {
-      builder.addAuthorityCertificate(createCertificate(i.next()));
+    builder.setPrivateKey(createPrivateKeyContent(privateKey));
+    builder.setCertificate(createCertificate(certificate));
+    for (X509CertificateHolder authority : chain) {
+      builder.addAuthorityCertificate(createCertificate(authority));
     }
     return builder.build();
   }
 
-  private String createPrivateKeyContent() {
-    StringWriter stringWriter = new StringWriter();
-    try (PEMWriter pemWriter = new PEMWriter(stringWriter)) {
-      PrivateKeyInfo privateKeyInfo = extractPrivateKeyInfo(privateKey);
-      if (passphrase == null) {
-        pemWriter.writeObject(privateKeyInfo);
-      }
-      else {
-        PKCS8Generator generator = new PKCS8Generator(privateKeyInfo, 
-            createPrivateKeyEncryptor());
-        pemWriter.writeObject(generator.generate());
-      }
-      pemWriter.flush();
-      return stringWriter.toString();
-    }
-    catch (PassphraseException ex) {
-      throw new RuntimeException(ex);
-    }
-    catch (IOException ex) {
-      throw new RuntimeException(ex);
-    }
-  }
-  
   private CredentialCertificate createCertificate(
       X509CertificateHolder certificate) {
     CredentialCertificateBuilder builder = 
@@ -297,33 +216,29 @@ public class BcCredentialImporter implements CredentialImporter {
     return builder.build();    
   }
 
+  private String createPrivateKeyContent(Object privateKey) {
+    StringWriter writer = new StringWriter();
+    try {
+      BcPemUtil.writePrivateKey(privateKey, passphrase, writer);
+      return writer.toString();
+    }
+    catch (IOException ex) {
+      throw new RuntimeException(ex);
+    }
+  }
+
   private String createCertificateContent(
       X509CertificateHolder certificate) {
-    StringWriter stringWriter = new StringWriter();
-    try (PEMWriter pemWriter = new PEMWriter(stringWriter)) {
-      pemWriter.writeObject(certificate);
-      pemWriter.flush();
-      return stringWriter.toString();
+    StringWriter writer = new StringWriter();
+    try {
+      BcPemUtil.writeCertificate(certificate, writer);
+      return writer.toString();
     }
     catch (IOException ex) {
       throw new RuntimeException(ex);
     }
   }
   
-  private OutputEncryptor createPrivateKeyEncryptor() {
-    try {
-      assertPassphraseAvailable();
-      return new JceOpenSSLPKCS8EncryptorBuilder(
-          PKCS8Generator.PBE_SHA1_3DES)
-          .setPasssword(passphrase)
-          .setIterationCount(100)
-          .build();
-    }
-    catch (OperatorCreationException ex) {
-      throw new RuntimeException(ex);
-    }
-  }
-
   @Override
   public boolean isPassphraseRequired() {
     for (Object obj : objects) {
