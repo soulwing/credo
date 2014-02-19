@@ -24,7 +24,7 @@ package org.soulwing.credo.service;
  *
  * @author Carl Harris
  */
-public class PassphraseException extends Exception {
+public class PassphraseException extends ImportException {
 
   private static final long serialVersionUID = -4797305467764987599L;
 

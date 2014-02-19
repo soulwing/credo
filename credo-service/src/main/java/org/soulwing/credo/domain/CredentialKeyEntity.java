@@ -1,5 +1,5 @@
 /*
- * File created on Feb 16, 2014 
+ * File created on Feb 18, 2014 
  *
  * Copyright (c) 2014 Virginia Polytechnic Institute and State University
  *
@@ -16,16 +16,23 @@
  * limitations under the License.
  *
  */
-package org.soulwing.credo.service;
+package org.soulwing.credo.domain;
+
+import javax.persistence.Entity;
+import javax.persistence.Table;
+
+import org.soulwing.credo.CredentialKey;
 
 /**
- * An exception thrown when an imported file contains nothing of interest to
- * a {@link CredentialImporter}.
+ * A {@link CredentialKey} implemented as a JPA entity.
  *
  * @author Carl Harris
  */
-public class NoContentException extends Exception {
+@Entity
+@Table(name = "credential_key")
+public class CredentialKeyEntity extends CredentialComponentEntity 
+    implements CredentialKey {
 
-  private static final long serialVersionUID = -2809097677243363079L;
+  private static final long serialVersionUID = 1989015823707931759L;
 
 }

@@ -53,10 +53,10 @@ public class ConcreteImportServiceTest {
   public final JUnitRuleMockery context = new JUnitRuleMockery();
   
   @Mock
-  private CredentialBuilderFactory factory;
+  private CredentialImporterFactory importerFactory;
   
   @Mock
-  private CredentialBuilder builder;
+  private CredentialImporter importer;
   
   @Mock
   private Credential credential;
@@ -74,7 +74,7 @@ public class ConcreteImportServiceTest {
   
   @Before
   public void setUp() throws Exception {
-    importService.credentialBuilderFactory = factory;
+    importService.importerFactory = importerFactory;
     importService.credentialRepository = credentialRepository;
     importService.tagRepository = tagRepository;
   }
@@ -82,6 +82,8 @@ public class ConcreteImportServiceTest {
   @Test(expected = ImportException.class)
   public void testPrepareImportWithNoFiles() throws Exception {
     context.checking(new Expectations() { {
+      oneOf(importerFactory).newImporter();
+      will(returnValue(importer));
       oneOf(errors).addError(
           with(containsString("Required")),
           with(emptyArray()));
@@ -97,13 +99,13 @@ public class ConcreteImportServiceTest {
     final InputStream inputStream = new ByteArrayInputStream(new byte[0]);
     final String name = "someFileName";
     context.checking(new Expectations() { {
-      oneOf(factory).newInstance();
-      will(returnValue(builder));
       oneOf(file).getInputStream();
       will(returnValue(inputStream));
       oneOf(file).getName();
       will(returnValue(name));
-      oneOf(builder).loadFile(with(same(inputStream)));
+      oneOf(importerFactory).newImporter();
+      will(returnValue(importer));
+      oneOf(importer).loadFile(with(same(inputStream)));
       will(throwException(new IOException()));
       oneOf(errors).addError(with("file0"),
           with(containsString("Error")),
@@ -122,13 +124,13 @@ public class ConcreteImportServiceTest {
     final InputStream inputStream = new ByteArrayInputStream(new byte[0]);
     final String name = "someFileName";
     context.checking(new Expectations() { {
-      oneOf(factory).newInstance();
-      will(returnValue(builder));
       oneOf(file).getInputStream();
       will(returnValue(inputStream));
       oneOf(file).getName();
       will(returnValue(name));
-      oneOf(builder).loadFile(with(same(inputStream)));
+      oneOf(importerFactory).newImporter();
+      will(returnValue(importer));
+      oneOf(importer).loadFile(with(same(inputStream)));
       will(throwException(new NoContentException()));
       oneOf(errors).addError(with("file0"),
           with(containsString("Content")),
@@ -144,22 +146,22 @@ public class ConcreteImportServiceTest {
   @Test(expected = ImportException.class)
   public void testCreateCredentialWhenError() throws Exception {
     context.checking(new Expectations() { { 
-      oneOf(builder).validate(with(same(errors)));
+      oneOf(importer).validate(with(same(errors)));
       will(throwException(new ImportException()));
     } });    
     
-    importService.createCredential(builder, errors);
+    importService.createCredential(importer, errors);
   }
 
   @Test
   public void testCreateCredentialWhenSuccessful() throws Exception {
     context.checking(new Expectations() { { 
-      oneOf(builder).validate(with(same(errors)));
-      oneOf(builder).build();
+      oneOf(importer).validate(with(same(errors)));
+      oneOf(importer).build();
       will(returnValue(credential));
     } });    
     
-    assertThat(importService.createCredential(builder, errors), 
+    assertThat(importService.createCredential(importer, errors), 
         sameInstance(credential));    
   }
 
@@ -194,7 +196,7 @@ public class ConcreteImportServiceTest {
     context.checking(new Expectations() { { 
       oneOf(tagRepository).findByTagText(with(same(token)));
       will(returnValue(null));
-      oneOf(tagRepository).newInstance(with(same(token)));
+      oneOf(tagRepository).newTag(with(same(token)));
       will(returnValue(tag));
     } });
     

@@ -18,9 +18,12 @@
  */
 package org.soulwing.credo.domain;
 
+import java.util.ArrayList;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Set;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -28,6 +31,9 @@ import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.Lob;
 import javax.persistence.ManyToMany;
+import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
+import javax.persistence.OrderColumn;
 import javax.persistence.Table;
 
 import org.soulwing.credo.Credential;
@@ -47,6 +53,11 @@ public class CredentialEntity extends AbstractEntity implements Credential {
   private String name;
   private String description;
   private Set<TagEntity> tags = new LinkedHashSet<TagEntity>();
+  
+  private CredentialKeyEntity privateKey;
+  private CredentialCertificateEntity certificate;
+  private List<CredentialCertificateEntity> authorityCertificates = 
+      new ArrayList<>();
   
   /**
    * {@inheritDoc}
@@ -107,6 +118,83 @@ public class CredentialEntity extends AbstractEntity implements Credential {
       }
       this.tags.add((TagEntity) tag);
     }
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  @OneToOne(optional = false, fetch = FetchType.LAZY, 
+      mappedBy = "credential", orphanRemoval = true, 
+      cascade = { CascadeType.PERSIST })
+  public CredentialKeyEntity getPrivateKey() {
+    return privateKey;
+  }
+
+  /**
+   * Sets the receiver's private key.
+   * @param privateKey the private key to set
+   */
+  public void setPrivateKey(CredentialKeyEntity privateKey) {
+    this.privateKey = privateKey;
+    if (privateKey != null) {
+      privateKey.setCredential(this);
+    }
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  @OneToOne(optional = false, fetch = FetchType.LAZY, 
+      mappedBy = "credential", orphanRemoval = true, 
+      cascade = { CascadeType.PERSIST })
+  public CredentialCertificateEntity getCertificate() {
+    return certificate;
+  }
+
+  /**
+   * Sets the receiver's subject certificate.
+   * @param certificate the certificate to set
+   */
+  public void setCertificate(CredentialCertificateEntity certificate) {
+    this.certificate = certificate;
+    if (certificate != null) {
+      certificate.setCredential(this);
+    }
+  }
+  
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  @OneToMany(fetch = FetchType.LAZY, mappedBy = "credential",
+      cascade = { CascadeType.PERSIST })
+  @OrderColumn(name = "list_offset")
+  public List<CredentialCertificateEntity> getAuthorityCertificates() {
+    return authorityCertificates;
+  }
+
+  /**
+   * Sets the receiver's collection of authority certificates.
+   * @param authorityCertificates the authority certificates to set
+   */
+  public void setAuthorityCertificates(
+      List<CredentialCertificateEntity> authorityCertificates) {
+    this.authorityCertificates = authorityCertificates;
+  }
+  
+  /**
+   * Adds a certificate to the receiver's collection of authority certificates.
+   * @param certificate the certificate to add
+   */
+  public void addAuthorityCertificate(
+      CredentialCertificateEntity certificate) {
+    if (certificate == null) {
+      throw new NullPointerException("cannot add null reference to list");
+    }
+    this.authorityCertificates.add(certificate);
+    certificate.setCredential(this);    
   }
 
 }

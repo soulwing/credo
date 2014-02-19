@@ -18,6 +18,7 @@
  */
 package org.soulwing.credo;
 
+import java.util.List;
 import java.util.Set;
 
 
@@ -63,5 +64,23 @@ public interface Credential {
    * @param tags the tags to set
    */
   void setTags(Set<? extends Tag> tags);
+  
+  /**
+   * Gets the private key for this credential.
+   * @return private key
+   */
+  CredentialKey getPrivateKey();
+  
+  /**
+   * Gets the (subject) certificate for this credential.
+   * @return certificate
+   */
+  CredentialCertificate getCertificate();
+  
+  /**
+   * Gets the authority (CA) certificates for this credential.
+   * @return certificate list
+   */
+  List<? extends CredentialCertificate> getAuthorityCertificates();
   
 }

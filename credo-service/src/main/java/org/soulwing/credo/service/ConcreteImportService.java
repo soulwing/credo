@@ -44,7 +44,7 @@ import org.soulwing.credo.repository.TagRepository;
 public class ConcreteImportService implements ImportService {
 
   @Inject
-  protected CredentialBuilderFactory credentialBuilderFactory;
+  protected CredentialImporterFactory importerFactory;
   
   @Inject
   protected CredentialRepository credentialRepository;
@@ -58,16 +58,15 @@ public class ConcreteImportService implements ImportService {
   @Override
   public ImportPreparation prepareImport(List<FileContentModel> files,
       Errors errors) throws ImportException {
+    CredentialImporter importer = importerFactory.newImporter();
     if (files.isEmpty()) {
       errors.addError("importFileRequired");
       throw new ImportException();
     }
-    CredentialBuilder builder = credentialBuilderFactory.newInstance();
     int i = 0;
     for (FileContentModel file : files) {
       try {
-        builder.loadFile(file.getInputStream());
-        
+        importer.loadFile(file.getInputStream());        
         i++;
       }
       catch (NoContentException ex) {
@@ -83,7 +82,7 @@ public class ConcreteImportService implements ImportService {
       throw new ImportException();
     }
     
-    return builder;
+    return importer;
   }
 
   /**
@@ -92,14 +91,14 @@ public class ConcreteImportService implements ImportService {
   @Override
   public Credential createCredential(ImportPreparation preparation,
       Errors errors) throws ImportException {
-    if (!(preparation instanceof CredentialBuilder)) {
+    if (!(preparation instanceof CredentialImporter)) {
       throw new IllegalArgumentException(
           "preparation was not created by this service");
     }
 
-    CredentialBuilder builder = (CredentialBuilder) preparation;
-    builder.validate(errors);
-    return builder.build();
+    CredentialImporter importer = (CredentialImporter) preparation;
+    importer.validate(errors);
+    return importer.build();
   }
 
   /**
@@ -121,7 +120,7 @@ public class ConcreteImportService implements ImportService {
     for (String token : tokens) {
       Tag tag = tagRepository.findByTagText(token);
       if (tag == null) {
-        tag = tagRepository.newInstance(token);
+        tag = tagRepository.newTag(token);
       }
       tags.add(tag);
     }

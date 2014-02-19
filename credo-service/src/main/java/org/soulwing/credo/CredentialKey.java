@@ -1,5 +1,5 @@
 /*
- * File created on Feb 16, 2014 
+ * File created on Feb 18, 2014 
  *
  * Copyright (c) 2014 Virginia Polytechnic Institute and State University
  *
@@ -16,16 +16,22 @@
  * limitations under the License.
  *
  */
-package org.soulwing.credo.service;
+package org.soulwing.credo;
+
+import java.io.IOException;
+import java.io.Reader;
 
 /**
- * An exception thrown when an imported file contains nothing of interest to
- * a {@link CredentialImporter}.
+ * A private key for a {@link Credential}.
  *
  * @author Carl Harris
  */
-public class NoContentException extends Exception {
+public interface CredentialKey {
 
-  private static final long serialVersionUID = -2809097677243363079L;
-
+  /**
+   * Gets the PEM-encoded content of the private key as an input stream.
+   * @return reader
+   */
+  Reader getContent() throws IOException;
+  
 }
