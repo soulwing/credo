@@ -1,5 +1,5 @@
 /*
- * File created on Feb 18, 2014 
+ * File created on Feb 19, 2014 
  *
  * Copyright (c) 2014 Virginia Polytechnic Institute and State University
  *
@@ -22,25 +22,32 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
 import org.soulwing.credo.CredentialBuilderFactory;
+import org.soulwing.credo.service.x509.CredentialBagFactory;
 
 /**
  * A {@link CredentialImporterFactory} that produces 
- * {@link BcCredentialImporter} objects.
+ * {@link ConcreteCredentialImporter} objects.
  *
  * @author Carl Harris
  */
 @ApplicationScoped
-public class BcCredentialImporterFactory implements CredentialImporterFactory {
+public class ConcreteCredentialImporterFactory
+    implements CredentialImporterFactory {
 
   @Inject
-  private CredentialBuilderFactory credentialBuilderFactory;
+  protected CredentialBagFactory credentialBagFactory;
+  
+  @Inject
+  protected CredentialBuilderFactory credentialBuilderFactory;
   
   /**
    * {@inheritDoc}
    */
   @Override
   public CredentialImporter newImporter() {
-    return new BcCredentialImporter(credentialBuilderFactory);
+    return new ConcreteCredentialImporter(
+        credentialBagFactory.newCredentialBag(), 
+        credentialBuilderFactory);
   }
 
 }
