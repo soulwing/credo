@@ -5,7 +5,27 @@
     xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-facesconfig_2_2.xsd">
     
   <navigation-rule>
-    <from-view-id>/credentials/add/details.xhtml</from-view-id>
+    <from-view-id>*</from-view-id>
+    <navigation-case>
+      <from-outcome>home</from-outcome>
+      <to-view-id>/index.xhtml</to-view-id>
+    </navigation-case>
+    <navigation-case>
+      <from-outcome>credentials</from-outcome>
+      <to-view-id>/credentials/add/index.xhtml</to-view-id>
+    </navigation-case>
+    <navigation-case>
+      <from-outcome>reports</from-outcome>
+      <to-view-id>/reports/index.xhtml</to-view-id>
+    </navigation-case>
+    <navigation-case>
+      <from-outcome>about</from-outcome>
+      <to-view-id>/about/index.xhtml</to-view-id>
+    </navigation-case>
+  </navigation-rule>
+
+  <navigation-rule>
+    <from-view-id>/credentials/add/*</from-view-id>
     <navigation-case>
       <from-outcome>success</from-outcome>
       <to-view-id>/index.xhtml</to-view-id>
@@ -16,6 +36,10 @@
       <to-view-id>/index.xhtml</to-view-id>
       <redirect/>
     </navigation-case>
+    <navigation-case>
+      <from-outcome>failure</from-outcome>
+      <to-view-id>/credentials/add/index.xhtml</to-view-id>
+    </navigation-case>    
   </navigation-rule>
   
   <application>
