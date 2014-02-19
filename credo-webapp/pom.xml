@@ -15,11 +15,12 @@
 
   <build>
   </build>
-  
+
   <dependencies>
     <dependency>
-      <groupId>javax</groupId>
-      <artifactId>javaee-api</artifactId>
+      <groupId>org.jboss.spec</groupId>
+      <artifactId>jboss-javaee-7.0</artifactId>
+      <type>pom</type>
     </dependency>
     <dependency>
       <groupId>com.sun.faces</groupId>
@@ -51,6 +52,9 @@
       <groupId>commons-lang</groupId>
       <artifactId>commons-lang</artifactId>
     </dependency>
+    <dependency>
+      <groupId>ch.qos.logback</groupId>
+      <artifactId>logback-classic</artifactId>
+    </dependency>
   </dependencies>
-
 </project>
