@@ -28,7 +28,7 @@ import org.soulwing.credo.Credential;
  *
  * @author Carl Harris
  */
-public interface CredentialBuilder extends ImportPreparation {
+public interface CredentialImporter extends ImportPreparation {
 
   /**
    * Loads a file containing content for a credential.

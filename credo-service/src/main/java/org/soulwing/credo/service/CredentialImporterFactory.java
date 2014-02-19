@@ -1,5 +1,5 @@
 /*
- * File created on Feb 16, 2014 
+ * File created on Feb 18, 2014 
  *
  * Copyright (c) 2014 Virginia Polytechnic Institute and State University
  *
@@ -18,14 +18,17 @@
  */
 package org.soulwing.credo.service;
 
-
 /**
- * A factory that produces {@link CredentialBuilder} objects.
+ * A factory that produces {@link CredentialImporter} objects.
  *
  * @author Carl Harris
  */
-public interface CredentialBuilderFactory {
+public interface CredentialImporterFactory {
 
-  CredentialBuilder newInstance();
+  /**
+   * Creates a new importer.
+   * @return importer object.
+   */
+  CredentialImporter newImporter();
   
 }
