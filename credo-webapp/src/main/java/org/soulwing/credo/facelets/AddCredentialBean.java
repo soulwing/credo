@@ -31,6 +31,7 @@ import javax.inject.Named;
 import javax.servlet.http.Part;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.Validate;
 import org.soulwing.credo.Credential;
 import org.soulwing.credo.Tag;
 import org.soulwing.credo.service.Errors;
@@ -192,6 +193,25 @@ public class AddCredentialBean implements Serializable {
     credential.setTags(importService.resolveTags(tokens));
   }
 
+  /**
+   * Gets the private key passphrase.
+   * @return passphrase
+   */
+  public String getPassphrase() {
+    Validate.notNull(preparation, "import not prepared");
+    if (preparation.getPassphrase() == null) return null;
+    return preparation.getPassphrase().toString();
+  }
+  
+  /**
+   * Sets the private key passphrase.
+   * @param passphrase the passphrase to set
+   */
+  public void setPassphrase(String passphrase) {
+    Validate.notNull(preparation, "import not prepared");
+    preparation.setPassphrase(passphrase.toCharArray());
+  }
+  
   /**
    * Gets the import preparation produced by the import service.
    * <p>
