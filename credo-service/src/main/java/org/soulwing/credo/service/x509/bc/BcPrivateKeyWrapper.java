@@ -25,11 +25,15 @@ import org.apache.commons.lang.Validate;
 import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
 import org.bouncycastle.crypto.params.AsymmetricKeyParameter;
 import org.bouncycastle.crypto.util.PrivateKeyFactory;
+import org.bouncycastle.openssl.EncryptionException;
+import org.bouncycastle.openssl.PEMDecryptorProvider;
+import org.bouncycastle.openssl.PEMEncryptedKeyPair;
 import org.bouncycastle.openssl.PEMKeyPair;
 import org.bouncycastle.openssl.PEMWriter;
 import org.bouncycastle.openssl.PKCS8Generator;
 import org.bouncycastle.openssl.jcajce.JceOpenSSLPKCS8DecryptorProviderBuilder;
 import org.bouncycastle.openssl.jcajce.JceOpenSSLPKCS8EncryptorBuilder;
+import org.bouncycastle.openssl.jcajce.JcePEMDecryptorProviderBuilder;
 import org.bouncycastle.operator.InputDecryptorProvider;
 import org.bouncycastle.operator.OperatorCreationException;
 import org.bouncycastle.operator.OutputEncryptor;
@@ -62,7 +66,8 @@ public class BcPrivateKeyWrapper implements BcWrapper, PrivateKeyWrapper {
    */
   @Override
   public boolean isPassphraseRequired() {
-    return key instanceof PKCS8EncryptedPrivateKeyInfo;
+    return key instanceof PKCS8EncryptedPrivateKeyInfo
+        || key instanceof PEMEncryptedKeyPair;    
   }
 
   /**
@@ -113,7 +118,10 @@ public class BcPrivateKeyWrapper implements BcWrapper, PrivateKeyWrapper {
   
   private PrivateKeyInfo derivePrivateKeyInfo() {
     if (key instanceof PKCS8EncryptedPrivateKeyInfo) {
-      return decryptPrivateKey();
+      return decryptPKCS8PrivateKey();
+    }
+    else if (key instanceof PEMEncryptedKeyPair) {
+      return decryptPEMPrivateKey();
     }
     else if (key instanceof PEMKeyPair) {
       return ((PEMKeyPair) key).getPrivateKeyInfo();
@@ -124,16 +132,30 @@ public class BcPrivateKeyWrapper implements BcWrapper, PrivateKeyWrapper {
     }
   }
 
-  private PrivateKeyInfo decryptPrivateKey() {
+  private PrivateKeyInfo decryptPKCS8PrivateKey() {
     try {
       return ((PKCS8EncryptedPrivateKeyInfo) key)
-          .decryptPrivateKeyInfo(createPrivateKeyDecryptor());
+          .decryptPrivateKeyInfo(createPKCS8KeyDecryptor());
     }
     catch (PKCSException ex) {
       throw new IncorrectPassphraseException();
     }
   }
 
+  private PrivateKeyInfo decryptPEMPrivateKey() {
+    try {
+      PEMKeyPair keyPair = ((PEMEncryptedKeyPair) key)
+          .decryptKeyPair(createPEMKeyDecryptor());
+      return keyPair.getPrivateKeyInfo();
+    }
+    catch (EncryptionException ex) {
+      throw new IncorrectPassphraseException();
+    }
+    catch (IOException ex) {
+      throw new RuntimeException(ex);
+    }
+  }
+  
   private OutputEncryptor createPrivateKeyEncryptor() {
     try {
       Validate.notNull(passphrase, "passphrase is required");
@@ -148,7 +170,7 @@ public class BcPrivateKeyWrapper implements BcWrapper, PrivateKeyWrapper {
     }
   }
 
-  private InputDecryptorProvider createPrivateKeyDecryptor() {
+  private InputDecryptorProvider createPKCS8KeyDecryptor() {
     try {
       Validate.notNull(passphrase, "passphrase is required");
       return new JceOpenSSLPKCS8DecryptorProviderBuilder().build(passphrase);
@@ -158,5 +180,9 @@ public class BcPrivateKeyWrapper implements BcWrapper, PrivateKeyWrapper {
     }
   }
 
+  private PEMDecryptorProvider createPEMKeyDecryptor() {
+    Validate.notNull(passphrase, "passphrase is required");
+    return new JcePEMDecryptorProviderBuilder().build(passphrase);
+  }
 
 }

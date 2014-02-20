@@ -27,9 +27,12 @@ import java.util.List;
 import org.bouncycastle.cert.X509CertificateHolder;
 import org.bouncycastle.crypto.params.AsymmetricKeyParameter;
 import org.bouncycastle.crypto.params.RSAPrivateCrtKeyParameters;
+import org.bouncycastle.openssl.PEMEncryptedKeyPair;
 import org.bouncycastle.openssl.PEMKeyPair;
 import org.bouncycastle.openssl.PEMParser;
 import org.bouncycastle.pkcs.PKCS8EncryptedPrivateKeyInfo;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.soulwing.credo.service.x509.CertificateWrapper;
 import org.soulwing.credo.service.x509.CredentialBag;
 import org.soulwing.credo.service.x509.PrivateKeyWrapper;
@@ -42,6 +45,9 @@ import org.soulwing.credo.service.x509.UnsupportedKeyTypeException;
  */
 public class BcCredentialBag implements CredentialBag {
 
+  private static final Logger logger = 
+      LoggerFactory.getLogger(BcCredentialBag.class);
+  
   private final List<BcWrapper> objects = new ArrayList<>();
   
   /**
@@ -57,11 +63,18 @@ public class BcCredentialBag implements CredentialBag {
         if (obj instanceof PKCS8EncryptedPrivateKeyInfo) {
           objects.add(new BcPrivateKeyWrapper(obj));          
         }
+        else if (obj instanceof PEMEncryptedKeyPair) {
+          objects.add(new BcPrivateKeyWrapper(obj));
+        }
         else if (obj instanceof PEMKeyPair) {
           objects.add(new BcPrivateKeyWrapper(obj));          
         }
         else if (obj instanceof X509CertificateHolder) {
           objects.add(new BcCertificateWrapper((X509CertificateHolder) obj));
+        }
+        else {
+          logger.info("unrecognized object of type: {}", 
+              obj.getClass().getName());
         }
         obj = parser.readObject();
       }
