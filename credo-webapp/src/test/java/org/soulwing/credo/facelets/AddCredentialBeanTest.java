@@ -46,6 +46,7 @@ import org.soulwing.credo.Credential;
 import org.soulwing.credo.Tag;
 import org.soulwing.credo.service.Errors;
 import org.soulwing.credo.service.FileContentModel;
+import org.soulwing.credo.service.ImportDetails;
 import org.soulwing.credo.service.ImportException;
 import org.soulwing.credo.service.ImportPreparation;
 import org.soulwing.credo.service.ImportService;
@@ -57,6 +58,8 @@ import org.soulwing.credo.service.ImportService;
  */
 public class AddCredentialBeanTest {
 
+  private static final String SUBJECT_NAME = "subjectName";
+  
   @Rule
   public JUnitRuleMockery context = new JUnitRuleMockery();
   
@@ -71,6 +74,9 @@ public class AddCredentialBeanTest {
     
   @Mock
   public ImportPreparation preparation;
+  
+  @Mock
+  public ImportDetails details;
   
   @Mock
   public Credential credential;
@@ -346,6 +352,11 @@ public class AddCredentialBeanTest {
       oneOf(importService).createCredential(with(same(preparation)), 
           with(same(errors)));
       will(returnValue(credential));
+      oneOf(preparation).getDetails();
+      will(returnValue(details));
+      oneOf(details).getSubject();
+      will(returnValue(SUBJECT_NAME));
+      oneOf(credential).setName(with(same(SUBJECT_NAME)));
       oneOf(errors).hasWarnings();
       will(returnValue(false));
     } });
@@ -363,6 +374,11 @@ public class AddCredentialBeanTest {
       oneOf(importService).createCredential(with(same(preparation)), 
           with(same(errors)));
       will(returnValue(credential));
+      oneOf(preparation).getDetails();
+      will(returnValue(details));
+      oneOf(details).getSubject();
+      will(returnValue(SUBJECT_NAME));
+      oneOf(credential).setName(with(same(SUBJECT_NAME)));
       oneOf(errors).hasWarnings();
       will(returnValue(true));
     } });
@@ -408,6 +424,11 @@ public class AddCredentialBeanTest {
       oneOf(importService).createCredential(with(same(preparation2)), 
           with(same(errors)));
       will(returnValue(credential));
+      oneOf(preparation2).getDetails();
+      will(returnValue(details));
+      oneOf(details).getSubject();
+      will(returnValue(SUBJECT_NAME));
+      oneOf(credential).setName(with(same(SUBJECT_NAME)));
       oneOf(errors).hasWarnings();
       will(returnValue(false));
     } });

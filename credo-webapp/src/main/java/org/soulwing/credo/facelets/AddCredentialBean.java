@@ -216,11 +216,9 @@ public class AddCredentialBean implements Serializable {
   
   /**
    * Gets the import preparation produced by the import service.
-   * <p>
-   * This method is exposed principally to support unit testing.
    * @return preparation
    */
-  ImportPreparation getPreparation() {
+  public ImportPreparation getPreparation() {
     return preparation;
   }
 
@@ -289,6 +287,7 @@ public class AddCredentialBean implements Serializable {
         preparation.setPassphrase(previous.getPassphrase());
       }
       credential = importService.createCredential(preparation, errors);
+      credential.setName(preparation.getDetails().getSubject());
       return errors.hasWarnings() ? WARNINGS_OUTCOME_ID : DETAILS_OUTCOME_ID;
     }
     catch (PassphraseException ex) {
