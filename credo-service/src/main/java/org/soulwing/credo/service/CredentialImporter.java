@@ -48,7 +48,11 @@ public interface CredentialImporter extends ImportPreparation {
    */
   void validate(Errors errors) throws ImportException;
   
-  
+  /**
+   * Creates a {@link Credential} containing the uploaded key and certificate 
+   * chain.
+   * @return transient credential object
+   */
   Credential build();
   
 }
