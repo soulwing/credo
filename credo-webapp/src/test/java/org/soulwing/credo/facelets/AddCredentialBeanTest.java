@@ -20,7 +20,9 @@ package org.soulwing.credo.facelets;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.allOf;
+import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.empty;
+import static org.hamcrest.Matchers.emptyArray;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasItemInArray;
 import static org.hamcrest.Matchers.not;
@@ -50,6 +52,7 @@ import org.soulwing.credo.service.ImportDetails;
 import org.soulwing.credo.service.ImportException;
 import org.soulwing.credo.service.ImportPreparation;
 import org.soulwing.credo.service.ImportService;
+import org.soulwing.credo.service.PassphraseException;
 
 /**
  * Unit tests for {@link AddCredentialBean}.
@@ -413,5 +416,35 @@ public class AddCredentialBeanTest {
     assertThat(bean.getCredential(), sameInstance(credential));
   }
 
+  @Test
+  @SuppressWarnings("unchecked")
+  public void testValidateWithIncorrectPassphrase() throws Exception {
+    final Part file = context.mock(Part.class);
+    final ImportPreparation preparation2 = context.mock(
+        ImportPreparation.class, "preparation2");
+    final char[] passphrase = new char[0];
+    context.checking(new Expectations() { { 
+      allowing(file).getInputStream();
+      will(returnValue(new ByteArrayInputStream(new byte[0])));
+      allowing(preparation).isPassphraseRequired();
+      will(returnValue(true));
+      oneOf(importService).prepareImport(
+          (List<FileContentModel>) with(not(empty())), 
+          with(errors));
+      will(returnValue(preparation2));
+      oneOf(preparation).getPassphrase();
+      will(returnValue(passphrase));
+      oneOf(preparation2).setPassphrase(with(same(passphrase)));
+      oneOf(importService).createCredential(with(same(preparation2)), 
+          with(same(errors)));
+      will(throwException(new PassphraseException()));
+      oneOf(errors).addError(with(containsString("passphrase")),
+          with(containsString("Incorrect")), with(emptyArray()));
+    } });
+    
+    bean.setFile0(file);
+    bean.setPreparation(preparation);
+    assertThat(bean.validate(), equalTo(AddCredentialBean.PASSPHRASE_OUTCOME_ID));
+  }
 
 }

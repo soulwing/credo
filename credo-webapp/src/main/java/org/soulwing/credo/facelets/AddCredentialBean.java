@@ -291,6 +291,7 @@ public class AddCredentialBean implements Serializable {
       return DETAILS_OUTCOME_ID;
     }
     catch (PassphraseException ex) {
+      errors.addError("passphrase", "passphraseIncorrect");
       return PASSPHRASE_OUTCOME_ID;
     }
     catch (ImportException ex) {
