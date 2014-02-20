@@ -40,6 +40,9 @@ public class ConcreteCredentialImporterFactory
   @Inject
   protected CredentialBuilderFactory credentialBuilderFactory;
   
+  @Inject
+  protected TimeOfDayService timeOfDayService;
+  
   /**
    * {@inheritDoc}
    */
@@ -47,7 +50,8 @@ public class ConcreteCredentialImporterFactory
   public CredentialImporter newImporter() {
     return new ConcreteCredentialImporter(
         credentialBagFactory.newCredentialBag(), 
-        credentialBuilderFactory);
+        credentialBuilderFactory, 
+        timeOfDayService);
   }
 
 }

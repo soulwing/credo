@@ -29,6 +29,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collections;
+import java.util.Date;
 
 import org.jmock.Expectations;
 import org.jmock.auto.Mock;
@@ -59,6 +60,9 @@ public class ConcreteCredentialImporterTest {
   private CredentialBuilderFactory credentialBuilderFactory;
   
   @Mock
+  private TimeOfDayService timeOfDayService;
+  
+  @Mock
   private Errors errors;
   
   @Mock
@@ -73,7 +77,8 @@ public class ConcreteCredentialImporterTest {
   
   @Before
   public void setUp() throws Exception {
-    importer = new ConcreteCredentialImporter(bag, credentialBuilderFactory);
+    importer = new ConcreteCredentialImporter(bag, credentialBuilderFactory,
+        timeOfDayService);
   }
   
   @Test
@@ -157,13 +162,8 @@ public class ConcreteCredentialImporterTest {
   
   @Test(expected = PassphraseException.class)
   public void testVerifyAgainWithIncorrectPassphrase() throws Exception {
+    context.checking(privateKeyExpectations());
     context.checking(new Expectations() { { 
-      exactly(2).of(bag).findPrivateKey();
-      will(onConsecutiveCalls(
-          returnValue(privateKey),
-          returnValue(null)));
-      oneOf(bag).removeObject(with(same(privateKey)));
-      will(returnValue(true));
       exactly(2).of(privateKey).setPassphrase(with(same(passphrase)));
       exactly(2).of(bag).findSubjectCertificate(with(same(privateKey)));
       will(throwException(new IncorrectPassphraseException()));
@@ -183,13 +183,8 @@ public class ConcreteCredentialImporterTest {
   
   @Test(expected = ImportException.class)
   public void testVerifyWhenSubjectCertificateNotFound() throws Exception {
+    context.checking(privateKeyExpectations());
     context.checking(new Expectations() { { 
-      exactly(2).of(bag).findPrivateKey();
-      will(onConsecutiveCalls(
-          returnValue(privateKey),
-          returnValue(null)));
-      oneOf(bag).removeObject(with(same(privateKey)));
-      will(returnValue(true));
       allowing(privateKey).setPassphrase(with(nullValue(char[].class)));
       oneOf(bag).findSubjectCertificate(with(same(privateKey)));
       will(returnValue(null));
@@ -199,19 +194,31 @@ public class ConcreteCredentialImporterTest {
 
     importer.validate(errors);
   }
+
+  @Test
+  public void testVerifyWhenSubjectCertificateExpired() throws Exception {
+    context.checking(privateKeyExpectations());
+    context.checking(certificateExpectations());
+    context.checking(expirationExpectations(new Date(0), new Date(1)));
+    context.checking(new Expectations() { { 
+      oneOf(errors).addWarning(with(containsString("Expired")), 
+          with(emptyArray()));
+      allowing(bag).findAuthorityCertificates(with(same(certificate)));
+      will(returnValue(Collections.emptyList()));
+      allowing(errors).addWarning(with(containsString("Incomplete")),
+          with(emptyArray()));
+    } });
+
+    importer.validate(errors);
+  }
   
+
   @Test
   public void testVerifyWhenAuthorityChainEmpty() throws Exception {
+    context.checking(privateKeyExpectations());
+    context.checking(certificateExpectations());
+    context.checking(expirationExpectations(new Date(1), new Date(0)));    
     context.checking(new Expectations() { { 
-      exactly(2).of(bag).findPrivateKey();
-      will(onConsecutiveCalls(
-          returnValue(privateKey),
-          returnValue(null)));
-      oneOf(bag).removeObject(with(same(privateKey)));
-      will(returnValue(true));
-      allowing(privateKey).setPassphrase(with(nullValue(char[].class)));
-      oneOf(bag).findSubjectCertificate(with(same(privateKey)));
-      will(returnValue(certificate));
       oneOf(bag).findAuthorityCertificates(certificate);
       will(returnValue(Collections.emptyList()));
       oneOf(errors).addWarning(with(containsString("Incomplete")), 
@@ -223,16 +230,10 @@ public class ConcreteCredentialImporterTest {
 
   @Test
   public void testVerifyWhenAuthorityChainIncomplete() throws Exception {
+    context.checking(privateKeyExpectations());
+    context.checking(certificateExpectations());
+    context.checking(expirationExpectations(new Date(1), new Date(0)));
     context.checking(new Expectations() { { 
-      exactly(2).of(bag).findPrivateKey();
-      will(onConsecutiveCalls(
-          returnValue(privateKey),
-          returnValue(null)));
-      oneOf(bag).removeObject(with(same(privateKey)));
-      will(returnValue(true));
-      allowing(privateKey).setPassphrase(with(nullValue(char[].class)));
-      oneOf(bag).findSubjectCertificate(with(same(privateKey)));
-      will(returnValue(certificate));
       oneOf(bag).findAuthorityCertificates(certificate);
       will(returnValue(Collections.singletonList(certificate)));
       oneOf(certificate).isSelfSigned();
@@ -240,9 +241,37 @@ public class ConcreteCredentialImporterTest {
       oneOf(errors).addWarning(with(containsString("Incomplete")), 
           with(emptyArray()));
     } });
-
+  
     importer.validate(errors);
   }
 
-  
+  private Expectations privateKeyExpectations() {
+    return new Expectations() { { 
+      exactly(2).of(bag).findPrivateKey();
+      will(onConsecutiveCalls(
+          returnValue(privateKey),
+          returnValue(null)));
+      oneOf(bag).removeObject(with(same(privateKey)));
+      will(returnValue(true));
+    } };
+  }
+
+  private Expectations certificateExpectations() { 
+    return new Expectations() { { 
+      allowing(privateKey).setPassphrase(with(nullValue(char[].class)));
+      oneOf(bag).findSubjectCertificate(with(same(privateKey)));
+      will(returnValue(certificate));
+    } };
+  }
+
+  private Expectations expirationExpectations(final Date notAfterDate, 
+      final Date currentDate) {
+    return new Expectations() { { 
+      oneOf(certificate).getNotAfter();
+      will(returnValue(notAfterDate));
+      oneOf(timeOfDayService).getCurrent();
+      will(returnValue(currentDate));
+    } };
+  }
+
 }

@@ -41,6 +41,7 @@ public class ConcreteCredentialImporter implements CredentialImporter {
 
   private final CredentialBag bag;
   private final CredentialBuilderFactory credentialBuilderFactory;
+  private final TimeOfDayService timeOfDayService;
   
   private char[] passphrase;
   private PrivateKeyWrapper privateKey;
@@ -52,11 +53,14 @@ public class ConcreteCredentialImporter implements CredentialImporter {
    * Constructs a new instance.
    * @param bag
    * @param credentialBuilderFactory
+   * @param timeOfDayService
    */
   public ConcreteCredentialImporter(CredentialBag bag,
-      CredentialBuilderFactory credentialBuilderFactory) {
+      CredentialBuilderFactory credentialBuilderFactory,
+      TimeOfDayService timeOfDayService) {
     this.bag = bag;
     this.credentialBuilderFactory = credentialBuilderFactory;
+    this.timeOfDayService = timeOfDayService;
   }
 
   /**
@@ -96,6 +100,9 @@ public class ConcreteCredentialImporter implements CredentialImporter {
         if (certificate == null) {
           errors.addError("importNoSubjectCertificate");
           throw new ImportException();
+        }
+        if (certificate.getNotAfter().before(timeOfDayService.getCurrent())) {
+          errors.addWarning("importExpiredSubjectCertificate");
         }
       }
       catch (IncorrectPassphraseException ex) {
