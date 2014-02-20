@@ -18,8 +18,11 @@
  */
 package org.soulwing.credo.service;
 
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.emptyArray;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
 
 import java.io.ByteArrayInputStream;
@@ -150,6 +153,32 @@ public class ConcreteCredentialImporterTest {
     
     importer.setPassphrase(passphrase);
     importer.validate(errors);
+  }
+  
+  @Test(expected = PassphraseException.class)
+  public void testVerifyAgainWithIncorrectPassphrase() throws Exception {
+    context.checking(new Expectations() { { 
+      exactly(2).of(bag).findPrivateKey();
+      will(onConsecutiveCalls(
+          returnValue(privateKey),
+          returnValue(null)));
+      oneOf(bag).removeObject(with(same(privateKey)));
+      will(returnValue(true));
+      exactly(2).of(privateKey).setPassphrase(with(same(passphrase)));
+      exactly(2).of(bag).findSubjectCertificate(with(same(privateKey)));
+      will(throwException(new IncorrectPassphraseException()));
+      oneOf(privateKey).isPassphraseRequired();
+      will(returnValue(true));
+    } });
+    
+    importer.setPassphrase(passphrase);
+    try {
+      importer.validate(errors);
+    }
+    catch (PassphraseException ex) {
+      assertThat(importer.isPassphraseRequired(), is(equalTo(true)));
+      importer.validate(errors);
+    }
   }
   
   @Test(expected = ImportException.class)

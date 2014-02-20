@@ -76,33 +76,39 @@ public class ConcreteCredentialImporter implements CredentialImporter {
   @Override
   public void validate(Errors errors) throws ImportException {
     
-    privateKey = bag.findPrivateKey();
     if (privateKey == null) {
-      errors.addError("importNoPrivateKey");
-      throw new ImportException();
-    }
-    
-    if (bag.removeObject(privateKey) && bag.findPrivateKey() != null) {
-      errors.addError("importMultiplePrivateKeys");
-      throw new ImportException();
-    }
-    
-    try {
-      privateKey.setPassphrase(passphrase);
-      certificate = bag.findSubjectCertificate(privateKey);
-      if (certificate == null) {
-        errors.addError("importNoSubjectCertificate");
+      privateKey = bag.findPrivateKey();
+      if (privateKey == null) {
+        errors.addError("importNoPrivateKey");
+        throw new ImportException();
+      }
+      
+      if (bag.removeObject(privateKey) && bag.findPrivateKey() != null) {
+        errors.addError("importMultiplePrivateKeys");
         throw new ImportException();
       }
     }
-    catch (IncorrectPassphraseException ex) {
-      throw new PassphraseException();
+    
+    if (certificate == null) {
+      try {
+        privateKey.setPassphrase(passphrase);
+        certificate = bag.findSubjectCertificate(privateKey);
+        if (certificate == null) {
+          errors.addError("importNoSubjectCertificate");
+          throw new ImportException();
+        }
+      }
+      catch (IncorrectPassphraseException ex) {
+        throw new PassphraseException();
+      }
     }
     
-    chain = bag.findAuthorityCertificates(certificate);
-    if (chain.isEmpty()
-        || !chain.get(chain.size() - 1).isSelfSigned()) {
-      errors.addWarning("importIncompleteTrustChain");
+    if (chain == null) {
+      chain = bag.findAuthorityCertificates(certificate);
+      if (chain.isEmpty()
+          || !chain.get(chain.size() - 1).isSelfSigned()) {
+        errors.addWarning("importIncompleteTrustChain");
+      }
     }
 
   }
@@ -150,7 +156,8 @@ public class ConcreteCredentialImporter implements CredentialImporter {
    */
   @Override
   public boolean isPassphraseRequired() {
-    return bag.isPassphraseRequired();
+    return (privateKey != null && privateKey.isPassphraseRequired())
+        || bag.isPassphraseRequired();
   }
 
   /**
