@@ -176,7 +176,7 @@ public class ConcreteCredentialImporter implements CredentialImporter {
   public ImportDetails getDetails() {
     if (certificate == null) return null;
     if (details == null) {
-      details = new ImportDetails(certificate);
+      details = new ConcreteImportDetails(certificate);
     }
     return details;
   }

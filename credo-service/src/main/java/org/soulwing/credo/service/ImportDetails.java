@@ -21,89 +21,42 @@ package org.soulwing.credo.service;
 import java.io.Serializable;
 import java.util.Date;
 
-import javax.naming.NamingException;
-import javax.naming.ldap.LdapName;
-import javax.naming.ldap.Rdn;
-
-import org.soulwing.credo.service.x509.CertificateWrapper;
-
 /**
  * An object that represents the details of a credential that has been
  * fully validated for import.
  *
  * @author Carl Harris
  */
-public class ImportDetails implements Serializable {
+public interface ImportDetails extends Serializable {
 
-  private static final long serialVersionUID = -5190604068859062839L;
-
-  private final String subject;
-  private final String issuer;
-  private final String serialNumber;
-  private final Date notBefore;
-  private final Date notAfter;
-  
-  protected ImportDetails(CertificateWrapper certificate) {
-    this.subject = getCommonName(certificate.getSubject().getName());
-    this.issuer = getCommonName(certificate.getIssuer().getName());
-    this.serialNumber = certificate.getSerialNumber().toString();
-    this.notBefore = certificate.getNotBefore();
-    this.notAfter = certificate.getNotAfter();
-  }
-
-  private String getCommonName(String name) {
-    try {
-      LdapName ldapName = new LdapName(name);
-      for (Rdn rdn : ldapName.getRdns()) {
-        if (rdn.getType().equalsIgnoreCase("cn")) {
-          return rdn.getValue().toString();
-        }
-      }
-      return name;
-    }
-    catch (NamingException ex) {
-      return name;
-    }
-  }
-  
   /**
    * Gets the {@code subject} property.
    * @return
    */
-  public String getSubject() {
-    return subject;
-  }
+  String getSubject();
 
   /**
    * Gets the {@code issuer} property.
    * @return
    */
-  public String getIssuer() {
-    return issuer;
-  }
+  String getIssuer();
 
   /**
    * Gets the {@code serialNumber} property.
    * @return
    */
-  public String getSerialNumber() {
-    return serialNumber;
-  }
+  String getSerialNumber();
 
   /**
    * Gets the {@code notBefore} property.
    * @return
    */
-  public Date getNotBefore() {
-    return notBefore;
-  }
+  Date getNotBefore();
 
   /**
    * Gets the {@code notAfter} property.
    * @return
    */
-  public Date getNotAfter() {
-    return notAfter;
-  }
+  Date getNotAfter();
 
 }
