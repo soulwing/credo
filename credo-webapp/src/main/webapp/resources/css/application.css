@@ -12,3 +12,28 @@ body {
 .theme-showcase > p > .btn {
   margin: 5px 0;
 }
+
+.app-callout {
+	margin: 20px 0;
+	padding: 10px;
+	border-left: 3px solid #eee;
+}
+
+.app-callout-danger {
+	background-color: #fdf7f7;
+	border-color: #d9534f;
+}
+
+.app-callout-danger h4 {
+  color: #d9534f;
+  margin-top: 0;
+}
+.app-callout-warning {
+	background-color: #fcf8f2;
+	border-color: #f0ad4e;
+}
+
+.app-callout-warning h4 {
+	color: #f0ad4e;
+	margin-top: 0;
+}
