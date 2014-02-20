@@ -46,6 +46,7 @@ public class ConcreteCredentialImporter implements CredentialImporter {
   private PrivateKeyWrapper privateKey;
   private CertificateWrapper certificate;
   private List<CertificateWrapper> chain;
+  private ImportDetails details;
   
   /**
    * Constructs a new instance.
@@ -103,6 +104,7 @@ public class ConcreteCredentialImporter implements CredentialImporter {
         || !chain.get(chain.size() - 1).isSelfSigned()) {
       errors.addWarning("importIncompleteTrustChain");
     }
+
   }
 
   /**
@@ -167,4 +169,16 @@ public class ConcreteCredentialImporter implements CredentialImporter {
     this.passphrase = passphrase;
   }
 
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public ImportDetails getDetails() {
+    if (certificate == null) return null;
+    if (details == null) {
+      details = new ImportDetails(certificate);
+    }
+    return details;
+  }
+  
 }

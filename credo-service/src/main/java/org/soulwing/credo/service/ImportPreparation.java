@@ -46,5 +46,11 @@ public interface ImportPreparation {
    */
   void setPassphrase(char[] passphrase);
 
+  /**
+   * Gets the details of a fully-prepared import.
+   * @return import details or {@code null} if the import is not fully
+   *    prepared
+   */
+  ImportDetails getDetails();
   
 }
