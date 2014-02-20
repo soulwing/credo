@@ -357,34 +357,10 @@ public class AddCredentialBeanTest {
       oneOf(details).getSubject();
       will(returnValue(SUBJECT_NAME));
       oneOf(credential).setName(with(same(SUBJECT_NAME)));
-      oneOf(errors).hasWarnings();
-      will(returnValue(false));
     } });
     
     bean.setPreparation(preparation);
     assertThat(bean.validate(), equalTo(AddCredentialBean.DETAILS_OUTCOME_ID));
-    assertThat(bean.getCredential(), sameInstance(credential));
-  }
-
-  @Test
-  public void testValidateWhenWarnings() throws Exception {
-    context.checking(new Expectations() { { 
-      allowing(preparation).isPassphraseRequired();
-      will(returnValue(false));
-      oneOf(importService).createCredential(with(same(preparation)), 
-          with(same(errors)));
-      will(returnValue(credential));
-      oneOf(preparation).getDetails();
-      will(returnValue(details));
-      oneOf(details).getSubject();
-      will(returnValue(SUBJECT_NAME));
-      oneOf(credential).setName(with(same(SUBJECT_NAME)));
-      oneOf(errors).hasWarnings();
-      will(returnValue(true));
-    } });
-    
-    bean.setPreparation(preparation);
-    assertThat(bean.validate(), equalTo(AddCredentialBean.WARNINGS_OUTCOME_ID));
     assertThat(bean.getCredential(), sameInstance(credential));
   }
 
@@ -429,8 +405,6 @@ public class AddCredentialBeanTest {
       oneOf(details).getSubject();
       will(returnValue(SUBJECT_NAME));
       oneOf(credential).setName(with(same(SUBJECT_NAME)));
-      oneOf(errors).hasWarnings();
-      will(returnValue(false));
     } });
     
     bean.setFile0(file);

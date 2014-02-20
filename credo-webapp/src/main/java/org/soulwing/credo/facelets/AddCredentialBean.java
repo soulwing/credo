@@ -288,7 +288,7 @@ public class AddCredentialBean implements Serializable {
       }
       credential = importService.createCredential(preparation, errors);
       credential.setName(preparation.getDetails().getSubject());
-      return errors.hasWarnings() ? WARNINGS_OUTCOME_ID : DETAILS_OUTCOME_ID;
+      return DETAILS_OUTCOME_ID;
     }
     catch (PassphraseException ex) {
       return PASSPHRASE_OUTCOME_ID;
