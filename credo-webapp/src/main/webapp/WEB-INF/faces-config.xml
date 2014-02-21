@@ -1,9 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<faces-config version="2.2"
-    xmlns="http://xmlns.jcp.org/xml/ns/javaee"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-facesconfig_2_2.xsd">
-    
+<faces-config version="2.2" xmlns="http://xmlns.jcp.org/xml/ns/javaee"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-facesconfig_2_2.xsd">
+
   <navigation-rule>
     <from-view-id>*</from-view-id>
     <navigation-case>
@@ -29,24 +28,33 @@
     <navigation-case>
       <from-outcome>success</from-outcome>
       <to-view-id>/index.xhtml</to-view-id>
-      <redirect/>
+      <redirect />
     </navigation-case>
     <navigation-case>
       <from-outcome>cancel</from-outcome>
       <to-view-id>/index.xhtml</to-view-id>
-      <redirect/>
+      <redirect />
     </navigation-case>
     <navigation-case>
       <from-outcome>failure</from-outcome>
       <to-view-id>/credentials/import/index.xhtml</to-view-id>
-    </navigation-case>    
+    </navigation-case>
   </navigation-rule>
-  
+
+  <converter>
+    <converter-for-class>
+      java.util.Date
+    </converter-for-class>
+    <converter-class>
+      org.soulwing.credo.converters.DefaultDateTimeConverter
+    </converter-class>
+  </converter>
+
   <application>
     <resource-bundle>
       <base-name>org.soulwing.credo.resource.messages</base-name>
       <var>messages</var>
-    </resource-bundle>    
+    </resource-bundle>
   </application>
-  
+
 </faces-config>
