@@ -128,6 +128,8 @@ public class ConcreteCredentialImporter implements CredentialImporter {
     try {
       CredentialBuilder builder = 
           credentialBuilderFactory.newCredentialBuilder();
+      builder.setIssuer(getDetails().getIssuer());
+      builder.setExpiration(certificate.getNotAfter());
       builder.setPrivateKey(privateKey.getContent());
       builder.addCertificate(createCertificate(certificate));
       for (CertificateWrapper authority : chain) {
