@@ -18,6 +18,7 @@
  */
 package org.soulwing.credo.repository;
 
+import java.util.Date;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
@@ -27,6 +28,7 @@ import javax.persistence.PersistenceContext;
 
 import org.soulwing.credo.Credential;
 import org.soulwing.credo.Tag;
+import org.soulwing.credo.domain.CredentialEntity;
 
 /**
  * A {@link CredentialRepository} implemented using JPA.
@@ -44,12 +46,19 @@ public class JpaCredentialRepository implements CredentialRepository {
    */
   @Override
   public void add(Credential credential) {
+    if (!(credential instanceof CredentialEntity)) {
+      throw new IllegalArgumentException("unsupported credential type: "
+          + credential.getClass().getName());
+    }
     Set<Tag> tags = new LinkedHashSet<>();
     
     for (Tag tag : credential.getTags()) {
       tags.add(mergeIfNecessary(tag));
     }
     credential.setTags(tags);
+    Date now = new Date();
+    ((CredentialEntity) credential).setDateCreated(now);
+    ((CredentialEntity) credential).setDateModified(now);
     entityManager.persist(credential);
   }
 

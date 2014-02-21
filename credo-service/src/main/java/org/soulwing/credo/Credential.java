@@ -18,6 +18,7 @@
  */
 package org.soulwing.credo;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
@@ -76,5 +77,17 @@ public interface Credential {
    * @return certificate list
    */
   List<? extends CredentialCertificate> getCertificates();
+  
+  /**
+   * Gets the date at which this credential was created.
+   * @return creation date
+   */
+  Date getDateCreated();
+  
+  /**
+   * Gets the date at which this credential was last modified;
+   * @return last modification date
+   */
+  Date getDateModified();
   
 }

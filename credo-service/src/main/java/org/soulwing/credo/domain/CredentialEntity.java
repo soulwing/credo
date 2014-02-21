@@ -19,6 +19,7 @@
 package org.soulwing.credo.domain;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
@@ -35,6 +36,8 @@ import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.OrderColumn;
 import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 
 import org.soulwing.credo.Credential;
 import org.soulwing.credo.Tag;
@@ -57,6 +60,9 @@ public class CredentialEntity extends AbstractEntity implements Credential {
   private CredentialKeyEntity privateKey;
   private List<CredentialCertificateEntity> certificates = 
       new ArrayList<>();
+  
+  private Date dateCreated;
+  private Date dateModified;
   
   /**
    * {@inheritDoc}
@@ -176,6 +182,42 @@ public class CredentialEntity extends AbstractEntity implements Credential {
     }
     this.certificates.add(certificate);
     certificate.setCredential(this);    
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  @Temporal(TemporalType.TIMESTAMP)
+  @Column(name = "date_created", nullable = false)
+  public Date getDateCreated() {
+    return dateCreated;
+  }
+
+  /**
+   * Sets the date at which this credential was created.
+   * @param dateCreated the creation date to set
+   */
+  public void setDateCreated(Date dateCreated) {
+    this.dateCreated = dateCreated;
+  }
+  
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  @Temporal(TemporalType.TIMESTAMP)
+  @Column(name = "date_modified", nullable = false)
+  public Date getDateModified() {
+    return dateModified;        
+  }
+
+  /**
+   * Sets the date at which this credential was last modified.
+   * @param dateModified the last modification date to set
+   */
+  public void setDateModified(Date dateModified) {
+    this.dateModified = dateModified;
   }
 
 }
