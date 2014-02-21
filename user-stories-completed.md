@@ -11,3 +11,16 @@ parts from one or more PEM-encoded files.
 * Allow the user to apply any number of tags to the certificate, defining
   new tags as desired
 
+Validate Credential on Import
+-----------------------------
+
+When importing a credential, the upload file contents must be validated.
+
+* Do not allow the import if private key does not correspond to the subject
+  certificate.
+* If the private key is protected by a passphrase, prompt the user to enter
+  it, but do not retain it longer than necessary to validate the private key.
+* Warn the user if the identity chain is incomplete (does not end on the
+  correct self-signed certificate).
+* Warn the user if irrelevant CA certificates were included.
+
