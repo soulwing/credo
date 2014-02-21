@@ -20,11 +20,13 @@ package org.soulwing.credo.repository;
 
 import java.util.Date;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Set;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.persistence.TypedQuery;
 
 import org.soulwing.credo.Credential;
 import org.soulwing.credo.Tag;
@@ -70,6 +72,16 @@ public class JpaCredentialRepository implements CredentialRepository {
       assert true;
     }
     return tag;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public List<Credential> findAll() {
+    TypedQuery<Credential> query = entityManager.createNamedQuery(
+        "findAllCredentials", Credential.class);
+    return query.getResultList();
   }
 
 }

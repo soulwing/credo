@@ -26,6 +26,7 @@ import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.nullValue;
 
 import java.util.Date;
+import java.util.List;
 
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
@@ -57,6 +58,15 @@ import org.soulwing.credo.domain.TagEntity;
 @RunWith(Arquillian.class)
 public class JpaCredentialRepositoryIT {
 
+  @Inject
+  private JpaCredentialRepository repository;
+  
+  @PersistenceContext
+  private EntityManager entityManager;
+  
+  @Inject
+  private UserTransaction tx;
+  
   @Deployment
   public static Archive<?> createDeployment() {
       return ShrinkWrap.create(WebArchive.class)
@@ -67,15 +77,6 @@ public class JpaCredentialRepositoryIT {
           .addAsResource("META-INF/orm.xml", "META-INF/orm.xml")
           .addAsWebInfResource(EmptyAsset.INSTANCE, "beans.xml");
   }
-  
-  @Inject
-  private JpaCredentialRepository repository;
-  
-  @PersistenceContext
-  private EntityManager entityManager;
-  
-  @Inject
-  private UserTransaction tx;
   
   @Before
   public void setUp() throws Exception {
@@ -176,6 +177,21 @@ public class JpaCredentialRepositoryIT {
         is(equalTo(certificate.getEncoded())));
   }
 
+  @Test
+  public void testFindAll() throws Exception {
+    CredentialEntity entity = new CredentialEntity();
+    entity.setName("Test");
+    entity.addTag(new TagEntity("tag"));
+    repository.add(entity);
+    entityManager.flush();
+    entityManager.clear();
+    List<Credential> credentials = repository.findAll();
+    assertThat(credentials, is(not(nullValue())));
+    assertThat(credentials, is(not(empty())));
+    Credential credential = credentials.get(0);
+    assertThat(credential.getName(), is(equalTo(entity.getName())));
+  }
+
   private CredentialKeyEntity newPrivateKey() {
     CredentialKeyEntity privateKey = new CredentialKeyEntity();
     privateKey.setEncoded("testContent");
@@ -192,4 +208,5 @@ public class JpaCredentialRepositoryIT {
     certificate.setEncoded("testContent");
     return certificate;
   }
+  
 }

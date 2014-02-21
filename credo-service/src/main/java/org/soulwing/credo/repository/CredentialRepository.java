@@ -18,6 +18,8 @@
  */
 package org.soulwing.credo.repository;
 
+import java.util.List;
+
 import org.soulwing.credo.Credential;
 
 /**
@@ -27,6 +29,16 @@ import org.soulwing.credo.Credential;
  */
 public interface CredentialRepository {
 
+  /**
+   * Adds a credential to the repository.
+   * @param credential the credential to add
+   */
   void add(Credential credential);
+
+  /**
+   * Finds all credentials in the repository.
+   * @return list of credentials
+   */
+  List<Credential> findAll();
   
 }
