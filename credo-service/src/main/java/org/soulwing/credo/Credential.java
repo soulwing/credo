@@ -72,15 +72,9 @@ public interface Credential {
   CredentialKey getPrivateKey();
   
   /**
-   * Gets the (subject) certificate for this credential.
-   * @return certificate
-   */
-  CredentialCertificate getCertificate();
-  
-  /**
-   * Gets the authority (CA) certificates for this credential.
+   * Gets the chain of certificates for this credential.
    * @return certificate list
    */
-  List<? extends CredentialCertificate> getAuthorityCertificates();
+  List<? extends CredentialCertificate> getCertificates();
   
 }

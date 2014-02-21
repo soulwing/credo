@@ -46,21 +46,9 @@ public class CredentialEntityBuilder implements CredentialBuilder {
    * {@inheritDoc}
    */
   @Override
-  public CredentialBuilder setCertificate(
-      CredentialCertificate certificate) {
+  public CredentialBuilder addCertificate(CredentialCertificate certificate) {
     assertIsCertificateEntity(certificate);
-    credential.setCertificate((CredentialCertificateEntity) certificate);
-    return this;
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public CredentialBuilder addAuthorityCertificate(
-      CredentialCertificate certificate) {
-    assertIsCertificateEntity(certificate);
-    credential.addAuthorityCertificate(
+    credential.addCertificate(
         (CredentialCertificateEntity) certificate);
     return this;
   }

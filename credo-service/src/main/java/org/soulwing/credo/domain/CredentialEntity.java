@@ -55,8 +55,7 @@ public class CredentialEntity extends AbstractEntity implements Credential {
   private Set<TagEntity> tags = new LinkedHashSet<TagEntity>();
   
   private CredentialKeyEntity privateKey;
-  private CredentialCertificateEntity certificate;
-  private List<CredentialCertificateEntity> authorityCertificates = 
+  private List<CredentialCertificateEntity> certificates = 
       new ArrayList<>();
   
   /**
@@ -116,10 +115,14 @@ public class CredentialEntity extends AbstractEntity implements Credential {
         throw new IllegalArgumentException("unexpected tag type: " 
             + tag.getClass().getName());
       }
-      this.tags.add((TagEntity) tag);
+      addTag((TagEntity) tag);
     }
   }
 
+  public void addTag(TagEntity tag) {
+    this.tags.add(tag);
+  }
+  
   /**
    * {@inheritDoc}
    */
@@ -146,54 +149,32 @@ public class CredentialEntity extends AbstractEntity implements Credential {
    * {@inheritDoc}
    */
   @Override
-  @OneToOne(optional = false, fetch = FetchType.LAZY, 
-      mappedBy = "credential", orphanRemoval = true, 
-      cascade = { CascadeType.PERSIST })
-  public CredentialCertificateEntity getCertificate() {
-    return certificate;
-  }
-
-  /**
-   * Sets the receiver's subject certificate.
-   * @param certificate the certificate to set
-   */
-  public void setCertificate(CredentialCertificateEntity certificate) {
-    this.certificate = certificate;
-    if (certificate != null) {
-      certificate.setCredential(this);
-    }
-  }
-  
-  /**
-   * {@inheritDoc}
-   */
-  @Override
   @OneToMany(fetch = FetchType.LAZY, mappedBy = "credential",
       cascade = { CascadeType.PERSIST })
   @OrderColumn(name = "list_offset")
-  public List<CredentialCertificateEntity> getAuthorityCertificates() {
-    return authorityCertificates;
+  public List<CredentialCertificateEntity> getCertificates() {
+    return certificates;
   }
 
   /**
-   * Sets the receiver's collection of authority certificates.
-   * @param authorityCertificates the authority certificates to set
+   * Sets the receiver's chain of certificates.
+   * @param certificates the certificates to set
    */
-  public void setAuthorityCertificates(
-      List<CredentialCertificateEntity> authorityCertificates) {
-    this.authorityCertificates = authorityCertificates;
+  public void setCertificates(
+      List<CredentialCertificateEntity> certificates) {
+    this.certificates = certificates;
   }
   
   /**
-   * Adds a certificate to the receiver's collection of authority certificates.
+   * Adds a certificate to the receiver's chain of certificates.
    * @param certificate the certificate to add
    */
-  public void addAuthorityCertificate(
+  public void addCertificate(
       CredentialCertificateEntity certificate) {
     if (certificate == null) {
       throw new NullPointerException("cannot add null reference to list");
     }
-    this.authorityCertificates.add(certificate);
+    this.certificates.add(certificate);
     certificate.setCredential(this);    
   }
 

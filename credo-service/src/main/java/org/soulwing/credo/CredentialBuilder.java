@@ -37,14 +37,7 @@ public interface CredentialBuilder {
    * @param certificate the subject certificate to set
    * @return the receiver
    */
-  CredentialBuilder setCertificate(CredentialCertificate certificate);
-  
-  /**
-   * Adds a CA certificate to the end of the chain for this credential.
-   * @param certificate the CA certificate to add
-   * @return the receiver
-   */
-  CredentialBuilder addAuthorityCertificate(CredentialCertificate certificate);
+  CredentialBuilder addCertificate(CredentialCertificate certificate);
   
   /**
    * Builds a new {@link Credential} according to the current state of the
