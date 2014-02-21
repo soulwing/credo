@@ -38,6 +38,20 @@ public class TagEntity extends AbstractEntity implements Tag {
   private String text;
   
   /**
+   * Constructs a new instance.
+   */
+  public TagEntity() {    
+  }
+
+  /**
+   * Constructs a new instance.
+   * @param text
+   */
+  public TagEntity(String text) {
+    this.text = text;
+  }
+  
+  /**
    * {@inheritDoc}
    */
   @Override
