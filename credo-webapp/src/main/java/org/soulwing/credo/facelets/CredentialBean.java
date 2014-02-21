@@ -65,7 +65,7 @@ public class CredentialBean {
    * @return issuer name
    */
   public String getIssuer() {
-    return null;
+    return credential.getIssuer();
   }
   
   /**
@@ -73,7 +73,7 @@ public class CredentialBean {
    * @return expiration date
    */
   public Date getExpiration() {
-    return null;
+    return credential.getExpiration();
   }
   
   /**
