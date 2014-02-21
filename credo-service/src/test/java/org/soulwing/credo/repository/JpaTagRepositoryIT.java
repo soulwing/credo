@@ -42,7 +42,7 @@ import org.soulwing.credo.Tag;
 import org.soulwing.credo.domain.TagEntity;
 
 /**
- * Unit tests for {@link TagRepository}.
+ * Integration tests for {@link JpaTagRepository}.
  *
  * @author Carl Harris
  */

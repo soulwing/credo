@@ -50,7 +50,7 @@ import org.soulwing.credo.domain.CredentialKeyEntity;
 import org.soulwing.credo.domain.TagEntity;
 
 /**
- * Unit tests for {@link JpaCredentialRepository}.
+ * Integration tests for {@link JpaCredentialRepository}.
  *
  * @author Carl Harris
  */
