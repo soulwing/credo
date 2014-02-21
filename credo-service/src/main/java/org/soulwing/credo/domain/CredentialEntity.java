@@ -53,22 +53,41 @@ public class CredentialEntity extends AbstractEntity implements Credential {
 
   private static final long serialVersionUID = 641502440794773525L;
   
+  @Column(unique = true, nullable = false, length = 100)
   private String name;
+
+  @Lob
   private String note;
+  
+  @ManyToMany(fetch = FetchType.LAZY)
+  @JoinTable(name = "credential_tag", inverseJoinColumns = { 
+      @JoinColumn(name = "tag_id")
+  })
   private Set<TagEntity> tags = new LinkedHashSet<TagEntity>();
   
+  @OneToOne(optional = false, fetch = FetchType.LAZY, 
+      mappedBy = "credential", orphanRemoval = true, 
+      cascade = { CascadeType.PERSIST })
   private CredentialKeyEntity privateKey;
+  
+  @OneToMany(fetch = FetchType.LAZY, mappedBy = "credential",
+      cascade = { CascadeType.PERSIST })
+  @OrderColumn(name = "list_offset")
   private List<CredentialCertificateEntity> certificates = 
       new ArrayList<>();
   
+  @Temporal(TemporalType.TIMESTAMP)
+  @Column(name = "date_created", nullable = false)
   private Date dateCreated;
+  
+  @Temporal(TemporalType.TIMESTAMP)
+  @Column(name = "date_modified", nullable = false)
   private Date dateModified;
   
   /**
    * {@inheritDoc}
    */
   @Override
-  @Column(unique = true, nullable = false, length = 100)
   public String getName() {
     return name;
   }
@@ -85,7 +104,6 @@ public class CredentialEntity extends AbstractEntity implements Credential {
    * {@inheritDoc}
    */
   @Override
-  @Lob
   public String getNote() {
     return note;
   }
@@ -102,10 +120,6 @@ public class CredentialEntity extends AbstractEntity implements Credential {
    * {@inheritDoc}
    */
   @Override
-  @ManyToMany(fetch = FetchType.LAZY)
-  @JoinTable(name = "credential_tag", inverseJoinColumns = { 
-      @JoinColumn(name = "tag_id")
-  })
   public Set<TagEntity> getTags() {
     return tags;
   }
@@ -133,9 +147,6 @@ public class CredentialEntity extends AbstractEntity implements Credential {
    * {@inheritDoc}
    */
   @Override
-  @OneToOne(optional = false, fetch = FetchType.LAZY, 
-      mappedBy = "credential", orphanRemoval = true, 
-      cascade = { CascadeType.PERSIST })
   public CredentialKeyEntity getPrivateKey() {
     return privateKey;
   }
@@ -155,9 +166,6 @@ public class CredentialEntity extends AbstractEntity implements Credential {
    * {@inheritDoc}
    */
   @Override
-  @OneToMany(fetch = FetchType.LAZY, mappedBy = "credential",
-      cascade = { CascadeType.PERSIST })
-  @OrderColumn(name = "list_offset")
   public List<CredentialCertificateEntity> getCertificates() {
     return certificates;
   }
@@ -188,8 +196,6 @@ public class CredentialEntity extends AbstractEntity implements Credential {
    * {@inheritDoc}
    */
   @Override
-  @Temporal(TemporalType.TIMESTAMP)
-  @Column(name = "date_created", nullable = false)
   public Date getDateCreated() {
     return dateCreated;
   }
@@ -206,8 +212,6 @@ public class CredentialEntity extends AbstractEntity implements Credential {
    * {@inheritDoc}
    */
   @Override
-  @Temporal(TemporalType.TIMESTAMP)
-  @Column(name = "date_modified", nullable = false)
   public Date getDateModified() {
     return dateModified;        
   }

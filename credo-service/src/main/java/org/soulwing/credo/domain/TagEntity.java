@@ -35,6 +35,7 @@ public class TagEntity extends AbstractEntity implements Tag {
 
   private static final long serialVersionUID = -5776251887144095935L;
 
+  @Column(unique = true, nullable = false, length = 50)
   private String text;
   
   /**
@@ -55,7 +56,6 @@ public class TagEntity extends AbstractEntity implements Tag {
    * {@inheritDoc}
    */
   @Override
-  @Column(unique = true, nullable = false, length = 50)
   public String getText() {
     return text;
   }

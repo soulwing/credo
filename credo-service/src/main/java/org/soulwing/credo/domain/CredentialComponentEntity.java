@@ -29,7 +29,6 @@ import javax.persistence.InheritanceType;
 import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
 import javax.persistence.MappedSuperclass;
-import javax.persistence.Transient;
 
 /**
  * A component entity for a {@link CredentialEntity}.
@@ -43,26 +42,33 @@ public abstract class CredentialComponentEntity extends AbstractEntity {
 
   private static final long serialVersionUID = -7847231056940730063L;
 
+  @ManyToOne(optional = false, fetch = FetchType.LAZY)
+  private CredentialEntity credential;
+
+  @Column(name = "content")
+  @Lob
   private String encoded;
 
-  private CredentialEntity credential;
-  
-  @ManyToOne(optional = false, fetch = FetchType.LAZY)
+  /**
+   * Gets the associated credential.
+   * @return credential
+   */
   public CredentialEntity getCredential() {
     return credential;
   }
 
+  /**
+   * Sets the associated credential.
+   * @param credential the credential to set
+   */
   public void setCredential(CredentialEntity credential) {
     this.credential = credential;
   }
-
 
   /**
    * Gets the {@code encoded} property.
    * @return
    */
-  @Column(name = "content")
-  @Lob
   public String getEncoded() {
     return encoded;
   }
@@ -78,7 +84,6 @@ public abstract class CredentialComponentEntity extends AbstractEntity {
   /**
    * {@inheritDoc}
    */
-  @Transient
   public Reader getContent() throws IOException {
     String content = getEncoded();
     return new StringReader(content != null ? content : "");

@@ -23,6 +23,8 @@ import java.util.Date;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 
 import org.soulwing.credo.CredentialCertificate;
 
@@ -38,17 +40,27 @@ public class CredentialCertificateEntity extends CredentialComponentEntity
 
   private static final long serialVersionUID = -8685213395580438912L;
   
+  @Column(nullable = false)
   private String subject;
+  
+  @Column(nullable = false)
   private String issuer;
+  
+  @Column(name = "serial_number", nullable = false)
   private String serialNumber;
+  
+  @Temporal(TemporalType.TIMESTAMP)
+  @Column(name = "not_before", nullable = false)
   private Date notBefore;
+  
+  @Temporal(TemporalType.TIMESTAMP)
+  @Column(name = "not_after", nullable = false)
   private Date notAfter;
 
   /**
    * {@inheritDoc}
    */
   @Override
-  @Column(nullable = false)
   public String getSubject() {
     return subject;
   }
@@ -65,7 +77,6 @@ public class CredentialCertificateEntity extends CredentialComponentEntity
    * {@inheritDoc}
    */
   @Override
-  @Column(nullable = false)
   public String getIssuer() {
     return issuer;
   }
@@ -82,7 +93,6 @@ public class CredentialCertificateEntity extends CredentialComponentEntity
    * {@inheritDoc}
    */
   @Override
-  @Column(name = "serial_number", nullable = false)
   public String getSerialNumber() {
     return serialNumber;
   }
@@ -99,7 +109,6 @@ public class CredentialCertificateEntity extends CredentialComponentEntity
    * {@inheritDoc}
    */
   @Override
-  @Column(name = "not_before", nullable = false)
   public Date getNotBefore() {
     return notBefore;
   }
@@ -116,7 +125,6 @@ public class CredentialCertificateEntity extends CredentialComponentEntity
    * {@inheritDoc}
    */
   @Override
-  @Column(name = "not_after", nullable = false)
   public Date getNotAfter() {
     return notAfter;
   }
@@ -129,5 +137,4 @@ public class CredentialCertificateEntity extends CredentialComponentEntity
     this.notAfter = notAfter;
   }
 
-  
 }

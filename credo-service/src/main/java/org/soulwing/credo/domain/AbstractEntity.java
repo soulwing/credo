@@ -35,42 +35,27 @@ public class AbstractEntity implements Serializable {
 
   private static final long serialVersionUID = 2429649536505196748L;
 
+  @Id
+  @GeneratedValue
   private Long id;
+  
+  @Version
   private Long version;
 
   /**
    * Gets the {@code id} property.
    * @return
    */
-  @Id
-  @GeneratedValue
   public Long getId() {
     return id;
-  }
-
-  /**
-   * Sets the {@code id} property.
-   * @param id
-   */
-  public void setId(Long id) {
-    this.id = id;
   }
 
   /**
    * Gets the {@code version} property.
    * @return
    */
-  @Version
   public Long getVersion() {
     return version;
-  }
-
-  /**
-   * Sets the {@code version} property.
-   * @param version
-   */
-  public void setVersion(Long version) {
-    this.version = version;
   }
 
 }
