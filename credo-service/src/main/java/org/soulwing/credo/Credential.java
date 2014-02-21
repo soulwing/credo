@@ -42,16 +42,16 @@ public interface Credential {
   void setName(String name);
 
   /**
-   * Gets the description assigned to this credential.
+   * Gets the note associated with this credential.
    * @return description
    */
-  String getDescription();
+  String getNote();
   
   /**
-   * Sets the description assigned to this credential.
-   * @param description the description to set
+   * Sets the note associated with assigned to this credential.
+   * @param note the note to set
    */
-  void setDescription(String description);
+  void setNote(String note);
   
   /**
    * Gets the collection of tags assigned to this credential.

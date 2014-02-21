@@ -55,11 +55,11 @@ import org.soulwing.credo.service.ImportService;
 import org.soulwing.credo.service.PassphraseException;
 
 /**
- * Unit tests for {@link AddCredentialBean}.
+ * Unit tests for {@link ImportCredentialBean}.
  *
  * @author Carl Harris
  */
-public class AddCredentialBeanTest {
+public class ImportCredentialBeanTest {
 
   private static final String SUBJECT_NAME = "subjectName";
   
@@ -84,7 +84,7 @@ public class AddCredentialBeanTest {
   @Mock
   public Credential credential;
   
-  private AddCredentialBean bean = new AddCredentialBean();
+  private ImportCredentialBean bean = new ImportCredentialBean();
   
   @Before
   public void setUp() throws Exception {
@@ -117,7 +117,7 @@ public class AddCredentialBeanTest {
     context.checking(uploadSuccessExpectations(file, true));
     
     bean.setFile0(file);
-    assertThat(bean.upload(), equalTo(AddCredentialBean.PASSPHRASE_OUTCOME_ID));
+    assertThat(bean.upload(), equalTo(ImportCredentialBean.PASSPHRASE_OUTCOME_ID));
     assertThat(bean.getPreparation(), sameInstance(preparation));
   }
 
@@ -128,7 +128,7 @@ public class AddCredentialBeanTest {
     context.checking(uploadSuccessExpectations(file, true));
     
     bean.setFile1(file);
-    assertThat(bean.upload(), equalTo(AddCredentialBean.PASSPHRASE_OUTCOME_ID));
+    assertThat(bean.upload(), equalTo(ImportCredentialBean.PASSPHRASE_OUTCOME_ID));
     assertThat(bean.getPreparation(), sameInstance(preparation));
   }
     
@@ -139,7 +139,7 @@ public class AddCredentialBeanTest {
     context.checking(uploadSuccessExpectations(file, true));
     
     bean.setFile2(file);
-    assertThat(bean.upload(), equalTo(AddCredentialBean.PASSPHRASE_OUTCOME_ID));
+    assertThat(bean.upload(), equalTo(ImportCredentialBean.PASSPHRASE_OUTCOME_ID));
     assertThat(bean.getPreparation(), sameInstance(preparation));
   }
 
@@ -158,7 +158,7 @@ public class AddCredentialBeanTest {
     } });
       
     bean.setFile0(file);
-    assertThat(bean.upload(), equalTo(AddCredentialBean.FAILURE_OUTCOME_ID));
+    assertThat(bean.upload(), equalTo(ImportCredentialBean.FAILURE_OUTCOME_ID));
   }
 
   @Test
@@ -321,7 +321,7 @@ public class AddCredentialBeanTest {
     } });
     
     bean.setCredential(credential);
-    assertThat(bean.save(), equalTo(AddCredentialBean.SUCCESS_OUTCOME_ID));    
+    assertThat(bean.save(), equalTo(ImportCredentialBean.SUCCESS_OUTCOME_ID));    
   }
 
   @Test
@@ -344,7 +344,7 @@ public class AddCredentialBeanTest {
       oneOf(conversation).end();
     } });
     
-    assertThat(bean.cancel(), equalTo(AddCredentialBean.CANCEL_OUTCOME_ID));
+    assertThat(bean.cancel(), equalTo(ImportCredentialBean.CANCEL_OUTCOME_ID));
   }
   
   @Test
@@ -363,7 +363,7 @@ public class AddCredentialBeanTest {
     } });
     
     bean.setPreparation(preparation);
-    assertThat(bean.validate(), equalTo(AddCredentialBean.DETAILS_OUTCOME_ID));
+    assertThat(bean.validate(), equalTo(ImportCredentialBean.DETAILS_OUTCOME_ID));
     assertThat(bean.getCredential(), sameInstance(credential));
   }
 
@@ -378,7 +378,7 @@ public class AddCredentialBeanTest {
     } });
     
     bean.setPreparation(preparation);
-    assertThat(bean.validate(), equalTo(AddCredentialBean.FAILURE_OUTCOME_ID));
+    assertThat(bean.validate(), equalTo(ImportCredentialBean.FAILURE_OUTCOME_ID));
   }
 
   @Test
@@ -412,7 +412,7 @@ public class AddCredentialBeanTest {
     
     bean.setFile0(file);
     bean.setPreparation(preparation);
-    assertThat(bean.validate(), equalTo(AddCredentialBean.DETAILS_OUTCOME_ID));
+    assertThat(bean.validate(), equalTo(ImportCredentialBean.DETAILS_OUTCOME_ID));
     assertThat(bean.getCredential(), sameInstance(credential));
   }
 
@@ -444,7 +444,7 @@ public class AddCredentialBeanTest {
     
     bean.setFile0(file);
     bean.setPreparation(preparation);
-    assertThat(bean.validate(), equalTo(AddCredentialBean.PASSPHRASE_OUTCOME_ID));
+    assertThat(bean.validate(), equalTo(ImportCredentialBean.PASSPHRASE_OUTCOME_ID));
   }
 
 }

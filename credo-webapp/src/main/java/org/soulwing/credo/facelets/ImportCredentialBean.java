@@ -49,7 +49,7 @@ import org.soulwing.credo.service.PassphraseException;
  */
 @Named
 @ConversationScoped
-public class AddCredentialBean implements Serializable {
+public class ImportCredentialBean implements Serializable {
 
   static final String DETAILS_OUTCOME_ID = "details";
 
@@ -148,19 +148,19 @@ public class AddCredentialBean implements Serializable {
   }
 
   /**
-   * Gets the {@code description} property.
+   * Gets the {@code note} property.
    * @return
    */
-  public String getDescription() {
-    return credential.getDescription();
+  public String getNote() {
+    return credential.getNote();
   }
 
   /**
-   * Sets the {@code description} property.
-   * @param description
+   * Sets the {@code note} property.
+   * @param note
    */
-  public void setDescription(String description) {
-    credential.setDescription(description);
+  public void setNote(String note) {
+    credential.setNote(note);
   }
 
   /**

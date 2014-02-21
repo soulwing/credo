@@ -92,7 +92,7 @@ public class JpaCredentialRepositoryIT {
   public void testAdd() throws Exception {
     CredentialEntity credential = new CredentialEntity();
     credential.setName("Test");
-    credential.setDescription("This is a test.");
+    credential.setNote("This is a test.");
     repository.add(credential);
     entityManager.flush();
     entityManager.clear();
@@ -105,7 +105,7 @@ public class JpaCredentialRepositoryIT {
   public void testAddWithDuplicateName() throws Exception {
     CredentialEntity credential = new CredentialEntity();
     credential.setName("Test");
-    credential.setDescription("This is a test.");
+    credential.setNote("This is a test.");
     repository.add(credential);
     entityManager.flush();
     entityManager.clear();

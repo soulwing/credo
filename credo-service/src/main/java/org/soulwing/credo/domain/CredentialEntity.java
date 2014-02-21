@@ -51,7 +51,7 @@ public class CredentialEntity extends AbstractEntity implements Credential {
   private static final long serialVersionUID = 641502440794773525L;
   
   private String name;
-  private String description;
+  private String note;
   private Set<TagEntity> tags = new LinkedHashSet<TagEntity>();
   
   private CredentialKeyEntity privateKey;
@@ -80,16 +80,16 @@ public class CredentialEntity extends AbstractEntity implements Credential {
    */
   @Override
   @Lob
-  public String getDescription() {
-    return description;
+  public String getNote() {
+    return note;
   }
 
   /**
    * {@inheritDoc}
    */
   @Override
-  public void setDescription(String description) {
-    this.description = description;
+  public void setNote(String note) {
+    this.note = note;
   }
 
   /**
