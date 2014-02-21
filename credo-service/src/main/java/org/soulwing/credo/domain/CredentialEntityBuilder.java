@@ -18,6 +18,8 @@
  */
 package org.soulwing.credo.domain;
 
+import java.util.Date;
+
 import org.soulwing.credo.Credential;
 import org.soulwing.credo.CredentialBuilder;
 import org.soulwing.credo.CredentialCertificate;
@@ -31,6 +33,22 @@ public class CredentialEntityBuilder implements CredentialBuilder {
 
   private final CredentialEntity credential = new CredentialEntity();
   
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public void setIssuer(String issuer) {
+    credential.setIssuer(issuer);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public void setExpiration(Date expiration) {
+    credential.setExpiration(expiration);
+  }
+
   /**
    * {@inheritDoc}
    */

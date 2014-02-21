@@ -65,6 +65,13 @@ public class CredentialEntity extends AbstractEntity implements Credential {
   })
   private Set<TagEntity> tags = new LinkedHashSet<TagEntity>();
   
+  @Column(nullable = false)
+  private String issuer;
+  
+  @Temporal(TemporalType.TIMESTAMP)
+  @Column(nullable = false)
+  private Date expiration;
+  
   @OneToOne(optional = false, fetch = FetchType.LAZY, 
       mappedBy = "credential", orphanRemoval = true, 
       cascade = { CascadeType.PERSIST })
@@ -143,6 +150,38 @@ public class CredentialEntity extends AbstractEntity implements Credential {
     this.tags.add(tag);
   }
   
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public String getIssuer() {
+    return issuer;
+  }
+
+  /**
+   * Sets the name of the issuer of the credential's certificate.
+   * @param issuer the issuer name to set
+   */
+  public void setIssuer(String issuer) {
+    this.issuer = issuer;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public Date getExpiration() {
+    return expiration;
+  }
+  
+  /**
+   * Sets the expiration date of the credential's certificate
+   * @param expiration the expiration date to set
+   */
+  public void setExpiration(Date expiration) {
+    this.expiration = expiration;
+  }
+
   /**
    * {@inheritDoc}
    */

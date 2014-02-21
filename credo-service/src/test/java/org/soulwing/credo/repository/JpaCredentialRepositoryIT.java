@@ -94,12 +94,18 @@ public class JpaCredentialRepositoryIT {
     CredentialEntity credential = new CredentialEntity();
     credential.setName("Test");
     credential.setNote("This is a test.");
+    credential.setIssuer("TestIssuer");
+    credential.setExpiration(new Date());
     repository.add(credential);
     entityManager.flush();
     entityManager.clear();
     CredentialEntity entity = entityManager.find(CredentialEntity.class, 
         credential.getId());
     assertThat(entity.getName(), is(equalTo(credential.getName())));
+    assertThat(entity.getNote(), is(equalTo(credential.getNote())));
+    assertThat(entity.getIssuer(), is(equalTo(credential.getIssuer())));
+    assertThat(entity.getExpiration().getTime(), 
+        is(equalTo(credential.getExpiration().getTime())));
   }
 
   @Test(expected = PersistenceException.class)
@@ -121,6 +127,8 @@ public class JpaCredentialRepositoryIT {
   public void testAddWithTags() throws Exception {
     CredentialEntity credential = new CredentialEntity();
     credential.setName("Test");
+    credential.setIssuer("TestIssuer");
+    credential.setExpiration(new Date());
     credential.addTag(new TagEntity("tag1"));
     credential.addTag(new TagEntity("tag2"));
     repository.add(credential);
@@ -143,6 +151,8 @@ public class JpaCredentialRepositoryIT {
     
     CredentialEntity credential = new CredentialEntity();
     credential.setName("Test");
+    credential.setIssuer("TestIssuer");
+    credential.setExpiration(new Date());
     credential.setPrivateKey(privateKey);
     credential.addCertificate(certificate);
     credential.addCertificate(authority);
@@ -181,6 +191,8 @@ public class JpaCredentialRepositoryIT {
   public void testFindAll() throws Exception {
     CredentialEntity entity = new CredentialEntity();
     entity.setName("Test");
+    entity.setIssuer("TestIssuer");
+    entity.setExpiration(new Date());
     entity.addTag(new TagEntity("tag"));
     repository.add(entity);
     entityManager.flush();

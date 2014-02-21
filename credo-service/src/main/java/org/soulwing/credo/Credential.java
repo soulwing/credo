@@ -67,6 +67,18 @@ public interface Credential {
   void setTags(Set<? extends Tag> tags);
   
   /**
+   * Gets the name of this credential's certificate issuer.
+   * @return issuer name
+   */
+  String getIssuer();
+  
+  /**
+   * Gets the expiration date of this credential's certificate.
+   * @return 
+   */
+  Date getExpiration();
+  
+  /**
    * Gets the private key for this credential.
    * @return private key
    */

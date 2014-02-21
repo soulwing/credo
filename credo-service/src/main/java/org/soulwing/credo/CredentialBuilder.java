@@ -18,6 +18,8 @@
  */
 package org.soulwing.credo;
 
+import java.util.Date;
+
 /**
  * A builder for a {@link Credential}.
  *
@@ -25,6 +27,18 @@ package org.soulwing.credo;
  */
 public interface CredentialBuilder {
 
+  /**
+   * Sets the name of the issuer of the credential's certificate.
+   * @param issuer the issuer name to set
+   */
+  void setIssuer(String issuer);
+  
+  /**
+   * Sets the expiration date of the credential's certificate
+   * @param expiration the expiration date to set
+   */
+  void setExpiration(Date expiration);
+  
   /**
    * Sets the private key content for the credential.
    * @param content PEM-encoded private key content
