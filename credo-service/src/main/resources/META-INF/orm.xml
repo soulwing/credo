@@ -14,8 +14,8 @@
   <named-query name="findAllCredentials">
     <query>
       select distinct c from CredentialEntity c
-      left outer join fetch c.tags
-      order by c.name
+      left outer join fetch c.tags t
+      order by c.name, t.text
     </query>
   </named-query>
 
