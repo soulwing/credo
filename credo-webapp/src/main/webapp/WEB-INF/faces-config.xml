@@ -27,6 +27,14 @@
   </navigation-rule>
 
   <navigation-rule>
+    <from-view-id>/credentials/index.xhtml</from-view-id>
+    <navigation-case>
+      <from-outcome>import</from-outcome>
+      <to-view-id>/credentials/import/index.xhtml</to-view-id>
+    </navigation-case>
+  </navigation-rule>
+
+  <navigation-rule>
     <from-view-id>/credentials/import/*</from-view-id>
     <navigation-case>
       <from-outcome>success</from-outcome>
