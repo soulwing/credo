@@ -96,6 +96,7 @@ public class JpaCredentialRepositoryIT {
     credential.setNote("This is a test.");
     credential.setIssuer("TestIssuer");
     credential.setExpiration(new Date());
+    credential.setPrivateKey(new CredentialKeyEntity());
     repository.add(credential);
     entityManager.flush();
     entityManager.clear();
@@ -131,6 +132,7 @@ public class JpaCredentialRepositoryIT {
     credential.setExpiration(new Date());
     credential.addTag(new TagEntity("tag1"));
     credential.addTag(new TagEntity("tag2"));
+    credential.setPrivateKey(new CredentialKeyEntity());
     repository.add(credential);
     entityManager.flush();
     entityManager.clear();
@@ -194,6 +196,7 @@ public class JpaCredentialRepositoryIT {
     entity.setIssuer("TestIssuer");
     entity.setExpiration(new Date());
     entity.addTag(new TagEntity("tag"));
+    entity.setPrivateKey(new CredentialKeyEntity());
     repository.add(entity);
     entityManager.flush();
     entityManager.clear();

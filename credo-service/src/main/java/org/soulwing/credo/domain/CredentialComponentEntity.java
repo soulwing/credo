@@ -23,11 +23,9 @@ import java.io.Reader;
 import java.io.StringReader;
 
 import javax.persistence.Column;
-import javax.persistence.FetchType;
 import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
 import javax.persistence.Lob;
-import javax.persistence.ManyToOne;
 import javax.persistence.MappedSuperclass;
 
 /**
@@ -42,28 +40,9 @@ public abstract class CredentialComponentEntity extends AbstractEntity {
 
   private static final long serialVersionUID = -7847231056940730063L;
 
-  @ManyToOne(optional = false, fetch = FetchType.LAZY)
-  private CredentialEntity credential;
-
   @Column(name = "content")
   @Lob
   private String encoded;
-
-  /**
-   * Gets the associated credential.
-   * @return credential
-   */
-  public CredentialEntity getCredential() {
-    return credential;
-  }
-
-  /**
-   * Sets the associated credential.
-   * @param credential the credential to set
-   */
-  public void setCredential(CredentialEntity credential) {
-    this.credential = credential;
-  }
 
   /**
    * Gets the {@code encoded} property.

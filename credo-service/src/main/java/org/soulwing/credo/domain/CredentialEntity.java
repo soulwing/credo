@@ -73,12 +73,11 @@ public class CredentialEntity extends AbstractEntity implements Credential {
   private Date expiration;
   
   @OneToOne(optional = false, fetch = FetchType.LAZY, 
-      mappedBy = "credential", orphanRemoval = true, 
       cascade = { CascadeType.PERSIST })
+  @JoinColumn(name = "private_key_id")
   private CredentialKeyEntity privateKey;
   
-  @OneToMany(fetch = FetchType.LAZY, mappedBy = "credential",
-      cascade = { CascadeType.PERSIST })
+  @OneToMany(fetch = FetchType.LAZY, cascade = { CascadeType.PERSIST })
   @OrderColumn(name = "list_offset")
   private List<CredentialCertificateEntity> certificates = 
       new ArrayList<>();
@@ -196,9 +195,6 @@ public class CredentialEntity extends AbstractEntity implements Credential {
    */
   public void setPrivateKey(CredentialKeyEntity privateKey) {
     this.privateKey = privateKey;
-    if (privateKey != null) {
-      privateKey.setCredential(this);
-    }
   }
 
   /**
@@ -228,7 +224,6 @@ public class CredentialEntity extends AbstractEntity implements Credential {
       throw new NullPointerException("cannot add null reference to list");
     }
     this.certificates.add(certificate);
-    certificate.setCredential(this);    
   }
 
   /**
