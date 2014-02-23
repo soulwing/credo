@@ -3,10 +3,6 @@ body {
   padding-bottom: 30px;
 }
 
-thead {
-	background-color: #eee;
-}
-
 .button-bar {
 	text-align: right;
 	margin-bottom: 5px;
