@@ -40,15 +40,19 @@ public class CredentialTableBean {
   @Inject
   protected CredentialService credentialService;
   
+  private List<CredentialBean> beans;
+  
   /**
    * Gets the collection of credentials to display in the table.
    * @return credential list
    */
   public List<CredentialBean> getCredentials() {
-    List<Credential> credentials = credentialService.findAllCredentials();
-    List<CredentialBean> beans = new ArrayList<>(credentials.size());
-    for (Credential credential : credentials) {
-      beans.add(new CredentialBean(credential));
+    if (beans == null) {
+      List<Credential> credentials = credentialService.findAllCredentials();
+      beans = new ArrayList<>(credentials.size());
+      for (Credential credential : credentials) {
+        beans.add(new CredentialBean(credential));
+      }
     }
     return beans;
   }
