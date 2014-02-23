@@ -8,11 +8,6 @@ body {
 	margin-bottom: 5px;
 }
 
-.table-hover > tbody > tr:hover > td,
-.table-hover > tbody > tr:hover > th {
-  background-color: #d9edf7;
-}
-
 .theme-dropdown .dropdown-menu {
   display: block;
   position: static;
