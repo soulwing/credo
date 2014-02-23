@@ -1,12 +1,3 @@
-Display Credentials in Repository
----------------------------------
-
-A user can view a table containing all of the credentials stored in the
-repository.
-
-* Table columns must include the short name for the credential and the
-  date the credential's certificate expires.
-  
 Export Credential in ZIP Archive
 --------------------------------
 
