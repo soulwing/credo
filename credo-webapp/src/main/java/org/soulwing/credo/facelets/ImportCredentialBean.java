@@ -43,7 +43,7 @@ import org.soulwing.credo.service.ImportService;
 import org.soulwing.credo.service.PassphraseException;
 
 /**
- * A bean that supports the Add Credential interaction.
+ * A bean that supports the Import Credential interaction.
  *
  * @author Carl Harris
  */
