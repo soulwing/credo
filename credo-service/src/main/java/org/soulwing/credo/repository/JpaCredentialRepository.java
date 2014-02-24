@@ -25,6 +25,7 @@ import java.util.Set;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
 import javax.persistence.TypedQuery;
 
@@ -72,6 +73,22 @@ public class JpaCredentialRepository implements CredentialRepository {
       assert true;
     }
     return tag;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public Credential findById(Long id) {
+    TypedQuery<Credential> query = entityManager.createNamedQuery(
+        "findCredentialById", Credential.class);
+    query.setParameter("id", id);
+    try {
+      return query.getSingleResult();
+    }
+    catch (NoResultException ex) {
+      return null;
+    }
   }
 
   /**

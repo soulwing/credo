@@ -36,6 +36,14 @@ public interface CredentialRepository {
   void add(Credential credential);
 
   /**
+   * Finds a credential using its persistent identifier
+   * @param id identifier of the credential to retrieve
+   * @return credential or {@code null} if no credential exists with the
+   *    given {@code id}
+   */
+  Credential findById(Long id);
+  
+  /**
    * Finds all credentials in the repository.
    * @return list of credentials
    */

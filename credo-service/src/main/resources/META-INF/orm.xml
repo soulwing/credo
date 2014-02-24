@@ -11,6 +11,16 @@
     </query>
   </named-query>
   
+  <named-query name="findCredentialById">
+    <query>
+      select distinct c from CredentialEntity c
+      left outer join fetch c.tags
+      left outer join fetch c.privateKey
+      left outer join fetch c.certificates
+      where c.id = :id
+    </query>  
+  </named-query>
+  
   <named-query name="findAllCredentials">
     <query>
       select distinct c from CredentialEntity c

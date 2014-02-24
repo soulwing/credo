@@ -91,12 +91,7 @@ public class JpaCredentialRepositoryIT {
   
   @Test
   public void testAdd() throws Exception {
-    CredentialEntity credential = new CredentialEntity();
-    credential.setName("Test");
-    credential.setNote("This is a test.");
-    credential.setIssuer("TestIssuer");
-    credential.setExpiration(new Date());
-    credential.setPrivateKey(new CredentialKeyEntity());
+    CredentialEntity credential = newCredential();
     repository.add(credential);
     entityManager.flush();
     entityManager.clear();
@@ -111,14 +106,11 @@ public class JpaCredentialRepositoryIT {
 
   @Test(expected = PersistenceException.class)
   public void testAddWithDuplicateName() throws Exception {
-    CredentialEntity credential = new CredentialEntity();
-    credential.setName("Test");
-    credential.setNote("This is a test.");
+    CredentialEntity credential = newCredential();
     repository.add(credential);
     entityManager.flush();
     entityManager.clear();
-    credential = new CredentialEntity();
-    credential.setName("Test");
+    credential = newCredential();
     repository.add(credential);
     entityManager.flush();
     entityManager.clear();
@@ -126,13 +118,9 @@ public class JpaCredentialRepositoryIT {
 
   @Test
   public void testAddWithTags() throws Exception {
-    CredentialEntity credential = new CredentialEntity();
-    credential.setName("Test");
-    credential.setIssuer("TestIssuer");
-    credential.setExpiration(new Date());
+    CredentialEntity credential = newCredential();
     credential.addTag(new TagEntity("tag1"));
     credential.addTag(new TagEntity("tag2"));
-    credential.setPrivateKey(new CredentialKeyEntity());
     repository.add(credential);
     entityManager.flush();
     entityManager.clear();
@@ -151,10 +139,7 @@ public class JpaCredentialRepositoryIT {
     CredentialCertificateEntity certificate = newCertificate();
     CredentialCertificateEntity authority = newCertificate();
     
-    CredentialEntity credential = new CredentialEntity();
-    credential.setName("Test");
-    credential.setIssuer("TestIssuer");
-    credential.setExpiration(new Date());
+    CredentialEntity credential = newCredential();
     credential.setPrivateKey(privateKey);
     credential.addCertificate(certificate);
     credential.addCertificate(authority);
@@ -191,12 +176,7 @@ public class JpaCredentialRepositoryIT {
 
   @Test
   public void testFindAll() throws Exception {
-    CredentialEntity entity = new CredentialEntity();
-    entity.setName("Test");
-    entity.setIssuer("TestIssuer");
-    entity.setExpiration(new Date());
-    entity.addTag(new TagEntity("tag"));
-    entity.setPrivateKey(new CredentialKeyEntity());
+    CredentialEntity entity = newCredential();
     repository.add(entity);
     entityManager.flush();
     entityManager.clear();
@@ -205,6 +185,28 @@ public class JpaCredentialRepositoryIT {
     assertThat(credentials, is(not(empty())));
     Credential credential = credentials.get(0);
     assertThat(credential.getName(), is(equalTo(entity.getName())));
+  }
+
+  @Test
+  public void testFindById() throws Exception {
+    CredentialEntity entity = newCredential();
+    repository.add(entity);
+    entityManager.flush();
+    entityManager.clear();
+    Credential credential = repository.findById(entity.getId());
+    assertThat(credential, is(not(nullValue())));
+    assertThat(credential.getName(), is(equalTo(entity.getName())));
+  }
+
+
+  private CredentialEntity newCredential() {
+    CredentialEntity credential = new CredentialEntity();
+    credential.setName("Test");
+    credential.setNote("This is a test.");
+    credential.setIssuer("TestIssuer");
+    credential.setExpiration(new Date());
+    credential.setPrivateKey(new CredentialKeyEntity());
+    return credential;
   }
 
   private CredentialKeyEntity newPrivateKey() {
