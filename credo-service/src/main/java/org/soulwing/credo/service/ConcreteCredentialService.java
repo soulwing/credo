@@ -41,6 +41,19 @@ public class ConcreteCredentialService implements CredentialService {
    * {@inheritDoc}
    */
   @Override
+  public Credential findCredentialById(Long id) 
+      throws NoSuchCredentialException{
+    Credential credential = credentialRepository.findById(id);
+    if (credential == null) {
+      throw new NoSuchCredentialException();
+    }
+    return credential;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
   @Transactional
   public List<Credential> findAllCredentials() {
     return credentialRepository.findAll();

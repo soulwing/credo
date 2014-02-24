@@ -31,6 +31,15 @@ import org.soulwing.credo.Credential;
 public interface CredentialService {
 
   /**
+   * Finds a credential using its persistent identifier.
+   * @param id identifier of the subject credential
+   * @return credential
+   * @throws NoSuchCredentialException if no credential exists with the
+   *    given identifier
+   */
+  Credential findCredentialById(Long id) throws NoSuchCredentialException;
+  
+  /**
    * Finds all credentials managed by the application.
    * @return list of credentials
    */

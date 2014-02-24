@@ -60,6 +60,28 @@ public class ConcreteCredentialServiceTest {
   }
   
   @Test
+  public void testFindCredentialById() throws Exception {
+    final Long id = -1L;
+    context.checking(new Expectations() { { 
+      oneOf(credentialRepository).findById(with(same(id)));
+      will(returnValue(credential));
+    } });
+    
+    assertThat(service.findCredentialById(id), is(sameInstance(credential)));
+  }
+
+  @Test(expected = NoSuchCredentialException.class)
+  public void testFindCredentialByIdNotFound() throws Exception {
+    final Long id = -1L;
+    context.checking(new Expectations() { { 
+      oneOf(credentialRepository).findById(with(same(id)));
+      will(returnValue(null));
+    } });
+
+    service.findCredentialById(id);
+  }
+
+  @Test
   public void testFindAllCredentials() throws Exception {
     context.checking(new Expectations() { { 
       oneOf(credentialRepository).findAll();
