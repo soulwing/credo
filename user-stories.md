@@ -16,7 +16,17 @@ the ZIP archive.
   private key should be exported in unprotected form in the ZIP archive.
   Prompt the user to enter the passphrase for the private key if this option 
   is selected. 
+  
 
+Export Credential in Common Key Store Format
+--------------------------------------------
+
+When exporting a credential, the user can choose a key store format as an
+alternative to receiving the credential as a ZIP file containing PEM-encoded
+files.
+
+* Supported key store formats should include PKCS12, JKS, and BKS, as well as 
+  the concatenated PEM files format used by curl.
 
 
 Apply Passphrase to Unprotected Private Key
