@@ -78,7 +78,8 @@ public class ConcreteCredentialImporter implements CredentialImporter {
    * {@inheritDoc}
    */
   @Override
-  public void validate(Errors errors) throws ImportException {
+  public void validate(Errors errors) throws ImportException, 
+      PassphraseException {
     
     if (privateKey == null) {
       privateKey = bag.findPrivateKey();

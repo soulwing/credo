@@ -90,7 +90,7 @@ public class ConcreteImportService implements ImportService {
    */
   @Override
   public Credential createCredential(ImportPreparation preparation,
-      Errors errors) throws ImportException {
+      Errors errors) throws ImportException, PassphraseException {
     if (!(preparation instanceof CredentialImporter)) {
       throw new IllegalArgumentException(
           "preparation was not created by this service");

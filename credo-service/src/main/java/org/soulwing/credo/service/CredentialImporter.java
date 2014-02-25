@@ -45,8 +45,9 @@ public interface CredentialImporter extends ImportPreparation {
    * @param errors errors object that will be updated with errors/warnings
    *    during validation
    * @throws ImportException if a validation error occurs
+   * @throws PassphraseException if a provided password is incorrect
    */
-  void validate(Errors errors) throws ImportException;
+  void validate(Errors errors) throws ImportException, PassphraseException;
   
   /**
    * Creates a {@link Credential} containing the uploaded key and certificate 
