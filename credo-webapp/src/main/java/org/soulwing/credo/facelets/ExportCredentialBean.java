@@ -218,6 +218,14 @@ public class ExportCredentialBean implements Serializable {
   }
   
   /**
+   * Gets the conversation associated with the receiver.
+   * @return
+   */
+  public Conversation getConversation() {
+    return conversation;
+  }
+
+  /**
    * Creates the export request.
    * @return outcome ID
    */
@@ -272,13 +280,12 @@ public class ExportCredentialBean implements Serializable {
     
     try {
       preparation.writeContent(externalContext.getResponseOutputStream());
+      conversation.setTimeout(60000);
     }
     catch (IOException ex) {
+      conversation.end();
       // FIXME
       throw new RuntimeException(ex);
-    }
-    finally {
-      conversation.end();
     }
   }
 

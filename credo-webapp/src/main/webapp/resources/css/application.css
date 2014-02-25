@@ -3,6 +3,10 @@ body {
   padding-bottom: 30px;
 }
 
+#download {
+	display: none;
+}
+
 .button-bar {
 	text-align: right;
 	margin-bottom: 5px;

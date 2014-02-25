@@ -167,8 +167,13 @@ public class ExportCredentialBeanTest {
   @Test
   public void testDownload() throws Exception {
     final String encoding = null;
+    final OutputStream outputStream = new ByteArrayOutputStream();
     
-    context.checking(newDownloadExpectations(encoding));
+    context.checking(newDownloadExpectations(encoding, outputStream));
+    context.checking(new Expectations() { { 
+      oneOf(preparation).writeContent(with(same(outputStream)));
+      oneOf(conversation).setTimeout(with(any(Long.class)));
+    } });
     
     bean.setExportPreparation(preparation);
     bean.download();
@@ -177,21 +182,39 @@ public class ExportCredentialBeanTest {
   @Test
   public void testDownloadText() throws Exception {
     final String encoding = "someEncoding";
+    final OutputStream outputStream = new ByteArrayOutputStream();
     
-    context.checking(newDownloadExpectations(encoding));
+    context.checking(newDownloadExpectations(encoding, outputStream));
     context.checking(new Expectations() { { 
       oneOf(externalContext).setResponseCharacterEncoding(with(encoding));
+      oneOf(preparation).writeContent(with(same(outputStream)));
+      oneOf(conversation).setTimeout(with(any(Long.class)));
     } });
        
     bean.setExportPreparation(preparation);
     bean.download();
   }
 
-  private Expectations newDownloadExpectations(final String encoding) 
-      throws IOException {
+  @Test(expected = RuntimeException.class)
+  public void testDownloadError() throws Exception {
+    final String encoding = null;
+    final OutputStream outputStream = new ByteArrayOutputStream();
+    
+    context.checking(newDownloadExpectations(encoding, outputStream));
+    context.checking(new Expectations() { { 
+      oneOf(preparation).writeContent(with(same(outputStream)));
+      will(throwException(new IOException()));
+      oneOf(conversation).end();
+    } });
+       
+    bean.setExportPreparation(preparation);
+    bean.download();
+  }
+
+  private Expectations newDownloadExpectations(final String encoding,
+      final OutputStream outputStream) throws IOException {
     final String contentType = "someContentType";
     final String fileName = "someFilename";
-    final OutputStream outputStream = new ByteArrayOutputStream();
     return new Expectations() { { 
       oneOf(facesContext).getExternalContext();
       will(returnValue(externalContext));
@@ -208,8 +231,6 @@ public class ExportCredentialBeanTest {
           with(containsString(fileName)));
       oneOf(externalContext).getResponseOutputStream();
       will(returnValue(outputStream));
-      oneOf(preparation).writeContent(with(same(outputStream)));
-      oneOf(conversation).end();
     } };
   }
 
