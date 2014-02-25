@@ -52,6 +52,15 @@
     </navigation-case>
   </navigation-rule>
 
+  <navigation-rule>
+    <from-view-id>/credentials/export/*</from-view-id>
+    <navigation-case>
+      <from-outcome>cancel</from-outcome>
+      <to-view-id>/credentials/index.xhtml</to-view-id>
+      <redirect />
+    </navigation-case>
+  </navigation-rule>
+
   <converter>
     <converter-for-class>
       java.util.Date
