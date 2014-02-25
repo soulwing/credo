@@ -32,6 +32,7 @@ import org.soulwing.credo.repository.CredentialRepository;
  * @author Carl Harris
  */
 @ApplicationScoped
+@Transactional
 public class ConcreteCredentialService implements CredentialService {
 
   @Inject
@@ -54,7 +55,6 @@ public class ConcreteCredentialService implements CredentialService {
    * {@inheritDoc}
    */
   @Override
-  @Transactional
   public List<Credential> findAllCredentials() {
     return credentialRepository.findAll();
   }
