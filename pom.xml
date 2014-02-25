@@ -12,6 +12,7 @@
   <properties>
     <java.version>1.7</java.version>
     <hamcrest.version>1.3</hamcrest.version>
+    <jmock.version>2.6.0</jmock.version>
     <bouncycastle.version>1.50</bouncycastle.version>
     <slf4j.version>1.7.6</slf4j.version>
     <wildfly.version>8.0.0.Final</wildfly.version>
@@ -175,7 +176,13 @@
       <dependency>
         <groupId>org.jmock</groupId>
         <artifactId>jmock-junit4</artifactId>
-        <version>2.6.0</version>
+        <version>${jmock.version}</version>
+        <scope>test</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.jmock</groupId>
+        <artifactId>jmock-legacy</artifactId>
+        <version>${jmock.version}</version>
         <scope>test</scope>
       </dependency>
       <dependency>
