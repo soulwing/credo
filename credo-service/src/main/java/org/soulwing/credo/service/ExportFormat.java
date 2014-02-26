@@ -25,6 +25,24 @@ package org.soulwing.credo.service;
  */
 public enum ExportFormat {
 
-  PEM_ARCHIVE;
+  PEM_ARCHIVE(".zip");
   
+  private final String fileSuffix;
+
+  /**
+   * Constructs a new instance.
+   * @param fileSuffix
+   */
+  private ExportFormat(String fileSuffix) {
+    this.fileSuffix = fileSuffix;
+  }
+
+  /**
+   * Gets the {@code fileSuffix} property.
+   * @return
+   */
+  public String getFileSuffix() {
+    return fileSuffix;
+  }
+
 }

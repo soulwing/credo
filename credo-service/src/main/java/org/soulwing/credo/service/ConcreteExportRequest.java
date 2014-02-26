@@ -34,6 +34,9 @@ public class ConcreteExportRequest
 
   private final Credential credential;
   
+  private char[] passphrase;
+  private char[] exportPassphrase;
+  private String fileName;  
   private ExportFormat format = ExportFormat.PEM_ARCHIVE;
   
   /**
@@ -66,8 +69,7 @@ public class ConcreteExportRequest
    */
   @Override
   public char[] getPassphrase() {
-    // TODO Auto-generated method stub
-    return null;
+    return passphrase;
   }
 
   /**
@@ -75,8 +77,7 @@ public class ConcreteExportRequest
    */
   @Override
   public void setPassphrase(char[] passphrase) {
-    // TODO Auto-generated method stub
-
+    this.passphrase = passphrase;
   }
 
   /**
@@ -84,8 +85,9 @@ public class ConcreteExportRequest
    */
   @Override
   public String getFileName() {
-    // TODO Auto-generated method stub
-    return null;
+    if (fileName != null) return fileName;
+    return credential.getName().trim().replaceAll("\\.|\\s+", "_")
+        + format.getFileSuffix();
   }
 
   /**
@@ -93,8 +95,7 @@ public class ConcreteExportRequest
    */
   @Override
   public void setFileName(String fileName) {
-    // TODO Auto-generated method stub
-
+    this.fileName = fileName;
   }
 
   /**
@@ -102,8 +103,7 @@ public class ConcreteExportRequest
    */
   @Override
   public char[] getExportPassphrase() {
-    // TODO Auto-generated method stub
-    return null;
+    return exportPassphrase;
   }
 
   /**
@@ -111,8 +111,7 @@ public class ConcreteExportRequest
    */
   @Override
   public void setExportPassphrase(char[] exportPassphrase) {
-    // TODO Auto-generated method stub
-
+    this.exportPassphrase = exportPassphrase;
   }
 
   /**
@@ -120,6 +119,7 @@ public class ConcreteExportRequest
    */
   @Override
   public ExportFormat getFormat() {
+    if (format == null) return ExportFormat.PEM_ARCHIVE;
     return format;
   }
 
