@@ -50,6 +50,9 @@ import org.junit.runner.RunWith;
 import org.soulwing.credo.Credential;
 import org.soulwing.credo.domain.CredentialEntity;
 import org.soulwing.credo.repository.CredentialRepository;
+import org.soulwing.credo.service.archive.ArchiveBuilder;
+import org.soulwing.credo.service.exporter.CredentialExporter;
+import org.soulwing.credo.service.importer.CredentialImporter;
 import org.soulwing.credo.service.x509.CredentialBag;
 import org.soulwing.credo.service.x509.bc.BcCredentialBag;
 
@@ -70,6 +73,9 @@ public class ConcreteImportServiceIT {
         .addPackage(CredentialEntity.class.getPackage())
         .addPackage(CredentialRepository.class.getPackage())
         .addPackage(ImportService.class.getPackage())
+        .addPackage(CredentialImporter.class.getPackage())
+        .addPackage(CredentialExporter.class.getPackage())
+        .addPackage(ArchiveBuilder.class.getPackage())
         .addPackage(CredentialBag.class.getPackage())
         .addPackage(BcCredentialBag.class.getPackage())
         .addAsResource("testcases")
