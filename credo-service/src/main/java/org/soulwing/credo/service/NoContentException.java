@@ -20,7 +20,7 @@ package org.soulwing.credo.service;
 
 /**
  * An exception thrown when an imported file contains nothing of interest to
- * a {@link CredentialImporter}.
+ * an importer.
  *
  * @author Carl Harris
  */
