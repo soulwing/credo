@@ -80,4 +80,16 @@ public interface ExportRequest {
    */
   void setExportPassphrase(char[] exportPassphrase);
 
+  /**
+   * Gets the format for the exported credential.
+   * @return export format
+   */
+  ExportFormat getFormat();
+  
+  /**
+   * Sets the format for the exported credential.
+   * @param format the export format to set
+   */
+  void setFormat(ExportFormat format);
+
 }
