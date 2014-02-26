@@ -51,7 +51,7 @@ public class ConcreteExportRequestTest {
   }
   
   @Test
-  public void testGetFileName() throws Exception {
+  public void testGetFileNameDefault() throws Exception {
     final String fileName = "some.dotted.and  spaced name ";
     context.checking(new Expectations() { { 
       oneOf(credential).getName();
@@ -64,5 +64,12 @@ public class ConcreteExportRequestTest {
         + request.getFormat().getFileSuffix();
     assertThat(request.getFileName(), is(equalTo(expectedName)));
   }
-  
+
+  @Test
+  public void testGetFileNameExplicit() throws Exception {
+    String fileName = "some name";
+    request.setFileName(fileName);
+    assertThat(request.getFileName(), is(equalTo(fileName)));
+  }
+
 }
