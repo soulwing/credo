@@ -61,7 +61,7 @@ public class ConcreteExportService implements ExportService {
       throws ExportException, PassphraseException {
     CredentialExportProvider provider = findProvider(request);
     
-    CredentialExporter exporter = provider.getExporter();
+    CredentialExporter exporter = provider.newExporter();
     try {
       return exporter.exportCredential(request);      
     }

@@ -110,7 +110,7 @@ public class ConcreteExportServiceTest {
   public void testPrepareExport() throws Exception {
     context.checking(prepareExportExpectations(true));
     context.checking(new Expectations() { { 
-      oneOf(provider).getExporter();
+      oneOf(provider).newExporter();
       will(returnValue(exporter));
       oneOf(exporter).exportCredential(with(same(request)));
       will(returnValue(preparation));
@@ -123,7 +123,7 @@ public class ConcreteExportServiceTest {
   public void testPrepareExportIOException() throws Exception {
     context.checking(prepareExportExpectations(true));
     context.checking(new Expectations() { { 
-      oneOf(provider).getExporter();
+      oneOf(provider).newExporter();
       will(returnValue(exporter));
       oneOf(exporter).exportCredential(with(same(request)));
       will(throwException(new IOException()));
