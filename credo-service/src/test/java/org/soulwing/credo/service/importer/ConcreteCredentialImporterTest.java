@@ -16,7 +16,7 @@
  * limitations under the License.
  *
  */
-package org.soulwing.credo.service;
+package org.soulwing.credo.service.importer;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
@@ -38,6 +38,12 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.soulwing.credo.CredentialBuilderFactory;
+import org.soulwing.credo.service.Errors;
+import org.soulwing.credo.service.ImportException;
+import org.soulwing.credo.service.NoContentException;
+import org.soulwing.credo.service.PassphraseException;
+import org.soulwing.credo.service.TimeOfDayService;
+import org.soulwing.credo.service.importer.ConcreteCredentialImporter;
 import org.soulwing.credo.service.x509.CertificateWrapper;
 import org.soulwing.credo.service.x509.CredentialBag;
 import org.soulwing.credo.service.x509.IncorrectPassphraseException;

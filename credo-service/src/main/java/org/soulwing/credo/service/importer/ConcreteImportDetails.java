@@ -16,7 +16,7 @@
  * limitations under the License.
  *
  */
-package org.soulwing.credo.service;
+package org.soulwing.credo.service.importer;
 
 import java.util.Date;
 
@@ -24,6 +24,7 @@ import javax.naming.NamingException;
 import javax.naming.ldap.LdapName;
 import javax.naming.ldap.Rdn;
 
+import org.soulwing.credo.service.ImportDetails;
 import org.soulwing.credo.service.x509.CertificateWrapper;
 
 /**

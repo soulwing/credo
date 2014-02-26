@@ -16,7 +16,7 @@
  * limitations under the License.
  *
  */
-package org.soulwing.credo.service;
+package org.soulwing.credo.service.importer;
 
 /**
  * A factory that produces {@link CredentialImporter} objects.

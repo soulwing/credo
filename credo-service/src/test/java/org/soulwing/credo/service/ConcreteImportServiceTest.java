@@ -41,6 +41,8 @@ import org.soulwing.credo.Credential;
 import org.soulwing.credo.Tag;
 import org.soulwing.credo.repository.CredentialRepository;
 import org.soulwing.credo.repository.TagRepository;
+import org.soulwing.credo.service.importer.CredentialImporter;
+import org.soulwing.credo.service.importer.CredentialImporterFactory;
 
 /**
  * Unit tests for {@link ConcreteImportService}.

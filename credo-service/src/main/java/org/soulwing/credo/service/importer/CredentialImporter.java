@@ -16,12 +16,17 @@
  * limitations under the License.
  *
  */
-package org.soulwing.credo.service;
+package org.soulwing.credo.service.importer;
 
 import java.io.IOException;
 import java.io.InputStream;
 
 import org.soulwing.credo.Credential;
+import org.soulwing.credo.service.Errors;
+import org.soulwing.credo.service.ImportException;
+import org.soulwing.credo.service.ImportPreparation;
+import org.soulwing.credo.service.NoContentException;
+import org.soulwing.credo.service.PassphraseException;
 
 /**
  * A builder for a {@link Credential}.

@@ -16,12 +16,13 @@
  * limitations under the License.
  *
  */
-package org.soulwing.credo.service;
+package org.soulwing.credo.service.importer;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
 import org.soulwing.credo.CredentialBuilderFactory;
+import org.soulwing.credo.service.TimeOfDayService;
 import org.soulwing.credo.service.x509.CredentialBagFactory;
 
 /**

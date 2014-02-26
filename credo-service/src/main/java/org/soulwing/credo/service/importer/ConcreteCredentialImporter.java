@@ -16,7 +16,7 @@
  * limitations under the License.
  *
  */
-package org.soulwing.credo.service;
+package org.soulwing.credo.service.importer;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -27,6 +27,12 @@ import org.soulwing.credo.CredentialBuilder;
 import org.soulwing.credo.CredentialBuilderFactory;
 import org.soulwing.credo.CredentialCertificate;
 import org.soulwing.credo.CredentialCertificateBuilder;
+import org.soulwing.credo.service.Errors;
+import org.soulwing.credo.service.ImportDetails;
+import org.soulwing.credo.service.ImportException;
+import org.soulwing.credo.service.NoContentException;
+import org.soulwing.credo.service.PassphraseException;
+import org.soulwing.credo.service.TimeOfDayService;
 import org.soulwing.credo.service.x509.CertificateWrapper;
 import org.soulwing.credo.service.x509.CredentialBag;
 import org.soulwing.credo.service.x509.IncorrectPassphraseException;
