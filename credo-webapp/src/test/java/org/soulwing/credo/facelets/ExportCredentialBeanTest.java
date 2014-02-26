@@ -172,6 +172,7 @@ public class ExportCredentialBeanTest {
     context.checking(newDownloadExpectations(encoding, outputStream));
     context.checking(new Expectations() { { 
       oneOf(preparation).writeContent(with(same(outputStream)));
+      oneOf(facesContext).responseComplete();
       oneOf(conversation).setTimeout(with(any(Long.class)));
     } });
     
@@ -188,6 +189,7 @@ public class ExportCredentialBeanTest {
     context.checking(new Expectations() { { 
       oneOf(externalContext).setResponseCharacterEncoding(with(encoding));
       oneOf(preparation).writeContent(with(same(outputStream)));
+      oneOf(facesContext).responseComplete();
       oneOf(conversation).setTimeout(with(any(Long.class)));
     } });
        
