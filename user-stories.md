@@ -1,23 +1,3 @@
-Export Credential in ZIP Archive
---------------------------------
-
-Export a selected credential in the repository to PEM-encoded files wrapped 
-in a ZIP archive.
-
-* Use the short name of the credential to derive the base name for 
-the ZIP archive.
-    * e.g. if the subject certificate is myserver.example.com, the ZIP archive 
-      name could be myserver-example-com.zip
-* Use Apache httpd naming conventions for the component PEM files.
-    * Put the private key in a file named server.key
-    * Put the subject certificate in a file name server.crt
-    * Put the CA certificates a file named server-ca.crt.
-* If the private key is protected, allow the user to indicate that the 
-  private key should be exported in unprotected form in the ZIP archive.
-  Prompt the user to enter the passphrase for the private key if this option 
-  is selected. 
-  
-
 Export Credential in Common Key Store Format
 --------------------------------------------
 

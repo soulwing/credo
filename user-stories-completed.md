@@ -11,6 +11,7 @@ parts from one or more PEM-encoded files.
 * Allow the user to apply any number of tags to the certificate, defining
   new tags as desired
 
+
 Validate Credential on Import
 -----------------------------
 
@@ -24,6 +25,7 @@ When importing a credential, the upload file contents must be validated.
   correct self-signed certificate).
 * Warn the user if irrelevant CA certificates were included.
 
+
 Display Credentials in Repository
 ---------------------------------
 
@@ -33,3 +35,19 @@ repository.
 * Table columns must include the short name for the credential and the
   date the credential's certificate expires.
 
+
+Export Credential in ZIP Archive
+--------------------------------
+
+Export a selected credential in the repository to PEM-encoded files wrapped 
+in a ZIP archive.
+
+* Use the short name of the credential to derive the base name for 
+the ZIP archive.
+    * e.g. if the subject certificate is myserver.example.com, the ZIP archive 
+      name could be myserver-example-com.zip
+* Use Apache httpd naming conventions for the component PEM files.
+    * Put the private key in a file named server.key
+    * Put the subject certificate in a file name server.crt
+    * Put the CA certificates a file named server-ca.crt.
+ 
