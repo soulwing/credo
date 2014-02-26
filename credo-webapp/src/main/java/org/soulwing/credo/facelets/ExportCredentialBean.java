@@ -179,6 +179,24 @@ public class ExportCredentialBean implements Serializable {
   }
 
   /**
+   * Gets the export file name.
+   * @return file name
+   */
+  public String getFileName() {
+    Validate.notNull(request, "request not prepared");
+    return request.getFileName();
+  }
+  
+  /**
+   * Sets the export file name.
+   * @param fileName the file name to set
+   */
+  public void setFileName(String fileName){
+    Validate.notNull(request, "request not prepared");
+    request.setFileName(fileName);
+  }
+  
+  /**
    * Gets the export request.
    * <p>
    * This method is exposed to support unit testing.
