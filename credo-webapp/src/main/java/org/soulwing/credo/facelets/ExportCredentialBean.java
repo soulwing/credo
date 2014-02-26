@@ -19,6 +19,7 @@
 package org.soulwing.credo.facelets;
 
 import java.io.IOException;
+import java.io.OutputStream;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.Set;
@@ -279,8 +280,10 @@ public class ExportCredentialBean implements Serializable {
     }
     
     try {
-      preparation.writeContent(externalContext.getResponseOutputStream());
-      conversation.setTimeout(60000);
+      OutputStream outputStream = externalContext.getResponseOutputStream();
+      preparation.writeContent(outputStream);
+      outputStream.close();
+      conversation.setTimeout(60000);      
     }
     catch (IOException ex) {
       conversation.end();
