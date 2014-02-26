@@ -53,6 +53,14 @@ public class CredentialBean {
   }
   
   /**
+   * Gets the unique identifier assigned to the credential.
+   * @return unique identifier
+   */
+  public Object getId() {
+    return credential.getId();
+  }
+  
+  /**
    * Gets the friendly name assigned to the credential.
    * @return friendly name
    */
