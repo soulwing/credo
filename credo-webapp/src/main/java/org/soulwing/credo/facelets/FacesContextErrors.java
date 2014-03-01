@@ -19,11 +19,13 @@
 package org.soulwing.credo.facelets;
 
 import java.text.MessageFormat;
+import java.util.Locale;
 import java.util.MissingResourceException;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
+import javax.inject.Inject;
 
 import org.soulwing.credo.resource.Bundle;
 import org.soulwing.credo.service.Errors;
@@ -38,13 +40,16 @@ public class FacesContextErrors implements Errors {
 
   private static final long serialVersionUID = -5205778057768297264L;
   
+  @Inject
+  private FacesContext context;
+  
   /**
    * Tests whether the faces context contains any errors.
    * @return {@code true} if the context contains at least one error
    */
   public boolean hasErrors() {
     return FacesMessage.SEVERITY_ERROR.equals(
-        getContext().getMaximumSeverity());
+        context.getMaximumSeverity());
   }
 
   /**
@@ -53,15 +58,7 @@ public class FacesContextErrors implements Errors {
    */
   public boolean hasWarnings() {
     return FacesMessage.SEVERITY_WARN.equals(
-        getContext().getMaximumSeverity());
-  }
-
-  private FacesContext getContext() {
-    FacesContext context = FacesContext.getCurrentInstance();
-    if (context == null) {
-      throw new NullPointerException("FacesContext is not available");
-    }
-    return context;
+        context.getMaximumSeverity());
   }
 
   /**
@@ -77,7 +74,7 @@ public class FacesContextErrors implements Errors {
    */
   @Override
   public void addError(String clientId, String message, Object... args) {
-    getContext().addMessage(clientId, 
+    context.addMessage(clientId, 
         createMessage(FacesMessage.SEVERITY_ERROR, message, args));
   }
 
@@ -94,7 +91,7 @@ public class FacesContextErrors implements Errors {
    */
   @Override
   public void addWarning(String clientId, String message, Object... args) {
-    getContext().addMessage(clientId, 
+    context.addMessage(clientId, 
         createMessage(FacesMessage.SEVERITY_WARN, message, args));
   }
 
@@ -108,7 +105,9 @@ public class FacesContextErrors implements Errors {
   private FacesMessage createMessage(FacesMessage.Severity severity, 
       String message, Object... args) {
     try {
-      String pattern = Bundle.get().getString(message);
+      Locale locale = FacesContext.getCurrentInstance().getViewRoot().getLocale();
+      String pattern = Bundle.get(
+          locale).getString(message);
       return new FacesMessage(severity,
           MessageFormat.format(pattern, args), null);
     }

@@ -18,6 +18,7 @@
  */
 package org.soulwing.credo.resource;
 
+import java.util.Locale;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
@@ -30,9 +31,10 @@ public class Bundle {
 
   /**
    * Gets the main resource bundle.
+   * @param locale locale
    * @return resource bundle
    */
-  public static ResourceBundle get() {
+  public static ResourceBundle get(Locale locale) {
     String base = Bundle.class.getPackage().getName() + ".messages";
     return ResourceBundle.getBundle(base);
   }
@@ -40,15 +42,16 @@ public class Bundle {
   /**
    * Gets a string from the resource bundle.
    * @param key key of the string to retrieve
+   * @param locale locale
    * @return string mapped to {@code code} or a placeholder if {@code key}
    *   does not exist in the bundle
    */
-  public static String getString(String key) {
+  public static String getString(String key, Locale locale) {
     try {
-      return get().getString(key);
+      return get(locale).getString(key);
     }
     catch (MissingResourceException ex) {
-      return "??" + key + "??";
+      return "???" + key + "???";
     }
   }
   
