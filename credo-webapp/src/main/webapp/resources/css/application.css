@@ -1,10 +1,51 @@
 body {
-  padding-top: 50px;
-  padding-bottom: 30px;
+	padding-top: 50px;
+	padding-bottom: 30px;
 }
 
 #download {
 	display: none;
+}
+
+#pw-progress {
+	margin-top: 5px;
+	margin-bottom: 1px;
+	height: 20px;
+	display: none;
+}
+
+#pw-container .form-control-feedback,
+#pw-again-container .form-control-feedback {
+	display: none;
+}
+
+.form-control-feedback.glyphicon-exclamation-sign {
+	color: #d9534f;
+}
+
+.form-control-feedback.glyphicon-warning-sign {
+  color: #f0ad4e;
+}
+
+.progress-bar {
+	text-align: left;
+}
+
+.password-verdict {
+	font-style: oblique;
+	font-size: x-small;
+	padding-left: 4px;
+}
+
+.has-feedback .form-control-feedback {
+	position: absolute;
+	top: 0;
+	right: 15px;
+	display: block;
+	width: 34px;
+	height: 34px;
+	line-height: 34px;
+	text-align: center;
 }
 
 .button-bar {
@@ -13,13 +54,13 @@ body {
 }
 
 .theme-dropdown .dropdown-menu {
-  display: block;
-  position: static;
-  margin-bottom: 20px;
+	display: block;
+	position: static;
+	margin-bottom: 20px;
 }
 
-.theme-showcase > p > .btn {
-  margin: 5px 0;
+.theme-showcase>p>.btn {
+	margin: 5px 0;
 }
 
 .app-callout {
@@ -34,9 +75,10 @@ body {
 }
 
 .app-callout-danger h4 {
-  color: #d9534f;
-  margin-top: 0;
+	color: #d9534f;
+	margin-top: 0;
 }
+
 .app-callout-warning {
 	background-color: #fcf8f2;
 	border-color: #f0ad4e;
