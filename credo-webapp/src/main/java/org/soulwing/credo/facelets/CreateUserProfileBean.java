@@ -30,7 +30,7 @@ import javax.inject.Named;
 @RequestScoped
 public class CreateUserProfileBean {
 
-  private String userName;
+  private String loginName;
   private String fullName;
   private String password;
   private String passwordAgain;
@@ -39,16 +39,16 @@ public class CreateUserProfileBean {
    * Gets the {@code userName} property.
    * @return
    */
-  public String getUserName() {
-    return userName;
+  public String getLoginName() {
+    return loginName;
   }
 
   /**
    * Sets the {@code userName} property.
    * @param userName
    */
-  public void setUserName(String userName) {
-    this.userName = userName;
+  public void setLoginName(String userName) {
+    this.loginName = userName;
   }
   
   /**

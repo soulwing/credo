@@ -18,25 +18,25 @@
           <ui:include src="/templates/messages.xhtml"/>
 	  		  <div class="form-group">
 	  		    <h:outputLabel styleClass="col-md-4 control-label" 
-	  		      for="userName">#{messages.userNameLabel}</h:outputLabel>
+	  		      for="userLoginName">#{messages.userLoginNameLabel}</h:outputLabel>
 	  		    <div class="col-md-4">
 	            <h:inputText styleClass="form-control"
 	              required="true" 
-                requiredMessage="#{messages.userNameRequired}"              	            
-	              id="userName" title="#{messages.userNameTip}" 
-	              value="#{createUserProfileBean.userName}">
-	              <f:validator validatorId="org.soulwing.credo.validators.UserName"/>
+                requiredMessage="#{messages.userLoginNameRequired}"              	            
+	              id="userLoginName" title="#{messages.userLoginNameTip}" 
+	              value="#{createUserProfileBean.loginName}">
+	              <f:validator validatorId="org.soulwing.credo.validators.LoginName"/>
 	            </h:inputText>
 	          </div>
 	  		  </div>
           <div class="form-group">
             <h:outputLabel styleClass="col-md-4 control-label" 
-              for="fullName">#{messages.fullNameLabel}</h:outputLabel>
+              for="userFullName">#{messages.userFullNameLabel}</h:outputLabel>
             <div class="col-md-4">
               <h:inputText styleClass="form-control"
-                id="fullName" title="#{messages.fullNameTip}"
+                id="userFullName" title="#{messages.userFullNameTip}"
                 required="true" 
-                requiredMessage="#{messages.fullNameRequired}"                               
+                requiredMessage="#{messages.userFullNameRequired}"                               
                 value="#{createUserProfileBean.fullName}">
                 <f:validator validatorId="org.soulwing.credo.validators.FullName"/>                
               </h:inputText>

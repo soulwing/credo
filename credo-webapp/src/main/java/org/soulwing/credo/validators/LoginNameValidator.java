@@ -35,8 +35,8 @@ import org.soulwing.credo.resource.Bundle;
  *
  * @author Carl Harris
  */
-@FacesValidator("org.soulwing.credo.validators.UserName")
-public class UserNameValidator implements Validator {
+@FacesValidator("org.soulwing.credo.validators.LoginName")
+public class LoginNameValidator implements Validator {
 
   private static final int MIN_LENGTH = 3;
   private static final int MAX_LENGTH = 30;
@@ -53,13 +53,13 @@ public class UserNameValidator implements Validator {
     Matcher matcher = PATTERN.matcher(value);
     if (!matcher.matches()) {
       throw new ValidatorException(new FacesMessage(FacesMessage.SEVERITY_ERROR,
-          Bundle.getString("userNameInvalidCharacters", 
+          Bundle.getString("userLoginNameInvalidCharacters", 
               FacesContext.getCurrentInstance().getViewRoot().getLocale()),
           null));
     }
     if (value.length() < MIN_LENGTH || value.length() > MAX_LENGTH) {
       throw new ValidatorException(new FacesMessage(FacesMessage.SEVERITY_ERROR,
-          Bundle.getString("userNameInvalidLength", 
+          Bundle.getString("userLoginNameInvalidLength", 
               FacesContext.getCurrentInstance().getViewRoot().getLocale()),
           null));
     }
