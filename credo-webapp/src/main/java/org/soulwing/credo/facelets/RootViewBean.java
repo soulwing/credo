@@ -18,10 +18,15 @@
  */
 package org.soulwing.credo.facelets;
 
+import java.io.IOException;
+
 import javax.enterprise.context.RequestScoped;
+import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
 import javax.inject.Inject;
 import javax.inject.Named;
+
+import org.soulwing.credo.service.WelcomeService;
 
 /**
  * A bean that handles requests for the root view of the application.
@@ -32,6 +37,13 @@ import javax.inject.Named;
 @RequestScoped
 public class RootViewBean {
 
+  static final String NEW_USER_PATH = "/welcome/index.xhtml";
+  
+  static final String EXISTING_USER_PATH = "/dashboard/index.xhtml";
+  
+  @Inject
+  protected WelcomeService welcomeService;
+  
   @Inject
   protected FacesContext facesContext;
   
@@ -39,7 +51,19 @@ public class RootViewBean {
    * Determines where to redirect a user who arrives at the root view.
    */
   public void redirect() {
-    
+    try {
+      StringBuilder sb = new StringBuilder();
+      ExternalContext externalContext = facesContext.getExternalContext();
+      String userName = externalContext.getRemoteUser();
+      sb.append(externalContext.getRequestContextPath());
+      sb.append(welcomeService.isNewUser(userName) ? 
+          NEW_USER_PATH : EXISTING_USER_PATH);
+      externalContext.redirect(sb.toString());
+      facesContext.responseComplete();
+    }
+    catch (IOException ex) {
+      throw new RuntimeException(ex);
+    }
   }
   
 }

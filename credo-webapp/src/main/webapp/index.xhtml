@@ -1,18 +1,11 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml"
-	xmlns:f="http://xmlns.jcp.org/jsf/core"
-	xmlns:h="http://xmlns.jcp.org/jsf/html"
-	xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+  xmlns:f="http://xmlns.jcp.org/jsf/core"
+  xmlns:h="http://xmlns.jcp.org/jsf/html"
+  xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
 
 <h:body>
-	<ui:composition template="/templates/masterTemplate.xhtml">
-		<ui:define name="windowTitle">#{messages.applicationName}</ui:define>
-		<ui:define name="content">
-		  <h1>Welcome!</h1>
-			<p>Credo is a web application you can use to manage all of your
-			X.509 credentials for web servers, web clients, and more.</p>
-		</ui:define>
-	</ui:composition>
+  <f:event type="preRenderView" listener="#{rootViewBean.redirect}" />
 </h:body>
 
 </html>

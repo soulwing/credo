@@ -1,7 +1,19 @@
+First Time User
+---------------
+
+When an authorized user visits the application for the first time, a welcome
+screen is displayed.
+
+* The welcome screen displays some helpful information about the purpose
+  of the application.
+* The user can activate a button/link to create a user profile.
+
+
 Create a User Profile
 ---------------------
 
-Anyone who has access to the application can create a user profile. 
+An authorized user can create a user profile.  The profile is created on the
+user's first visit to the application.
 
 A user profile contains
 * username --- the same string used to access the application
@@ -10,6 +22,11 @@ A user profile contains
   access control mechanism, this may also be the login password
 * public/private key pair -- used to access stored credentials; this key pair
   is created and stored for the user but the user doesn't need to know about it
+
+* If the user cancel's without creating a profile, he/she is returned to the
+  welcome screen.
+* It must not be possible to create a user profile for anyone other than the
+  authentic, logged-in user.
 
 
 Export Credential in Common Key Store Format
