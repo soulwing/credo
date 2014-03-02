@@ -8,7 +8,8 @@ A user profile contains
 * full name --- used in displaying current activity, etc
 * password --- used to protect the user's private key; depending on the 
   access control mechanism, this may also be the login password
-* public/private key pair -- used to access stored credentials
+* public/private key pair -- used to access stored credentials; this key pair
+  is created and stored for the user but the user doesn't need to know about it
 
 
 Export Credential in Common Key Store Format
