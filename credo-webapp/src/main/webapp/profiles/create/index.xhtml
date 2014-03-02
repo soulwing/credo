@@ -7,12 +7,12 @@
 <h:body>
 	<ui:composition template="/templates/masterTemplate.xhtml">
 		<ui:define name="windowTitle">
-		  #{messages.applicationName}::#{messages.addUserSubtitle}
+		  #{messages.applicationName}::#{messages.createUserProfileSubtitle}
 		</ui:define>
 		<ui:define name="content">
 		  <div class="col-md-8">
-	      <h1>#{messages.addUserSubtitle}</h1>
-	      <p>#{messages.addUserDetail}</p>
+	      <h1>#{messages.createUserProfileSubtitle}</h1>
+	      <p>#{messages.createUserProfileDetail}</p>
 			  <h:form prependId="false" styleClass="form-horizontal">		 
           <ui:include src="/templates/messages.xhtml"/>
 	  		  <div class="form-group">
@@ -23,7 +23,7 @@
 	              required="true" 
                 requiredMessage="#{messages.userNameRequired}"              	            
 	              id="userName" title="#{messages.userNameTip}" 
-	              value="#{addUserBean.userName}">
+	              value="#{createUserProfileBean.userName}">
 	              <f:validator validatorId="org.soulwing.credo.validators.UserName"/>
 	            </h:inputText>
 	          </div>
@@ -36,7 +36,7 @@
                 id="fullName" title="#{messages.fullNameTip}"
                 required="true" 
                 requiredMessage="#{messages.fullNameRequired}"                               
-                value="#{addUserBean.fullName}">
+                value="#{createUserProfileBean.fullName}">
                 <f:validator validatorId="org.soulwing.credo.validators.FullName"/>                
               </h:inputText>
             </div>
@@ -49,7 +49,7 @@
 	              redisplay="true" required="true" 
                 requiredMessage="#{messages.passwordRequired}"               	              
                 id="password" title="#{messages.passwordTip}" 
-                value="#{addUserBean.password}"/>
+                value="#{createUserProfileBean.password}"/>
               <span class="form-control-feedback glyphicon glyphicon-warning-sign"
                   title="The selected password is weak."></span>
               <div id="pw-progress"></div>
@@ -64,7 +64,7 @@
                 redisplay="true" required="true" 
                 requiredMessage="#{messages.passwordAgainRequired}"               
                 id="passwordAgain" title="#{messages.passwordAgainTip}" 
-                value="#{addUserBean.passwordAgain}">
+                value="#{createUserProfileBean.passwordAgain}">
                 <f:validator validatorId="org.soulwing.credo.validators.Password"/>                
               </h:inputSecret>
               <span class="form-control-feedback"></span>
@@ -74,12 +74,12 @@
 	          <div class="col-md-8 col-md-push-4">      
               <h:commandButton styleClass="btn" 
                 value="#{messages.cancelLabel}" 
-                action="#{addUserBean.cancel}" 
+                action="#{createUserProfileBean.cancel}" 
                 immediate="true"/>
               #{""}
 	            <h:commandButton styleClass="btn btn-primary" 
 	              value="#{messages.saveLabel}" 
-	              action="#{addUserBean.createUser}" />
+	              action="#{createUserProfileBean.createProfile}" />
 	          </div>
 	        </div>
 	  		</h:form>

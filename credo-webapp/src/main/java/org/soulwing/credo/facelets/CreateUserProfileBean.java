@@ -22,13 +22,13 @@ import javax.enterprise.context.RequestScoped;
 import javax.inject.Named;
 
 /**
- * A bean that supports the Add User interaction.
+ * A bean that supports the Create User Profile interaction.
  *
  * @author Carl Harris
  */
 @Named
 @RequestScoped
-public class AddUserBean {
+public class CreateUserProfileBean {
 
   private String userName;
   private String fullName;
@@ -103,7 +103,7 @@ public class AddUserBean {
    * Creates the user specified in the form.
    * @return the user to create
    */
-  public String createUser() {
+  public String createProfile() {
     return null;
   }
   
