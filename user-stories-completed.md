@@ -50,4 +50,17 @@ the ZIP archive.
     * Put the private key in a file named server.key
     * Put the subject certificate in a file name server.crt
     * Put the CA certificates a file named server-ca.crt.
+    
+First Time User
+---------------
+
+When an authorized user visits the application for the first time, a welcome
+screen is displayed.
+
+* The welcome screen displays some helpful information about the purpose
+  of the application.
+* The user can activate a button/link to create a user profile.
+
+
+    
  

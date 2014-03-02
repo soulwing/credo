@@ -1,14 +1,3 @@
-First Time User
----------------
-
-When an authorized user visits the application for the first time, a welcome
-screen is displayed.
-
-* The welcome screen displays some helpful information about the purpose
-  of the application.
-* The user can activate a button/link to create a user profile.
-
-
 Create a User Profile
 ---------------------
 
