@@ -1,3 +1,16 @@
+Create a User Profile
+---------------------
+
+Anyone who has access to the application can create a user profile. 
+
+A user profile contains
+* username --- the same string used to access the application
+* full name --- used in displaying current activity, etc
+* password --- used to protect the user's private key; depending on the 
+  access control mechanism, this may also be the login password
+* public/private key pair -- used to access stored credentials
+
+
 Export Credential in Common Key Store Format
 --------------------------------------------
 
