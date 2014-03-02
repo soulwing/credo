@@ -5,7 +5,9 @@ An authorized user can create a user profile.  The profile is created on the
 user's first visit to the application.
 
 A user profile contains
-* username --- the same string used to access the application
+* username --- the same string used to access the application; this field
+  is displayed in the form, but is set to the logged-in user name and is
+  read-only
 * full name --- used in displaying current activity, etc
 * password --- used to protect the user's private key; depending on the 
   access control mechanism, this may also be the login password
