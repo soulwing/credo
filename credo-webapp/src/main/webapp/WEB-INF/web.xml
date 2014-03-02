@@ -3,25 +3,103 @@
   xmlns="http://xmlns.jcp.org/xml/ns/javaee"
   xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd"
   version="3.1">
+  
   <context-param>
     <param-name>javax.faces.PROJECT_STAGE</param-name>
     <param-value>Development</param-value>
   </context-param>
+  
   <context-param>
     <param-name>javax.faces.DATETIMECONVERTER_DEFAULT_TIMEZONE_IS_SYSTEM_TIMEZONE</param-name>
     <param-value>true</param-value>
   </context-param>
+  
   <servlet>
     <servlet-name>faces-servlet</servlet-name>
     <servlet-class>javax.faces.webapp.FacesServlet</servlet-class>
     <load-on-startup>1</load-on-startup>
+    <security-role-ref>
+      <role-name>USER</role-name>
+      <role-link>org.soulwing.credo.user</role-link>
+    </security-role-ref>
+    <security-role-ref>
+      <role-name>ADMINISTRATOR</role-name>
+      <role-link>org.soulwing.credo.administrator</role-link>
+    </security-role-ref>
     <multipart-config />
   </servlet>
+  
   <servlet-mapping>
     <servlet-name>faces-servlet</servlet-name>
     <url-pattern>*.xhtml</url-pattern>
   </servlet-mapping>
+  
+  <security-role>
+    <role-name>org.soulwing.credo.user</role-name>
+  </security-role>
+  
+  <security-role>
+    <role-name>org.soulwing.credo.administrator</role-name>
+  </security-role>
+  
+  <login-config>
+    <auth-method>BASIC</auth-method>
+    <realm-name>Credo</realm-name>
+  </login-config>
+  
+  <security-constraint>
+    <web-resource-collection>
+      <web-resource-name>Public Resources</web-resource-name>
+      <description>
+        Allows all client-side assets to be retrieved by an unauthenticated 
+        browser. 
+      </description>
+      <url-pattern>/javax.faces.resource/*</url-pattern>
+      <url-pattern>/resources/*</url-pattern>
+    </web-resource-collection>
+    <user-data-constraint>
+      <transport-guarantee>CONFIDENTIAL</transport-guarantee>
+    </user-data-constraint>
+  </security-constraint>
+
+  <security-constraint>
+    <web-resource-collection>
+      <web-resource-name>Welcome</web-resource-name>
+      <description>
+        Allows the welcome and profile setup page(s) to be retrieved by any 
+        authorized user.
+      </description>
+      <url-pattern>/index.xhtml</url-pattern>
+      <url-pattern>/welcome/*</url-pattern>
+      <url-pattern>/profile/create/*</url-pattern>
+    </web-resource-collection>
+    <auth-constraint>
+      <role-name>*</role-name>
+    </auth-constraint> 
+    <user-data-constraint>
+      <transport-guarantee>CONFIDENTIAL</transport-guarantee>
+    </user-data-constraint>
+  </security-constraint>
+  
+  <security-constraint>
+    <web-resource-collection>
+      <web-resource-name>Default</web-resource-name>
+      <description>
+        Ensures that all other access requires an authorized user and
+        is protected by SSL.
+      </description>
+      <url-pattern>/*</url-pattern>
+    </web-resource-collection>
+    <auth-constraint>
+      <role-name>*</role-name>
+    </auth-constraint>
+    <user-data-constraint>
+      <transport-guarantee>CONFIDENTIAL</transport-guarantee>
+    </user-data-constraint>
+  </security-constraint>
+
   <welcome-file-list>
     <welcome-file>index.xhtml</welcome-file>
   </welcome-file-list>
+  
 </web-app>
