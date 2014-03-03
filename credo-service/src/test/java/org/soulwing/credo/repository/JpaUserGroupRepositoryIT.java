@@ -103,7 +103,7 @@ public class JpaUserGroupRepositoryIT {
   }
   
   @Test
-  public void testFindByUserLoginName() throws Exception {
+  public void testFindByLoginName() throws Exception {
     final String loginName = "someUser";
     UserProfileEntity user = newUser("someUser");
     UserGroupEntity group = newGroup("someGroup");
@@ -117,10 +117,91 @@ public class JpaUserGroupRepositoryIT {
     entityManager.clear();
     
     Set<? extends UserGroup> groups = 
-        repository.findByUserLoginName(loginName);
+        repository.findByLoginName(loginName);
     assertThat(groups, contains(hasProperty("name", equalTo("someGroup"))));
   }
-  
+
+  @Test
+  public void testFindByGroupAndLoginName() throws Exception {
+    final String loginName = "someUser";
+    final String groupName = "someGroup";
+    UserProfileEntity user = newUser("someUser");
+    UserGroupEntity group = newGroup(groupName);
+    
+    UserGroupMemberEntity groupMember = newGroupMember(user, group);
+    
+    entityManager.persist(user);
+    entityManager.persist(group);
+    entityManager.persist(groupMember);
+    entityManager.flush();
+    entityManager.clear();
+    
+    UserGroup actual = repository.findByGroupAndLoginName(groupName, loginName);
+    assertThat(actual, is(not(nullValue())));
+    assertThat(actual, hasProperty("name", equalTo(groupName)));
+  }
+
+  @Test
+  public void testFindByGroupAndLoginNameWhenGroupNotFound() throws Exception {
+    final String loginName = "someUser";
+    final String groupName = "someGroup";
+    UserProfileEntity user = newUser("someUser");
+    UserGroupEntity group = newGroup(groupName);
+    
+    UserGroupMemberEntity groupMember = newGroupMember(user, group);
+    
+    entityManager.persist(user);
+    entityManager.persist(group);
+    entityManager.persist(groupMember);
+    entityManager.flush();
+    entityManager.clear();
+    
+    UserGroup actual = repository.findByGroupAndLoginName("someOtherGroup", 
+        loginName);
+    assertThat(actual, is(nullValue()));
+  }
+
+  @Test
+  public void testFindByGroupAndLoginNameWhenSelfGroup() throws Exception {
+    final String loginName = "someUser";
+    final String groupName = UserGroup.SELF_GROUP_NAME;
+    UserProfileEntity user = newUser("someUser");
+    UserGroupEntity group = newGroup(groupName);
+    
+    UserGroupMemberEntity groupMember = newGroupMember(user, group);
+    
+    entityManager.persist(user);
+    entityManager.persist(group);
+    entityManager.persist(groupMember);
+    entityManager.flush();
+    entityManager.clear();
+    
+    UserGroup actual = repository.findByGroupAndLoginName(groupName, 
+        loginName);
+    assertThat(actual, is(nullValue()));
+  }
+
+  @Test
+  public void testFindByGroupAndLoginNameWhenGroupIsNull() throws Exception {
+    final String loginName = "someUser";
+    final String groupName = null;
+    UserProfileEntity user = newUser("someUser");
+    UserGroupEntity group = newGroup(groupName);
+    
+    UserGroupMemberEntity groupMember = newGroupMember(user, group);
+    
+    entityManager.persist(user);
+    entityManager.persist(group);
+    entityManager.persist(groupMember);
+    entityManager.flush();
+    entityManager.clear();
+    
+    UserGroup actual = repository.findByGroupAndLoginName(groupName, 
+        loginName);
+    assertThat(actual, is(nullValue()));
+  }
+
+
   private UserProfileEntity newUser(String loginName) {
     UserProfileEntity user = new UserProfileEntity();
     Date now = new Date();

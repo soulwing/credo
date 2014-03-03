@@ -19,6 +19,26 @@
       where u.loginName = :loginName
     </query>
   </named-query>
+
+  <named-query name="findUserGroupWithLoginName">
+    <query>
+      select distinct g from UserGroupMemberEntity gm
+      inner join gm.group g
+      inner join gm.user u
+      where u.loginName = :loginName
+      and g.name = :groupName
+    </query>
+  </named-query>
+  
+  <named-query name="findUserSelfGroup">
+    <query>
+      select distinct g from UserGroupMemberEntity gm
+      inner join gm.group g
+      inner join gm.user u
+      where u.loginName = :loginName
+      and g.name is null
+    </query>
+  </named-query>
   
   <named-query name="findTagByText">
     <query>
