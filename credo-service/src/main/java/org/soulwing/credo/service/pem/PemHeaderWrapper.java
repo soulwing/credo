@@ -19,7 +19,7 @@
 package org.soulwing.credo.service.pem;
 
 /**
- * DESCRIBE THE TYPE HERE.
+ * A PEM object header.
  *
  * @author Carl Harris
  */
