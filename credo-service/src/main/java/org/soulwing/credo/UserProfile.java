@@ -36,5 +36,23 @@ public interface UserProfile {
    * @return full name
    */
   String getFullName();
-    
+  
+  /**
+   * Gets the user's encrypted password.
+   * @return encrypted password
+   */
+  String getPassword();
+  
+  /**
+   * Gets the user's PEM encoded public key.
+   * @return public key
+   */
+  String getPublicKey();
+  
+  /**
+   * Gets the user's encrypted, PEM encoded private key.
+   * @return public key
+   */
+  String getPrivateKey();
+  
 }
