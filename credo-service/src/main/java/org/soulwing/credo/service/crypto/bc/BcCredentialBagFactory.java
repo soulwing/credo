@@ -19,9 +19,11 @@
 package org.soulwing.credo.service.crypto.bc;
 
 import javax.enterprise.context.ApplicationScoped;
+import javax.inject.Inject;
 
 import org.soulwing.credo.service.crypto.CredentialBag;
 import org.soulwing.credo.service.crypto.CredentialBagFactory;
+import org.soulwing.credo.service.pem.PemObjectBuilderFactory;
 
 /**
  * A {@link CredentialBagFactory} that produces {@link BcCredentialBag}
@@ -32,12 +34,15 @@ import org.soulwing.credo.service.crypto.CredentialBagFactory;
 @ApplicationScoped
 public class BcCredentialBagFactory implements CredentialBagFactory {
 
+  @Inject
+  protected PemObjectBuilderFactory objectBuilderFactory;
+  
   /**
    * {@inheritDoc}
    */
   @Override
   public CredentialBag newCredentialBag() {
-    return new BcCredentialBag();
+    return new BcCredentialBag(objectBuilderFactory);
   }
 
 }

@@ -19,7 +19,6 @@
 package org.soulwing.credo.service.crypto.bc;
 
 import java.io.IOException;
-import java.io.StringWriter;
 import java.security.PrivateKey;
 
 import org.apache.commons.lang.Validate;
@@ -30,7 +29,6 @@ import org.bouncycastle.openssl.EncryptionException;
 import org.bouncycastle.openssl.PEMDecryptorProvider;
 import org.bouncycastle.openssl.PEMEncryptedKeyPair;
 import org.bouncycastle.openssl.PEMKeyPair;
-import org.bouncycastle.openssl.PEMWriter;
 import org.bouncycastle.openssl.PKCS8Generator;
 import org.bouncycastle.openssl.jcajce.JceOpenSSLPKCS8DecryptorProviderBuilder;
 import org.bouncycastle.openssl.jcajce.JceOpenSSLPKCS8EncryptorBuilder;
@@ -42,6 +40,8 @@ import org.bouncycastle.pkcs.PKCS8EncryptedPrivateKeyInfo;
 import org.bouncycastle.pkcs.PKCSException;
 import org.soulwing.credo.service.crypto.IncorrectPassphraseException;
 import org.soulwing.credo.service.crypto.PrivateKeyWrapper;
+import org.soulwing.credo.service.pem.PemObjectBuilder;
+import org.soulwing.credo.service.pem.PemObjectBuilderFactory;
 
 /**
  * A {@link PrivateKeyWrapper} implementation based on Bouncy Castle.
@@ -51,15 +51,19 @@ import org.soulwing.credo.service.crypto.PrivateKeyWrapper;
 public class BcPrivateKeyWrapper implements BcWrapper, PrivateKeyWrapper {
 
   private final Object key;
-
+  private final PemObjectBuilderFactory objectBuilderFactory;
+  
   private char[] passphrase;
   
   /**
    * Constructs a new instance.
    * @param key key object
+   * @param objectBuilderFactory PEM object builder factory
    */
-  public BcPrivateKeyWrapper(Object key) {
+  public BcPrivateKeyWrapper(Object key, 
+      PemObjectBuilderFactory objectBuilderFactory) {
     this.key = key;
+    this.objectBuilderFactory = objectBuilderFactory;
   }
 
   /**
@@ -92,19 +96,21 @@ public class BcPrivateKeyWrapper implements BcWrapper, PrivateKeyWrapper {
    */
   @Override
   public String getContent() {
-    StringWriter writer = new StringWriter();
-    try (PEMWriter pemWriter = new PEMWriter(writer)) {
+    try {
       PrivateKeyInfo privateKeyInfo = derivePrivateKeyInfo();
+      PemObjectBuilder builder = objectBuilderFactory.newBuilder();
       if (passphrase == null) {
-        pemWriter.writeObject(privateKeyInfo);
+        builder.setType("RSA PRIVATE KEY");
+        builder.append(privateKeyInfo.getEncoded());
       }
       else {
         PKCS8Generator generator = new PKCS8Generator(privateKeyInfo, 
             createPrivateKeyEncryptor());
-        pemWriter.writeObject(generator.generate());
+        builder.setType("ENCRYPTED PRIVATE KEY");
+        builder.append(generator.generate().getContent());
       }
-      pemWriter.flush();
-      return writer.toString();
+      
+      return builder.build().getEncoded();
     }
     catch (IOException ex) {
       throw new RuntimeException(ex);

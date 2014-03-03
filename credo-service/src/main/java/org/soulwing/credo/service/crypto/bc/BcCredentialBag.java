@@ -37,6 +37,7 @@ import org.soulwing.credo.service.crypto.CertificateWrapper;
 import org.soulwing.credo.service.crypto.CredentialBag;
 import org.soulwing.credo.service.crypto.PrivateKeyWrapper;
 import org.soulwing.credo.service.crypto.UnsupportedKeyTypeException;
+import org.soulwing.credo.service.pem.PemObjectBuilderFactory;
 
 /**
  * A {@link CredentialBag} implementation based on Bouncy Castle.
@@ -50,6 +51,16 @@ public class BcCredentialBag implements CredentialBag {
   
   private final List<BcWrapper> objects = new ArrayList<>();
   
+  private final PemObjectBuilderFactory objectBuilderFactory;
+  
+  /**
+   * Constructs a new instance.
+   * @param objectBuilderFactory PEM object builder factory
+   */
+  public BcCredentialBag(PemObjectBuilderFactory objectBuilderFactory) {
+    this.objectBuilderFactory = objectBuilderFactory;
+  }
+
   /**
    * {@inheritDoc}
    */
@@ -61,13 +72,13 @@ public class BcCredentialBag implements CredentialBag {
       Object obj = parser.readObject();
       while (obj != null) {
         if (obj instanceof PKCS8EncryptedPrivateKeyInfo) {
-          objects.add(new BcPrivateKeyWrapper(obj));          
+          objects.add(new BcPrivateKeyWrapper(obj, objectBuilderFactory));          
         }
         else if (obj instanceof PEMEncryptedKeyPair) {
-          objects.add(new BcPrivateKeyWrapper(obj));
+          objects.add(new BcPrivateKeyWrapper(obj, objectBuilderFactory));
         }
         else if (obj instanceof PEMKeyPair) {
-          objects.add(new BcPrivateKeyWrapper(obj));          
+          objects.add(new BcPrivateKeyWrapper(obj, objectBuilderFactory));          
         }
         else if (obj instanceof X509CertificateHolder) {
           objects.add(new BcCertificateWrapper((X509CertificateHolder) obj));
