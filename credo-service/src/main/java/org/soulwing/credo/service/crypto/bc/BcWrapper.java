@@ -16,28 +16,12 @@
  * limitations under the License.
  *
  */
-package org.soulwing.credo.service.x509.bc;
-
-import javax.enterprise.context.ApplicationScoped;
-
-import org.soulwing.credo.service.x509.CredentialBag;
-import org.soulwing.credo.service.x509.CredentialBagFactory;
+package org.soulwing.credo.service.crypto.bc;
 
 /**
- * A {@link CredentialBagFactory} that produces {@link BcCredentialBag}
- * objects.
+ * A Bouncy Castle wrapper object
  *
  * @author Carl Harris
  */
-@ApplicationScoped
-public class BcCredentialBagFactory implements CredentialBagFactory {
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public CredentialBag newCredentialBag() {
-    return new BcCredentialBag();
-  }
-
+public interface BcWrapper {
 }

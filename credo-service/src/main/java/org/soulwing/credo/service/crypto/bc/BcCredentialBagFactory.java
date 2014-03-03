@@ -16,16 +16,28 @@
  * limitations under the License.
  *
  */
-package org.soulwing.credo.service.x509;
+package org.soulwing.credo.service.crypto.bc;
+
+import javax.enterprise.context.ApplicationScoped;
+
+import org.soulwing.credo.service.crypto.CredentialBag;
+import org.soulwing.credo.service.crypto.CredentialBagFactory;
 
 /**
- * An exception thrown when a {@link CredentialBag} cannot support a
- * requested operation for a given key type.
+ * A {@link CredentialBagFactory} that produces {@link BcCredentialBag}
+ * objects.
  *
  * @author Carl Harris
  */
-public class UnsupportedKeyTypeException extends RuntimeException {
+@ApplicationScoped
+public class BcCredentialBagFactory implements CredentialBagFactory {
 
-  private static final long serialVersionUID = 2740222668605034930L;
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public CredentialBag newCredentialBag() {
+    return new BcCredentialBag();
+  }
 
 }

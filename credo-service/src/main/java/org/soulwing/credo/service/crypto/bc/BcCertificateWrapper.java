@@ -16,7 +16,7 @@
  * limitations under the License.
  *
  */
-package org.soulwing.credo.service.x509.bc;
+package org.soulwing.credo.service.crypto.bc;
 
 import java.io.IOException;
 import java.io.StringWriter;
@@ -31,7 +31,7 @@ import org.bouncycastle.crypto.params.RSAKeyParameters;
 import org.bouncycastle.crypto.params.RSAPrivateCrtKeyParameters;
 import org.bouncycastle.crypto.util.PublicKeyFactory;
 import org.bouncycastle.openssl.PEMWriter;
-import org.soulwing.credo.service.x509.CertificateWrapper;
+import org.soulwing.credo.service.crypto.CertificateWrapper;
 
 /**
  * A {@link CertificateWrapper} implementation based on Bouncy Castle.

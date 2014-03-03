@@ -51,10 +51,10 @@ import org.soulwing.credo.Credential;
 import org.soulwing.credo.domain.CredentialEntity;
 import org.soulwing.credo.repository.CredentialRepository;
 import org.soulwing.credo.service.archive.ArchiveBuilder;
+import org.soulwing.credo.service.crypto.CredentialBag;
+import org.soulwing.credo.service.crypto.bc.BcCredentialBag;
 import org.soulwing.credo.service.exporter.CredentialExporter;
 import org.soulwing.credo.service.importer.CredentialImporter;
-import org.soulwing.credo.service.x509.CredentialBag;
-import org.soulwing.credo.service.x509.bc.BcCredentialBag;
 
 /**
  * Integration tests for {@link ConcreteImportService}.

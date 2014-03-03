@@ -16,12 +16,16 @@
  * limitations under the License.
  *
  */
-package org.soulwing.credo.service.x509.bc;
+package org.soulwing.credo.service.crypto;
 
 /**
- * A Bouncy Castle wrapper object
+ * An exception thrown when a {@link CredentialBag} cannot support a
+ * requested operation for a given key type.
  *
  * @author Carl Harris
  */
-public interface BcWrapper {
+public class UnsupportedKeyTypeException extends RuntimeException {
+
+  private static final long serialVersionUID = 2740222668605034930L;
+
 }

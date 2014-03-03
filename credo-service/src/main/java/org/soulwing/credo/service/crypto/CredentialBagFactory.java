@@ -16,7 +16,7 @@
  * limitations under the License.
  *
  */
-package org.soulwing.credo.service.x509;
+package org.soulwing.credo.service.crypto;
 
 /**
  * A factory that prodcuces {@link CredentialBag} objects.

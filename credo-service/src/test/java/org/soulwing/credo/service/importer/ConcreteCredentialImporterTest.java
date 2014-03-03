@@ -43,11 +43,11 @@ import org.soulwing.credo.service.ImportException;
 import org.soulwing.credo.service.NoContentException;
 import org.soulwing.credo.service.PassphraseException;
 import org.soulwing.credo.service.TimeOfDayService;
+import org.soulwing.credo.service.crypto.CertificateWrapper;
+import org.soulwing.credo.service.crypto.CredentialBag;
+import org.soulwing.credo.service.crypto.IncorrectPassphraseException;
+import org.soulwing.credo.service.crypto.PrivateKeyWrapper;
 import org.soulwing.credo.service.importer.ConcreteCredentialImporter;
-import org.soulwing.credo.service.x509.CertificateWrapper;
-import org.soulwing.credo.service.x509.CredentialBag;
-import org.soulwing.credo.service.x509.IncorrectPassphraseException;
-import org.soulwing.credo.service.x509.PrivateKeyWrapper;
 
 /**
  * Unit tests for {@link ConcreteCredentialImporter}.

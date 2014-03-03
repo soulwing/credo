@@ -23,7 +23,7 @@ import javax.inject.Inject;
 
 import org.soulwing.credo.CredentialBuilderFactory;
 import org.soulwing.credo.service.TimeOfDayService;
-import org.soulwing.credo.service.x509.CredentialBagFactory;
+import org.soulwing.credo.service.crypto.CredentialBagFactory;
 
 /**
  * A {@link CredentialImporterFactory} that produces 

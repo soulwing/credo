@@ -16,7 +16,7 @@
  * limitations under the License.
  *
  */
-package org.soulwing.credo.service.x509.bc;
+package org.soulwing.credo.service.crypto.bc;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -33,10 +33,10 @@ import org.bouncycastle.openssl.PEMParser;
 import org.bouncycastle.pkcs.PKCS8EncryptedPrivateKeyInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.soulwing.credo.service.x509.CertificateWrapper;
-import org.soulwing.credo.service.x509.CredentialBag;
-import org.soulwing.credo.service.x509.PrivateKeyWrapper;
-import org.soulwing.credo.service.x509.UnsupportedKeyTypeException;
+import org.soulwing.credo.service.crypto.CertificateWrapper;
+import org.soulwing.credo.service.crypto.CredentialBag;
+import org.soulwing.credo.service.crypto.PrivateKeyWrapper;
+import org.soulwing.credo.service.crypto.UnsupportedKeyTypeException;
 
 /**
  * A {@link CredentialBag} implementation based on Bouncy Castle.

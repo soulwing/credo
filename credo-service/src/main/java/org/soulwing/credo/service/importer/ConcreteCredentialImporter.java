@@ -33,10 +33,10 @@ import org.soulwing.credo.service.ImportException;
 import org.soulwing.credo.service.NoContentException;
 import org.soulwing.credo.service.PassphraseException;
 import org.soulwing.credo.service.TimeOfDayService;
-import org.soulwing.credo.service.x509.CertificateWrapper;
-import org.soulwing.credo.service.x509.CredentialBag;
-import org.soulwing.credo.service.x509.IncorrectPassphraseException;
-import org.soulwing.credo.service.x509.PrivateKeyWrapper;
+import org.soulwing.credo.service.crypto.CertificateWrapper;
+import org.soulwing.credo.service.crypto.CredentialBag;
+import org.soulwing.credo.service.crypto.IncorrectPassphraseException;
+import org.soulwing.credo.service.crypto.PrivateKeyWrapper;
 
 /**
  * A concrete {@link CredentialImporter}.
@@ -132,21 +132,16 @@ public class ConcreteCredentialImporter implements CredentialImporter {
    */
   @Override
   public Credential build() {
-    try {
-      CredentialBuilder builder = 
-          credentialBuilderFactory.newCredentialBuilder();
-      builder.setIssuer(getDetails().getIssuer());
-      builder.setExpiration(certificate.getNotAfter());
-      builder.setPrivateKey(privateKey.getContent());
-      builder.addCertificate(createCertificate(certificate));
-      for (CertificateWrapper authority : chain) {
-        builder.addCertificate(createCertificate(authority));
-      }
-      return builder.build();
+    CredentialBuilder builder = 
+        credentialBuilderFactory.newCredentialBuilder();
+    builder.setIssuer(getDetails().getIssuer());
+    builder.setExpiration(certificate.getNotAfter());
+    builder.setPrivateKey(privateKey.getContent());
+    builder.addCertificate(createCertificate(certificate));
+    for (CertificateWrapper authority : chain) {
+      builder.addCertificate(createCertificate(authority));
     }
-    catch (IOException ex) {
-      throw new RuntimeException(ex);
-    }
+    return builder.build();
   }
   
   private CredentialCertificate createCertificate(

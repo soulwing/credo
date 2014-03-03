@@ -25,7 +25,7 @@ import javax.naming.ldap.LdapName;
 import javax.naming.ldap.Rdn;
 
 import org.soulwing.credo.service.ImportDetails;
-import org.soulwing.credo.service.x509.CertificateWrapper;
+import org.soulwing.credo.service.crypto.CertificateWrapper;
 
 /**
  * A concrete implementation of {@link ImportDetails}.
