@@ -36,7 +36,7 @@ import org.soulwing.crypt4j.Crypt;
 public class Crypt4jPasswordEncryptionService
     implements PasswordEncryptionService {
 
-  static final String SALT_PREFIX = "$6$";
+  static final String SALT_PREFIX = "$6$rounds=10000$";
   
   static final int SALT_LENGTH = 16;
   
