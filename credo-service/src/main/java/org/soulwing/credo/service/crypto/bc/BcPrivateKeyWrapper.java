@@ -19,7 +19,11 @@
 package org.soulwing.credo.service.crypto.bc;
 
 import java.io.IOException;
+import java.security.KeyFactory;
+import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
+import java.security.spec.InvalidKeySpecException;
+import java.security.spec.PKCS8EncodedKeySpec;
 
 import org.apache.commons.lang.Validate;
 import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
@@ -122,7 +126,22 @@ public class BcPrivateKeyWrapper implements BcWrapper, PrivateKeyWrapper {
    */
   @Override
   public PrivateKey derive() {
-    throw new UnsupportedOperationException();
+    try {
+      PrivateKeyInfo keyInfo = derivePrivateKeyInfo();
+      PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(
+          keyInfo.getEncoded());
+      KeyFactory kf = KeyFactory.getInstance("RSA");
+      return kf.generatePrivate(keySpec);
+    }
+    catch (NoSuchAlgorithmException ex) {
+      throw new RuntimeException(ex);
+    }
+    catch (InvalidKeySpecException ex) {
+      throw new RuntimeException(ex);
+    }
+    catch (IOException ex) {
+      throw new RuntimeException(ex);
+    }
   }
 
   public AsymmetricKeyParameter derivePrivateKeyParameters() {
