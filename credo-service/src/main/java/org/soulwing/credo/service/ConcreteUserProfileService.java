@@ -23,13 +23,20 @@ import javax.inject.Inject;
 import javax.transaction.Transactional;
 
 import org.apache.commons.lang.Validate;
+import org.soulwing.credo.UserGroup;
+import org.soulwing.credo.UserGroupMember;
+import org.soulwing.credo.UserGroupMemberBuilderFactory;
 import org.soulwing.credo.UserProfile;
 import org.soulwing.credo.UserProfileBuilderFactory;
+import org.soulwing.credo.repository.UserGroupMemberRepository;
+import org.soulwing.credo.repository.UserGroupRepository;
 import org.soulwing.credo.repository.UserProfileRepository;
 import org.soulwing.credo.service.crypto.KeyGeneratorService;
 import org.soulwing.credo.service.crypto.KeyPairWrapper;
 import org.soulwing.credo.service.crypto.PasswordEncryptionService;
 import org.soulwing.credo.service.crypto.PrivateKeyEncryptionService;
+import org.soulwing.credo.service.crypto.PublicKeyWrapper;
+import org.soulwing.credo.service.crypto.SecretKeyEncryptionService;
 
 /**
  * A concrete {@link UserProfileService} implementation.
@@ -45,13 +52,25 @@ public class ConcreteUserProfileService
   protected UserProfileRepository profileRepository;
   
   @Inject
+  protected UserGroupRepository groupRepository;
+  
+  @Inject
+  protected UserGroupMemberRepository groupMemberRepository;
+  
+  @Inject
   protected UserProfileBuilderFactory profileBuilderFactory;
+  
+  @Inject
+  protected UserGroupMemberBuilderFactory groupMemberBuilderFactory;
   
   @Inject
   protected PasswordEncryptionService passwordEncryptionService;
   
   @Inject
   protected PrivateKeyEncryptionService privateKeyEncryptionService;
+  
+  @Inject
+  protected SecretKeyEncryptionService secretKeyEncryptionService;
   
   @Inject
   protected KeyGeneratorService keyGeneratorService;
@@ -78,20 +97,32 @@ public class ConcreteUserProfileService
   @Override
   public void createProfile(UserProfilePreparation preparation) {
     Validate.notNull(preparation.getPassword(), "password is required");
-    KeyPairWrapper keyPair = keyGeneratorService.generateKeyPair();
+    KeyPairWrapper keyPair = keyGeneratorService.generateKeyPair();    
+    PublicKeyWrapper publicKey = keyPair.getPublic();
     
-    UserProfile profile = profileBuilderFactory.newProfileBuilder()
+    UserProfile user = profileBuilderFactory.newProfileBuilder()
         .setLoginName(preparation.getLoginName())
         .setFullName(preparation.getFullName())
         .setPassword(passwordEncryptionService.encrypt(
             preparation.getPassword()))
-        .setPublicKey(keyPair.getPublic().getContent())
+        .setPublicKey(publicKey.getContent())
         .setPrivateKey(privateKeyEncryptionService.encrypt(
             keyPair.getPrivate(), 
             preparation.getPassword()).getContent())
         .build();
     
-    profileRepository.add(profile);
+    UserGroup group = groupRepository.newGroup(UserGroup.SELF_GROUP_NAME);
+    
+    UserGroupMember groupMember = groupMemberBuilderFactory.newBuilder()
+        .setUser(user)
+        .setGroup(group)
+        .setSecretKey(secretKeyEncryptionService.encrypt(
+            keyGeneratorService.generateSecretKey(), publicKey).getContent())
+        .build();
+    
+    profileRepository.add(user);
+    groupRepository.add(group);
+    groupMemberRepository.add(groupMember);
   }
 
 }

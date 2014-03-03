@@ -31,9 +31,15 @@ import org.jmock.integration.junit4.JUnitRuleMockery;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.soulwing.credo.UserGroup;
+import org.soulwing.credo.UserGroupMember;
+import org.soulwing.credo.UserGroupMemberBuilder;
+import org.soulwing.credo.UserGroupMemberBuilderFactory;
 import org.soulwing.credo.UserProfile;
 import org.soulwing.credo.UserProfileBuilder;
 import org.soulwing.credo.UserProfileBuilderFactory;
+import org.soulwing.credo.repository.UserGroupMemberRepository;
+import org.soulwing.credo.repository.UserGroupRepository;
 import org.soulwing.credo.repository.UserProfileRepository;
 import org.soulwing.credo.service.crypto.KeyGeneratorService;
 import org.soulwing.credo.service.crypto.KeyPairWrapper;
@@ -41,6 +47,8 @@ import org.soulwing.credo.service.crypto.PasswordEncryptionService;
 import org.soulwing.credo.service.crypto.PrivateKeyEncryptionService;
 import org.soulwing.credo.service.crypto.PrivateKeyWrapper;
 import org.soulwing.credo.service.crypto.PublicKeyWrapper;
+import org.soulwing.credo.service.crypto.SecretKeyEncryptionService;
+import org.soulwing.credo.service.crypto.SecretKeyWrapper;
 
 /**
  * Unit tests for {@link ConcreteUserProfileService}.
@@ -52,11 +60,28 @@ public class ConcreteUserProfileServiceTest {
   @Rule
   public final JUnitRuleMockery context = new JUnitRuleMockery();
 
+  private final String loginName = new String();
+  private final String fullName = new String();
+  private final char[] password = new char[0];
+  private final String encryptedPassword = new String();
+  private final String encodedPublicKey = new String();
+  private final String encodedPrivateKey = new String();
+  private final String encodedSecretKey = new String();
+
   @Mock
   private UserProfileRepository profileRepository;
   
   @Mock
+  private UserGroupRepository groupRepository;
+  
+  @Mock
+  private UserGroupMemberRepository groupMemberRepository;
+  
+  @Mock
   private UserProfileBuilderFactory profileBuilderFactory;
+  
+  @Mock
+  private UserGroupMemberBuilderFactory groupMemberBuilderFactory;
   
   @Mock
   private KeyGeneratorService keyGeneratorService;
@@ -68,6 +93,9 @@ public class ConcreteUserProfileServiceTest {
   private PrivateKeyEncryptionService privateKeyEncryptionService;
   
   @Mock
+  private SecretKeyEncryptionService secretKeyEncryptionService;
+  
+  @Mock
   private KeyPairWrapper keyPair;
   
   @Mock
@@ -77,8 +105,14 @@ public class ConcreteUserProfileServiceTest {
   private PrivateKeyWrapper privateKey;
 
   @Mock
+  private SecretKeyWrapper secretKey;
+  
+  @Mock
   private PrivateKeyWrapper encryptedPrivateKey;
 
+  @Mock
+  private SecretKeyWrapper encryptedSecretKey;
+  
   @Mock
   private UserProfilePreparation preparation;
   
@@ -86,17 +120,30 @@ public class ConcreteUserProfileServiceTest {
   private UserProfileBuilder profileBuilder;
   
   @Mock
-  private UserProfile profile;
+  private UserGroupMemberBuilder groupMemberBuilder;
+  
+  @Mock
+  private UserProfile user;
+  
+  @Mock
+  private UserGroup group;
+  
+  @Mock
+  private UserGroupMember groupMember;
   
   private ConcreteUserProfileService service = new ConcreteUserProfileService();
   
   @Before
   public void setUp() throws Exception {
     service.profileRepository = profileRepository;
+    service.groupRepository = groupRepository;
+    service.groupMemberRepository = groupMemberRepository;
+    service.groupMemberBuilderFactory = groupMemberBuilderFactory;
     service.profileBuilderFactory = profileBuilderFactory;
     service.keyGeneratorService = keyGeneratorService;
     service.passwordEncryptionService = passwordEncryptionService;
     service.privateKeyEncryptionService = privateKeyEncryptionService;
+    service.secretKeyEncryptionService = secretKeyEncryptionService;
   }
   
   @Test
@@ -132,34 +179,61 @@ public class ConcreteUserProfileServiceTest {
   
   @Test
   public void testCreateProfile() throws Exception {
-    final String loginName = new String();
-    final String fullName = new String();
-    final char[] password = new char[0];
-    final String encryptedPassword = new String();
-    final String encodedPublicKey = new String();
-    final String encodedPrivateKey = new String();
-    context.checking(new Expectations() { {
+    context.checking(preparationExpectations());
+    context.checking(keyGenerationExpectations());
+    context.checking(encryptionExpectations());
+    context.checking(profileExpectations());
+    context.checking(groupExpectations());
+    context.checking(groupMemberExpectations());
+    context.checking(repositoryExpectations());    
+    service.createProfile(preparation);
+  }
+
+  private Expectations preparationExpectations() {
+    return new Expectations() { { 
       oneOf(preparation).getLoginName();
       will(returnValue(loginName));
       oneOf(preparation).getFullName();
       will(returnValue(fullName));
       allowing(preparation).getPassword();
       will(returnValue(password));
+    } };
+  }
+
+  private Expectations keyGenerationExpectations() {
+    return new Expectations() { {
       oneOf(keyGeneratorService).generateKeyPair();
       will(returnValue(keyPair));
       oneOf(keyPair).getPublic();
       will(returnValue(publicKey));
       oneOf(keyPair).getPrivate();
       will(returnValue(privateKey));
+      oneOf(publicKey).getContent();
+      will(returnValue(encodedPublicKey));
+      oneOf(keyGeneratorService).generateSecretKey();
+      will(returnValue(secretKey));
+    } };
+  }
+
+  private Expectations encryptionExpectations() {
+    return new Expectations() { { 
       oneOf(passwordEncryptionService).encrypt(with(same(password)));
       will(returnValue(encryptedPassword));
       oneOf(privateKeyEncryptionService).encrypt(with(same(privateKey)),
           with(same(password)));
       will(returnValue(encryptedPrivateKey));
-      oneOf(publicKey).getContent();
-      will(returnValue(encodedPublicKey));
       oneOf(encryptedPrivateKey).getContent();
       will(returnValue(encodedPrivateKey));
+      oneOf(secretKeyEncryptionService).encrypt(with(same(secretKey)),
+          with(same(publicKey)));
+      will(returnValue(encryptedSecretKey));
+      oneOf(encryptedSecretKey).getContent();
+      will(returnValue(encodedSecretKey));
+    } };
+  }
+
+  private Expectations profileExpectations() {
+    return new Expectations() { { 
       oneOf(profileBuilderFactory).newProfileBuilder();
       will(returnValue(profileBuilder));
       oneOf(profileBuilder).setLoginName(with(same(loginName)));
@@ -173,11 +247,38 @@ public class ConcreteUserProfileServiceTest {
       oneOf(profileBuilder).setPrivateKey(with(same(encodedPrivateKey)));
       will(returnValue(profileBuilder));
       oneOf(profileBuilder).build();
-      will(returnValue(profile));
-      oneOf(profileRepository).add(with(same(profile)));
-    } });
-    
-    service.createProfile(preparation);
+      will(returnValue(user));
+    } };
+  }
+
+  private Expectations groupExpectations() {
+    return new Expectations() { { 
+      oneOf(groupRepository).newGroup(with(UserGroup.SELF_GROUP_NAME));
+      will(returnValue(group));
+    } };
+  }
+  
+  private Expectations groupMemberExpectations() {
+    return new Expectations() { { 
+      oneOf(groupMemberBuilderFactory).newBuilder();
+      will(returnValue(groupMemberBuilder));
+      oneOf(groupMemberBuilder).setUser(with(same(user)));
+      will(returnValue(groupMemberBuilder));
+      oneOf(groupMemberBuilder).setGroup(with(same(group)));
+      will(returnValue(groupMemberBuilder));
+      oneOf(groupMemberBuilder).setSecretKey(with(any(String.class)));  //FIXME
+      will(returnValue(groupMemberBuilder));
+      oneOf(groupMemberBuilder).build();
+      will(returnValue(groupMember));
+    } };
+  }
+
+  private Expectations repositoryExpectations() {
+    return new Expectations() { {
+      oneOf(profileRepository).add(with(same(user)));
+      oneOf(groupRepository).add(with(same(group)));
+      oneOf(groupMemberRepository).add(with(same(groupMember)));
+    } };
   }
   
 }
