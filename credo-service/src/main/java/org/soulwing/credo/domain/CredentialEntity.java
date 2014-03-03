@@ -32,6 +32,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.Lob;
 import javax.persistence.ManyToMany;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.OrderColumn;
@@ -41,6 +42,7 @@ import javax.persistence.TemporalType;
 
 import org.soulwing.credo.Credential;
 import org.soulwing.credo.Tag;
+import org.soulwing.credo.UserGroup;
 
 /**
  * A {@link Credential} that is a JPA entity.
@@ -56,6 +58,9 @@ public class CredentialEntity extends AbstractEntity implements Credential {
   @Column(unique = true, nullable = false, length = 100)
   private String name;
 
+  @ManyToOne(optional = false, fetch = FetchType.LAZY)
+  private UserGroupEntity owner;
+  
   @Lob
   private String note;
   
@@ -104,6 +109,26 @@ public class CredentialEntity extends AbstractEntity implements Credential {
   @Override
   public void setName(String name) {
     this.name = name;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public UserGroup getOwner() {
+    return owner;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public void setOwner(UserGroup owner) {
+    if (!(owner instanceof UserGroupEntity)) {
+      throw new IllegalArgumentException("unsupported group type: "
+          + owner.getClass().getName());
+    }
+    this.owner = (UserGroupEntity) owner;
   }
 
   /**

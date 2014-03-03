@@ -49,6 +49,7 @@ import org.soulwing.credo.domain.CredentialCertificateEntity;
 import org.soulwing.credo.domain.CredentialEntity;
 import org.soulwing.credo.domain.CredentialKeyEntity;
 import org.soulwing.credo.domain.TagEntity;
+import org.soulwing.credo.domain.UserGroupEntity;
 
 /**
  * Integration tests for {@link JpaCredentialRepository}.
@@ -202,11 +203,22 @@ public class JpaCredentialRepositoryIT {
   private CredentialEntity newCredential() {
     CredentialEntity credential = new CredentialEntity();
     credential.setName("Test");
+    credential.setOwner(newGroup("someGroup"));
     credential.setNote("This is a test.");
     credential.setIssuer("TestIssuer");
     credential.setExpiration(new Date());
-    credential.setPrivateKey(new CredentialKeyEntity());
+    credential.setPrivateKey(newPrivateKey());
     return credential;
+  }
+
+  private UserGroupEntity newGroup(String name) {
+    UserGroupEntity group = new UserGroupEntity();
+    Date now = new Date();
+    group.setName("someGroup");
+    group.setDateCreated(now);
+    group.setDateModified(now);
+    entityManager.persist(group);
+    return group;
   }
 
   private CredentialKeyEntity newPrivateKey() {
