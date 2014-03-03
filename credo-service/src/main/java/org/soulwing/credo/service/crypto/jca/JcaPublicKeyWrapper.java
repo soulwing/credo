@@ -54,4 +54,12 @@ public class JcaPublicKeyWrapper implements PublicKeyWrapper {
         .append(delegate.getEncoded()).build().getEncoded();
   }
 
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public PublicKey derive() {
+    return delegate;
+  }
+
 }

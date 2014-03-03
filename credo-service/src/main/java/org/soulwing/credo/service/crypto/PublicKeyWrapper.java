@@ -18,6 +18,8 @@
  */
 package org.soulwing.credo.service.crypto;
 
+import java.security.PublicKey;
+
 
 /**
  * A wrapper for a public key object.
@@ -32,5 +34,11 @@ public interface PublicKeyWrapper {
    * @return public key content
    */
   String getContent();
+  
+  /**
+   * Derive the JCA {@link PublicKey} that corresponds to this wrapper.
+   * @return JCA public key
+   */
+  PublicKey derive();
   
 }
