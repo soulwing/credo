@@ -1,5 +1,5 @@
 /*
- * File created on Mar 2, 2014 
+ * File created on Mar 3, 2014 
  *
  * Copyright (c) 2014 Virginia Polytechnic Institute and State University
  *
@@ -18,25 +18,20 @@
  */
 package org.soulwing.credo.service.crypto;
 
-
-
 /**
- * A service that generates cryptographic keys.
+ * A service that encrypts a (symmetric) secret key using a public key.
  *
  * @author Carl Harris
  */
-public interface KeyGeneratorService {
+public interface SecretKeyEncryptionService {
 
   /**
-   * Generates a public/private key pair.
-   * @return new key pair
+   * Encrypts (wraps) a secret key using the given public key.
+   * @param secretKey the key to encrypt
+   * @param publicKey the public key that will be used to wrap the secret key 
+   * @return encrypted (wrapped) secret key
    */
-  KeyPairWrapper generateKeyPair();
-  
-  /**
-   * Generates a (symmetric) secret key.
-   * @return secret key
-   */
-  SecretKeyWrapper generateSecretKey();
+  SecretKeyWrapper encrypt(SecretKeyWrapper secretKey, 
+      PublicKeyWrapper publicKey);
   
 }
