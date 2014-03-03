@@ -168,7 +168,7 @@ public class ImportCredentialBean implements Serializable {
    */
   public String getOwner() {
     UserGroup owner = credential.getOwner();
-    if (owner == null) return null;
+    if (owner == null) return UserGroup.SELF_GROUP_NAME;
     return owner.getName();
   }
   

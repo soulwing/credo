@@ -383,7 +383,19 @@ public class ImportCredentialBeanTest {
     bean.setCredential(credential);
     assertThat(bean.getOwner(), is(equalTo(groupName)));
   }
+
+  @Test
+  public void testGetOwnerWhenNotSet() throws Exception {
+    context.checking(new Expectations() { { 
+      oneOf(credential).getOwner();
+      will(returnValue(null));
+    } });
+    
+    bean.setCredential(credential);
+    assertThat(bean.getOwner(), is(equalTo(UserGroup.SELF_GROUP_NAME)));
+  }
   
+
   @Test
   public void testSetOwnerWhenGroupFound() throws Exception {
     final String groupName = "someGroup";
