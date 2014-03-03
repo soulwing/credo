@@ -16,9 +16,9 @@
  * limitations under the License.
  *
  */
-package org.soulwing.credo.service.x509;
+package org.soulwing.credo.service.crypto;
 
-import java.io.IOException;
+import java.security.PrivateKey;
 
 /**
  * A wrapper for a private key object implementation.
@@ -49,8 +49,13 @@ public interface PrivateKeyWrapper {
    * Gets the content of this private key in a suitable string encoding
    * (typically PEM).
    * @return private key content
-   * @throws IOException
    */
-  String getContent() throws IOException, IllegalStateException;
+  String getContent();
+  
+  /**
+   * Derive the JCA {@link PrivateKey} that corresponds to this wrapper.
+   * @return JCA private key
+   */
+  PrivateKey derive();
   
 }

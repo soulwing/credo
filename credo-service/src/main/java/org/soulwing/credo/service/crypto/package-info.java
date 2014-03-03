@@ -1,5 +1,5 @@
 /*
- * File created on Feb 19, 2014 
+ * File created on Mar 2, 2014 
  *
  * Copyright (c) 2014 Virginia Polytechnic Institute and State University
  *
@@ -16,16 +16,7 @@
  * limitations under the License.
  *
  */
-package org.soulwing.credo.service.x509;
-
 /**
- * An exception thrown to indicate that a passphrase provided to decrypt a
- * private key appears to be incorrect.
- *
- * @author Carl Harris
+ * Cryptography support
  */
-public class IncorrectPassphraseException extends RuntimeException {
-
-  private static final long serialVersionUID = -3404702454760853222L;
-
-}
+package org.soulwing.credo.service.crypto;
