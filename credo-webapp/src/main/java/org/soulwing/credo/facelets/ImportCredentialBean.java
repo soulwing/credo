@@ -88,6 +88,8 @@ public class ImportCredentialBean implements Serializable {
 
   private Credential credential;
   
+  private String owner = UserGroup.SELF_GROUP_NAME;
+  
   /**
    * Gets the {@code file0} property.
    * @return
@@ -167,9 +169,7 @@ public class ImportCredentialBean implements Serializable {
    * @return owner name or {@code null} if none has been set
    */
   public String getOwner() {
-    UserGroup owner = credential.getOwner();
-    if (owner == null) return UserGroup.SELF_GROUP_NAME;
-    return owner.getName();
+    return owner;
   }
   
   /**
@@ -177,13 +177,7 @@ public class ImportCredentialBean implements Serializable {
    * @param owner the owner name to set
    */
   public void setOwner(String owner) {
-    try {
-      credential.setOwner(importService.resolveGroup(owner, 
-          facesContext.getExternalContext().getRemoteUser()));
-    }
-    catch (NoSuchGroupException ex) {
-      errors.addError("owner", "credentialOwnerNotFound");
-    }
+    this.owner = owner;
   }
   
   /**
@@ -348,9 +342,15 @@ public class ImportCredentialBean implements Serializable {
    */
   public String save() {
     try {
+      credential.setOwner(importService.resolveGroup(owner, 
+          facesContext.getExternalContext().getRemoteUser()));
       importService.saveCredential(credential, errors);
       conversation.end();
       return SUCCESS_OUTCOME_ID;
+    }
+    catch (NoSuchGroupException ex) {
+      errors.addError("owner", "credentialOwnerNotFound");
+      return null;
     }
     catch (ImportException ex) {
       return null;

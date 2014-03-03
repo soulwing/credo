@@ -228,12 +228,9 @@ public class ImportCredentialBeanTest {
         new HashSet<>();
     groupMemberships.add(group1);
     groupMemberships.add(group2);
-   
+
+    context.checking(newRemoteUserExpectations(loginName));
     context.checking(new Expectations() { { 
-      oneOf(facesContext).getExternalContext();
-      will(returnValue(externalContext));
-      oneOf(externalContext).getRemoteUser();
-      will(returnValue(loginName));
       oneOf(importService).getGroupMemberships(with(same(loginName)));
       will(returnValue(groupMemberships));
     } });
@@ -370,63 +367,56 @@ public class ImportCredentialBeanTest {
   }
 
   @Test
-  public void testGetOwner() throws Exception {
-    final String groupName = "someGroup";
-    final UserGroup group = context.mock(UserGroup.class);
-    context.checking(new Expectations() { { 
-      oneOf(credential).getOwner();
-      will(returnValue(group));
-      oneOf(group).getName();
-      will(returnValue(groupName));
-    } });
-    
-    bean.setCredential(credential);
-    assertThat(bean.getOwner(), is(equalTo(groupName)));
-  }
-
-  @Test
-  public void testGetOwnerWhenNotSet() throws Exception {
-    context.checking(new Expectations() { { 
-      oneOf(credential).getOwner();
-      will(returnValue(null));
-    } });
-    
-    bean.setCredential(credential);
-    assertThat(bean.getOwner(), is(equalTo(UserGroup.SELF_GROUP_NAME)));
-  }
-  
-
-  @Test
-  public void testSetOwnerWhenGroupFound() throws Exception {
+  public void testSaveSuccess() throws Exception {
     final String groupName = "someGroup";
     final String loginName = "someUser";
     final UserGroup group = context.mock(UserGroup.class);
-    
+
+    context.checking(newRemoteUserExpectations(loginName));
     context.checking(new Expectations() { { 
-      oneOf(facesContext).getExternalContext();
-      will(returnValue(externalContext));
-      oneOf(externalContext).getRemoteUser();
-      will(returnValue(loginName));
       oneOf(importService).resolveGroup(with(same(groupName)), 
           with(same(loginName)));
       will(returnValue(group));
       oneOf(credential).setOwner(with(same(group)));
+      oneOf(importService).saveCredential(with(same(credential)), 
+          with(same(errors)));
+      oneOf(conversation).end();
     } });
     
-    bean.setCredential(credential);
     bean.setOwner(groupName);
+    bean.setCredential(credential);
+    assertThat(bean.save(), equalTo(ImportCredentialBean.SUCCESS_OUTCOME_ID));    
   }
 
   @Test
-  public void testSetOwnerWhenGroupNotFound() throws Exception {
+  public void testSaveImportError() throws Exception {
     final String groupName = "someGroup";
     final String loginName = "someUser";
-    
+    final UserGroup group = context.mock(UserGroup.class);
+
+    context.checking(newRemoteUserExpectations(loginName));
     context.checking(new Expectations() { { 
-      oneOf(facesContext).getExternalContext();
-      will(returnValue(externalContext));
-      oneOf(externalContext).getRemoteUser();
-      will(returnValue(loginName));
+      oneOf(importService).resolveGroup(with(same(groupName)), 
+          with(same(loginName)));
+      will(returnValue(group));
+      oneOf(credential).setOwner(with(same(group)));
+      oneOf(importService).saveCredential(with(same(credential)), 
+          with(same(errors)));
+      will(throwException(new ImportException()));
+    } });
+    
+    bean.setOwner(groupName);
+    bean.setCredential(credential);
+    assertThat(bean.save(), nullValue());    
+  }
+
+  @Test
+  public void testSaveOwnerNotFound() throws Exception {
+    final String groupName = "someGroup";
+    final String loginName = "someUser";
+
+    context.checking(newRemoteUserExpectations(loginName));
+    context.checking(new Expectations() { { 
       oneOf(importService).resolveGroup(with(same(groupName)), 
           with(same(loginName)));
       will(throwException(new NoSuchGroupException()));
@@ -435,32 +425,19 @@ public class ImportCredentialBeanTest {
           with(emptyArray()));
     } });
     
-    bean.setCredential(credential);
     bean.setOwner(groupName);
-  }
-
-  @Test
-  public void testSaveSuccess() throws Exception {
-    context.checking(new Expectations() { { 
-      oneOf(importService).saveCredential(with(same(credential)), 
-          with(same(errors)));
-      oneOf(conversation).end();
-    } });
-    
-    bean.setCredential(credential);
-    assertThat(bean.save(), equalTo(ImportCredentialBean.SUCCESS_OUTCOME_ID));    
-  }
-
-  @Test
-  public void testSaveError() throws Exception {
-    context.checking(new Expectations() { { 
-      oneOf(importService).saveCredential(with(same(credential)), 
-          with(same(errors)));
-      will(throwException(new ImportException()));
-    } });
-    
     bean.setCredential(credential);
     assertThat(bean.save(), nullValue());    
+  }
+  
+
+  private Expectations newRemoteUserExpectations(final String loginName) { 
+    return new Expectations() { { 
+      oneOf(facesContext).getExternalContext();
+      will(returnValue(externalContext));
+      oneOf(externalContext).getRemoteUser();
+      will(returnValue(loginName));
+    } };
   }
   
   @Test
