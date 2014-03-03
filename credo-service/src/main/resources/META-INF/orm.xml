@@ -11,6 +11,15 @@
     </query>
   </named-query>
 
+  <named-query name="findUserGroupsByLoginName">
+    <query>
+      select distinct g from UserGroupMemberEntity gm
+      inner join gm.group g
+      inner join gm.user u
+      where u.loginName = :loginName
+    </query>
+  </named-query>
+  
   <named-query name="findTagByText">
     <query>
       select distinct t from TagEntity t
