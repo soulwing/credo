@@ -30,6 +30,12 @@ import java.io.Writer;
 public interface PemObjectWrapper {
 
   /**
+   * Gets the PEM object type.
+   * @return object type
+   */
+  String getType();
+  
+  /**
    * Gets a PEM header.
    * @param name name of the header
    * @return header or {@code null} if no header exists with the given name
@@ -47,15 +53,6 @@ public interface PemObjectWrapper {
    * @return byte array containing the PEM object contents
    */
   byte[] getContent();
-  
-  /**
-   * Copies content bytes from the PEM object.
-   * @param start
-   * @param end
-   * @return an array containing the requested range of bytes from the 
-   *    PEM content
-   */
-  byte[] copyBytes(int start, int end);
   
   /**
    * Gets the PEM encoded representation of the data in this wrapper. 
