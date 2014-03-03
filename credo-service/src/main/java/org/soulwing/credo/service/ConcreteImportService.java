@@ -139,7 +139,7 @@ public class ConcreteImportService implements ImportService {
    */
   @Override
   public Set<? extends UserGroup> getGroupMemberships(String loginName) {
-    return groupRepository.findByUserLoginName(loginName);
+    return groupRepository.findByLoginName(loginName);
   }
 
   /**
@@ -148,8 +148,12 @@ public class ConcreteImportService implements ImportService {
   @Override
   public UserGroup resolveGroup(String groupName, String loginName)
       throws NoSuchGroupException {
-    // TODO Auto-generated method stub
-    return null;
+    UserGroup group = groupRepository.findByGroupAndLoginName(groupName, 
+        loginName);
+    if (group == null) {
+      throw new NoSuchGroupException();
+    }
+    return group;
   }
   
 }

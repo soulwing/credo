@@ -23,13 +23,16 @@ import static org.hamcrest.Matchers.arrayContaining;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.emptyArray;
+import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.sameInstance;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.jmock.Expectations;
 import org.jmock.auto.Mock;
@@ -39,8 +42,10 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.soulwing.credo.Credential;
 import org.soulwing.credo.Tag;
+import org.soulwing.credo.UserGroup;
 import org.soulwing.credo.repository.CredentialRepository;
 import org.soulwing.credo.repository.TagRepository;
+import org.soulwing.credo.repository.UserGroupRepository;
 import org.soulwing.credo.service.importer.CredentialImporter;
 import org.soulwing.credo.service.importer.CredentialImporterFactory;
 
@@ -72,6 +77,9 @@ public class ConcreteImportServiceTest {
   @Mock
   private TagRepository tagRepository;
   
+  @Mock
+  private UserGroupRepository groupRepository;
+  
   public ConcreteImportService importService = new ConcreteImportService();
   
   @Before
@@ -79,6 +87,7 @@ public class ConcreteImportServiceTest {
     importService.importerFactory = importerFactory;
     importService.credentialRepository = credentialRepository;
     importService.tagRepository = tagRepository;
+    importService.groupRepository = groupRepository;
   }
   
   @Test(expected = ImportException.class)
@@ -164,7 +173,7 @@ public class ConcreteImportServiceTest {
     } });    
     
     assertThat(importService.createCredential(importer, errors), 
-        sameInstance(credential));    
+        is(sameInstance(credential)));    
   }
 
   @Test
@@ -206,4 +215,51 @@ public class ConcreteImportServiceTest {
         contains(tag));
   }
 
+  @Test
+  public void testGetGroupMemberships() throws Exception {
+    final String loginName = "someUser";
+    final Set<? extends UserGroup> groupMemberships = 
+        new HashSet<>();
+        
+    context.checking(new Expectations() { { 
+      oneOf(groupRepository).findByLoginName(with(same(loginName)));
+      will(returnValue(groupMemberships));
+    } });
+    
+    assertThat((Set) importService.getGroupMemberships(loginName), 
+        is(sameInstance((Set) groupMemberships)));
+  }
+
+  @Test
+  public void testResolveGroup() throws Exception {
+    final String groupName = "someGroup";
+    final String loginName = "someUser";
+    final UserGroup group = context.mock(UserGroup.class);
+    
+    context.checking(new Expectations() { { 
+      oneOf(groupRepository).findByGroupAndLoginName(
+          with(same(groupName)), with(same(loginName)));
+      will(returnValue(group));
+    } });
+    
+    assertThat(importService.resolveGroup(groupName, loginName),
+        is(sameInstance(group)));
+  }
+
+  @Test(expected = NoSuchGroupException.class)
+  public void testResolveGroupNotFound() throws Exception {
+    final String groupName = "someGroup";
+    final String loginName = "someUser";
+    
+    context.checking(new Expectations() { { 
+      oneOf(groupRepository).findByGroupAndLoginName(
+          with(same(groupName)), with(same(loginName)));
+      will(returnValue(null));
+    } });
+    
+    importService.resolveGroup(groupName, loginName);
+  }
+
 }
+
+
