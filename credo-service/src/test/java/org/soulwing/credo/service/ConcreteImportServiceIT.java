@@ -50,11 +50,14 @@ import org.junit.runner.RunWith;
 import org.soulwing.credo.Credential;
 import org.soulwing.credo.domain.CredentialEntity;
 import org.soulwing.credo.repository.CredentialRepository;
-import org.soulwing.credo.service.archive.ArchiveBuilder;
+import org.soulwing.credo.repository.JpaCredentialRepository;
+import org.soulwing.credo.repository.JpaTagRepository;
+import org.soulwing.credo.repository.TagRepository;
 import org.soulwing.credo.service.crypto.CredentialBag;
 import org.soulwing.credo.service.crypto.bc.BcCredentialBag;
-import org.soulwing.credo.service.exporter.CredentialExporter;
 import org.soulwing.credo.service.importer.CredentialImporter;
+import org.soulwing.credo.service.pem.PemObjectBuilder;
+import org.soulwing.credo.service.pem.bc.BcPemObjectBuilder;
 
 /**
  * Integration tests for {@link ConcreteImportService}.
@@ -71,13 +74,18 @@ public class ConcreteImportServiceIT {
             .importRuntimeAndTestDependencies().resolve().withTransitivity().asFile())
         .addPackage(Credential.class.getPackage())
         .addPackage(CredentialEntity.class.getPackage())
-        .addPackage(CredentialRepository.class.getPackage())
-        .addPackage(ImportService.class.getPackage())
+        .addClasses(CredentialRepository.class, JpaCredentialRepository.class)
+        .addClasses(TagRepository.class, JpaTagRepository.class)
+        .addClasses(ImportService.class, ImportException.class, 
+            ImportDetails.class, ImportPreparation.class, Errors.class, 
+            FileContentModel.class, NoContentException.class,
+            PassphraseException.class, ConcreteImportService.class)
+        .addClasses(TimeOfDayService.class, ConcreteTimeOfDayService.class)
         .addPackage(CredentialImporter.class.getPackage())
-        .addPackage(CredentialExporter.class.getPackage())
-        .addPackage(ArchiveBuilder.class.getPackage())
         .addPackage(CredentialBag.class.getPackage())
         .addPackage(BcCredentialBag.class.getPackage())
+        .addPackage(PemObjectBuilder.class.getPackage())
+        .addPackage(BcPemObjectBuilder.class.getPackage())
         .addAsResource("testcases")
         .addAsResource("persistence-test.xml", "META-INF/persistence.xml")
         .addAsResource("META-INF/orm.xml", "META-INF/orm.xml")
