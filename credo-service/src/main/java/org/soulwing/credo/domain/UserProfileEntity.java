@@ -22,13 +22,10 @@ import java.util.Date;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
 import javax.persistence.Lob;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
-import javax.persistence.Version;
 
 import org.soulwing.credo.UserProfile;
 
@@ -39,15 +36,10 @@ import org.soulwing.credo.UserProfile;
  */
 @Entity
 @Table(name = "user_profile")
-public class UserProfileEntity implements UserProfile {
+public class UserProfileEntity extends AbstractEntity implements UserProfile {
 
-  @Id
-  @GeneratedValue
-  private Long id;
-  
-  @Version
-  private Long version;
-  
+  private static final long serialVersionUID = -4625919386950644573L;
+
   @Column(name = "login_name", nullable = false, unique = true)
   private String loginName;
   
@@ -72,15 +64,6 @@ public class UserProfileEntity implements UserProfile {
   @Temporal(TemporalType.TIMESTAMP)
   @Column(name = "date_modified", nullable = false)
   private Date dateModified;
-  
-  /**
-   * Gets the persistent identifier.
-   * @return persistent identifier or {@code null} if this instance is 
-   *    transient
-   */
-  public Long getId() {
-    return id;
-  }
   
   /**
    * {@inheritDoc}
