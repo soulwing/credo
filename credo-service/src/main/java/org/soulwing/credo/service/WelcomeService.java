@@ -26,11 +26,11 @@ package org.soulwing.credo.service;
 public interface WelcomeService {
 
   /**
-   * Tests whether the given username is a new or existing user.
-   * @param userName the subject username
+   * Tests whether the given loginName represents a new user.
+   * @param loginName the subject login name
    * @return {@code true} if there exists no user profile with the given
-   *    {@code username}
+   *    {@code loginName}
    */
-  boolean isNewUser(String userName);
+  boolean isNewUser(String loginName);
   
 }
