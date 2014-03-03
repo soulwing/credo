@@ -25,33 +25,40 @@ import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.emptyArray;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasItemInArray;
+import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.Matchers.sameInstance;
 
 import java.io.ByteArrayInputStream;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
 import javax.enterprise.context.Conversation;
+import javax.faces.context.ExternalContext;
+import javax.faces.context.FacesContext;
 import javax.servlet.http.Part;
 
 import org.jmock.Expectations;
 import org.jmock.auto.Mock;
 import org.jmock.integration.junit4.JUnitRuleMockery;
+import org.jmock.lib.legacy.ClassImposteriser;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.soulwing.credo.Credential;
 import org.soulwing.credo.Tag;
+import org.soulwing.credo.UserGroup;
 import org.soulwing.credo.service.Errors;
 import org.soulwing.credo.service.FileContentModel;
 import org.soulwing.credo.service.ImportDetails;
 import org.soulwing.credo.service.ImportException;
 import org.soulwing.credo.service.ImportPreparation;
 import org.soulwing.credo.service.ImportService;
+import org.soulwing.credo.service.NoSuchGroupException;
 import org.soulwing.credo.service.PassphraseException;
 
 /**
@@ -64,7 +71,9 @@ public class ImportCredentialBeanTest {
   private static final String SUBJECT_NAME = "subjectName";
   
   @Rule
-  public JUnitRuleMockery context = new JUnitRuleMockery();
+  public JUnitRuleMockery context = new JUnitRuleMockery() { {
+    setImposteriser(ClassImposteriser.INSTANCE);
+  } };
   
   @Mock
   public Conversation conversation;
@@ -74,7 +83,13 @@ public class ImportCredentialBeanTest {
   
   @Mock
   public ImportService importService;
-    
+  
+  @Mock
+  public FacesContext facesContext;
+  
+  @Mock
+  public ExternalContext externalContext;
+  
   @Mock
   public ImportPreparation preparation;
   
@@ -91,6 +106,7 @@ public class ImportCredentialBeanTest {
     bean.conversation = conversation;
     bean.errors = errors;
     bean.importService = importService;
+    bean.facesContext = facesContext;
   }
 
   @Test
@@ -204,6 +220,47 @@ public class ImportCredentialBeanTest {
   }
   
   @Test
+  public void testIsMemberOfSelfGroupOnlyWhenFalse() throws Exception {
+    final String loginName = "someUser";
+    final UserGroup group1 = context.mock(UserGroup.class, "group1");
+    final UserGroup group2 = context.mock(UserGroup.class, "group2");
+    final Set<UserGroup> groupMemberships =
+        new HashSet<>();
+    groupMemberships.add(group1);
+    groupMemberships.add(group2);
+   
+    context.checking(new Expectations() { { 
+      oneOf(facesContext).getExternalContext();
+      will(returnValue(externalContext));
+      oneOf(externalContext).getRemoteUser();
+      will(returnValue(loginName));
+      oneOf(importService).getGroupMemberships(with(same(loginName)));
+      will(returnValue(groupMemberships));
+    } });
+    
+    assertThat(bean.isMemberOfSelfGroupOnly(), is(false));
+  }
+  
+  @Test
+  public void testIsMemberOfSelfGroupOnlyWhenTrue() throws Exception {
+    final String loginName = "someUser";
+    final UserGroup group = context.mock(UserGroup.class);
+    final Set<? extends UserGroup> groupMemberships =
+        Collections.singleton(group);
+  
+    context.checking(new Expectations() { { 
+      oneOf(facesContext).getExternalContext();
+      will(returnValue(externalContext));
+      oneOf(externalContext).getRemoteUser();
+      will(returnValue(loginName));
+      oneOf(importService).getGroupMemberships(with(same(loginName)));
+      will(returnValue(groupMemberships));
+    } });
+    
+    assertThat(bean.isMemberOfSelfGroupOnly(), is(true));
+  }
+
+  @Test
   public void testGetTagsWhenNull() throws Exception {
     context.checking(new Expectations() { { 
       oneOf(credential).getTags();
@@ -310,6 +367,64 @@ public class ImportCredentialBeanTest {
     
     bean.setCredential(credential);
     bean.setTags("tag0, tag1");
+  }
+
+  @Test
+  public void testGetOwner() throws Exception {
+    final String groupName = "someGroup";
+    final UserGroup group = context.mock(UserGroup.class);
+    context.checking(new Expectations() { { 
+      oneOf(credential).getOwner();
+      will(returnValue(group));
+      oneOf(group).getName();
+      will(returnValue(groupName));
+    } });
+    
+    bean.setCredential(credential);
+    assertThat(bean.getOwner(), is(equalTo(groupName)));
+  }
+  
+  @Test
+  public void testSetOwnerWhenGroupFound() throws Exception {
+    final String groupName = "someGroup";
+    final String loginName = "someUser";
+    final UserGroup group = context.mock(UserGroup.class);
+    
+    context.checking(new Expectations() { { 
+      oneOf(facesContext).getExternalContext();
+      will(returnValue(externalContext));
+      oneOf(externalContext).getRemoteUser();
+      will(returnValue(loginName));
+      oneOf(importService).resolveGroup(with(same(groupName)), 
+          with(same(loginName)));
+      will(returnValue(group));
+      oneOf(credential).setOwner(with(same(group)));
+    } });
+    
+    bean.setCredential(credential);
+    bean.setOwner(groupName);
+  }
+
+  @Test
+  public void testSetOwnerWhenGroupNotFound() throws Exception {
+    final String groupName = "someGroup";
+    final String loginName = "someUser";
+    
+    context.checking(new Expectations() { { 
+      oneOf(facesContext).getExternalContext();
+      will(returnValue(externalContext));
+      oneOf(externalContext).getRemoteUser();
+      will(returnValue(loginName));
+      oneOf(importService).resolveGroup(with(same(groupName)), 
+          with(same(loginName)));
+      will(throwException(new NoSuchGroupException()));
+      oneOf(errors).addError(with("owner"), 
+          with(containsString("OwnerNotFound")),
+          with(emptyArray()));
+    } });
+    
+    bean.setCredential(credential);
+    bean.setOwner(groupName);
   }
 
   @Test

@@ -50,6 +50,18 @@ public interface Credential {
   void setName(String name);
 
   /**
+   * Gets the group that owns this credential.
+   * @return owner group or {@code null} if no owner has been assigned
+   */
+  UserGroup getOwner();
+  
+  /**
+   * Sets the group that owns this credential.
+   * @param owner the owner group to set
+   */
+  void setOwner(UserGroup owner);
+  
+  /**
    * Gets the note associated with this credential.
    * @return description
    */

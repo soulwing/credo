@@ -31,8 +31,10 @@ import javax.transaction.Transactional;
 
 import org.soulwing.credo.Credential;
 import org.soulwing.credo.Tag;
+import org.soulwing.credo.UserGroup;
 import org.soulwing.credo.repository.CredentialRepository;
 import org.soulwing.credo.repository.TagRepository;
+import org.soulwing.credo.repository.UserGroupRepository;
 import org.soulwing.credo.service.importer.CredentialImporter;
 import org.soulwing.credo.service.importer.CredentialImporterFactory;
 
@@ -53,6 +55,9 @@ public class ConcreteImportService implements ImportService {
   
   @Inject
   protected TagRepository tagRepository;
+  
+  @Inject
+  protected UserGroupRepository groupRepository;
   
   /**
    * {@inheritDoc}
@@ -127,6 +132,24 @@ public class ConcreteImportService implements ImportService {
       tags.add(tag);
     }
     return tags;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public Set<? extends UserGroup> getGroupMemberships(String loginName) {
+    return groupRepository.findByUserLoginName(loginName);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public UserGroup resolveGroup(String groupName, String loginName)
+      throws NoSuchGroupException {
+    // TODO Auto-generated method stub
+    return null;
   }
   
 }

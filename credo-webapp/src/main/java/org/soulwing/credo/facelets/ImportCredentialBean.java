@@ -27,6 +27,7 @@ import java.util.Set;
 
 import javax.enterprise.context.Conversation;
 import javax.enterprise.context.ConversationScoped;
+import javax.faces.context.FacesContext;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.servlet.http.Part;
@@ -35,11 +36,13 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.Validate;
 import org.soulwing.credo.Credential;
 import org.soulwing.credo.Tag;
+import org.soulwing.credo.UserGroup;
 import org.soulwing.credo.service.Errors;
 import org.soulwing.credo.service.FileContentModel;
 import org.soulwing.credo.service.ImportException;
 import org.soulwing.credo.service.ImportPreparation;
 import org.soulwing.credo.service.ImportService;
+import org.soulwing.credo.service.NoSuchGroupException;
 import org.soulwing.credo.service.PassphraseException;
 
 /**
@@ -78,6 +81,8 @@ public class ImportCredentialBean implements Serializable {
   @Inject
   protected ImportService importService;
   
+  @Inject
+  protected FacesContext facesContext;
   
   private ImportPreparation preparation;
 
@@ -147,6 +152,40 @@ public class ImportCredentialBean implements Serializable {
     credential.setName(name);
   }
 
+  /**
+   * Tests whether the user is a member of the "self" group, only.
+   * @return {@code true} if the user has no group memberships other than
+   *    the "self" group 
+   */
+  public boolean isMemberOfSelfGroupOnly() {
+    return importService.getGroupMemberships(
+        facesContext.getExternalContext().getRemoteUser()).size() <= 1;
+  }
+  
+  /**
+   * Gets the owner name for the credential.
+   * @return owner name or {@code null} if none has been set
+   */
+  public String getOwner() {
+    UserGroup owner = credential.getOwner();
+    if (owner == null) return null;
+    return owner.getName();
+  }
+  
+  /**
+   * Sets the owner name for the credential.
+   * @param owner the owner name to set
+   */
+  public void setOwner(String owner) {
+    try {
+      credential.setOwner(importService.resolveGroup(owner, 
+          facesContext.getExternalContext().getRemoteUser()));
+    }
+    catch (NoSuchGroupException ex) {
+      errors.addError("owner", "credentialOwnerNotFound");
+    }
+  }
+  
   /**
    * Gets the {@code note} property.
    * @return

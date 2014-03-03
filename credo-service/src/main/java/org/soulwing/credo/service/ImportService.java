@@ -25,6 +25,7 @@ import javax.ejb.Local;
 
 import org.soulwing.credo.Credential;
 import org.soulwing.credo.Tag;
+import org.soulwing.credo.UserGroup;
 
 /**
  * A service that imports credentials using the contents of uploaded files.
@@ -79,4 +80,23 @@ public interface ImportService {
    */
   Set<? extends Tag> resolveTags(String[] tokens);
 
+  /**
+   * Gets the set of access groups for which the user represented by
+   * {@code loginName} is a member.
+   * @param loginName the subject login name
+   * @return set of access groups
+   */
+  Set<? extends UserGroup> getGroupMemberships(String loginName);
+
+  /**
+   * Resolves a group name for a user represented by a given login name.
+   * @param groupName subject group name
+   * @param loginName subject login name
+   * @return group object
+   * @throws NoSuchGroupException if the given user does not belong to 
+   *    a group with the given name
+   */
+  UserGroup resolveGroup(String groupName, String loginName)
+      throws NoSuchGroupException;
+  
 }
