@@ -10,6 +10,9 @@
         <dependent-module archiveName="credo-service-1.0.0-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/credo-service/credo-service">
             <dependency-type>uses</dependency-type>
         </dependent-module>
+        <dependent-module archiveName="crypt4j-1.0.0-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/crypt4j/crypt4j">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
         <property name="context-root" value="credo-webapp"/>
         <property name="java-output-path" value="/credo-webapp/target/classes"/>
     </wb-module>
