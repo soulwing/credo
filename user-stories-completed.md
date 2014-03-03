@@ -92,5 +92,25 @@ interface provides a simple subjective and visual indication of password
 complexity that is updated as the user types the password.
 
 * e.g. Weak (red), Moderate (yellow), Strong (green)
+
+
+"Self" Group for a User
+-----------------------
+
+When a user creates her profile she is automatically added to a "self" group 
+that contains no other users.
+
+* The user is always a member of the "self" group; i.e. she cannot be removed
+  from this group.
+
+
+Ownership of an Imported Credential
+-----------------------------------
+
+When a user imports a credential, the ownership of the credential is assigned
+to "self".
+
+
+
     
  

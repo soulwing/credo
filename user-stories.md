@@ -1,24 +1,10 @@
-"Self" Group for a User
------------------------
+Encrypt the Private Key of an Imported Credential
+-------------------------------------------------
 
-When a user creates her profile she is automatically added to a "self" group 
-that contains no other users.
+When importing a credential, the private key is encrypted using the
+secret key associated with the group that is assigned as the credential's
+owner.
 
-* The user is always a member of the "self" group; i.e. she cannot be removed
-  from this group.
-
-
-Ownership of an Imported Credential
------------------------------------
-
-When a user imports a credential, the ownership of the credential is assigned.
-
-* If the user is a member of no groups other than "self", the ownership of
-  the credential is assigned to "self"; the user is not presented with any
-  option to change the ownership.
-* If the user is a member of at least one group other than "self", the user
-  can choose a group for the credential's ownership.
-  
   
 Export Credential in Common Key Store Format
 --------------------------------------------
@@ -31,13 +17,21 @@ files.
   the concatenated PEM files format used by curl.
 
 
-Encrypt the Private Key of an Imported Credential
--------------------------------------------------
+Assign a Group Owner for an Imported Credential
+-----------------------------------------------
 
-When importing a credential, the private key is encrypted using the
-secret key associated with the group that is assigned as the credential's
-owner.
+When importing a credential, if the user is a member of a group in addition
+to "self", she can choose to assign ownership to a group other than "self".
 
+* Only those groups for which the user is a member may be selected as the
+  owner of the credential.
+  
+
+Create a New Group for an Imported Credential
+---------------------------------------------
+
+When importing a credential, a user can create a new group containing herself
+by specifying the new group name as the owner.
 
 
 
