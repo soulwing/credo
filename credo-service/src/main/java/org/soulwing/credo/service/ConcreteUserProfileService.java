@@ -34,7 +34,7 @@ import org.soulwing.credo.repository.UserProfileRepository;
 import org.soulwing.credo.service.crypto.KeyGeneratorService;
 import org.soulwing.credo.service.crypto.KeyPairWrapper;
 import org.soulwing.credo.service.crypto.PasswordEncryptionService;
-import org.soulwing.credo.service.crypto.PrivateKeyEncryptionService;
+import org.soulwing.credo.service.crypto.PKCS8EncryptionService;
 import org.soulwing.credo.service.crypto.PublicKeyWrapper;
 import org.soulwing.credo.service.crypto.SecretKeyEncryptionService;
 
@@ -67,7 +67,7 @@ public class ConcreteUserProfileService
   protected PasswordEncryptionService passwordEncryptionService;
   
   @Inject
-  protected PrivateKeyEncryptionService privateKeyEncryptionService;
+  protected PKCS8EncryptionService privateKeyEncryptionService;
   
   @Inject
   protected SecretKeyEncryptionService secretKeyEncryptionService;

@@ -20,14 +20,11 @@ package org.soulwing.credo.service.crypto;
 
 
 /**
- * A service that encrypts private keys.
- * <p>
- * An implementation of this service encrypts a private key using a password-
- * based mechanism such as PKCS8.
+ * A service that encrypts private keys using PKCS8.
  *
  * @author Carl Harris
  */
-public interface PrivateKeyEncryptionService {
+public interface PKCS8EncryptionService {
 
   /** 
    * Encrypts the given private key.

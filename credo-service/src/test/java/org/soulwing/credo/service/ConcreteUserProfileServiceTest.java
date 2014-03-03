@@ -44,7 +44,7 @@ import org.soulwing.credo.repository.UserProfileRepository;
 import org.soulwing.credo.service.crypto.KeyGeneratorService;
 import org.soulwing.credo.service.crypto.KeyPairWrapper;
 import org.soulwing.credo.service.crypto.PasswordEncryptionService;
-import org.soulwing.credo.service.crypto.PrivateKeyEncryptionService;
+import org.soulwing.credo.service.crypto.PKCS8EncryptionService;
 import org.soulwing.credo.service.crypto.PrivateKeyWrapper;
 import org.soulwing.credo.service.crypto.PublicKeyWrapper;
 import org.soulwing.credo.service.crypto.SecretKeyEncryptionService;
@@ -90,7 +90,7 @@ public class ConcreteUserProfileServiceTest {
   private PasswordEncryptionService passwordEncryptionService;
   
   @Mock
-  private PrivateKeyEncryptionService privateKeyEncryptionService;
+  private PKCS8EncryptionService privateKeyEncryptionService;
   
   @Mock
   private SecretKeyEncryptionService secretKeyEncryptionService;

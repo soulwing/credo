@@ -32,19 +32,19 @@ import org.bouncycastle.operator.OperatorCreationException;
 import org.bouncycastle.operator.OutputEncryptor;
 import org.bouncycastle.pkcs.PKCS8EncryptedPrivateKeyInfo;
 import org.bouncycastle.pkcs.jcajce.JcaPKCS8EncryptedPrivateKeyInfoBuilder;
-import org.soulwing.credo.service.crypto.PrivateKeyEncryptionService;
+import org.soulwing.credo.service.crypto.PKCS8EncryptionService;
 import org.soulwing.credo.service.crypto.PrivateKeyWrapper;
 import org.soulwing.credo.service.pem.PemObjectBuilderFactory;
 
 /**
- * A {@link PrivateKeyEncryptionService} that encrypts/decrypts using PKCS8
+ * A {@link PKCS8EncryptionService} that encrypts/decrypts using PKCS8
  * and is implemented using Bouncy Castle.
  *
  * @author Carl Harris
  */
 @ApplicationScoped
-public class BcPKCS8PrivateKeyEncryptionService
-    implements PrivateKeyEncryptionService {
+public class BcPKCS8EncryptionService
+    implements PKCS8EncryptionService {
 
   @Inject
   protected PemObjectBuilderFactory objectBuilderFactory;
