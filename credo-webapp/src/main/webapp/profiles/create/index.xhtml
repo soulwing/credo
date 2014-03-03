@@ -19,15 +19,10 @@
 	  		  <div class="form-group">
 	  		    <h:outputLabel styleClass="col-md-4 control-label" 
 	  		      for="userLoginName">#{messages.userLoginNameLabel}</h:outputLabel>
-	  		    <div class="col-md-4">
-	            <h:inputText styleClass="form-control"
-	              required="true" 
-                requiredMessage="#{messages.userLoginNameRequired}"              	            
-	              id="userLoginName" title="#{messages.userLoginNameTip}" 
-	              value="#{createUserProfileBean.loginName}">
-	              <f:validator validatorId="org.soulwing.credo.validators.LoginName"/>
-	            </h:inputText>
-	          </div>
+	  		    <p class="form-control-static col-md-4" 
+              title="#{messages.userLoginNameTip}">
+              #{createUserProfileBean.loginName}
+            </p>
 	  		  </div>
           <div class="form-group">
             <h:outputLabel styleClass="col-md-4 control-label" 
