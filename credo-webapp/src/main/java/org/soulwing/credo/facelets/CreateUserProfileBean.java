@@ -18,8 +18,15 @@
  */
 package org.soulwing.credo.facelets;
 
+import javax.annotation.PostConstruct;
 import javax.enterprise.context.RequestScoped;
+import javax.faces.context.FacesContext;
+import javax.inject.Inject;
 import javax.inject.Named;
+
+import org.apache.commons.lang.Validate;
+import org.soulwing.credo.service.UserProfilePreparation;
+import org.soulwing.credo.service.UserProfileService;
 
 /**
  * A bean that supports the Create User Profile interaction.
@@ -30,90 +37,125 @@ import javax.inject.Named;
 @RequestScoped
 public class CreateUserProfileBean {
 
-  private String loginName;
-  private String fullName;
-  private String password;
+  static final String SUCCESS_OUTCOME_ID = "success";
+  
+  static final String CANCEL_OUTCOME_ID = "cancel";
+  
+  @Inject
+  protected FacesContext facesContext;
+  
+  @Inject
+  protected UserProfileService userProfileService;
+
+  private UserProfilePreparation preparation;
   private String passwordAgain;
+
+  @PostConstruct
+  public void init() {
+    preparation = userProfileService.prepareProfile(
+        facesContext.getExternalContext().getRemoteUser());
+  }
   
   /**
-   * Gets the {@code userName} property.
-   * @return
+   * Gets the login name for the profile that will be created.
+   * @return login name
    */
   public String getLoginName() {
-    return loginName;
+    Validate.notNull(preparation, "not prepared");
+    return preparation.getLoginName();
   }
 
   /**
-   * Sets the {@code userName} property.
-   * @param userName
-   */
-  public void setLoginName(String userName) {
-    this.loginName = userName;
-  }
-  
-  /**
-   * Gets the {@code fullName} property.
-   * @return
+   * Gets the full name for the profile that will be created.
+   * @return full name or {@code null} if none has been set
    */
   public String getFullName() {
-    return fullName;
+    Validate.notNull(preparation, "not prepared");
+    return preparation.getFullName();
   }
 
   /**
-   * Sets the {@code fullName} property.
-   * @param fullName
+   * Sets the full name for the profile that will be created.
+   * @param fullName the full name to set
    */
   public void setFullName(String fullName) {
-    this.fullName = fullName;
+    Validate.notNull(preparation, "not prepared");
+    preparation.setFullName(fullName);
   }
 
   /**
-   * Gets the {@code password} property.
-   * @return
+   * Gets the password for the profile that will be created.
+   * @return password or {@code null} if none has been set
    */
   public String getPassword() {
-    return password;
+    Validate.notNull(preparation, "not prepared");
+    char[] password = preparation.getPassword();
+    if (password == null) return null;
+    return new String(password);
   }
 
   /**
-   * Sets the {@code password} property.
-   * @param password
+   * Gets the password for the profile that will be created.
+   * @param password the password to set
    */
   public void setPassword(String password) {
-    this.password = password;
+    Validate.notNull(preparation, "not prepared");
+    preparation.setPassword(password.toCharArray());
   }
 
   /**
-   * Gets the {@code passwordAgain} property.
-   * @return
+   * Gets the password verification property.
+   * @return alleged duplicate of the password property or {@code null}
+   *   if none has been set
    */
   public String getPasswordAgain() {
     return passwordAgain;
   }
 
   /**
-   * Sets the {@code passwordAgain} property.
-   * @param passwordAgain
+   * Sets the password verification property.
+   * @param passwordAgain the value to set
    */
   public void setPasswordAgain(String passwordAgain) {
     this.passwordAgain = passwordAgain;
   }
 
   /**
-   * Creates the user specified in the form.
-   * @return the user to create
+   * Gets the user profile preparation object.
+   * <p>
+   * This method is exposed to support unit testing.
+   * @return preparation
+   */
+  UserProfilePreparation getPreparation() {
+    return preparation;
+  }
+
+  /**
+   * Sets the user profile preparation object.
+   * <p>
+   * This method is exposed to support unit testing.
+   * @param preparation the preparation to set
+   */
+  void setPreparation(UserProfilePreparation preparation) {
+    this.preparation = preparation;
+  }
+
+  /**
+   * Creates the user profile specified in the form.
+   * @return outcome ID
    */
   public String createProfile() {
-    return null;
+    Validate.notNull(preparation, "not prepared");
+    userProfileService.createProfile(preparation);
+    return SUCCESS_OUTCOME_ID;
   }
   
   /**
-   * Cancels the add user interaction.
-   * @return
+   * Cancels the user profile creation.
+   * @return outcome ID
    */
   public String cancel() {
-    // TODO
-    return null;
+    return CANCEL_OUTCOME_ID;
   }
   
 }
