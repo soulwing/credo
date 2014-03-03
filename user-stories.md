@@ -1,3 +1,25 @@
+"Self" Group for a User
+-----------------------
+
+When a user creates her profile she is automatically added to a "self" group 
+that contains no other users.
+
+* The user is always a member of the "self" group; i.e. she cannot be removed
+  from this group.
+
+
+Ownership of an Imported Credential
+-----------------------------------
+
+When a user imports a credential, the ownership of the credential is assigned.
+
+* If the user is a member of no groups other than "self", the ownership of
+  the credential is assigned to "self"; the user is not presented with any
+  option to change the ownership.
+* If the user is a member of at least one group other than "self", the user
+  can choose a group for the credential's ownership.
+  
+  
 Export Credential in Common Key Store Format
 --------------------------------------------
 
@@ -9,24 +31,14 @@ files.
   the concatenated PEM files format used by curl.
 
 
-Apply Passphrase to Unprotected Private Key
--------------------------------------------
+Encrypt the Private Key of an Imported Credential
+-------------------------------------------------
 
-When importing a private key that is not protected by a passphrase, require
-the user to enter a passphrase, and use it to protect the private key before
-storing it in the database.
-
-* The user must enter the passphrase twice to verify correct entry.
+When importing a credential, the private key is encrypted using the
+secret key associated with the group that is assigned as the credential's
+owner.
 
 
-Display New Passphrase Complexity
----------------------------------
-
-When a user enters a new passphrase that will be used to protect a private 
-key, provide a simple subjective and visual indication of password complexity
-as the user is typing the passphrase.
-
-* e.g. Weak (red), Moderate (yellow), Strong (green)
 
 
 

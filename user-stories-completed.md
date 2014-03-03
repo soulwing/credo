@@ -84,5 +84,13 @@ A user profile contains
   authentic, logged-in user.
 
 
+Display New Password Complexity
+---------------------------------
+
+When entering a password for that will be assigned to her profile, the user
+interface provides a simple subjective and visual indication of password 
+complexity that is updated as the user types the password.
+
+* e.g. Weak (red), Moderate (yellow), Strong (green)
     
  
