@@ -22,6 +22,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.Reader;
+import java.io.StringReader;
 import java.io.Writer;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
@@ -56,6 +57,14 @@ public class ZipArchiveBuilder implements ArchiveBuilder {
     assertEntryOpenState(true);
     writeEntry(content, charset);
     return this;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public ArchiveBuilder addContent(String content) throws IOException {
+    return addContent(new StringReader(content));
   }
 
   /**

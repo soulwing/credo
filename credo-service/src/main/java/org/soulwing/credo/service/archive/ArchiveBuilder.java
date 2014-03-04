@@ -44,7 +44,16 @@ public interface ArchiveBuilder {
    * @throws IOException
    */
   ArchiveBuilder addContent(Reader content) throws IOException;
+
+  /**
+   * Adds content to the current entry of the receiver.
+   * @param content the content to add
+   * @return the receiver
+   * @throws IOException
+   */
+  ArchiveBuilder addContent(String content) throws IOException;
   
+
   /**
    * Ends the current entry in the receiver.
    * @return the receiver.
