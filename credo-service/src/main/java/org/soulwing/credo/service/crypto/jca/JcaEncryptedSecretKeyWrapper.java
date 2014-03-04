@@ -98,16 +98,10 @@ public class JcaEncryptedSecretKeyWrapper implements SecretKeyWrapper {
    */
   @Override
   public SecretKey derive() {
-    int delimiter = transform.indexOf('/');
-    if (delimiter == -1) {
-      throw new IllegalArgumentException("illegal transform syntax: " 
-          + transform);
-    }
     try {
-      String algorithm = transform.substring(0, delimiter);
       Cipher decipher = Cipher.getInstance(transform);
       decipher.init(Cipher.UNWRAP_MODE, privateKey);
-      return (SecretKey) decipher.unwrap(cipherText, algorithm, 
+      return (SecretKey) decipher.unwrap(cipherText, "AES", 
           Cipher.SECRET_KEY);
     }
     catch (NoSuchAlgorithmException ex) {

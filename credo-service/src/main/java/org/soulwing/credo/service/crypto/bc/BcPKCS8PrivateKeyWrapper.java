@@ -33,6 +33,7 @@ import org.bouncycastle.pkcs.PKCS8EncryptedPrivateKeyInfo;
 import org.bouncycastle.pkcs.PKCSException;
 import org.soulwing.credo.service.crypto.IncorrectPassphraseException;
 import org.soulwing.credo.service.crypto.PrivateKeyWrapper;
+import org.soulwing.credo.service.crypto.jca.JcaPrivateKeyWrapper;
 import org.soulwing.credo.service.pem.PemObjectBuilderFactory;
 
 /**
@@ -126,6 +127,14 @@ public class BcPKCS8PrivateKeyWrapper implements PrivateKeyWrapper {
     catch (IOException ex) {
       throw new RuntimeException(ex);
     }
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public PrivateKeyWrapper deriveWrapper() {
+    return new JcaPrivateKeyWrapper(derive(), objectBuilderFactory);
   }
 
   private InputDecryptorProvider createPrivateKeyDecryptor() {

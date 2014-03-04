@@ -57,5 +57,12 @@ public interface PrivateKeyWrapper {
    * @return JCA private key
    */
   PrivateKey derive();
+ 
+  /**
+   * Derives and re-wraps the JCP {@link PrivateKey} that corresponds to this
+   * wrapper.
+   * @return 
+   */
+  PrivateKeyWrapper deriveWrapper();
   
 }

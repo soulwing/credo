@@ -25,12 +25,12 @@ import java.security.PrivateKey;
 
 import javax.crypto.Cipher;
 import javax.crypto.NoSuchPaddingException;
+import javax.crypto.SecretKey;
 import javax.crypto.spec.IvParameterSpec;
 
 import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.lang.Validate;
 import org.soulwing.credo.service.crypto.PrivateKeyWrapper;
-import org.soulwing.credo.service.crypto.SecretKeyWrapper;
 import org.soulwing.credo.service.pem.PemObjectBuilderFactory;
 
 /**
@@ -45,7 +45,7 @@ public class JcaEncryptedPrivateKeyWrapper implements PrivateKeyWrapper {
   private final byte[] cipherText;  
   private final PemObjectBuilderFactory objectBuilderFactory;
   
-  private SecretKeyWrapper secretKey;
+  private SecretKey secretKey;
   
   /**
    * Constructs a new instance.
@@ -75,7 +75,7 @@ public class JcaEncryptedPrivateKeyWrapper implements PrivateKeyWrapper {
    * {@inheritDoc}
    */
   @Override
-  public SecretKeyWrapper getProtectionParameter() {
+  public SecretKey getProtectionParameter() {
     return secretKey;
   }
 
@@ -84,9 +84,9 @@ public class JcaEncryptedPrivateKeyWrapper implements PrivateKeyWrapper {
    */
   @Override
   public void setProtectionParameter(Object parameter) {
-    Validate.isTrue(parameter instanceof SecretKeyWrapper,
-        "requires a " + SecretKeyWrapper.class.getSimpleName());
-    this.secretKey = (SecretKeyWrapper) parameter;
+    Validate.isTrue(parameter instanceof SecretKey,
+        "requires a " + SecretKey.class.getSimpleName());
+    this.secretKey = (SecretKey) parameter;
   }
 
   /**
@@ -107,18 +107,11 @@ public class JcaEncryptedPrivateKeyWrapper implements PrivateKeyWrapper {
    */
   @Override
   public PrivateKey derive() {
-    int delimiter = transform.indexOf('/');
-    if (delimiter == -1) {
-      throw new IllegalArgumentException("illegal transform syntax: " 
-          + transform);
-    }
     try {
-      String algorithm = transform.substring(0, delimiter);
       Cipher cipher = Cipher.getInstance(transform);
-      cipher.init(Cipher.UNWRAP_MODE, secretKey.derive(), 
-          new IvParameterSpec(iv));
-      return (PrivateKey) cipher.unwrap(cipherText, algorithm, 
-          Cipher.SECRET_KEY);
+      cipher.init(Cipher.UNWRAP_MODE, secretKey, new IvParameterSpec(iv));
+      return (PrivateKey) cipher.unwrap(cipherText, "RSA", 
+          Cipher.PRIVATE_KEY);
     }
     catch (NoSuchAlgorithmException ex) {
       throw new RuntimeException(ex);
@@ -132,6 +125,14 @@ public class JcaEncryptedPrivateKeyWrapper implements PrivateKeyWrapper {
     catch (InvalidKeyException ex) {
       throw new RuntimeException(ex);
     }
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public PrivateKeyWrapper deriveWrapper() {
+    return new JcaPrivateKeyWrapper(derive(), objectBuilderFactory);
   }
 
 }

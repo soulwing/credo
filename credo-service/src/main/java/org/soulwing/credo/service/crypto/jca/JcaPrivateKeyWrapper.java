@@ -84,4 +84,12 @@ public class JcaPrivateKeyWrapper implements PrivateKeyWrapper {
     return delegate;
   }
 
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public PrivateKeyWrapper deriveWrapper() {
+    return new JcaPrivateKeyWrapper(derive(), objectBuilderFactory);
+  }
+
 }
