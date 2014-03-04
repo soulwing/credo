@@ -21,6 +21,8 @@ package org.soulwing.credo.service.pem.bc;
 import java.io.IOException;
 import java.io.StringReader;
 
+import javax.enterprise.context.ApplicationScoped;
+
 import org.bouncycastle.openssl.PEMException;
 import org.bouncycastle.util.io.pem.PemObject;
 import org.bouncycastle.util.io.pem.PemReader;
@@ -32,6 +34,7 @@ import org.soulwing.credo.service.pem.PemObjectWrapper;
  *
  * @author Carl Harris
  */
+@ApplicationScoped
 public class BcPemObjectFactory implements PemObjectFactory {
 
   /**
