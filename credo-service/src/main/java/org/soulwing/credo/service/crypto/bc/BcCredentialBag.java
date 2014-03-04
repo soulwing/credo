@@ -192,7 +192,7 @@ public class BcCredentialBag implements CredentialBag {
   public boolean isPassphraseRequired() {
     for (BcWrapper obj : objects) {
       if (obj instanceof BcPrivateKeyWrapper) {
-        if (((BcPrivateKeyWrapper) obj).isPassphraseRequired()) {
+        if (((BcPrivateKeyWrapper) obj).isProtected()) {
           return true;
         }
       }
