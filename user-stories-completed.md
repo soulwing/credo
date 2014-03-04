@@ -111,6 +111,14 @@ When a user imports a credential, the ownership of the credential is assigned
 to "self".
 
 
+Encrypt the Private Key of an Imported Credential
+-------------------------------------------------
+
+When importing a credential, the private key is encrypted using the
+secret key associated with the group that is assigned as the credential's
+owner.
+
+  
 
     
  

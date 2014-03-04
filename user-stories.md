@@ -1,11 +1,3 @@
-Encrypt the Private Key of an Imported Credential
--------------------------------------------------
-
-When importing a credential, the private key is encrypted using the
-secret key associated with the group that is assigned as the credential's
-owner.
-
-  
 Export Credential in Common Key Store Format
 --------------------------------------------
 
