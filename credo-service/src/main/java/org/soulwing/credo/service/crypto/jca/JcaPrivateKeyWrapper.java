@@ -18,8 +18,10 @@
  */
 package org.soulwing.credo.service.crypto.jca;
 
+import java.io.IOException;
 import java.security.PrivateKey;
 
+import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
 import org.soulwing.credo.service.crypto.PrivateKeyWrapper;
 import org.soulwing.credo.service.pem.PemObjectBuilderFactory;
 
@@ -72,8 +74,16 @@ public class JcaPrivateKeyWrapper implements PrivateKeyWrapper {
    */
   @Override
   public String getContent() {
-    return objectBuilderFactory.newBuilder().setType("RSA PRIVATE KEY")
-        .append(delegate.getEncoded()).build().getEncoded();
+    try {
+      PrivateKeyInfo keyInfo = PrivateKeyInfo.getInstance(
+          delegate.getEncoded());
+      byte[] content = keyInfo.parsePrivateKey().toASN1Primitive().getEncoded();
+      return objectBuilderFactory.newBuilder().setType("RSA PRIVATE KEY")
+          .append(content).build().getEncoded();
+    }
+    catch (IOException ex) {
+      throw new RuntimeException(ex);
+    }
   }
 
   /**
