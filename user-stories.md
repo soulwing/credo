@@ -1,3 +1,12 @@
+Decrypt Private Key on Credential Export
+----------------------------------------
+
+When exporting a credential, the private key is decrypted (using the owner
+group's secret key).
+
+* The user's password is required to decrypt the group's secret key.
+
+
 Protect Private Key of Exported Credential
 ------------------------------------------
 
