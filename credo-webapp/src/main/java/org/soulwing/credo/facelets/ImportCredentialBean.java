@@ -25,6 +25,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
+import javax.annotation.PostConstruct;
 import javax.enterprise.context.Conversation;
 import javax.enterprise.context.ConversationScoped;
 import javax.faces.context.FacesContext;
@@ -56,6 +57,8 @@ public class ImportCredentialBean implements Serializable {
 
   static final String DETAILS_OUTCOME_ID = "details";
 
+  static final String CONFIRM_OUTCOME_ID = "confirm";
+
   static final String WARNINGS_OUTCOME_ID = "warnings";
   
   static final String FAILURE_OUTCOME_ID = "failure";
@@ -72,6 +75,9 @@ public class ImportCredentialBean implements Serializable {
   private final PartContent file1 = new PartContent();
   private final PartContent file2 = new PartContent();
 
+  private final ImportProtectionParameters protection =
+      new ImportProtectionParameters();
+  
   @Inject
   protected Conversation conversation;
   
@@ -88,7 +94,12 @@ public class ImportCredentialBean implements Serializable {
 
   private Credential credential;
   
-  private String owner = UserGroup.SELF_GROUP_NAME;
+  @PostConstruct
+  public void init() {
+    protection.setGroupName(UserGroup.SELF_GROUP_NAME);
+    protection.setLoginName(
+        facesContext.getExternalContext().getRemoteUser());
+  }
   
   /**
    * Gets the {@code file0} property.
@@ -161,7 +172,7 @@ public class ImportCredentialBean implements Serializable {
    */
   public boolean isMemberOfSelfGroupOnly() {
     return importService.getGroupMemberships(
-        facesContext.getExternalContext().getRemoteUser()).size() <= 1;
+        protection.getLoginName()).size() <= 1;
   }
   
   /**
@@ -169,7 +180,7 @@ public class ImportCredentialBean implements Serializable {
    * @return owner name or {@code null} if none has been set
    */
   public String getOwner() {
-    return owner;
+    return protection.getGroupName();
   }
   
   /**
@@ -177,7 +188,7 @@ public class ImportCredentialBean implements Serializable {
    * @param owner the owner name to set
    */
   public void setOwner(String owner) {
-    this.owner = owner;
+    protection.setGroupName(owner);
   }
   
   /**
@@ -248,6 +259,38 @@ public class ImportCredentialBean implements Serializable {
   }
   
   /**
+   * Gets the user's password.
+   * <p>
+   * This password is used to access the owner group's secret key to 
+   * protect the imported credential.
+   * @return password or {@code null} if none has been set
+   */
+  public String getProtectionPassword() {
+    if (protection.getPassword() == null) return null;
+    return protection.getPassword().toString();
+  }
+  
+  /**
+   * Sets the user's password.
+   * <p>
+   * This password is used to access the owner group's secret key to 
+   * protect the imported credential.
+   * @param password the password to set
+   */
+  public void setProtectionPassword(String password) {
+    protection.setPassword(password.toCharArray());
+  }
+  
+  /**
+   * Gets the protection parameters object.
+   * <p>
+   * This method is exposed to support unit testing.
+   */
+  ImportProtectionParameters getProtectionParameters() {
+    return protection;
+  }
+  
+  /**
    * Gets the import preparation produced by the import service.
    * @return preparation
    */
@@ -258,7 +301,7 @@ public class ImportCredentialBean implements Serializable {
   /**
    * Sets the import preparation produced by the import service.
    * <p>
-   * This method is exposed principally to support unit testing.
+   * This method is exposed to support unit testing.
    * @param preparation the preparation to set
    */
   void setPreparation(ImportPreparation preparation) {
@@ -336,21 +379,34 @@ public class ImportCredentialBean implements Serializable {
   }
   
   /**
+   * Action that is fired when the form containing the credential details
+   * is submitted with the {@code protect} action.
+   * @return outcome ID
+   */
+  public String protect() {
+    try {
+      importService.protectCredential(credential, preparation, protection, 
+          errors);
+      return CONFIRM_OUTCOME_ID;
+    }
+    catch (NoSuchGroupException ex) {
+      return DETAILS_OUTCOME_ID;
+    }
+    catch (PassphraseException ex) {
+      return null;
+    }
+  }
+  
+  /**
    * Action that is fired when the form containing credential details is
    * submitted with the save action.
    * @return outcome ID
    */
   public String save() {
     try {
-      credential.setOwner(importService.resolveGroup(owner, 
-          facesContext.getExternalContext().getRemoteUser()));
       importService.saveCredential(credential, errors);
       conversation.end();
       return SUCCESS_OUTCOME_ID;
-    }
-    catch (NoSuchGroupException ex) {
-      errors.addError("owner", "credentialOwnerNotFound");
-      return null;
     }
     catch (ImportException ex) {
       return null;

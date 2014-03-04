@@ -60,6 +60,7 @@ import org.soulwing.credo.service.ImportPreparation;
 import org.soulwing.credo.service.ImportService;
 import org.soulwing.credo.service.NoSuchGroupException;
 import org.soulwing.credo.service.PassphraseException;
+import org.soulwing.credo.service.ProtectionParameters;
 
 /**
  * Unit tests for {@link ImportCredentialBean}.
@@ -107,6 +108,21 @@ public class ImportCredentialBeanTest {
     bean.errors = errors;
     bean.importService = importService;
     bean.facesContext = facesContext;
+  }
+
+  @Test
+  public void testInit() throws Exception {
+    final String loginName = "someUser";
+    context.checking(new Expectations() { { 
+      oneOf(facesContext).getExternalContext();
+      will(returnValue(externalContext));
+      oneOf(externalContext).getRemoteUser();
+      will(returnValue(loginName));
+    } });
+    
+    bean.init();
+    assertThat(bean.getProtectionParameters().getLoginName(),
+        is(equalTo(loginName)));
   }
 
   @Test
@@ -229,12 +245,12 @@ public class ImportCredentialBeanTest {
     groupMemberships.add(group1);
     groupMemberships.add(group2);
 
-    context.checking(newRemoteUserExpectations(loginName));
     context.checking(new Expectations() { { 
       oneOf(importService).getGroupMemberships(with(same(loginName)));
       will(returnValue(groupMemberships));
     } });
-    
+
+    bean.getProtectionParameters().setLoginName(loginName);
     assertThat(bean.isMemberOfSelfGroupOnly(), is(false));
   }
   
@@ -246,14 +262,11 @@ public class ImportCredentialBeanTest {
         Collections.singleton(group);
   
     context.checking(new Expectations() { { 
-      oneOf(facesContext).getExternalContext();
-      will(returnValue(externalContext));
-      oneOf(externalContext).getRemoteUser();
-      will(returnValue(loginName));
       oneOf(importService).getGroupMemberships(with(same(loginName)));
       will(returnValue(groupMemberships));
     } });
     
+    bean.getProtectionParameters().setLoginName(loginName);
     assertThat(bean.isMemberOfSelfGroupOnly(), is(true));
   }
 
@@ -368,78 +381,29 @@ public class ImportCredentialBeanTest {
 
   @Test
   public void testSaveSuccess() throws Exception {
-    final String groupName = "someGroup";
-    final String loginName = "someUser";
-    final UserGroup group = context.mock(UserGroup.class);
-
-    context.checking(newRemoteUserExpectations(loginName));
     context.checking(new Expectations() { { 
-      oneOf(importService).resolveGroup(with(same(groupName)), 
-          with(same(loginName)));
-      will(returnValue(group));
-      oneOf(credential).setOwner(with(same(group)));
       oneOf(importService).saveCredential(with(same(credential)), 
           with(same(errors)));
       oneOf(conversation).end();
     } });
     
-    bean.setOwner(groupName);
     bean.setCredential(credential);
     assertThat(bean.save(), equalTo(ImportCredentialBean.SUCCESS_OUTCOME_ID));    
   }
 
   @Test
   public void testSaveImportError() throws Exception {
-    final String groupName = "someGroup";
-    final String loginName = "someUser";
-    final UserGroup group = context.mock(UserGroup.class);
 
-    context.checking(newRemoteUserExpectations(loginName));
     context.checking(new Expectations() { { 
-      oneOf(importService).resolveGroup(with(same(groupName)), 
-          with(same(loginName)));
-      will(returnValue(group));
-      oneOf(credential).setOwner(with(same(group)));
       oneOf(importService).saveCredential(with(same(credential)), 
           with(same(errors)));
       will(throwException(new ImportException()));
     } });
     
-    bean.setOwner(groupName);
     bean.setCredential(credential);
     assertThat(bean.save(), nullValue());    
   }
 
-  @Test
-  public void testSaveOwnerNotFound() throws Exception {
-    final String groupName = "someGroup";
-    final String loginName = "someUser";
-
-    context.checking(newRemoteUserExpectations(loginName));
-    context.checking(new Expectations() { { 
-      oneOf(importService).resolveGroup(with(same(groupName)), 
-          with(same(loginName)));
-      will(throwException(new NoSuchGroupException()));
-      oneOf(errors).addError(with("owner"), 
-          with(containsString("OwnerNotFound")),
-          with(emptyArray()));
-    } });
-    
-    bean.setOwner(groupName);
-    bean.setCredential(credential);
-    assertThat(bean.save(), nullValue());    
-  }
-  
-
-  private Expectations newRemoteUserExpectations(final String loginName) { 
-    return new Expectations() { { 
-      oneOf(facesContext).getExternalContext();
-      will(returnValue(externalContext));
-      oneOf(externalContext).getRemoteUser();
-      will(returnValue(loginName));
-    } };
-  }
-  
   @Test
   public void testCancel() throws Exception {
     context.checking(new Expectations() { {
@@ -548,7 +512,54 @@ public class ImportCredentialBeanTest {
     
     bean.setFile0(file);
     bean.setPreparation(preparation);
-    assertThat(bean.validate(), equalTo(ImportCredentialBean.PASSPHRASE_OUTCOME_ID));
+    assertThat(bean.validate(), 
+        equalTo(ImportCredentialBean.PASSPHRASE_OUTCOME_ID));
+  }
+
+  @Test
+  public void testProtectSuccess() throws Exception {
+    context.checking(new Expectations() { { 
+      oneOf(importService).protectCredential(with(same(credential)), 
+          with(same(preparation)), 
+          with(any(ProtectionParameters.class)), 
+          with(same(errors)));
+    } });
+    
+    bean.setPreparation(preparation);
+    bean.setCredential(credential);
+    assertThat(bean.protect(), 
+        is(equalTo(ImportCredentialBean.CONFIRM_OUTCOME_ID)));    
+  }
+  
+  @Test
+  public void testProtectOwnerNotFound() throws Exception {
+    context.checking(new Expectations() { { 
+      oneOf(importService).protectCredential(with(same(credential)), 
+          with(same(preparation)), 
+          with(any(ProtectionParameters.class)), 
+          with(same(errors)));
+      will(throwException(new NoSuchGroupException()));
+    } });
+    
+    bean.setPreparation(preparation);
+    bean.setCredential(credential);
+    assertThat(bean.protect(), 
+        is(equalTo(ImportCredentialBean.DETAILS_OUTCOME_ID)));        
+  }
+
+  @Test
+  public void testProtectPasswordIncorrect() throws Exception {
+    context.checking(new Expectations() { { 
+      oneOf(importService).protectCredential(with(same(credential)), 
+          with(same(preparation)), 
+          with(any(ProtectionParameters.class)), 
+          with(same(errors)));
+      will(throwException(new PassphraseException()));
+    } });
+    
+    bean.setPreparation(preparation);
+    bean.setCredential(credential);
+    assertThat(bean.protect(), is(nullValue()));        
   }
 
 }
