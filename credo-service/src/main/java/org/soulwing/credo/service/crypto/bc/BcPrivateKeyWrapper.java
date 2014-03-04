@@ -74,7 +74,7 @@ public class BcPrivateKeyWrapper implements BcWrapper, PrivateKeyWrapper {
    * {@inheritDoc}
    */
   @Override
-  public boolean isPassphraseRequired() {
+  public boolean isProtected() {
     return key instanceof PKCS8EncryptedPrivateKeyInfo
         || key instanceof PEMEncryptedKeyPair;    
   }
@@ -83,7 +83,7 @@ public class BcPrivateKeyWrapper implements BcWrapper, PrivateKeyWrapper {
    * {@inheritDoc}
    */
   @Override
-  public char[] getPassphrase() {
+  public char[] getProtectionParameter() {
     return passphrase;
   }
 
@@ -91,8 +91,9 @@ public class BcPrivateKeyWrapper implements BcWrapper, PrivateKeyWrapper {
    * {@inheritDoc}
    */
   @Override
-  public void setPassphrase(char[] passphrase) {
-    this.passphrase = passphrase;
+  public void setProtectionParameter(Object parameter) {
+    Validate.isTrue(parameter instanceof char[], "requires a passphrase");
+    this.passphrase = (char[]) parameter;
   }
 
   /**

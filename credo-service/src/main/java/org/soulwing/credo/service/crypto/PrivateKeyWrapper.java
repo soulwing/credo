@@ -28,22 +28,22 @@ import java.security.PrivateKey;
 public interface PrivateKeyWrapper {
 
   /**
-   * Tests whether this private key requires a passphrase.
-   * @return {@code true} if the key requires a passphrase
+   * Tests whether this private key is protected.
+   * @return {@code true} if the key requires a protection parameter.
    */
-  boolean isPassphraseRequired();
+  boolean isProtected();
   
   /**
-   * Gets the passphrase.
-   * @return passphrase or {@code null} if none has been set
+   * Gets the protection parameter.
+   * @return protection parameter or {@code null} if none has been set
    */
-  char[] getPassphrase();
+  Object getProtectionParameter();
   
   /**
-   * Sets the passphrase
-   * @param passphrase the passphrase to set
+   * Sets the protection parameter.
+   * @param parameter the protection parameter to set
    */
-  void setPassphrase(char[] passphrase);
+  void setProtectionParameter(Object parameter);
   
   /**
    * Gets the content of this private key in a suitable string encoding

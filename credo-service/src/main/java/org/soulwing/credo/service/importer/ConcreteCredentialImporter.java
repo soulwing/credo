@@ -102,7 +102,7 @@ public class ConcreteCredentialImporter implements CredentialImporter {
     
     if (certificate == null) {
       try {
-        privateKey.setPassphrase(passphrase);
+        privateKey.setProtectionParameter(passphrase);
         certificate = bag.findSubjectCertificate(privateKey);
         if (certificate == null) {
           errors.addError("importNoSubjectCertificate");
@@ -167,7 +167,7 @@ public class ConcreteCredentialImporter implements CredentialImporter {
    */
   @Override
   public boolean isPassphraseRequired() {
-    return (privateKey != null && privateKey.isPassphraseRequired())
+    return (privateKey != null && privateKey.isProtected())
         || bag.isPassphraseRequired();
   }
 
@@ -194,7 +194,7 @@ public class ConcreteCredentialImporter implements CredentialImporter {
   public ImportDetails getDetails() {
     if (certificate == null) return null;
     if (details == null) {
-      details = new ConcreteImportDetails(certificate);
+      details = new ConcreteImportDetails(privateKey, certificate);
     }
     return details;
   }

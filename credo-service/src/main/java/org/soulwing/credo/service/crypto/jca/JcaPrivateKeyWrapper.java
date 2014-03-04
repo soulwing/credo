@@ -25,14 +25,14 @@ import org.soulwing.credo.service.pem.PemObjectBuilderFactory;
 
 /**
  * A {@link PrivateKeyWrapper} that delegates to a JCA {@link PrivateKey}.
- *
+ * 
  * @author Carl Harris
  */
 public class JcaPrivateKeyWrapper implements PrivateKeyWrapper {
 
   private final PrivateKey delegate;
   private final PemObjectBuilderFactory objectBuilderFactory;
-  
+
   /**
    * Constructs a new instance.
    * @param privateKey private key delegate
@@ -48,7 +48,7 @@ public class JcaPrivateKeyWrapper implements PrivateKeyWrapper {
    * {@inheritDoc}
    */
   @Override
-  public boolean isPassphraseRequired() {
+  public boolean isProtected() {
     return false;
   }
 
@@ -56,7 +56,7 @@ public class JcaPrivateKeyWrapper implements PrivateKeyWrapper {
    * {@inheritDoc}
    */
   @Override
-  public char[] getPassphrase() {
+  public Object getProtectionParameter() {
     return null;
   }
 
@@ -64,8 +64,7 @@ public class JcaPrivateKeyWrapper implements PrivateKeyWrapper {
    * {@inheritDoc}
    */
   @Override
-  public void setPassphrase(char[] passphrase) {
-    throw new UnsupportedOperationException();
+  public void setProtectionParameter(Object parameter) {
   }
 
   /**
@@ -73,10 +72,8 @@ public class JcaPrivateKeyWrapper implements PrivateKeyWrapper {
    */
   @Override
   public String getContent() {
-    return objectBuilderFactory.newBuilder()
-        .setType("RSA PRIVATE KEY")
-        .append(delegate.getEncoded())
-        .build().getEncoded();
+    return objectBuilderFactory.newBuilder().setType("RSA PRIVATE KEY")
+        .append(delegate.getEncoded()).build().getEncoded();
   }
 
   /**

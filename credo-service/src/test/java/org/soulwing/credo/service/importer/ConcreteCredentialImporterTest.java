@@ -157,7 +157,7 @@ public class ConcreteCredentialImporterTest {
           returnValue(null)));
       oneOf(bag).removeObject(with(same(privateKey)));
       will(returnValue(true));
-      oneOf(privateKey).setPassphrase(with(same(passphrase)));
+      oneOf(privateKey).setProtectionParameter(with(same(passphrase)));
       oneOf(bag).findSubjectCertificate(with(same(privateKey)));
       will(throwException(new IncorrectPassphraseException()));
     } });
@@ -170,10 +170,10 @@ public class ConcreteCredentialImporterTest {
   public void testVerifyAgainWithIncorrectPassphrase() throws Exception {
     context.checking(privateKeyExpectations());
     context.checking(new Expectations() { { 
-      exactly(2).of(privateKey).setPassphrase(with(same(passphrase)));
+      exactly(2).of(privateKey).setProtectionParameter(with(same(passphrase)));
       exactly(2).of(bag).findSubjectCertificate(with(same(privateKey)));
       will(throwException(new IncorrectPassphraseException()));
-      oneOf(privateKey).isPassphraseRequired();
+      oneOf(privateKey).isProtected();
       will(returnValue(true));
     } });
     
@@ -191,7 +191,7 @@ public class ConcreteCredentialImporterTest {
   public void testVerifyWhenSubjectCertificateNotFound() throws Exception {
     context.checking(privateKeyExpectations());
     context.checking(new Expectations() { { 
-      allowing(privateKey).setPassphrase(with(nullValue(char[].class)));
+      allowing(privateKey).setProtectionParameter(with(nullValue(char[].class)));
       oneOf(bag).findSubjectCertificate(with(same(privateKey)));
       will(returnValue(null));
       oneOf(errors).addError(with(containsString("NoSubject")), 
@@ -264,7 +264,7 @@ public class ConcreteCredentialImporterTest {
 
   private Expectations certificateExpectations() { 
     return new Expectations() { { 
-      allowing(privateKey).setPassphrase(with(nullValue(char[].class)));
+      allowing(privateKey).setProtectionParameter(with(nullValue(char[].class)));
       oneOf(bag).findSubjectCertificate(with(same(privateKey)));
       will(returnValue(certificate));
     } };

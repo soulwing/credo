@@ -66,7 +66,7 @@ public class BcPKCS8PrivateKeyWrapper implements PrivateKeyWrapper {
    * {@inheritDoc}
    */
   @Override
-  public boolean isPassphraseRequired() {
+  public boolean isProtected() {
     return true;
   }
 
@@ -74,7 +74,7 @@ public class BcPKCS8PrivateKeyWrapper implements PrivateKeyWrapper {
    * {@inheritDoc}
    */
   @Override
-  public char[] getPassphrase() {
+  public char[] getProtectionParameter() {
     return passphrase;
   }
 
@@ -82,8 +82,9 @@ public class BcPKCS8PrivateKeyWrapper implements PrivateKeyWrapper {
    * {@inheritDoc}
    */
   @Override
-  public void setPassphrase(char[] passphrase) {
-    this.passphrase = passphrase;
+  public void setProtectionParameter(Object parameter) {
+    Validate.isTrue(parameter instanceof char[], "requires a passphrase");
+    this.passphrase = (char[]) parameter;
   }
 
   /**
@@ -112,7 +113,8 @@ public class BcPKCS8PrivateKeyWrapper implements PrivateKeyWrapper {
     InputDecryptorProvider decryptor = createPrivateKeyDecryptor();
     try {
       PrivateKeyInfo keyInfo = delegate.decryptPrivateKeyInfo(decryptor);
-      PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(keyInfo.getEncoded());
+      PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(
+          keyInfo.getEncoded());
       return keyFactory.generatePrivate(keySpec);
     }
     catch (PKCSException ex) {
