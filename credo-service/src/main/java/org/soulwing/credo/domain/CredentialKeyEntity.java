@@ -35,4 +35,12 @@ public class CredentialKeyEntity extends CredentialComponentEntity
 
   private static final long serialVersionUID = 1989015823707931759L;
 
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public void setContent(String content) {
+    setEncoded(content);
+  }
+
 }

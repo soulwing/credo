@@ -33,5 +33,11 @@ public interface CredentialKey {
    * @return reader
    */
   Reader getContent() throws IOException;
+
+  /**
+   * Sets the PEM encoded encrypted private key content. 
+   * @param content the content to set
+   */
+  void setContent(String content);
   
 }
