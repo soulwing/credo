@@ -40,8 +40,8 @@ public abstract class CredentialComponentEntity extends AbstractEntity {
 
   private static final long serialVersionUID = -7847231056940730063L;
 
-  @Column(name = "content")
   @Lob
+  @Column(name = "content", nullable = false)
   private String encoded;
 
   /**
