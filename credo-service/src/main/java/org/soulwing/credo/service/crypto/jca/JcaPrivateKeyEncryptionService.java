@@ -25,13 +25,13 @@ import java.security.spec.InvalidParameterSpecException;
 import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
+import javax.crypto.SecretKey;
 import javax.crypto.spec.IvParameterSpec;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
 import org.soulwing.credo.service.crypto.PrivateKeyEncryptionService;
 import org.soulwing.credo.service.crypto.PrivateKeyWrapper;
-import org.soulwing.credo.service.crypto.SecretKeyWrapper;
 import org.soulwing.credo.service.pem.PemObjectBuilderFactory;
 
 /**
@@ -54,10 +54,10 @@ public class JcaPrivateKeyEncryptionService
    */
   @Override
   public PrivateKeyWrapper encrypt(PrivateKeyWrapper privateKey,
-      SecretKeyWrapper secretKey) {
+      SecretKey secretKey) {
     try {
       Cipher cipher = Cipher.getInstance(TRANSFORM);
-      cipher.init(Cipher.WRAP_MODE, secretKey.derive());
+      cipher.init(Cipher.WRAP_MODE, secretKey);
 
       byte[] iv = cipher.getParameters()
           .getParameterSpec(IvParameterSpec.class).getIV();

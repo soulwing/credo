@@ -20,6 +20,7 @@ package org.soulwing.credo.service.crypto.jca;
 
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
+import java.security.PublicKey;
 
 import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
@@ -27,7 +28,6 @@ import javax.crypto.NoSuchPaddingException;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
-import org.soulwing.credo.service.crypto.PublicKeyWrapper;
 import org.soulwing.credo.service.crypto.SecretKeyEncryptionService;
 import org.soulwing.credo.service.crypto.SecretKeyWrapper;
 import org.soulwing.credo.service.pem.PemObjectBuilderFactory;
@@ -52,10 +52,10 @@ public class JcaSecretKeyEncryptionService
    */
   @Override
   public SecretKeyWrapper encrypt(SecretKeyWrapper secretKey,
-      PublicKeyWrapper publicKey) {
+      PublicKey publicKey) {
     try {
       Cipher cipher = Cipher.getInstance(TRANSFORM);
-      cipher.init(Cipher.WRAP_MODE, publicKey.derive());
+      cipher.init(Cipher.WRAP_MODE, publicKey);
       byte[] cipherText = cipher.wrap(secretKey.derive());
       return new JcaEncryptedSecretKeyWrapper(TRANSFORM, cipherText, 
           objectBuilderFactory);

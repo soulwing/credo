@@ -117,7 +117,8 @@ public class ConcreteUserProfileService
         .setUser(user)
         .setGroup(group)
         .setSecretKey(secretKeyEncryptionService.encrypt(
-            keyGeneratorService.generateSecretKey(), publicKey).getContent())
+            keyGeneratorService.generateSecretKey(), 
+            publicKey.derive()).getContent())
         .build();
     
     profileRepository.add(user);

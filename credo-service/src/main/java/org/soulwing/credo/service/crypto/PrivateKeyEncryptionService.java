@@ -18,6 +18,8 @@
  */
 package org.soulwing.credo.service.crypto;
 
+import javax.crypto.SecretKey;
+
 /**
  * A service that encrypts (wraps) a private key using a secret key.
  *
@@ -32,6 +34,6 @@ public interface PrivateKeyEncryptionService {
    * @return encrypted (wrapped) private key
    */
   PrivateKeyWrapper encrypt(PrivateKeyWrapper privateKey, 
-      SecretKeyWrapper secretKey);
+      SecretKey secretKey);
   
 }

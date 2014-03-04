@@ -18,6 +18,8 @@
  */
 package org.soulwing.credo.service.crypto;
 
+import java.security.PublicKey;
+
 /**
  * A service that encrypts a (symmetric) secret key using a public key.
  *
@@ -32,6 +34,6 @@ public interface SecretKeyEncryptionService {
    * @return encrypted (wrapped) secret key
    */
   SecretKeyWrapper encrypt(SecretKeyWrapper secretKey, 
-      PublicKeyWrapper publicKey);
+      PublicKey publicKey);
   
 }
