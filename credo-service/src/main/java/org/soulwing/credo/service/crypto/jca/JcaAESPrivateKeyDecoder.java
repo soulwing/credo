@@ -23,7 +23,7 @@ import javax.inject.Inject;
 
 import org.apache.commons.codec.DecoderException;
 import org.apache.commons.codec.binary.Hex;
-import org.jsoup.helper.Validate;
+import org.apache.commons.lang.Validate;
 import org.soulwing.credo.service.crypto.Encoded;
 import org.soulwing.credo.service.crypto.PrivateKeyDecoder;
 import org.soulwing.credo.service.crypto.PrivateKeyWrapper;

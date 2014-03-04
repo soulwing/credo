@@ -21,7 +21,7 @@ package org.soulwing.credo.service.crypto.jca;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
-import org.jsoup.helper.Validate;
+import org.apache.commons.lang.Validate;
 import org.soulwing.credo.service.crypto.SecretKeyDecoder;
 import org.soulwing.credo.service.crypto.SecretKeyWrapper;
 import org.soulwing.credo.service.pem.PemHeaderWrapper;
