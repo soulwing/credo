@@ -24,6 +24,7 @@ import org.soulwing.credo.service.ExportException;
 import org.soulwing.credo.service.ExportPreparation;
 import org.soulwing.credo.service.ExportRequest;
 import org.soulwing.credo.service.PassphraseException;
+import org.soulwing.credo.service.crypto.PrivateKeyWrapper;
 
 /**
  * An object that performs an export request for a particular export format.
@@ -35,13 +36,15 @@ public interface CredentialExporter {
   /**
    * Performs the export of a credential represented by the given request.
    * @param request the subject request
+   * @param privateKey private key for the credential
    * @return prepared export
    * @throws IOException
    * @throws ExportException
    * @throws PassphraseException if a passphrase is required for the export
    *    and is not provided or is incorrect 
    */
-  ExportPreparation exportCredential(ExportRequest request) 
-      throws IOException, PassphraseException, ExportException;
+  ExportPreparation exportCredential(ExportRequest request, 
+      PrivateKeyWrapper privateKey) throws IOException, PassphraseException, 
+      ExportException;
   
 }

@@ -28,6 +28,7 @@ import org.soulwing.credo.service.ExportPreparation;
 import org.soulwing.credo.service.ExportRequest;
 import org.soulwing.credo.service.PassphraseException;
 import org.soulwing.credo.service.archive.ArchiveBuilder;
+import org.soulwing.credo.service.crypto.PrivateKeyWrapper;
 
 /**
  * An exporter that exports in the {@link ExportFormat#PEM_ARCHIVE} format.
@@ -60,11 +61,12 @@ public class PemArchiveExporter implements CredentialExporter {
    * {@inheritDoc}
    */
   @Override
-  public ExportPreparation exportCredential(ExportRequest request)
-      throws IOException, PassphraseException, ExportException {
+  public ExportPreparation exportCredential(ExportRequest request, 
+      PrivateKeyWrapper privateKey) throws IOException, PassphraseException, 
+      ExportException {
     
     archiveBuilder.beginEntry(KEY_ENTRY_NAME, CHARACTER_ENCODING)    
-      .addContent(request.getCredential().getPrivateKey().getContent())
+      .addContent(privateKey.getContent())
       .endEntry();
 
     List<? extends CredentialCertificate> certificates = 
