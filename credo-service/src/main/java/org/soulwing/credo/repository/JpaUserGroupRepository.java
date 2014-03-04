@@ -24,7 +24,6 @@ import java.util.Set;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.persistence.EntityManager;
-import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
 import javax.persistence.TypedQuery;
 
@@ -76,34 +75,6 @@ public class JpaUserGroupRepository implements UserGroupRepository {
     Set<UserGroup> groups = new LinkedHashSet<>();
     groups.addAll(query.getResultList());
     return groups;
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public UserGroup findByGroupAndLoginName(String groupName, String loginName) {
-    
-    if (UserGroup.SELF_GROUP_NAME.equals(groupName)) {
-      groupName = null;
-    }
-    
-    String queryName = groupName != null ? 
-        "findUserGroupWithLoginName" : "findUserSelfGroup";
-    TypedQuery<UserGroup> query = entityManager.createNamedQuery(
-        queryName, UserGroup.class);
-    
-    if (groupName != null) {
-      query.setParameter("groupName", groupName);
-    }
-    query.setParameter("loginName", loginName);
-    
-    try {
-      return query.getSingleResult();
-    }
-    catch (NoResultException ex) {
-      return null;
-    }
   }
 
 }

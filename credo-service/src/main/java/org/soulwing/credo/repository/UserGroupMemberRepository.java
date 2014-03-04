@@ -33,4 +33,12 @@ public interface UserGroupMemberRepository {
    */
   void add(UserGroupMember groupMember);
   
+  /**
+   * Finds a group member for the given group and login name.
+   * @param groupName the subject group name
+   * @param loginName the subject user's login name
+   * @return matching group member or {@code null} if no such member exists
+   */
+  UserGroupMember findByGroupAndLoginName(String groupName, String loginName);
+  
 }

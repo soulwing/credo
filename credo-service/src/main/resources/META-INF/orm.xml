@@ -20,9 +20,9 @@
     </query>
   </named-query>
 
-  <named-query name="findUserGroupWithLoginName">
+  <named-query name="findGroupMemberWithGroupAndLoginName">
     <query>
-      select distinct g from UserGroupMemberEntity gm
+      select distinct gm from UserGroupMemberEntity gm
       inner join gm.group g
       inner join gm.user u
       where u.loginName = :loginName
@@ -30,9 +30,9 @@
     </query>
   </named-query>
   
-  <named-query name="findUserSelfGroup">
+  <named-query name="findGroupMemberSelf">
     <query>
-      select distinct g from UserGroupMemberEntity gm
+      select distinct gm from UserGroupMemberEntity gm
       inner join gm.group g
       inner join gm.user u
       where u.loginName = :loginName

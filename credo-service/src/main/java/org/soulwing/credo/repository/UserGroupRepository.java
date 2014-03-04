@@ -44,12 +44,4 @@ public interface UserGroupRepository extends UserGroupFactory {
    */
   Set<? extends UserGroup> findByLoginName(String loginName);
 
-  /**
-   * Finds a group with the given name for which the given user is a member.
-   * @param groupName the subject group name
-   * @param loginName the subject user's login name
-   * @return matching group or {@code null} if no such group exists
-   */
-  UserGroup findByGroupAndLoginName(String groupName, String loginName);
-  
 }

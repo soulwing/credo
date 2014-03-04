@@ -20,6 +20,7 @@ package org.soulwing.credo.repository;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasProperty;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.nullValue;
@@ -41,6 +42,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.soulwing.credo.UserGroup;
 import org.soulwing.credo.UserGroupMember;
 import org.soulwing.credo.domain.UserGroupEntity;
 import org.soulwing.credo.domain.UserGroupMemberEntity;
@@ -109,6 +111,90 @@ public class JpaUserGroupMemberRepositoryIT {
     assertThat(actual.getDateCreated(), is(not(nullValue())));
   }
   
+  @Test
+  public void testFindByGroupAndLoginName() throws Exception {
+    final String loginName = "someUser";
+    final String groupName = "someGroup";
+    UserProfileEntity user = newUser("someUser");
+    UserGroupEntity group = newGroup(groupName);
+    
+    UserGroupMemberEntity groupMember = newGroupMember(user, group);
+    
+    entityManager.persist(user);
+    entityManager.persist(group);
+    entityManager.persist(groupMember);
+    entityManager.flush();
+    entityManager.clear();
+    
+    UserGroupMember actual = repository.findByGroupAndLoginName(
+        groupName, loginName);
+    assertThat(actual, is(not(nullValue())));
+    assertThat(actual, 
+        hasProperty("group", hasProperty("name", equalTo(groupName))));
+    assertThat(actual, 
+        hasProperty("user", hasProperty("loginName", equalTo(loginName))));
+  }
+
+  @Test
+  public void testFindByGroupAndLoginNameWhenGroupNotFound() throws Exception {
+    final String loginName = "someUser";
+    final String groupName = "someGroup";
+    UserProfileEntity user = newUser("someUser");
+    UserGroupEntity group = newGroup(groupName);
+    
+    UserGroupMemberEntity groupMember = newGroupMember(user, group);
+    
+    entityManager.persist(user);
+    entityManager.persist(group);
+    entityManager.persist(groupMember);
+    entityManager.flush();
+    entityManager.clear();
+    
+    UserGroupMember actual = repository.findByGroupAndLoginName(
+        "someOtherGroup", loginName);
+    assertThat(actual, is(nullValue()));
+  }
+
+  @Test
+  public void testFindByGroupAndLoginNameWhenSelfGroup() throws Exception {
+    final String loginName = "someUser";
+    final String groupName = UserGroup.SELF_GROUP_NAME;
+    UserProfileEntity user = newUser("someUser");
+    UserGroupEntity group = newGroup(groupName);
+    
+    UserGroupMemberEntity groupMember = newGroupMember(user, group);
+    
+    entityManager.persist(user);
+    entityManager.persist(group);
+    entityManager.persist(groupMember);
+    entityManager.flush();
+    entityManager.clear();
+    
+    UserGroupMember actual = repository.findByGroupAndLoginName(groupName, 
+        loginName);
+    assertThat(actual, is(nullValue()));
+  }
+
+  @Test
+  public void testFindByGroupAndLoginNameWhenGroupIsNull() throws Exception {
+    final String loginName = "someUser";
+    final String groupName = null;
+    UserProfileEntity user = newUser("someUser");
+    UserGroupEntity group = newGroup(groupName);
+    
+    UserGroupMemberEntity groupMember = newGroupMember(user, group);
+    
+    entityManager.persist(user);
+    entityManager.persist(group);
+    entityManager.persist(groupMember);
+    entityManager.flush();
+    entityManager.clear();
+    
+    UserGroupMember actual = repository.findByGroupAndLoginName(groupName, 
+        loginName);
+    assertThat(actual, is(nullValue()));
+  }
+
   private UserProfileEntity newUser(String loginName) {
     UserProfileEntity user = new UserProfileEntity();
     Date now = new Date();
@@ -138,6 +224,7 @@ public class JpaUserGroupMemberRepositoryIT {
     groupMember.setUser(user);
     groupMember.setGroup(group);
     groupMember.setSecretKey("some secret key");
+    groupMember.setDateCreated(new Date());
     return groupMember;
   }
 

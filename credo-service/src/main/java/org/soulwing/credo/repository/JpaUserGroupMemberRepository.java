@@ -22,8 +22,11 @@ import java.util.Date;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
+import javax.persistence.TypedQuery;
 
+import org.soulwing.credo.UserGroup;
 import org.soulwing.credo.UserGroupMember;
 import org.soulwing.credo.domain.UserGroupMemberEntity;
 
@@ -53,4 +56,32 @@ public class JpaUserGroupMemberRepository
     entityManager.persist(groupMember);
   }
 
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public UserGroupMember findByGroupAndLoginName(String groupName, 
+      String loginName) {
+    
+    if (UserGroup.SELF_GROUP_NAME.equals(groupName)) {
+      groupName = null;
+    }
+    
+    String queryName = groupName != null ? 
+        "findGroupMemberWithGroupAndLoginName" : "findGroupMemberSelf";
+    TypedQuery<UserGroupMember> query = entityManager.createNamedQuery(
+        queryName, UserGroupMember.class);
+    
+    if (groupName != null) {
+      query.setParameter("groupName", groupName);
+    }
+    query.setParameter("loginName", loginName);
+    
+    try {
+      return query.getSingleResult();
+    }
+    catch (NoResultException ex) {
+      return null;
+    }
+  }
 }
