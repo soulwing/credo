@@ -92,7 +92,8 @@ public class BcPrivateKeyWrapper implements BcWrapper, PrivateKeyWrapper {
    */
   @Override
   public void setProtectionParameter(Object parameter) {
-    Validate.isTrue(parameter instanceof char[], "requires a passphrase");
+    Validate.isTrue(parameter == null || parameter instanceof char[], 
+        "requires a passphrase");    
     this.passphrase = (char[]) parameter;
   }
 
