@@ -26,6 +26,7 @@ import javax.naming.ldap.Rdn;
 
 import org.soulwing.credo.service.ImportDetails;
 import org.soulwing.credo.service.crypto.CertificateWrapper;
+import org.soulwing.credo.service.crypto.PrivateKeyWrapper;
 
 /**
  * A concrete implementation of {@link ImportDetails}.
@@ -41,13 +42,16 @@ public class ConcreteImportDetails implements ImportDetails {
   private final String serialNumber;
   private final Date notBefore;
   private final Date notAfter;
+  private final PrivateKeyWrapper privateKey;
   
-  protected ConcreteImportDetails(CertificateWrapper certificate) {
+  protected ConcreteImportDetails(PrivateKeyWrapper privateKey,
+      CertificateWrapper certificate) {
     this.subject = getCommonName(certificate.getSubject().getName());
     this.issuer = getCommonName(certificate.getIssuer().getName());
     this.serialNumber = certificate.getSerialNumber().toString();
     this.notBefore = certificate.getNotBefore();
     this.notAfter = certificate.getNotAfter();
+    this.privateKey = privateKey;
   }
 
   private String getCommonName(String name) {
@@ -65,6 +69,14 @@ public class ConcreteImportDetails implements ImportDetails {
     }
   }
   
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public PrivateKeyWrapper getPrivateKey() {
+    return privateKey;
+  }
+
   /**
    * {@inheritDoc}
    */
