@@ -25,6 +25,8 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.nullValue;
 
+import java.security.PublicKey;
+
 import org.jmock.Expectations;
 import org.jmock.auto.Mock;
 import org.jmock.integration.junit4.JUnitRuleMockery;
@@ -43,8 +45,8 @@ import org.soulwing.credo.repository.UserGroupRepository;
 import org.soulwing.credo.repository.UserProfileRepository;
 import org.soulwing.credo.service.crypto.KeyGeneratorService;
 import org.soulwing.credo.service.crypto.KeyPairWrapper;
-import org.soulwing.credo.service.crypto.PasswordEncryptionService;
 import org.soulwing.credo.service.crypto.PKCS8EncryptionService;
+import org.soulwing.credo.service.crypto.PasswordEncryptionService;
 import org.soulwing.credo.service.crypto.PrivateKeyWrapper;
 import org.soulwing.credo.service.crypto.PublicKeyWrapper;
 import org.soulwing.credo.service.crypto.SecretKeyEncryptionService;
@@ -100,6 +102,9 @@ public class ConcreteUserProfileServiceTest {
   
   @Mock
   private PublicKeyWrapper publicKey;
+  
+  @Mock
+  private PublicKey jcaPublicKey;
   
   @Mock
   private PrivateKeyWrapper privateKey;
@@ -224,8 +229,10 @@ public class ConcreteUserProfileServiceTest {
       will(returnValue(encryptedPrivateKey));
       oneOf(encryptedPrivateKey).getContent();
       will(returnValue(encodedPrivateKey));
+      oneOf(publicKey).derive();
+      will(returnValue(jcaPublicKey));
       oneOf(secretKeyEncryptionService).encrypt(with(same(secretKey)),
-          with(same(publicKey)));
+          with(same(jcaPublicKey)));
       will(returnValue(encryptedSecretKey));
       oneOf(encryptedSecretKey).getContent();
       will(returnValue(encodedSecretKey));
