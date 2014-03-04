@@ -286,7 +286,7 @@ public class ImportCredentialBean implements Serializable {
    * <p>
    * This method is exposed to support unit testing.
    */
-  ImportProtectionParameters getProtectionParameters() {
+  public ImportProtectionParameters getProtectionParameters() {
     return protection;
   }
   
