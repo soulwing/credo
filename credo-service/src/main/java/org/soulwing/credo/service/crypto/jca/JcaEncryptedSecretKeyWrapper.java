@@ -20,12 +20,12 @@ package org.soulwing.credo.service.crypto.jca;
 
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
+import java.security.PrivateKey;
 
 import javax.crypto.Cipher;
 import javax.crypto.NoSuchPaddingException;
 import javax.crypto.SecretKey;
 
-import org.soulwing.credo.service.crypto.PrivateKeyWrapper;
 import org.soulwing.credo.service.crypto.SecretKeyWrapper;
 import org.soulwing.credo.service.pem.PemObjectBuilderFactory;
 
@@ -40,7 +40,7 @@ public class JcaEncryptedSecretKeyWrapper implements SecretKeyWrapper {
   private final byte[] cipherText;  
   private final PemObjectBuilderFactory objectBuilderFactory;
   
-  private PrivateKeyWrapper privateKey;
+  private PrivateKey privateKey;
   
   /**
    * Constructs a new instance.
@@ -68,7 +68,7 @@ public class JcaEncryptedSecretKeyWrapper implements SecretKeyWrapper {
    * {@inheritDoc}
    */
   @Override
-  public PrivateKeyWrapper getPrivateKey() {
+  public PrivateKey getPrivateKey() {
     return privateKey;
   }
 
@@ -76,7 +76,7 @@ public class JcaEncryptedSecretKeyWrapper implements SecretKeyWrapper {
    * {@inheritDoc}
    */
   @Override
-  public void setPrivateKey(PrivateKeyWrapper privateKey) {
+  public void setPrivateKey(PrivateKey privateKey) {
     this.privateKey = privateKey;    
   }
 
@@ -106,7 +106,7 @@ public class JcaEncryptedSecretKeyWrapper implements SecretKeyWrapper {
     try {
       String algorithm = transform.substring(0, delimiter);
       Cipher decipher = Cipher.getInstance(transform);
-      decipher.init(Cipher.UNWRAP_MODE, privateKey.derive());
+      decipher.init(Cipher.UNWRAP_MODE, privateKey);
       return (SecretKey) decipher.unwrap(cipherText, algorithm, 
           Cipher.SECRET_KEY);
     }
