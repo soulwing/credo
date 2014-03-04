@@ -26,8 +26,6 @@ import static org.hamcrest.Matchers.nullValue;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.Reader;
-import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -44,6 +42,7 @@ import org.soulwing.credo.CredentialKey;
 import org.soulwing.credo.service.ExportPreparation;
 import org.soulwing.credo.service.ExportRequest;
 import org.soulwing.credo.service.archive.ArchiveBuilder;
+import org.soulwing.credo.service.crypto.PrivateKeyWrapper;
 
 /**
  * Unit tests for {@link PemArchiveExporter}.
@@ -62,7 +61,10 @@ public class PemArchiveExporterTest {
   private Credential credential;
   
   @Mock
-  private CredentialKey privateKey;
+  private CredentialKey credentialKey;
+  
+  @Mock
+  private PrivateKeyWrapper privateKey;
   
   @Mock
   private CredentialCertificate certificate;
@@ -75,11 +77,11 @@ public class PemArchiveExporterTest {
   
   private String fileName = "fileName";
   
-  private Reader privateKeyContent = new StringReader("content");
+  private String privateKeyContent = "privateKey";
   
-  private Reader certificateContent = new StringReader("content");
+  private String certificateContent = "certificate";
   
-  private Reader authorityContent = new StringReader("content");
+  private String authorityContent = "authority"; 
 
   private byte[] archive = new byte[] { 0, 1, 2, 3 };
   
@@ -102,7 +104,7 @@ public class PemArchiveExporterTest {
     context.checking(newAuthorityArchiverExpectations());
     context.checking(newBuildArchiveExpectations());
     
-    validatePreparation(exporter.exportCredential(request));
+    validatePreparation(exporter.exportCredential(request, privateKey));
   }
 
   @Test
@@ -114,7 +116,7 @@ public class PemArchiveExporterTest {
     context.checking(newCertificateArchiverExpectations());
     context.checking(newBuildArchiveExpectations());
     
-    validatePreparation(exporter.exportCredential(request));
+    validatePreparation(exporter.exportCredential(request, privateKey));
   }
 
   @Test
@@ -124,7 +126,7 @@ public class PemArchiveExporterTest {
     context.checking(newPrivateKeyArchiverExpectations());
     context.checking(newBuildArchiveExpectations());
     
-    validatePreparation(exporter.exportCredential(request));
+    validatePreparation(exporter.exportCredential(request, privateKey));
   }
 
 
@@ -147,10 +149,6 @@ public class PemArchiveExporterTest {
     return new Expectations() { { 
       allowing(request).getCredential();
       will(returnValue(credential));
-      oneOf(credential).getPrivateKey();
-      will(returnValue(privateKey));
-      oneOf(privateKey).getContent();
-      will(returnValue(privateKeyContent));
       oneOf(credential).getCertificates();
       will(returnValue(certificates));
       allowing(certificate).getContent();
@@ -166,6 +164,8 @@ public class PemArchiveExporterTest {
           with(PemArchiveExporter.KEY_ENTRY_NAME), 
           with(PemArchiveExporter.CHARACTER_ENCODING));
       will(returnValue(archiveBuilder));
+      oneOf(privateKey).getContent();
+      will(returnValue(privateKeyContent));
       oneOf(archiveBuilder).addContent(with(same(privateKeyContent)));
       will(returnValue(archiveBuilder));
       oneOf(archiveBuilder).endEntry();
