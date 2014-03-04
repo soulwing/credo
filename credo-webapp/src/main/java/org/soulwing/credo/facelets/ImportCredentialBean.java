@@ -75,8 +75,8 @@ public class ImportCredentialBean implements Serializable {
   private final PartContent file1 = new PartContent();
   private final PartContent file2 = new PartContent();
 
-  private final ImportProtectionParameters protection =
-      new ImportProtectionParameters();
+  private final ProtectionParametersBean protection =
+      new ProtectionParametersBean();
   
   @Inject
   protected Conversation conversation;
@@ -286,7 +286,7 @@ public class ImportCredentialBean implements Serializable {
    * <p>
    * This method is exposed to support unit testing.
    */
-  public ImportProtectionParameters getProtectionParameters() {
+  public ProtectionParametersBean getProtectionParameters() {
     return protection;
   }
   

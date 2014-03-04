@@ -25,7 +25,7 @@ import org.soulwing.credo.service.ProtectionParameters;
  *
  * @author Carl Harris
  */
-public class ImportProtectionParameters implements ProtectionParameters {
+public class ProtectionParametersBean implements ProtectionParameters {
 
   private String groupName;
   private String loginName;
