@@ -21,6 +21,8 @@ package org.soulwing.credo.service;
 import java.io.Serializable;
 import java.util.Date;
 
+import org.soulwing.credo.service.crypto.PrivateKeyWrapper;
+
 /**
  * An object that represents the details of a credential that has been
  * fully validated for import.
@@ -28,6 +30,12 @@ import java.util.Date;
  * @author Carl Harris
  */
 public interface ImportDetails extends Serializable {
+
+  /**
+   * Gets the private key.
+   * @return private key
+   */
+  PrivateKeyWrapper getPrivateKey();
 
   /**
    * Gets the {@code subject} property.
@@ -58,5 +66,5 @@ public interface ImportDetails extends Serializable {
    * @return
    */
   Date getNotAfter();
-
+  
 }

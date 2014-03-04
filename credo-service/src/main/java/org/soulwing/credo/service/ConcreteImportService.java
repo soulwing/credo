@@ -19,6 +19,7 @@
 package org.soulwing.credo.service;
 
 import java.io.IOException;
+import java.security.PrivateKey;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
@@ -32,9 +33,18 @@ import javax.transaction.Transactional;
 import org.soulwing.credo.Credential;
 import org.soulwing.credo.Tag;
 import org.soulwing.credo.UserGroup;
+import org.soulwing.credo.UserGroupMember;
 import org.soulwing.credo.repository.CredentialRepository;
 import org.soulwing.credo.repository.TagRepository;
+import org.soulwing.credo.repository.UserGroupMemberRepository;
 import org.soulwing.credo.repository.UserGroupRepository;
+import org.soulwing.credo.service.crypto.Encoded;
+import org.soulwing.credo.service.crypto.IncorrectPassphraseException;
+import org.soulwing.credo.service.crypto.PrivateKeyDecoder;
+import org.soulwing.credo.service.crypto.PrivateKeyEncryptionService;
+import org.soulwing.credo.service.crypto.PrivateKeyWrapper;
+import org.soulwing.credo.service.crypto.SecretKeyDecoder;
+import org.soulwing.credo.service.crypto.SecretKeyWrapper;
 import org.soulwing.credo.service.importer.CredentialImporter;
 import org.soulwing.credo.service.importer.CredentialImporterFactory;
 
@@ -58,6 +68,19 @@ public class ConcreteImportService implements ImportService {
   
   @Inject
   protected UserGroupRepository groupRepository;
+  
+  @Inject
+  protected UserGroupMemberRepository groupMemberRepository;
+  
+  @Inject
+  protected SecretKeyDecoder secretKeyDecoder;
+  
+  @Inject 
+  @Encoded(type = Encoded.Type.PKCS8)
+  protected PrivateKeyDecoder privateKeyDecoder;
+  
+  @Inject 
+  protected PrivateKeyEncryptionService privateKeyEncryptionService;
   
   /**
    * {@inheritDoc}
@@ -112,6 +135,46 @@ public class ConcreteImportService implements ImportService {
    * {@inheritDoc}
    */
   @Override
+  public void protectCredential(Credential credential,
+      ImportPreparation preparation, ProtectionParameters protection,
+      Errors errors) throws NoSuchGroupException, PassphraseException {
+    
+    UserGroupMember groupMember = groupMemberRepository
+        .findByGroupAndLoginName(protection.getGroupName(), 
+            protection.getLoginName());
+    if (groupMember == null) {
+      errors.addError("owner", "credentialOwnerNotFound");
+      throw new NoSuchGroupException();
+    }
+    
+    try {
+      PrivateKeyWrapper encryptedPrivateKey = privateKeyDecoder.decode(
+          groupMember.getUser().getPrivateKey());
+      encryptedPrivateKey.setProtectionParameter(protection.getPassword());
+      PrivateKey userPrivateKey = encryptedPrivateKey.derive();
+      
+      SecretKeyWrapper encryptedSecretKey = secretKeyDecoder.decode(
+          groupMember.getSecretKey()); 
+  
+      encryptedSecretKey.setPrivateKey(userPrivateKey);
+      PrivateKeyWrapper credentialPrivateKey = 
+          privateKeyEncryptionService.encrypt(
+              preparation.getDetails().getPrivateKey(), 
+              encryptedSecretKey.derive());
+      
+      credential.setOwner(groupMember.getGroup());
+      credential.getPrivateKey().setContent(credentialPrivateKey.getContent());
+    }
+    catch (IncorrectPassphraseException ex) {
+      errors.addError("password", "passwordIncorrect");
+      throw new PassphraseException();
+    }
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
   @Transactional
   public void saveCredential(Credential credential, Errors errors)
       throws ImportException {
@@ -140,20 +203,6 @@ public class ConcreteImportService implements ImportService {
   @Override
   public Set<? extends UserGroup> getGroupMemberships(String loginName) {
     return groupRepository.findByLoginName(loginName);
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public UserGroup resolveGroup(String groupName, String loginName)
-      throws NoSuchGroupException {
-    UserGroup group = groupRepository.findByGroupAndLoginName(groupName, 
-        loginName);
-    if (group == null) {
-      throw new NoSuchGroupException();
-    }
-    return group;
   }
   
 }

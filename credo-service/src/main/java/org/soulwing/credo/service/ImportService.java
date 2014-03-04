@@ -62,11 +62,25 @@ public interface ImportService {
       throws ImportException, PassphraseException;
   
   /**
+   * Protects the (private key of the) given credential. 
+   * @param credential the subject credential
+   * @param preparation prepared credential content
+   * @param protection protection parameters
+   * @param errors an errors object that will be updated to report any
+   *    recoverable errors that occur
+   * @throws NoSuchGroupException if the given user is not in the specified
+   *    protection group
+   * @throws PassphraseException if the provided passphrase is incorrect 
+   */
+  void protectCredential(Credential credential, 
+      ImportPreparation preparation, ProtectionParameters protection,
+      Errors errors) throws NoSuchGroupException, PassphraseException;
+  
+  /**
    * Save the given (transient) credential making it persistent.
    * @param credential the credential to save
    * @param errors an errors object that will be updated if a recoverable
    *    error occurs
-   * @return credential the imported credential
    * @throws ImportException if a recoverable error occurs
    */
   void saveCredential(Credential credential, Errors errors) 
@@ -88,15 +102,4 @@ public interface ImportService {
    */
   Set<? extends UserGroup> getGroupMemberships(String loginName);
 
-  /**
-   * Resolves a group name for a user represented by a given login name.
-   * @param groupName subject group name
-   * @param loginName subject login name
-   * @return group object
-   * @throws NoSuchGroupException if the given user does not belong to 
-   *    a group with the given name
-   */
-  UserGroup resolveGroup(String groupName, String loginName)
-      throws NoSuchGroupException;
-  
 }

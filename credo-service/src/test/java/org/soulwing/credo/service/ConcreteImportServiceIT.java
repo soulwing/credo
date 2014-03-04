@@ -48,13 +48,14 @@ import org.jboss.shrinkwrap.resolver.api.maven.Maven;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.soulwing.credo.Credential;
+import org.soulwing.credo.UserGroup;
 import org.soulwing.credo.domain.CredentialEntity;
 import org.soulwing.credo.repository.CredentialRepository;
-import org.soulwing.credo.repository.JpaCredentialRepository;
-import org.soulwing.credo.repository.JpaTagRepository;
-import org.soulwing.credo.repository.TagRepository;
-import org.soulwing.credo.service.crypto.CredentialBag;
-import org.soulwing.credo.service.crypto.bc.BcCredentialBag;
+import org.soulwing.credo.service.archive.ArchiveBuilder;
+import org.soulwing.credo.service.crypto.PrivateKeyWrapper;
+import org.soulwing.credo.service.crypto.bc.BcPrivateKeyWrapper;
+import org.soulwing.credo.service.crypto.jca.JcaPrivateKeyWrapper;
+import org.soulwing.credo.service.exporter.CredentialExporter;
 import org.soulwing.credo.service.importer.CredentialImporter;
 import org.soulwing.credo.service.pem.PemObjectBuilder;
 import org.soulwing.credo.service.pem.bc.BcPemObjectBuilder;
@@ -69,29 +70,32 @@ public class ConcreteImportServiceIT {
 
   @Deployment
   public static Archive<?> createDeployment() {
-    return ShrinkWrap.create(WebArchive.class)
+    WebArchive archive = ShrinkWrap.create(WebArchive.class)
         .addAsLibraries(Maven.resolver().loadPomFromFile("pom.xml")
             .importRuntimeAndTestDependencies().resolve().withTransitivity().asFile())
         .addPackage(Credential.class.getPackage())
         .addPackage(CredentialEntity.class.getPackage())
-        .addClasses(CredentialRepository.class, JpaCredentialRepository.class)
-        .addClasses(TagRepository.class, JpaTagRepository.class)
-        .addClasses(ImportService.class, ImportException.class, 
-            ImportDetails.class, ImportPreparation.class, Errors.class, 
-            FileContentModel.class, NoContentException.class,
-            PassphraseException.class, ConcreteImportService.class)
-        .addClasses(TimeOfDayService.class, ConcreteTimeOfDayService.class)
+        .addPackage(CredentialRepository.class.getPackage())
+        .addPackage(CredentialService.class.getPackage())
+        .addPackage(ArchiveBuilder.class.getPackage())
+        .addPackage(CredentialExporter.class.getPackage())
         .addPackage(CredentialImporter.class.getPackage())
-        .addPackage(CredentialBag.class.getPackage())
-        .addPackage(BcCredentialBag.class.getPackage())
+        .addPackage(PrivateKeyWrapper.class.getPackage())
+        .addPackage(BcPrivateKeyWrapper.class.getPackage())
+        .addPackage(JcaPrivateKeyWrapper.class.getPackage())
         .addPackage(PemObjectBuilder.class.getPackage())
         .addPackage(BcPemObjectBuilder.class.getPackage())
         .addAsResource("testcases")
         .addAsResource("persistence-test.xml", "META-INF/persistence.xml")
         .addAsResource("META-INF/orm.xml", "META-INF/orm.xml")
         .addAsWebInfResource(EmptyAsset.INSTANCE, "beans.xml");
+    System.out.println(archive.toString(true));
+    return archive;
   }
-
+  
+  @Inject
+  private UserProfileService profileService;
+  
   @Inject
   private ImportService importService;
 
@@ -182,7 +186,62 @@ public class ConcreteImportServiceIT {
         containsString(properties.getProperty("issuer2")));
   }
 
+  @Test
+  public void testImportProtectAndSave() throws Exception {
+    final String testCase = "pkcs8-key";
+    final String loginName = "someUser";
+    final char[] password = "somePassword".toCharArray();
+    final ProtectionParameters protection = newProtectionParameters(loginName, 
+        password);
 
+    createUserProfile(loginName, password);
+
+    Properties properties = properties(testCase);
+    
+    ImportPreparation preparation = 
+        importService.prepareImport(testFiles(testCase), errors);
+    assertThat(preparation, is(not(nullValue())));
+    assertThat(preparation.isPassphraseRequired(), is(true));
+    
+    preparation.setPassphrase(
+        properties.getProperty("passphrase").toCharArray());
+    
+    Credential credential = importService.createCredential(preparation, errors);
+    credential.setName(preparation.getDetails().getSubject());
+    importService.protectCredential(credential, preparation, protection, errors);
+    importService.saveCredential(credential, errors);
+  }
+
+  private void createUserProfile(String loginName, char[] password) {
+    UserProfilePreparation preparation = 
+        profileService.prepareProfile(loginName);
+    preparation.setFullName("Some User");
+    preparation.setPassword(password);
+    profileService.createProfile(preparation);
+  }
+
+  private ProtectionParameters newProtectionParameters(final String loginName,
+      final char[] password) {
+    return new ProtectionParameters() {
+
+      @Override
+      public String getGroupName() {
+        return UserGroup.SELF_GROUP_NAME;
+      }
+
+      @Override
+      public String getLoginName() {
+        return loginName; 
+      }
+
+      @Override
+      public char[] getPassword() {
+        return password;
+      } 
+      
+    };
+  }
+ 
   private List<FileContentModel> testFiles(String testCase) 
       throws Exception {
     List<FileContentModel> files = new ArrayList<>();
