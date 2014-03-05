@@ -119,6 +119,15 @@ secret key associated with the group that is assigned as the credential's
 owner.
 
   
+Decrypt Private Key on Credential Export
+----------------------------------------
+
+When exporting a credential, the private key is decrypted (using the owner
+group's secret key).
+
+* The user's password is required to decrypt the group's secret key.
+
+
 
     
  
