@@ -24,6 +24,7 @@ import java.util.Set;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
 import javax.persistence.TypedQuery;
 
@@ -62,6 +63,22 @@ public class JpaUserGroupRepository implements UserGroupRepository {
     ((UserGroupEntity) group).setDateCreated(now);
     ((UserGroupEntity) group).setDateModified(now);
     entityManager.persist(group);    
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public UserGroup findByGroupName(String groupName) {
+    TypedQuery<UserGroup> query = entityManager.createNamedQuery(
+        "findUserGroupsByName", UserGroup.class);
+    query.setParameter("groupName", groupName);
+    try {
+      return query.getSingleResult();      
+    }
+    catch (NoResultException ex) {
+      return null;
+    }
   }
 
   /**

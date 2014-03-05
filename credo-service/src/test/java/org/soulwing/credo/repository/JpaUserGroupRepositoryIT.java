@@ -103,6 +103,25 @@ public class JpaUserGroupRepositoryIT {
   }
   
   @Test
+  public void testFindByGroupName() throws Exception {
+    final String groupName = "someGroup";
+    final UserGroupEntity group = newGroup(groupName);
+    entityManager.persist(group);
+    entityManager.flush();
+    entityManager.clear();
+    
+    UserGroup actual = repository.findByGroupName(groupName);
+    assertThat(actual, is(not(nullValue())));
+    assertThat(actual.getName(), is(equalTo(group.getName())));
+  }
+  
+  @Test
+  public void testFindByGroupNameWhenNotFound() throws Exception {
+    UserGroup actual = repository.findByGroupName("does not exist");
+    assertThat(actual, is(nullValue()));
+  }
+
+  @Test
   public void testFindByLoginName() throws Exception {
     final String loginName = "someUser";
     UserProfileEntity user = newUser("someUser");
