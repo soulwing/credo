@@ -25,8 +25,6 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.nullValue;
 
-import java.util.Date;
-
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -90,9 +88,9 @@ public class JpaUserGroupMemberRepositoryIT {
   
   @Test
   public void testAdd() throws Exception {
-    UserProfileEntity user = newUser("someUser");
-    UserGroupEntity group = newGroup("someGroup");
-    UserGroupMemberEntity expected = newGroupMember(user, group);
+    UserProfileEntity user = EntityUtil.newUser("someUser");
+    UserGroupEntity group = EntityUtil.newGroup("someGroup");
+    UserGroupMemberEntity expected = EntityUtil.newGroupMember(user, group);
     
     entityManager.persist(user);
     entityManager.persist(group);
@@ -115,10 +113,10 @@ public class JpaUserGroupMemberRepositoryIT {
   public void testFindByGroupAndLoginName() throws Exception {
     final String loginName = "someUser";
     final String groupName = "someGroup";
-    UserProfileEntity user = newUser("someUser");
-    UserGroupEntity group = newGroup(groupName);
+    UserProfileEntity user = EntityUtil.newUser("someUser");
+    UserGroupEntity group = EntityUtil.newGroup(groupName);
     
-    UserGroupMemberEntity groupMember = newGroupMember(user, group);
+    UserGroupMemberEntity groupMember = EntityUtil.newGroupMember(user, group);
     
     entityManager.persist(user);
     entityManager.persist(group);
@@ -139,10 +137,10 @@ public class JpaUserGroupMemberRepositoryIT {
   public void testFindByGroupAndLoginNameWhenGroupNotFound() throws Exception {
     final String loginName = "someUser";
     final String groupName = "someGroup";
-    UserProfileEntity user = newUser("someUser");
-    UserGroupEntity group = newGroup(groupName);
+    UserProfileEntity user = EntityUtil.newUser("someUser");
+    UserGroupEntity group = EntityUtil.newGroup(groupName);
     
-    UserGroupMemberEntity groupMember = newGroupMember(user, group);
+    UserGroupMemberEntity groupMember = EntityUtil.newGroupMember(user, group);
     
     entityManager.persist(user);
     entityManager.persist(group);
@@ -159,10 +157,10 @@ public class JpaUserGroupMemberRepositoryIT {
   public void testFindByGroupAndLoginNameWhenSelfGroup() throws Exception {
     final String loginName = "someUser";
     final String groupName = UserGroup.SELF_GROUP_NAME;
-    UserProfileEntity user = newUser("someUser");
-    UserGroupEntity group = newGroup(groupName);
+    UserProfileEntity user = EntityUtil.newUser(loginName);
+    UserGroupEntity group = EntityUtil.newGroup(groupName);
     
-    UserGroupMemberEntity groupMember = newGroupMember(user, group);
+    UserGroupMemberEntity groupMember = EntityUtil.newGroupMember(user, group);
     
     entityManager.persist(user);
     entityManager.persist(group);
@@ -172,17 +170,17 @@ public class JpaUserGroupMemberRepositoryIT {
     
     UserGroupMember actual = repository.findByGroupAndLoginName(groupName, 
         loginName);
-    assertThat(actual, is(nullValue()));
+    assertThat(actual, is(not(nullValue())));
   }
 
   @Test
   public void testFindByGroupAndLoginNameWhenGroupIsNull() throws Exception {
     final String loginName = "someUser";
     final String groupName = null;
-    UserProfileEntity user = newUser("someUser");
-    UserGroupEntity group = newGroup(groupName);
+    UserProfileEntity user = EntityUtil.newUser("someUser");
+    UserGroupEntity group = EntityUtil.newGroup(groupName);
     
-    UserGroupMemberEntity groupMember = newGroupMember(user, group);
+    UserGroupMemberEntity groupMember = EntityUtil.newGroupMember(user, group);
     
     entityManager.persist(user);
     entityManager.persist(group);
@@ -195,37 +193,5 @@ public class JpaUserGroupMemberRepositoryIT {
     assertThat(actual, is(nullValue()));
   }
 
-  private UserProfileEntity newUser(String loginName) {
-    UserProfileEntity user = new UserProfileEntity();
-    Date now = new Date();
-    user.setLoginName(loginName);
-    user.setFullName("Some User");
-    user.setPassword("some password");
-    user.setPublicKey("some public key");
-    user.setPrivateKey("some public key");
-    user.setDateCreated(now);
-    user.setDateModified(now);
-    user.getDateCreated();
-    return user;
-  }
-  
-  private UserGroupEntity newGroup(String name) {
-    UserGroupEntity group = new UserGroupEntity();
-    Date now = new Date();
-    group.setName("someGroup");
-    group.setDateCreated(now);
-    group.setDateModified(now);
-    return group;
-  }
-  
-  private UserGroupMemberEntity newGroupMember(UserProfileEntity user,
-      UserGroupEntity group) {
-    UserGroupMemberEntity groupMember = new UserGroupMemberEntity();
-    groupMember.setUser(user);
-    groupMember.setGroup(group);
-    groupMember.setSecretKey("some secret key");
-    groupMember.setDateCreated(new Date());
-    return groupMember;
-  }
 
 }
