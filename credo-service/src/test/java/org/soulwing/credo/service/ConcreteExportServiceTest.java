@@ -46,6 +46,7 @@ import org.soulwing.credo.service.crypto.PrivateKeyWrapper;
 import org.soulwing.credo.service.exporter.CredentialExportProvider;
 import org.soulwing.credo.service.exporter.CredentialExporter;
 import org.soulwing.credo.service.protect.CredentialProtectionService;
+import org.soulwing.credo.service.protect.GroupAccessException;
 import org.soulwing.credo.service.protect.UserAccessException;
 
 /**
@@ -164,12 +165,19 @@ public class ConcreteExportServiceTest {
     exportService.prepareExport(request);
   }
 
+  @Test(expected = AccessDeniedException.class)
+  public void testPrepareExportWhenNotUserGroupMember() throws Exception {
+    context.checking(prepareExportExpectations(true));
+    context.checking(unprotectCredentialExpectations(
+        throwException(new GroupAccessException("some message"))));
+    exportService.prepareExport(request);
+  }
+
   @Test(expected = IllegalArgumentException.class)
   public void testPrepareExportUnsupportedFormat() throws Exception {
     context.checking(prepareExportExpectations(false));
     exportService.prepareExport(request); 
   }
-
 
   private Expectations prepareExportExpectations(final boolean supports)
       throws Exception {

@@ -31,13 +31,10 @@ import static org.jmock.Expectations.throwException;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.security.PrivateKey;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
-import javax.crypto.SecretKey;
 
 import org.jmock.Expectations;
 import org.jmock.api.Action;
@@ -50,20 +47,15 @@ import org.soulwing.credo.Credential;
 import org.soulwing.credo.CredentialKey;
 import org.soulwing.credo.Tag;
 import org.soulwing.credo.UserGroup;
-import org.soulwing.credo.UserGroupMember;
-import org.soulwing.credo.UserProfile;
 import org.soulwing.credo.repository.CredentialRepository;
 import org.soulwing.credo.repository.TagRepository;
-import org.soulwing.credo.repository.UserGroupMemberRepository;
 import org.soulwing.credo.repository.UserGroupRepository;
-import org.soulwing.credo.service.crypto.IncorrectPassphraseException;
-import org.soulwing.credo.service.crypto.PrivateKeyDecoder;
-import org.soulwing.credo.service.crypto.PrivateKeyEncryptionService;
 import org.soulwing.credo.service.crypto.PrivateKeyWrapper;
-import org.soulwing.credo.service.crypto.SecretKeyDecoder;
-import org.soulwing.credo.service.crypto.SecretKeyWrapper;
 import org.soulwing.credo.service.importer.CredentialImporter;
 import org.soulwing.credo.service.importer.CredentialImporterFactory;
+import org.soulwing.credo.service.protect.CredentialProtectionService;
+import org.soulwing.credo.service.protect.GroupAccessException;
+import org.soulwing.credo.service.protect.UserAccessException;
 
 /**
  * Unit tests for {@link ConcreteImportService}.
@@ -72,15 +64,11 @@ import org.soulwing.credo.service.importer.CredentialImporterFactory;
  */
 public class ConcreteImportServiceTest {
 
+  private static final String GROUP_NAME = "someGroup";
+
   @Rule
   public final JUnitRuleMockery context = new JUnitRuleMockery();
   
-  private final String groupName = "someGroup";
-  private final String loginName = "someUser";
-  private final String encodedSecretKey = "someSecretKey";
-  private final String encodedPrivateKey = "somePrivateKey";
-  private final char[] password = new char[0];
-
   @Mock
   private CredentialImporterFactory importerFactory;
   
@@ -100,25 +88,7 @@ public class ConcreteImportServiceTest {
   private ProtectionParameters protection;
 
   @Mock
-  private UserProfile user;
-  
-  @Mock
   private UserGroup group;
-  
-  @Mock
-  private UserGroupMember groupMember;
-  
-  @Mock
-  private SecretKeyWrapper encryptedSecretKey;
-  
-  @Mock
-  private SecretKey secretKey;
-  
-  @Mock
-  private PrivateKeyWrapper encryptedPrivateKey;
-  
-  @Mock
-  private PrivateKey privateKey;
   
   @Mock
   private PrivateKeyWrapper credentialPrivateKey;
@@ -136,17 +106,7 @@ public class ConcreteImportServiceTest {
   private UserGroupRepository groupRepository;
   
   @Mock
-  protected UserGroupMemberRepository groupMemberRepository;
-  
-  @Mock
-  private SecretKeyDecoder secretKeyDecoder;
-  
-  @Mock
-  private PrivateKeyDecoder privateKeyDecoder;
-  
-  @Mock
-  private PrivateKeyEncryptionService privateKeyEncryptionService;
-
+  private CredentialProtectionService protectionService;
   
   public ConcreteImportService importService = new ConcreteImportService();
   
@@ -156,10 +116,7 @@ public class ConcreteImportServiceTest {
     importService.credentialRepository = credentialRepository;
     importService.tagRepository = tagRepository;
     importService.groupRepository = groupRepository;
-    importService.groupMemberRepository = groupMemberRepository;
-    importService.secretKeyDecoder = secretKeyDecoder;
-    importService.privateKeyDecoder = privateKeyDecoder;
-    importService.privateKeyEncryptionService = privateKeyEncryptionService;
+    importService.protectionService = protectionService;
   }
   
   @Test(expected = ImportException.class)
@@ -249,109 +206,103 @@ public class ConcreteImportServiceTest {
   }
 
   @Test
-  public void testProtectCredential() throws Exception {        
-    context.checking(protectionExpectations(groupName, loginName, password));
-    context.checking(userPrivateKeyExpectations(
-        returnValue(privateKey)));
-    context.checking(groupSecretKeyExpectations());
-    context.checking(credentialKeyExpectations());
-    context.checking(new Expectations() { {
-      oneOf(groupMemberRepository).findByGroupAndLoginName(
-          with(same(groupName)), with(same(loginName)));
-      will(returnValue(groupMember));
-      oneOf(groupMember).getGroup();
-      will(returnValue(group));
-      oneOf(credential).setOwner(with(same(group)));
-    } });
-    
+  public void testProtectCredential() throws Exception {
+    context.checking(requestDetailsExpectations());
+    context.checking(resolveOwnerExpectations(returnValue(group)));
+    context.checking(storeOwnerExpectations());
+    context.checking(protectionExpectations(returnValue(null)));
     importService.protectCredential(credential, importer, protection, errors);
   }
   
   @Test(expected = NoSuchGroupException.class)
   public void testProtectCredentialWhenGroupNotFound() throws Exception {
-    context.checking(protectionExpectations(groupName, loginName, password));
-    context.checking(new Expectations() { {
-      oneOf(groupMemberRepository).findByGroupAndLoginName(
-          with(same(groupName)), with(same(loginName)));
-      will(returnValue(null)); 
-      oneOf(errors).addError(with("owner"), 
-          with(containsString("NotFound")),
-          with(emptyArray()));
-    } });
-    
+    context.checking(requestDetailsExpectations());
+    context.checking(resolveOwnerExpectations(returnValue(null)));
+    context.checking(groupErrorExpectations());
     importService.protectCredential(credential, importer, protection, errors);
   }
   
   @Test(expected = PassphraseException.class)
   public void testProtectCredentialWhenPasswordIncorrect() throws Exception {
-    context.checking(protectionExpectations(groupName, loginName, password));
-    context.checking(userPrivateKeyExpectations(
-        throwException(new IncorrectPassphraseException())));
-    context.checking(new Expectations() { {
-      oneOf(groupMemberRepository).findByGroupAndLoginName(
-          with(same(groupName)), with(same(loginName)));
-      will(returnValue(groupMember)); 
-      oneOf(errors).addError(with("password"), 
-          with(containsString("Incorrect")),
-          with(emptyArray()));
-    } });
-    
+    context.checking(requestDetailsExpectations());
+    context.checking(resolveOwnerExpectations(returnValue(group)));
+    context.checking(storeOwnerExpectations());
+    context.checking(protectionExpectations(
+        throwException(new UserAccessException(new Exception()))));
+    context.checking(passwordErrorExpectations());
+    importService.protectCredential(credential, importer, protection, errors);
+  }
+
+  @Test(expected = AccessDeniedException.class)
+  public void testProtectCredentialWhenUserNotInGroup() throws Exception {
+    context.checking(requestDetailsExpectations());
+    context.checking(resolveOwnerExpectations(returnValue(group)));
+    context.checking(storeOwnerExpectations());
+    context.checking(protectionExpectations(
+        throwException(new GroupAccessException("some message"))));
+    context.checking(accessDeniedErrorExpectations());
     importService.protectCredential(credential, importer, protection, errors);
   }
   
-  private Expectations protectionExpectations(
-      final String groupName, final String loginName, final char[] password) {
+  private Expectations requestDetailsExpectations() {
+    return new Expectations() { { 
+      allowing(importer).getDetails();
+      will(returnValue(details));
+      allowing(details).getPrivateKey();
+      will(returnValue(credentialPrivateKey));     
+    } };
+  }
+
+  private Expectations resolveOwnerExpectations(final Action outcome)
+      throws Exception {
     return new Expectations() { { 
       allowing(protection).getGroupName();
-      will(returnValue(groupName));
-      allowing(protection).getLoginName();
-      will(returnValue(loginName));
-      allowing(protection).getPassword();
-      will(returnValue(password));
-    } };
-  }
-  
-  private Expectations userPrivateKeyExpectations(
-      final Action outcome) {
-    return new Expectations() { { 
-      oneOf(groupMember).getUser();
-      will(returnValue(user));
-      oneOf(user).getPrivateKey();
-      will(returnValue(encodedPrivateKey));
-      oneOf(privateKeyDecoder).decode(with(same(encodedPrivateKey)));
-      will(returnValue(encryptedPrivateKey));
-      oneOf(encryptedPrivateKey).setProtectionParameter(with(same(password)));
-      oneOf(encryptedPrivateKey).derive();
+      will(returnValue(GROUP_NAME));
+      oneOf(groupRepository).findByGroupName(with(same(GROUP_NAME)));
       will(outcome);
-      allowing(encryptedSecretKey).setPrivateKey(with(privateKey));
     } };
   }
   
-  private Expectations groupSecretKeyExpectations() { 
+  private Expectations protectionExpectations(final Action outcome) 
+      throws Exception {
     return new Expectations() { { 
-      oneOf(groupMember).getSecretKey();
-      will(returnValue(encodedSecretKey));
-      oneOf(secretKeyDecoder).decode(with(same(encodedSecretKey)));
-      will(returnValue(encryptedSecretKey));
-      oneOf(encryptedSecretKey).derive();
-      will(returnValue(secretKey));
+      oneOf(protectionService).protect(with(same(credential)), 
+          with(same(credentialPrivateKey)), with(same(protection)));
+      will(outcome);
     } };
   }
   
-  private Expectations credentialKeyExpectations() {
+  private Expectations storeOwnerExpectations() {
     return new Expectations() { { 
-      oneOf(importer).getDetails();
-      will(returnValue(details));
-      oneOf(details).getPrivateKey();
-      will(returnValue(credentialPrivateKey));
-      oneOf(privateKeyEncryptionService).encrypt(
-          with(same(credentialPrivateKey)), with(same(secretKey)));
-      will(returnValue(credentialPrivateKey));
-      oneOf(credential).getPrivateKey();
-      will(returnValue(credentialKey));
-      oneOf(credentialPrivateKey).getContent();
-      will(returnValue(encodedPrivateKey));
-      oneOf(credentialKey).setContent(with(same(encodedPrivateKey)));
+      oneOf(credential).setOwner(with(same(group)));
+    } };
+  }
+  
+  private Expectations groupErrorExpectations() { 
+    return new Expectations() { {
+      allowing(protection).getGroupName();
+      will(returnValue(GROUP_NAME));
+      oneOf(errors).addError(with("owner"), 
+          with(containsString("NotFound")),
+          (Object[]) with(arrayContaining(GROUP_NAME)));
+    } };
+  }
+
+  private Expectations passwordErrorExpectations() { 
+    return new Expectations() { { 
+      oneOf(errors).addError(with("password"), 
+          with(containsString("Incorrect")),
+          with(emptyArray()));
+    } };
+  }
+
+  private Expectations accessDeniedErrorExpectations() { 
+    return new Expectations() { { 
+      allowing(protection).getGroupName();
+      will(returnValue(GROUP_NAME));
+      oneOf(errors).addError(with("owner"), 
+          with(containsString("Denied")),
+          (Object[]) with(arrayContaining(GROUP_NAME)));
     } };
   }
 

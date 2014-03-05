@@ -68,7 +68,7 @@ public class ConcreteExportService implements ExportService {
   @Override
   @Transactional
   public ExportPreparation prepareExport(ExportRequest request)
-      throws ExportException, NoSuchGroupException, PassphraseException {
+      throws ExportException, AccessDeniedException, PassphraseException {
     
     CredentialExportProvider provider = findProvider(request);        
     try {
@@ -81,7 +81,7 @@ public class ConcreteExportService implements ExportService {
       return exporter.exportCredential(request, privateKey);      
     }
     catch (GroupAccessException ex) {
-      throw new NoSuchGroupException();     
+      throw new AccessDeniedException();     
     }
     catch (UserAccessException ex) {
       throw new PassphraseException();

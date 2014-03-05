@@ -68,13 +68,16 @@ public interface ImportService {
    * @param protection protection parameters
    * @param errors an errors object that will be updated to report any
    *    recoverable errors that occur
-   * @throws NoSuchGroupException if the given user is not in the specified
-   *    protection group
-   * @throws PassphraseException if the provided passphrase is incorrect 
+   * @throws NoSuchGroupException if the specified protection group 
+   *    does not exist
+   * @throws PassphraseException if the provided passphrase is incorrect
+   * @throws AccessDeniedException if the specified user is
+   *    not a member of the specified protetion group 
    */
   void protectCredential(Credential credential, 
       ImportPreparation preparation, ProtectionParameters protection,
-      Errors errors) throws NoSuchGroupException, PassphraseException;
+      Errors errors) throws NoSuchGroupException, PassphraseException,
+      AccessDeniedException;
   
   /**
    * Save the given (transient) credential making it persistent.

@@ -19,7 +19,6 @@
 package org.soulwing.credo.service;
 
 import java.io.IOException;
-import java.security.PrivateKey;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
@@ -33,20 +32,15 @@ import javax.transaction.Transactional;
 import org.soulwing.credo.Credential;
 import org.soulwing.credo.Tag;
 import org.soulwing.credo.UserGroup;
-import org.soulwing.credo.UserGroupMember;
 import org.soulwing.credo.repository.CredentialRepository;
 import org.soulwing.credo.repository.TagRepository;
-import org.soulwing.credo.repository.UserGroupMemberRepository;
 import org.soulwing.credo.repository.UserGroupRepository;
-import org.soulwing.credo.service.crypto.Encoded;
-import org.soulwing.credo.service.crypto.IncorrectPassphraseException;
-import org.soulwing.credo.service.crypto.PrivateKeyDecoder;
-import org.soulwing.credo.service.crypto.PrivateKeyEncryptionService;
 import org.soulwing.credo.service.crypto.PrivateKeyWrapper;
-import org.soulwing.credo.service.crypto.SecretKeyDecoder;
-import org.soulwing.credo.service.crypto.SecretKeyWrapper;
 import org.soulwing.credo.service.importer.CredentialImporter;
 import org.soulwing.credo.service.importer.CredentialImporterFactory;
+import org.soulwing.credo.service.protect.CredentialProtectionService;
+import org.soulwing.credo.service.protect.GroupAccessException;
+import org.soulwing.credo.service.protect.UserAccessException;
 
 /**
  * A concrete implementation of {@link ImportService}.
@@ -70,17 +64,7 @@ public class ConcreteImportService implements ImportService {
   protected UserGroupRepository groupRepository;
   
   @Inject
-  protected UserGroupMemberRepository groupMemberRepository;
-  
-  @Inject
-  protected SecretKeyDecoder secretKeyDecoder;
-  
-  @Inject 
-  @Encoded(type = Encoded.Type.PKCS8)
-  protected PrivateKeyDecoder privateKeyDecoder;
-  
-  @Inject 
-  protected PrivateKeyEncryptionService privateKeyEncryptionService;
+  protected CredentialProtectionService protectionService;
   
   /**
    * {@inheritDoc}
@@ -137,40 +121,39 @@ public class ConcreteImportService implements ImportService {
   @Override
   public void protectCredential(Credential credential,
       ImportPreparation preparation, ProtectionParameters protection,
-      Errors errors) throws NoSuchGroupException, PassphraseException {
-    
-    UserGroupMember groupMember = groupMemberRepository
-        .findByGroupAndLoginName(protection.getGroupName(), 
-            protection.getLoginName());
-    if (groupMember == null) {
-      errors.addError("owner", "credentialOwnerNotFound");
-      throw new NoSuchGroupException();
-    }
-    
+      Errors errors) throws NoSuchGroupException, PassphraseException,
+      AccessDeniedException {
+
     try {
-      PrivateKeyWrapper encryptedPrivateKey = privateKeyDecoder.decode(
-          groupMember.getUser().getPrivateKey());
-      encryptedPrivateKey.setProtectionParameter(protection.getPassword());
-      PrivateKey userPrivateKey = encryptedPrivateKey.derive();
-      
-      SecretKeyWrapper encryptedSecretKey = secretKeyDecoder.decode(
-          groupMember.getSecretKey()); 
-  
-      encryptedSecretKey.setPrivateKey(userPrivateKey);
-      PrivateKeyWrapper credentialPrivateKey = 
-          privateKeyEncryptionService.encrypt(
-              preparation.getDetails().getPrivateKey(), 
-              encryptedSecretKey.derive());
-      
-      credential.setOwner(groupMember.getGroup());
-      credential.getPrivateKey().setContent(credentialPrivateKey.getContent());
+      PrivateKeyWrapper privateKey = preparation.getDetails().getPrivateKey();
+      resolveOwner(credential, protection.getGroupName());
+      protectionService.protect(credential, privateKey, protection);
     }
-    catch (IncorrectPassphraseException ex) {
+    catch (UserAccessException ex) {
       errors.addError("password", "passwordIncorrect");
       throw new PassphraseException();
     }
+    catch (GroupAccessException ex) {
+      errors.addError("owner", "groupAccessDenied", 
+          protection.getGroupName());
+      throw new AccessDeniedException();
+    }
+    catch (NoSuchGroupException ex) {
+      errors.addError("owner", "credentialGroupNotFound", 
+          protection.getGroupName());
+      throw ex;
+    }
   }
-
+  
+  private void resolveOwner(Credential credential, String groupName) 
+      throws NoSuchGroupException {
+    UserGroup group = groupRepository.findByGroupName(groupName);
+    if (group == null) {
+      throw new NoSuchGroupException();
+    }
+    credential.setOwner(group);
+  }
+  
   /**
    * {@inheritDoc}
    */
