@@ -19,6 +19,7 @@
 package org.soulwing.credo.service;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasProperty;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
@@ -40,6 +41,7 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.soulwing.credo.Credential;
+import org.soulwing.credo.UserGroup;
 import org.soulwing.credo.service.crypto.PrivateKeyWrapper;
 import org.soulwing.credo.service.exporter.CredentialExportProvider;
 import org.soulwing.credo.service.exporter.CredentialExporter;
@@ -188,12 +190,18 @@ public class ConcreteExportServiceTest {
   
   private Expectations unprotectCredentialExpectations(final Action outcome)
       throws Exception {
+    final UserGroup group = context.mock(UserGroup.class);
     return new Expectations() { { 
       oneOf(request).getCredential();
       will(returnValue(credential));
       oneOf(request).getProtectionParameters();
       will(returnValue(protection));
-      oneOf(protectionService).unprotect(with(credential), with(protection));
+      oneOf(credential).getOwner();
+      will(returnValue(group));
+      oneOf(group).getName();
+      will(returnValue("someGroup"));
+      oneOf(protectionService).unprotect(with(credential), 
+          (ProtectionParameters) with(hasProperty("groupName", equalTo("someGroup"))));
       will(outcome);
     } };
   }

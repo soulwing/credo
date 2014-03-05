@@ -26,6 +26,7 @@ import javax.enterprise.inject.Instance;
 import javax.inject.Inject;
 import javax.transaction.Transactional;
 
+import org.soulwing.credo.Credential;
 import org.soulwing.credo.service.crypto.PrivateKeyWrapper;
 import org.soulwing.credo.service.exporter.CredentialExportProvider;
 import org.soulwing.credo.service.exporter.CredentialExporter;
@@ -69,10 +70,13 @@ public class ConcreteExportService implements ExportService {
   public ExportPreparation prepareExport(ExportRequest request)
       throws ExportException, NoSuchGroupException, PassphraseException {
     
-    CredentialExportProvider provider = findProvider(request);    
+    CredentialExportProvider provider = findProvider(request);        
     try {
+      Credential credential = request.getCredential();
+      ProtectionParametersWrapper protection = new ProtectionParametersWrapper(
+          request.getProtectionParameters(), credential.getOwner().getName());
       PrivateKeyWrapper privateKey = protectionService.unprotect(
-          request.getCredential(), request.getProtectionParameters());
+          credential, protection);
       CredentialExporter exporter = provider.newExporter();      
       return exporter.exportCredential(request, privateKey);      
     }
@@ -97,4 +101,54 @@ public class ConcreteExportService implements ExportService {
         + request.getFormat());
   }
 
+  /**
+   * A wrapper for a {@link ProtectionParameters} that overrides the 
+   * specified group with a given value.
+   * <p>
+   * This wrapper is used to ensure that the credential's owner group is
+   * used instead of the value provided by the caller.
+   */
+  public static class ProtectionParametersWrapper 
+      implements ProtectionParameters {
+
+    private final ProtectionParameters delegate;
+    private final String groupName;
+    
+    /**
+     * Constructs a new instance.
+     * @param delegate
+     * @param groupName
+     */
+    public ProtectionParametersWrapper(ProtectionParameters delegate,
+        String groupName) {
+      this.delegate = delegate;
+      this.groupName = groupName;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getGroupName() {
+      return groupName;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getLoginName() {
+      return delegate.getLoginName();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public char[] getPassword() {
+      return delegate.getPassword();
+    }
+        
+  }
+  
 }

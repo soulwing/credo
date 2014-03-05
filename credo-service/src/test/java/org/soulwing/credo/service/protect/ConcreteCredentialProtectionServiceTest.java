@@ -190,9 +190,7 @@ public class ConcreteCredentialProtectionServiceTest {
     return new Expectations() { { 
       allowing(protection).getLoginName();
       will(returnValue(loginName));
-      allowing(credential).getOwner();
-      will(returnValue(group));
-      allowing(group).getName();
+      allowing(protection).getGroupName();
       will(returnValue(groupName));
       oneOf(groupMemberRepository).findByGroupAndLoginName(
           with(same(groupName)), with(same(loginName)));

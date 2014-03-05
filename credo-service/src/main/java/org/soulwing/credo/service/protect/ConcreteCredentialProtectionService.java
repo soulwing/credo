@@ -70,7 +70,7 @@ public class ConcreteCredentialProtectionService
       GroupAccessException {
     
     UserGroupMember groupMember = findGroupMember(
-        credential.getOwner().getName(), protection.getLoginName());
+        protection.getGroupName(), protection.getLoginName());
     
     credential.getPrivateKey().setContent(protect(privateKey, groupMember, 
         protection.getPassword()));
@@ -84,7 +84,7 @@ public class ConcreteCredentialProtectionService
       ProtectionParameters protection) throws UserAccessException,
       GroupAccessException {
     UserGroupMember groupMember = findGroupMember(
-        credential.getOwner().getName(), protection.getLoginName());
+        protection.getGroupName(), protection.getLoginName());
     return unprotect(credential.getPrivateKey().getContent(), groupMember, 
         protection.getPassword());
   }
