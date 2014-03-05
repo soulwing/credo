@@ -63,6 +63,7 @@ public class JpaUserGroupRepositoryIT {
           .addPackage(UserGroup.class.getPackage())
           .addPackage(UserGroupEntity.class.getPackage())
           .addClasses(UserGroupRepository.class, JpaUserGroupRepository.class)
+          .addClass(EntityUtil.class)
           .addAsResource("persistence-test.xml", "META-INF/persistence.xml")
           .addAsResource("META-INF/orm.xml", "META-INF/orm.xml")
           .addAsWebInfResource(EmptyAsset.INSTANCE, "beans.xml");

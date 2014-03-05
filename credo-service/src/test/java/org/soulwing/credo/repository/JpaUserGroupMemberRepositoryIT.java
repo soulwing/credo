@@ -61,6 +61,7 @@ public class JpaUserGroupMemberRepositoryIT {
           .addPackage(UserGroupMemberEntity.class.getPackage())
           .addClasses(UserGroupMemberRepository.class, 
               JpaUserGroupMemberRepository.class)
+          .addClass(EntityUtil.class)
           .addAsResource("persistence-test.xml", "META-INF/persistence.xml")
           .addAsResource("META-INF/orm.xml", "META-INF/orm.xml")
           .addAsWebInfResource(EmptyAsset.INSTANCE, "beans.xml");
@@ -177,7 +178,7 @@ public class JpaUserGroupMemberRepositoryIT {
   public void testFindByGroupAndLoginNameWhenGroupIsNull() throws Exception {
     final String loginName = "someUser";
     final String groupName = null;
-    UserProfileEntity user = EntityUtil.newUser("someUser");
+    UserProfileEntity user = EntityUtil.newUser(loginName);
     UserGroupEntity group = EntityUtil.newGroup(groupName);
     
     UserGroupMemberEntity groupMember = EntityUtil.newGroupMember(user, group);
@@ -190,8 +191,7 @@ public class JpaUserGroupMemberRepositoryIT {
     
     UserGroupMember actual = repository.findByGroupAndLoginName(groupName, 
         loginName);
-    assertThat(actual, is(nullValue()));
+    assertThat(actual, is(not(nullValue())));
   }
-
 
 }
