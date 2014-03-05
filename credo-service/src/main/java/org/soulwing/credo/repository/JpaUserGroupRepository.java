@@ -69,10 +69,23 @@ public class JpaUserGroupRepository implements UserGroupRepository {
    * {@inheritDoc}
    */
   @Override
-  public UserGroup findByGroupName(String groupName) {
+  public UserGroup findByGroupName(String groupName, String loginName) {
+    
+    if (UserGroup.SELF_GROUP_NAME.equals(groupName)) {
+      groupName = null;
+    }
+    
+    String queryName = groupName != null ? "findGroupByName" : "findGroupSelf";
     TypedQuery<UserGroup> query = entityManager.createNamedQuery(
-        "findUserGroupsByName", UserGroup.class);
-    query.setParameter("groupName", groupName);
+        queryName, UserGroup.class);
+    
+    if (groupName != null) {
+      query.setParameter("groupName", groupName);
+    }
+    else {
+      query.setParameter("loginName", loginName);
+    }
+    
     try {
       return query.getSingleResult();      
     }
@@ -87,7 +100,7 @@ public class JpaUserGroupRepository implements UserGroupRepository {
   @Override
   public Set<? extends UserGroup> findByLoginName(String loginName) {
     TypedQuery<UserGroup> query = entityManager.createNamedQuery(
-        "findUserGroupsByLoginName", UserGroup.class);
+        "findGroupsByLoginName", UserGroup.class);
     query.setParameter("loginName", loginName);
     Set<UserGroup> groups = new LinkedHashSet<>();
     groups.addAll(query.getResultList());

@@ -38,10 +38,13 @@ public interface UserGroupRepository extends UserGroupFactory {
   
   /**
    * Finds a group by name.
-   * @param groupName the group name to match
+   * @param groupName the group name to match or {@code null} to match the
+   *   {@link UserGroup#SELF_GROUP_NAME}
+   * @param loginName the login name of the user (ignored unless the "self"
+   *    group is specified)
    * @return matching group or {@code null} if no such group can be found
    */
-  UserGroup findByGroupName(String groupName);
+  UserGroup findByGroupName(String groupName, String loginName);
 
   /**
    * Finds the groups for which the given user is a member.

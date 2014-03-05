@@ -11,14 +11,24 @@
     </query>
   </named-query>
 
-  <named-query name="findUserGroupsByName">
+  <named-query name="findGroupByName">
     <query>
       select distinct g from UserGroupEntity g
       where g.name = :groupName
     </query>
   </named-query>
 
-  <named-query name="findUserGroupsByLoginName">
+  <named-query name="findGroupSelf">
+    <query>
+      select distinct g from UserGroupMemberEntity gm
+      inner join gm.group g
+      inner join gm.user u
+      where u.loginName = :loginName
+      and g.name is null
+    </query>
+  </named-query>
+  
+  <named-query name="findGroupsByLoginName">
     <query>
       select distinct g from UserGroupMemberEntity gm
       inner join gm.group g

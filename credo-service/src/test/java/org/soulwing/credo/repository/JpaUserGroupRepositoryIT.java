@@ -26,7 +26,6 @@ import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertThat;
 
-import java.util.Date;
 import java.util.Set;
 
 import javax.inject.Inject;
@@ -45,6 +44,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.soulwing.credo.UserGroup;
+import org.soulwing.credo.UserGroupMember;
 import org.soulwing.credo.domain.UserGroupEntity;
 import org.soulwing.credo.domain.UserGroupMemberEntity;
 import org.soulwing.credo.domain.UserProfileEntity;
@@ -105,29 +105,49 @@ public class JpaUserGroupRepositoryIT {
   @Test
   public void testFindByGroupName() throws Exception {
     final String groupName = "someGroup";
-    final UserGroupEntity group = newGroup(groupName);
+    final String loginName = null;
+    final UserGroupEntity group = EntityUtil.newGroup(groupName);
     entityManager.persist(group);
     entityManager.flush();
     entityManager.clear();
     
-    UserGroup actual = repository.findByGroupName(groupName);
+    UserGroup actual = repository.findByGroupName(groupName, loginName);
     assertThat(actual, is(not(nullValue())));
     assertThat(actual.getName(), is(equalTo(group.getName())));
+  }
+
+  @Test
+  public void testFindGroupSelf() throws Exception {
+    final String groupName = UserGroup.SELF_GROUP_NAME;
+    final String loginName = "someUser";
+    final UserGroupEntity group = EntityUtil.newGroup(groupName);
+    final UserProfileEntity user = EntityUtil.newUser(loginName);
+    final UserGroupMember groupMember = EntityUtil.newGroupMember(user, group);
+    entityManager.persist(group);
+    entityManager.persist(user);
+    entityManager.persist(groupMember);
+    entityManager.flush();
+    entityManager.clear();
+    
+    UserGroup actual = repository.findByGroupName(groupName, loginName);
+    assertThat(actual, is(not(nullValue())));
+    assertThat(actual.getName(), is(equalTo(UserGroup.SELF_GROUP_NAME)));
   }
   
   @Test
   public void testFindByGroupNameWhenNotFound() throws Exception {
-    UserGroup actual = repository.findByGroupName("does not exist");
+    UserGroup actual = repository.findByGroupName("does not exist", 
+        null);
     assertThat(actual, is(nullValue()));
   }
 
   @Test
   public void testFindByLoginName() throws Exception {
     final String loginName = "someUser";
-    UserProfileEntity user = newUser("someUser");
-    UserGroupEntity group = newGroup("someGroup");
+    UserProfileEntity user = EntityUtil.newUser("someUser");
+    UserGroupEntity group = EntityUtil.newGroup("someGroup");
     
-    UserGroupMemberEntity groupMember = newGroupMember(user, group);
+    UserGroupMemberEntity groupMember = EntityUtil.newGroupMember(user, group);
     
     entityManager.persist(user);
     entityManager.persist(group);
@@ -138,40 +158,6 @@ public class JpaUserGroupRepositoryIT {
     Set<? extends UserGroup> groups = 
         repository.findByLoginName(loginName);
     assertThat(groups, contains(hasProperty("name", equalTo("someGroup"))));
-  }
-
-  private UserProfileEntity newUser(String loginName) {
-    UserProfileEntity user = new UserProfileEntity();
-    Date now = new Date();
-    user.setLoginName(loginName);
-    user.setFullName("Some User");
-    user.setPassword("some password");
-    user.setPublicKey("some public key");
-    user.setPrivateKey("some public key");
-    user.setDateCreated(now);
-    user.setDateModified(now);
-    user.getDateCreated();
-    return user;
-  }
-  
-  private UserGroupEntity newGroup(String name) {
-    UserGroupEntity group = new UserGroupEntity();
-    Date now = new Date();
-    group.setName("someGroup");
-    group.setDateCreated(now);
-    group.setDateModified(now);
-    return group;
-  }
-  
-  private UserGroupMemberEntity newGroupMember(UserProfileEntity user,
-      UserGroupEntity group) {
-    UserGroupMemberEntity groupMember = new UserGroupMemberEntity();
-    Date now = new Date();
-    groupMember.setUser(user);
-    groupMember.setGroup(group);
-    groupMember.setSecretKey("some secret key");
-    groupMember.setDateCreated(now);
-    return groupMember;
   }
 
 }
