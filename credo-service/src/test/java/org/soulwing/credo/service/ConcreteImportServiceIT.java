@@ -59,6 +59,7 @@ import org.soulwing.credo.service.exporter.CredentialExporter;
 import org.soulwing.credo.service.importer.CredentialImporter;
 import org.soulwing.credo.service.pem.PemObjectBuilder;
 import org.soulwing.credo.service.pem.bc.BcPemObjectBuilder;
+import org.soulwing.credo.service.protect.CredentialProtectionService;
 
 /**
  * Integration tests for {@link ConcreteImportService}.
@@ -85,6 +86,7 @@ public class ConcreteImportServiceIT {
         .addPackage(JcaPrivateKeyWrapper.class.getPackage())
         .addPackage(PemObjectBuilder.class.getPackage())
         .addPackage(BcPemObjectBuilder.class.getPackage())
+        .addPackage(CredentialProtectionService.class.getPackage())
         .addAsResource("testcases")
         .addAsResource("persistence-test.xml", "META-INF/persistence.xml")
         .addAsResource("META-INF/orm.xml", "META-INF/orm.xml")
