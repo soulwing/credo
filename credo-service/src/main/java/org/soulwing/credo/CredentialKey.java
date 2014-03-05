@@ -18,8 +18,6 @@
  */
 package org.soulwing.credo;
 
-import java.io.IOException;
-import java.io.Reader;
 
 /**
  * A private key for a {@link Credential}.
@@ -29,10 +27,10 @@ import java.io.Reader;
 public interface CredentialKey {
 
   /**
-   * Gets the PEM-encoded content of the private key as an input stream.
-   * @return reader
+   * Gets the PEM-encoded content of the private key.
+   * @return content
    */
-  Reader getContent() throws IOException;
+  String getContent();
 
   /**
    * Sets the PEM encoded encrypted private key content. 

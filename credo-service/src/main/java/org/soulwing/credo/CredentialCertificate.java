@@ -18,8 +18,6 @@
  */
 package org.soulwing.credo;
 
-import java.io.IOException;
-import java.io.Reader;
 import java.util.Date;
 
 /**
@@ -60,9 +58,9 @@ public interface CredentialCertificate {
   Date getNotAfter();
   
   /**
-   * Gets the PEM-wrapped content of this component as an input stream.
-   * @return reader
+   * Gets the PEM-wrapped content of this component.
+   * @return content
    */
-  Reader getContent() throws IOException;
+  String getContent();
   
 }

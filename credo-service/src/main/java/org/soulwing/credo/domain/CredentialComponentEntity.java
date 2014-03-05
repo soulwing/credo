@@ -18,10 +18,6 @@
  */
 package org.soulwing.credo.domain;
 
-import java.io.IOException;
-import java.io.Reader;
-import java.io.StringReader;
-
 import javax.persistence.Column;
 import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
@@ -63,9 +59,8 @@ public abstract class CredentialComponentEntity extends AbstractEntity {
   /**
    * {@inheritDoc}
    */
-  public Reader getContent() throws IOException {
-    String content = getEncoded();
-    return new StringReader(content != null ? content : "");
+  public String getContent() {
+    return getEncoded();
   }
 
 }
