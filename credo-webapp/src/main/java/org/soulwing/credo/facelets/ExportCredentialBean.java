@@ -33,13 +33,13 @@ import javax.inject.Named;
 
 import org.apache.commons.lang.Validate;
 import org.soulwing.credo.Tag;
+import org.soulwing.credo.service.AccessDeniedException;
 import org.soulwing.credo.service.Errors;
 import org.soulwing.credo.service.ExportException;
 import org.soulwing.credo.service.ExportPreparation;
 import org.soulwing.credo.service.ExportRequest;
 import org.soulwing.credo.service.ExportService;
 import org.soulwing.credo.service.NoSuchCredentialException;
-import org.soulwing.credo.service.NoSuchGroupException;
 import org.soulwing.credo.service.PassphraseException;
 import org.soulwing.credo.service.ProtectionParameters;
 
@@ -265,7 +265,7 @@ public class ExportCredentialBean implements Serializable {
       preparation = exportService.prepareExport(request);
       return PREPARED_OUTCOME_ID;
     }
-    catch (NoSuchGroupException ex) {
+    catch (AccessDeniedException ex) {
       // FIXME -- should divert to an error view for this
       throw new RuntimeException(ex);
     }

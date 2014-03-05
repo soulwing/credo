@@ -29,6 +29,8 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.Matchers.sameInstance;
+import static org.jmock.Expectations.returnValue;
+import static org.jmock.Expectations.throwException;
 
 import java.io.ByteArrayInputStream;
 import java.util.Collections;
@@ -43,6 +45,7 @@ import javax.faces.context.FacesContext;
 import javax.servlet.http.Part;
 
 import org.jmock.Expectations;
+import org.jmock.api.Action;
 import org.jmock.auto.Mock;
 import org.jmock.integration.junit4.JUnitRuleMockery;
 import org.jmock.lib.legacy.ClassImposteriser;
@@ -52,6 +55,7 @@ import org.junit.Test;
 import org.soulwing.credo.Credential;
 import org.soulwing.credo.Tag;
 import org.soulwing.credo.UserGroup;
+import org.soulwing.credo.service.AccessDeniedException;
 import org.soulwing.credo.service.Errors;
 import org.soulwing.credo.service.FileContentModel;
 import org.soulwing.credo.service.ImportDetails;
@@ -518,13 +522,7 @@ public class ImportCredentialBeanTest {
 
   @Test
   public void testProtectSuccess() throws Exception {
-    context.checking(new Expectations() { { 
-      oneOf(importService).protectCredential(with(same(credential)), 
-          with(same(preparation)), 
-          with(any(ProtectionParameters.class)), 
-          with(same(errors)));
-    } });
-    
+    context.checking(protectionExpectations(returnValue(null)));    
     bean.setPreparation(preparation);
     bean.setCredential(credential);
     assertThat(bean.protect(), 
@@ -533,14 +531,8 @@ public class ImportCredentialBeanTest {
   
   @Test
   public void testProtectOwnerNotFound() throws Exception {
-    context.checking(new Expectations() { { 
-      oneOf(importService).protectCredential(with(same(credential)), 
-          with(same(preparation)), 
-          with(any(ProtectionParameters.class)), 
-          with(same(errors)));
-      will(throwException(new NoSuchGroupException()));
-    } });
-    
+    context.checking(protectionExpectations(
+        throwException(new NoSuchGroupException())));    
     bean.setPreparation(preparation);
     bean.setCredential(credential);
     assertThat(bean.protect(), 
@@ -549,17 +541,30 @@ public class ImportCredentialBeanTest {
 
   @Test
   public void testProtectPasswordIncorrect() throws Exception {
-    context.checking(new Expectations() { { 
-      oneOf(importService).protectCredential(with(same(credential)), 
-          with(same(preparation)), 
-          with(any(ProtectionParameters.class)), 
-          with(same(errors)));
-      will(throwException(new PassphraseException()));
-    } });
-    
+    context.checking(protectionExpectations(
+        throwException(new PassphraseException())));
     bean.setPreparation(preparation);
     bean.setCredential(credential);
     assertThat(bean.protect(), is(nullValue()));        
   }
 
+  @Test(expected = RuntimeException.class)
+  public void testProtectAccessDenied() throws Exception {
+    context.checking(protectionExpectations(
+        throwException(new AccessDeniedException())));
+    bean.setPreparation(preparation);
+    bean.setCredential(credential);
+    bean.protect();     
+  }
+
+  private Expectations protectionExpectations(final Action outcome) 
+      throws Exception {
+    return new Expectations() { { 
+      oneOf(importService).protectCredential(with(same(credential)), 
+          with(same(preparation)), 
+          with(any(ProtectionParameters.class)), 
+          with(same(errors)));
+      will(outcome);
+    } };
+  }
 }

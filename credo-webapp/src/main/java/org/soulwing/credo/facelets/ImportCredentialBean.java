@@ -38,6 +38,7 @@ import org.apache.commons.lang.Validate;
 import org.soulwing.credo.Credential;
 import org.soulwing.credo.Tag;
 import org.soulwing.credo.UserGroup;
+import org.soulwing.credo.service.AccessDeniedException;
 import org.soulwing.credo.service.Errors;
 import org.soulwing.credo.service.FileContentModel;
 import org.soulwing.credo.service.ImportException;
@@ -388,6 +389,10 @@ public class ImportCredentialBean implements Serializable {
       importService.protectCredential(credential, preparation, protection, 
           errors);
       return CONFIRM_OUTCOME_ID;
+    }
+    catch (AccessDeniedException ex) {
+      // FIXME -- should divert to an error view for this
+      throw new RuntimeException(ex);
     }
     catch (NoSuchGroupException ex) {
       return DETAILS_OUTCOME_ID;

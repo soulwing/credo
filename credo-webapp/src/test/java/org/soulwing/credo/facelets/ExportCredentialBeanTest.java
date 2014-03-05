@@ -44,6 +44,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.soulwing.credo.Credential;
 import org.soulwing.credo.UserGroup;
+import org.soulwing.credo.service.AccessDeniedException;
 import org.soulwing.credo.service.Errors;
 import org.soulwing.credo.service.ExportException;
 import org.soulwing.credo.service.ExportPreparation;
@@ -177,6 +178,18 @@ public class ExportCredentialBeanTest {
     bean.setExportRequest(request);
     assertThat(bean.prepareDownload(), is(nullValue()));
   }
+
+  @Test(expected = RuntimeException.class)
+  public void testPrepareDownloadAccessDenied() throws Exception {
+    context.checking(new Expectations() { {
+      oneOf(exportService).prepareExport(with(same(request)));
+      will(throwException(new AccessDeniedException()));
+    } });
+    
+    bean.setExportRequest(request);
+    bean.prepareDownload();
+  }
+
 
   @Test
   public void testPrepareDownloadError() throws Exception {
