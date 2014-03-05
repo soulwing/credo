@@ -34,27 +34,6 @@ public interface ExportRequest {
   Credential getCredential();
   
   /**
-   * Tests whether a passphrase is required in order to export the
-   * subject credential for this request
-   * @return {@code true} if a passphrase is required
-   */
-  boolean isPassphraseRequired();
-  
-  /**
-   * Gets the passphrase that will be used to decrypt the credential's 
-   * private key.
-   * @return passphrase or {@code null} if none has been set
-   */
-  char[] getPassphrase();
-  
-  /**
-   * Sets the passphrase that will be used to decrypt the credential's
-   * private key.
-   * @param passphrase the passphrase to set
-   */
-  void setPassphrase(char[] passphrase);
-
-  /**
    * Gets the filename to assign to the exported credential.
    * @return file name or {@code null} if none has been set
    */
@@ -92,4 +71,16 @@ public interface ExportRequest {
    */
   void setFormat(ExportFormat format);
 
+  /**
+   * Gets the protection parameters assigned to this request.
+   * @return parameters object or {@code null} if none has been set
+   */
+  ProtectionParameters getProtectionParameters();
+  
+  /**
+   * Sets the protection parameters assigned to this request.
+   * @param parameters the parameters object to set
+   */
+  void setProtectionParameters(ProtectionParameters parameters);
+  
 }

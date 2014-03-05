@@ -24,6 +24,8 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.Matchers.sameInstance;
+import static org.jmock.Expectations.returnValue;
+import static org.jmock.Expectations.throwException;
 
 import java.io.IOException;
 import java.util.Iterator;
@@ -31,14 +33,18 @@ import java.util.Iterator;
 import javax.enterprise.inject.Instance;
 
 import org.jmock.Expectations;
+import org.jmock.api.Action;
 import org.jmock.auto.Mock;
 import org.jmock.integration.junit4.JUnitRuleMockery;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.soulwing.credo.Credential;
+import org.soulwing.credo.service.crypto.PrivateKeyWrapper;
 import org.soulwing.credo.service.exporter.CredentialExportProvider;
 import org.soulwing.credo.service.exporter.CredentialExporter;
+import org.soulwing.credo.service.protect.CredentialProtectionService;
+import org.soulwing.credo.service.protect.UserAccessException;
 
 /**
  * Unit tests for {@link ConcreteExportService}.
@@ -52,9 +58,6 @@ public class ConcreteExportServiceTest {
   
   @Mock
   private CredentialService credentialService;
-  
-  @Mock
-  private Credential credential;
   
   @Mock
   private Instance<CredentialExportProvider> exportProvider;
@@ -72,7 +75,19 @@ public class ConcreteExportServiceTest {
   private ExportRequest request;
   
   @Mock
+  private Credential credential;
+
+  @Mock
+  private PrivateKeyWrapper credentialPrivateKey;
+  
+  @Mock
   private ExportPreparation preparation;
+  
+  @Mock
+  private ProtectionParameters protection;
+
+  @Mock
+  private CredentialProtectionService protectionService;
   
   private ConcreteExportService exportService = new ConcreteExportService();
   
@@ -80,6 +95,7 @@ public class ConcreteExportServiceTest {
   public void setUp() throws Exception {
     exportService.credentialService = credentialService;
     exportService.exportProvider = exportProvider;
+    exportService.protectionService = protectionService;
   }
   
   @Test
@@ -109,10 +125,13 @@ public class ConcreteExportServiceTest {
   @Test
   public void testPrepareExport() throws Exception {
     context.checking(prepareExportExpectations(true));
+    context.checking(unprotectCredentialExpectations(
+        returnValue(credentialPrivateKey)));
     context.checking(new Expectations() { { 
       oneOf(provider).newExporter();
       will(returnValue(exporter));
-      oneOf(exporter).exportCredential(with(same(request)));
+      oneOf(exporter).exportCredential(with(same(request)), 
+          with(same(credentialPrivateKey)));
       will(returnValue(preparation));
     } });
     assertThat(exportService.prepareExport(request), 
@@ -122,14 +141,25 @@ public class ConcreteExportServiceTest {
   @Test(expected = RuntimeException.class)
   public void testPrepareExportIOException() throws Exception {
     context.checking(prepareExportExpectations(true));
+    context.checking(unprotectCredentialExpectations(
+        returnValue(credentialPrivateKey)));
     context.checking(new Expectations() { { 
       oneOf(provider).newExporter();
       will(returnValue(exporter));
-      oneOf(exporter).exportCredential(with(same(request)));
+      oneOf(exporter).exportCredential(with(same(request)), 
+          with(credentialPrivateKey));
       will(throwException(new IOException()));
     } });
     
     exportService.prepareExport(request); 
+  }
+  
+  @Test(expected = PassphraseException.class)
+  public void testPrepareExportWhenIncorrectPassword() throws Exception {
+    context.checking(prepareExportExpectations(true));
+    context.checking(unprotectCredentialExpectations(
+        throwException(new UserAccessException(new Exception()))));
+    exportService.prepareExport(request);
   }
 
   @Test(expected = IllegalArgumentException.class)
@@ -140,7 +170,7 @@ public class ConcreteExportServiceTest {
 
 
   private Expectations prepareExportExpectations(final boolean supports)
-      throws IOException, PassphraseException, ExportException {
+      throws Exception {
     final ExportFormat format = ExportFormat.PEM_ARCHIVE;
     return new Expectations() { {
       oneOf(exportProvider).iterator();
@@ -155,4 +185,17 @@ public class ConcreteExportServiceTest {
       will(returnValue(supports));
     } };
   }
+  
+  private Expectations unprotectCredentialExpectations(final Action outcome)
+      throws Exception {
+    return new Expectations() { { 
+      oneOf(request).getCredential();
+      will(returnValue(credential));
+      oneOf(request).getProtectionParameters();
+      will(returnValue(protection));
+      oneOf(protectionService).unprotect(with(credential), with(protection));
+      will(outcome);
+    } };
+  }
+
 }

@@ -34,10 +34,10 @@ public class ConcreteExportRequest
 
   private final Credential credential;
   
-  private char[] passphrase;
   private char[] exportPassphrase;
   private String fileName;  
   private ExportFormat format = ExportFormat.PEM_ARCHIVE;
+  private ProtectionParameters protectionParameters;
   
   /**
    * Constructs a new instance.
@@ -53,31 +53,6 @@ public class ConcreteExportRequest
   @Override
   public Credential getCredential() {
     return credential;
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public boolean isPassphraseRequired() {
-    // TODO Auto-generated method stub
-    return false;
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public char[] getPassphrase() {
-    return passphrase;
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public void setPassphrase(char[] passphrase) {
-    this.passphrase = passphrase;
   }
 
   /**
@@ -131,4 +106,20 @@ public class ConcreteExportRequest
     this.format = format;
   }
 
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public ProtectionParameters getProtectionParameters() {
+    return protectionParameters;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public void setProtectionParameters(ProtectionParameters parameters) {
+    this.protectionParameters = parameters;
+  }
+  
 }

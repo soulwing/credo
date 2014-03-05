@@ -24,9 +24,14 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.inject.Any;
 import javax.enterprise.inject.Instance;
 import javax.inject.Inject;
+import javax.transaction.Transactional;
 
+import org.soulwing.credo.service.crypto.PrivateKeyWrapper;
 import org.soulwing.credo.service.exporter.CredentialExportProvider;
 import org.soulwing.credo.service.exporter.CredentialExporter;
+import org.soulwing.credo.service.protect.CredentialProtectionService;
+import org.soulwing.credo.service.protect.GroupAccessException;
+import org.soulwing.credo.service.protect.UserAccessException;
 
 /**
  * A concrete {@link ExportService} implementation.
@@ -43,6 +48,9 @@ public class ConcreteExportService implements ExportService {
   @Any
   protected Instance<CredentialExportProvider> exportProvider;
   
+  @Inject
+  protected CredentialProtectionService protectionService;
+  
   /**
    * {@inheritDoc}
    */
@@ -57,13 +65,22 @@ public class ConcreteExportService implements ExportService {
    * {@inheritDoc}
    */
   @Override
+  @Transactional
   public ExportPreparation prepareExport(ExportRequest request)
-      throws ExportException, PassphraseException {
-    CredentialExportProvider provider = findProvider(request);
+      throws ExportException, NoSuchGroupException, PassphraseException {
     
-    CredentialExporter exporter = provider.newExporter();
+    CredentialExportProvider provider = findProvider(request);    
     try {
-      return exporter.exportCredential(request);      
+      PrivateKeyWrapper privateKey = protectionService.unprotect(
+          request.getCredential(), request.getProtectionParameters());
+      CredentialExporter exporter = provider.newExporter();      
+      return exporter.exportCredential(request, privateKey);      
+    }
+    catch (GroupAccessException ex) {
+      throw new NoSuchGroupException();     
+    }
+    catch (UserAccessException ex) {
+      throw new PassphraseException();
     }
     catch (IOException ex) {
       throw new RuntimeException(ex);

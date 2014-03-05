@@ -44,8 +44,10 @@ public interface ExportService {
    * @throws ExportException if an error occurs in performing the request
    * @throws PassphraseException if the credential requires a passphrase 
    *    but the provided credential was not provided or incorrect
+   * @throws NoSuchGroupException the user identified in the request's
+   *    protection parameters is not a member of the credential's owner group
    */
   ExportPreparation prepareExport(ExportRequest request)
-      throws ExportException, PassphraseException;
+      throws ExportException, PassphraseException, NoSuchGroupException;
   
 }
