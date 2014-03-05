@@ -66,6 +66,8 @@ public class ConcreteImportServiceTest {
 
   private static final String GROUP_NAME = "someGroup";
 
+  private static final String LOGIN_NAME = "someUser";
+
   @Rule
   public final JUnitRuleMockery context = new JUnitRuleMockery();
   
@@ -258,7 +260,10 @@ public class ConcreteImportServiceTest {
     return new Expectations() { { 
       allowing(protection).getGroupName();
       will(returnValue(GROUP_NAME));
-      oneOf(groupRepository).findByGroupName(with(same(GROUP_NAME)));
+      allowing(protection).getLoginName();
+      will(returnValue(LOGIN_NAME));
+      oneOf(groupRepository).findByGroupName(with(same(GROUP_NAME)), 
+          with(same(LOGIN_NAME)));
       will(outcome);
     } };
   }

@@ -126,7 +126,7 @@ public class ConcreteImportService implements ImportService {
 
     try {
       PrivateKeyWrapper privateKey = preparation.getDetails().getPrivateKey();
-      resolveOwner(credential, protection.getGroupName());
+      resolveOwner(credential, protection);
       protectionService.protect(credential, privateKey, protection);
     }
     catch (UserAccessException ex) {
@@ -145,9 +145,10 @@ public class ConcreteImportService implements ImportService {
     }
   }
   
-  private void resolveOwner(Credential credential, String groupName) 
-      throws NoSuchGroupException {
-    UserGroup group = groupRepository.findByGroupName(groupName);
+  private void resolveOwner(Credential credential, 
+      ProtectionParameters protection) throws NoSuchGroupException {
+    UserGroup group = groupRepository.findByGroupName(
+        protection.getGroupName(), protection.getLoginName());
     if (group == null) {
       throw new NoSuchGroupException();
     }
