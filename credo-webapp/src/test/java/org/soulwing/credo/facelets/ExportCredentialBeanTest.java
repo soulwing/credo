@@ -42,6 +42,8 @@ import org.jmock.lib.legacy.ClassImposteriser;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.soulwing.credo.Credential;
+import org.soulwing.credo.UserGroup;
 import org.soulwing.credo.service.Errors;
 import org.soulwing.credo.service.ExportException;
 import org.soulwing.credo.service.ExportPreparation;
@@ -96,11 +98,35 @@ public class ExportCredentialBeanTest {
   }
   
   @Test
+  public void testInit() throws Exception {
+    final String loginName = "someUser";
+    context.checking(new Expectations() { { 
+      oneOf(facesContext).getExternalContext();
+      will(returnValue(externalContext));
+      oneOf(externalContext).getRemoteUser();
+      will(returnValue(loginName));
+    } });
+    
+    bean.init();
+    assertThat(bean.getProtection().getLoginName(), is(equalTo(loginName)));
+  }
+
+  @Test
   public void testCreateExportRequest() throws Exception {
     final Long id = -1L;
+    final Credential credential = context.mock(Credential.class);
+    final UserGroup group = context.mock(UserGroup.class);
+    final String groupName = "someGroup";
     context.checking(new Expectations() { { 
       oneOf(exportService).newExportRequest(with(id));
       will(returnValue(request));
+      oneOf(request).getCredential();
+      will(returnValue(credential));
+      oneOf(credential).getOwner();
+      will(returnValue(group));
+      oneOf(group).getName();
+      will(returnValue(groupName));
+      oneOf(request).setProtectionParameters(with(same(bean.getProtection())));
       oneOf(conversation).isTransient();
       will(returnValue(true));
       oneOf(conversation).begin();

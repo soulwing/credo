@@ -23,6 +23,7 @@ import java.io.Serializable;
 import java.util.Date;
 import java.util.Set;
 
+import javax.annotation.PostConstruct;
 import javax.enterprise.context.Conversation;
 import javax.enterprise.context.ConversationScoped;
 import javax.faces.context.ExternalContext;
@@ -38,7 +39,9 @@ import org.soulwing.credo.service.ExportPreparation;
 import org.soulwing.credo.service.ExportRequest;
 import org.soulwing.credo.service.ExportService;
 import org.soulwing.credo.service.NoSuchCredentialException;
+import org.soulwing.credo.service.NoSuchGroupException;
 import org.soulwing.credo.service.PassphraseException;
+import org.soulwing.credo.service.ProtectionParameters;
 
 /**
  * A bean that supports the Export Credential interaction.
@@ -57,6 +60,8 @@ public class ExportCredentialBean implements Serializable {
   
   static final String CONTENT_DISPOSITION_HEADER = "Content-Disposition";
 
+  private final ProtectionParametersBean protection = 
+      new ProtectionParametersBean();
  
   @Inject
   protected Conversation conversation;
@@ -76,6 +81,15 @@ public class ExportCredentialBean implements Serializable {
   
   private ExportPreparation preparation;
 
+  /**
+   * Initializes the receiver.
+   */
+  @PostConstruct
+  public void init() {
+    protection.setLoginName(
+        facesContext.getExternalContext().getRemoteUser());
+  }
+  
   /**
    * Gets the {@code id} property.
    * @return
@@ -148,36 +162,6 @@ public class ExportCredentialBean implements Serializable {
   }
 
   /**
-   * Tests whether the export to be exported requires a passphrase.
-   * @return {@code true} if the credential requires a passphrase
-   */
-  public boolean isPassphraseRequired() {
-    if (request == null) return false;
-    return request.isPassphraseRequired();
-  }
-  
-  /**
-   * Gets the passphrase to be used to decrypt the credential's private key
-   * for export.
-   * @return passphrase or {@code null} if none has been set
-   */
-  public String getPassphrase() {
-    Validate.notNull(request, "request not prepared");
-    if (request.getPassphrase() == null) return null;
-    return request.getPassphrase().toString();
-  }
-  
-  /**
-   * Sets the passphrase to be used to decrypt the credential's private key
-   * for export.
-   * @param passphrase the passphrase to set
-   */
-  public void setPassphrase(String passphrase) {
-    Validate.notNull(request, "request not prepared");
-    request.setPassphrase(passphrase.toCharArray());
-  }
-
-  /**
    * Gets the export file name.
    * @return file name
    */
@@ -195,6 +179,14 @@ public class ExportCredentialBean implements Serializable {
     request.setFileName(fileName);
   }
   
+  /**
+   * Gets the protection parameters.
+   * @return protection parameters
+   */
+  public ProtectionParameters getProtection() {
+    return protection;
+  }
+
   /**
    * Gets the export request.
    * <p>
@@ -251,6 +243,8 @@ public class ExportCredentialBean implements Serializable {
     Validate.notNull(id, "id is required");
     try {
       request = exportService.newExportRequest(id);
+      protection.setGroupName(request.getCredential().getOwner().getName());
+      request.setProtectionParameters(protection);
       if (conversation.isTransient()) {
         conversation.begin();
       }
@@ -270,6 +264,10 @@ public class ExportCredentialBean implements Serializable {
     try {
       preparation = exportService.prepareExport(request);
       return PREPARED_OUTCOME_ID;
+    }
+    catch (NoSuchGroupException ex) {
+      // FIXME -- should divert to an error view for this
+      throw new RuntimeException(ex);
     }
     catch (PassphraseException ex) {
       errors.addError("passphrase", "passphraseIncorrect");
