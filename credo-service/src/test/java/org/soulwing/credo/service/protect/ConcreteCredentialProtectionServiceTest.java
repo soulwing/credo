@@ -34,6 +34,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.soulwing.credo.Credential;
 import org.soulwing.credo.CredentialKey;
+import org.soulwing.credo.Password;
 import org.soulwing.credo.UserGroup;
 import org.soulwing.credo.UserGroupMember;
 import org.soulwing.credo.UserProfile;
@@ -60,7 +61,7 @@ public class ConcreteCredentialProtectionServiceTest {
   
   private final String groupName = "someGroup";
 
-  private final char[] password = "somePassword".toCharArray();
+  private final Password password = new Password("somePassword".toCharArray());
 
   private final String encodedPrivateKey = "privateKey";
   
