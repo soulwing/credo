@@ -32,6 +32,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.apache.commons.lang.Validate;
+import org.soulwing.credo.Password;
 import org.soulwing.credo.Tag;
 import org.soulwing.credo.service.AccessDeniedException;
 import org.soulwing.credo.service.Errors;
@@ -81,6 +82,8 @@ public class ExportCredentialBean implements Serializable {
   
   private ExportPreparation preparation;
 
+  private Password passphraseAgain;
+  
   /**
    * Initializes the receiver.
    */
@@ -179,6 +182,26 @@ public class ExportCredentialBean implements Serializable {
     request.setFileName(fileName);
   }
   
+  public Password getExportPassphrase() { 
+    if (request == null) return null;
+    return request.getExportPassphrase();
+  }
+  
+  public void setExportPassphrase(Password exportPassphrase) {
+    Validate.notNull(request, "request not prepared");
+    request.setExportPassphrase(exportPassphrase);
+  }
+
+  public Password getExportPassphraseAgain() { 
+    if (request == null) return null;
+    return passphraseAgain;
+  }
+  
+  public void setExportPassphraseAgain(Password passphraseAgain) {
+    Validate.notNull(request, "request not prepared");
+    this.passphraseAgain = passphraseAgain;
+  }
+
   /**
    * Gets the protection parameters.
    * @return protection parameters

@@ -19,6 +19,7 @@
 package org.soulwing.credo.service;
 
 import org.soulwing.credo.Credential;
+import org.soulwing.credo.Password;
 
 /**
  * An object that describes a request to export a credential.
@@ -50,14 +51,14 @@ public interface ExportRequest {
    * credential.
    * @return export passphrase or {@code null} if none has been set
    */
-  char[] getExportPassphrase();
+  Password getExportPassphrase();
   
   /**
    * Sets the passphrase that will be used to protect the exported
    * credential.
    * @param exportPassphrase the export passphrase to set
    */
-  void setExportPassphrase(char[] exportPassphrase);
+  void setExportPassphrase(Password exportPassphrase);
 
   /**
    * Gets the format for the exported credential.

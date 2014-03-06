@@ -21,6 +21,7 @@ package org.soulwing.credo.service;
 import java.io.Serializable;
 
 import org.soulwing.credo.Credential;
+import org.soulwing.credo.Password;
 
 /**
  * A concrete {@link ExportRequest} implementation.
@@ -34,7 +35,7 @@ public class ConcreteExportRequest
 
   private final Credential credential;
   
-  private char[] exportPassphrase;
+  private Password exportPassphrase;
   private String fileName;  
   private ExportFormat format = ExportFormat.PEM_ARCHIVE;
   private ProtectionParameters protectionParameters;
@@ -77,7 +78,7 @@ public class ConcreteExportRequest
    * {@inheritDoc}
    */
   @Override
-  public char[] getExportPassphrase() {
+  public Password getExportPassphrase() {
     return exportPassphrase;
   }
 
@@ -85,7 +86,7 @@ public class ConcreteExportRequest
    * {@inheritDoc}
    */
   @Override
-  public void setExportPassphrase(char[] exportPassphrase) {
+  public void setExportPassphrase(Password exportPassphrase) {
     this.exportPassphrase = exportPassphrase;
   }
 
