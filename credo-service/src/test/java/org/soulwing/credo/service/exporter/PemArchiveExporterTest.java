@@ -45,6 +45,7 @@ import org.soulwing.credo.Password;
 import org.soulwing.credo.service.ExportPreparation;
 import org.soulwing.credo.service.ExportRequest;
 import org.soulwing.credo.service.archive.ArchiveBuilder;
+import org.soulwing.credo.service.archive.ArchiveBuilderFactory;
 import org.soulwing.credo.service.crypto.PKCS8EncryptionService;
 import org.soulwing.credo.service.crypto.PrivateKeyWrapper;
 
@@ -58,6 +59,18 @@ public class PemArchiveExporterTest {
   @Rule
   public final JUnitRuleMockery context = new JUnitRuleMockery();
   
+  private final String fileName = "fileName";
+  
+  private final String privateKeyContent = "privateKey";
+  
+  private final String certificateContent = "certificate";
+  
+  private final String authorityContent = "authority"; 
+
+  private final byte[] archive = new byte[] { 0, 1, 2, 3 };
+  
+  private final Password password = new Password(new char[0]);
+
   @Mock
   private ExportRequest request;
 
@@ -77,28 +90,20 @@ public class PemArchiveExporterTest {
   private CredentialCertificate authority;
   
   @Mock
+  private ArchiveBuilderFactory archiveBuilderFactory;
+  
+  @Mock
   private ArchiveBuilder archiveBuilder;
   
   @Mock
   private PKCS8EncryptionService pkcs8EncryptionService;
   
-  private String fileName = "fileName";
-  
-  private String privateKeyContent = "privateKey";
-  
-  private String certificateContent = "certificate";
-  
-  private String authorityContent = "authority"; 
-
-  private byte[] archive = new byte[] { 0, 1, 2, 3 };
-  
-  private Password password = new Password(new char[0]);
-  
-  private PemArchiveExporter exporter;
+  private PemArchiveExporter exporter = new PemArchiveExporter();
   
   @Before
   public void setUp() throws Exception {
-    exporter = new PemArchiveExporter(archiveBuilder, pkcs8EncryptionService);
+    exporter.archiveBuilderFactory = archiveBuilderFactory;
+    exporter.pkcs8EncryptionService = pkcs8EncryptionService;
   }
   
   @Test
@@ -108,6 +113,7 @@ public class PemArchiveExporterTest {
     certificates.add(authority);
     
     context.checking(newPassphraseExpectations(returnValue(null)));
+    context.checking(newBuilderFactoryExpectations());
     context.checking(newCredentialExpectations(certificates));
     context.checking(newPrivateKeyArchiverExpectations());
     context.checking(newCertificateArchiverExpectations());
@@ -124,6 +130,7 @@ public class PemArchiveExporterTest {
     certificates.add(authority);
     
     context.checking(newPassphraseExpectations(returnValue(password)));
+    context.checking(newBuilderFactoryExpectations());
     context.checking(newEncryptionServiceExpectations());
     context.checking(newCredentialExpectations(certificates));
     context.checking(newPrivateKeyArchiverExpectations());
@@ -140,6 +147,7 @@ public class PemArchiveExporterTest {
     List<CredentialCertificate> certificates = 
         Collections.singletonList(certificate);
     context.checking(newPassphraseExpectations(returnValue(null)));
+    context.checking(newBuilderFactoryExpectations());
     context.checking(newCredentialExpectations(certificates));
     context.checking(newPrivateKeyArchiverExpectations());
     context.checking(newCertificateArchiverExpectations());
@@ -152,13 +160,13 @@ public class PemArchiveExporterTest {
   public void testExportCredentialWithNoCertificates() throws Exception {
     List<CredentialCertificate> certificates = Collections.emptyList();
     context.checking(newPassphraseExpectations(returnValue(null)));
+    context.checking(newBuilderFactoryExpectations());
     context.checking(newCredentialExpectations(certificates));
     context.checking(newPrivateKeyArchiverExpectations());
     context.checking(newBuildArchiveExpectations());
     
     validatePreparation(exporter.exportCredential(request, privateKey));
   }
-
 
   private void validatePreparation(ExportPreparation preparation)
       throws Exception {
@@ -178,6 +186,13 @@ public class PemArchiveExporterTest {
     return new Expectations() { { 
       allowing(request).getExportPassphrase();
       will(outcome);
+    } };
+  }
+
+  private Expectations newBuilderFactoryExpectations() {
+    return new Expectations() { { 
+      oneOf(archiveBuilderFactory).newBuilder();
+      will(returnValue(archiveBuilder));
     } };
   }
   
@@ -246,7 +261,7 @@ public class PemArchiveExporterTest {
 
   private Expectations newBuildArchiveExpectations() throws IOException {
     return new Expectations() { {
-      oneOf(request).getFileName();
+      oneOf(request).getSuffixedFileName(with(PemArchiveExporter.SUFFIX));
       will(returnValue(fileName));
       oneOf(archiveBuilder).build();
       will(returnValue(archive));

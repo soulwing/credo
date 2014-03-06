@@ -35,16 +35,25 @@ public interface ExportRequest {
   Credential getCredential();
   
   /**
-   * Gets the filename to assign to the exported credential.
+   * Gets the base filename to assign to the exported credential.
    * @return file name or {@code null} if none has been set
    */
   String getFileName();
   
   /**
-   * Sets the filename to assign to the exported credential.
+   * Sets the base filename to assign to the exported credential.
    * @param fileName the file name to set
    */
   void setFileName(String fileName);
+  
+  /**
+   * Gets the filename to assign to the exported credential with the
+   * default suffix appended, if needed.
+   * @param suffix the default suffix to append
+   * @return filename
+   * @throws IllegalStateException if no base filename has been set
+   */
+  String getSuffixedFileName(String suffix);
   
   /**
    * Gets the passphrase that will be used to protect the exported
@@ -64,13 +73,13 @@ public interface ExportRequest {
    * Gets the format for the exported credential.
    * @return export format
    */
-  ExportFormat getFormat();
+  String getFormat();
   
   /**
    * Sets the format for the exported credential.
    * @param format the export format to set
    */
-  void setFormat(ExportFormat format);
+  void setFormat(String format);
 
   /**
    * Gets the protection parameters assigned to this request.

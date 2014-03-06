@@ -1,5 +1,5 @@
 /*
- * File created on Feb 25, 2014 
+ * File created on Mar 6, 2014 
  *
  * Copyright (c) 2014 Virginia Polytechnic Institute and State University
  *
@@ -18,26 +18,26 @@
  */
 package org.soulwing.credo.service.exporter;
 
-import org.soulwing.credo.service.ExportFormat;
+import javax.enterprise.context.ApplicationScoped;
 
 /**
- * A provider that knows how to support some export formats.
+ * A {@link CredentialExporter} that exports a JKS key store.
  *
  * @author Carl Harris
  */
-public interface CredentialExportProvider {
+@ApplicationScoped
+@ExportFormat(BKSKeyStoreExporter.TYPE)
+public class BKSKeyStoreExporter extends AbstractKeyStoreExporter {
 
-  /**
-   * Tests whether the receiver knows how to export in the the given format.
-   * @param format the subject format
-   * @return {@code true} if the receiver can export using {@code format}
-   */
-  boolean supports(ExportFormat format);
+  public static final String TYPE = "BKS";
+  public static final String CONTENT_TYPE = "application/octet-stream";
+  public static final String SUFFIX = ".bks";
   
   /**
-   * Creates a new exporter.
-   * @return exporter
+   * Constructs a new instance.
    */
-  CredentialExporter newExporter();
+  public BKSKeyStoreExporter() {
+    super(TYPE, CONTENT_TYPE, SUFFIX);
+  }
   
 }

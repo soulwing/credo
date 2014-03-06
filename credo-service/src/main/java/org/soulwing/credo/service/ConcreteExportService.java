@@ -23,21 +23,22 @@ import java.io.IOException;
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.inject.Any;
 import javax.enterprise.inject.Instance;
+import javax.enterprise.util.AnnotationLiteral;
 import javax.inject.Inject;
 import javax.transaction.Transactional;
 
 import org.soulwing.credo.Credential;
 import org.soulwing.credo.Password;
 import org.soulwing.credo.service.crypto.PrivateKeyWrapper;
-import org.soulwing.credo.service.exporter.CredentialExportProvider;
 import org.soulwing.credo.service.exporter.CredentialExporter;
+import org.soulwing.credo.service.exporter.ExportFormat;
 import org.soulwing.credo.service.protect.CredentialProtectionService;
 import org.soulwing.credo.service.protect.GroupAccessException;
 import org.soulwing.credo.service.protect.UserAccessException;
 
 /**
  * A concrete {@link ExportService} implementation.
- *
+ * 
  * @author Carl Harris
  */
 @ApplicationScoped
@@ -45,22 +46,22 @@ public class ConcreteExportService implements ExportService {
 
   @Inject
   protected CredentialService credentialService;
-  
+
   @Inject
   @Any
-  protected Instance<CredentialExportProvider> exportProvider;
-  
+  protected Instance<CredentialExporter> exporters;
+
   @Inject
   protected CredentialProtectionService protectionService;
-  
+
   /**
    * {@inheritDoc}
    */
   @Override
   public ExportRequest newExportRequest(Long credentialId)
       throws NoSuchCredentialException {
-    return new ConcreteExportRequest(credentialService.findCredentialById(
-        credentialId));
+    return new ConcreteExportRequest(
+        credentialService.findCredentialById(credentialId));
   }
 
   /**
@@ -70,19 +71,19 @@ public class ConcreteExportService implements ExportService {
   @Transactional
   public ExportPreparation prepareExport(ExportRequest request)
       throws ExportException, AccessDeniedException, PassphraseException {
-    
-    CredentialExportProvider provider = findProvider(request);        
+
     try {
       Credential credential = request.getCredential();
-      ProtectionParametersWrapper protection = new ProtectionParametersWrapper(
-          request.getProtectionParameters(), credential.getOwner().getName());
-      PrivateKeyWrapper privateKey = protectionService.unprotect(
-          credential, protection);
-      CredentialExporter exporter = provider.newExporter();      
-      return exporter.exportCredential(request, privateKey);      
+      ProtectionParametersWrapper protection =
+          new ProtectionParametersWrapper(request.getProtectionParameters(),
+              credential.getOwner().getName());
+      PrivateKeyWrapper privateKey =
+          protectionService.unprotect(credential, protection);
+      CredentialExporter exporter = findExporter(request.getFormat());
+      return exporter.exportCredential(request, privateKey);
     }
     catch (GroupAccessException ex) {
-      throw new AccessDeniedException();     
+      throw new AccessDeniedException();
     }
     catch (UserAccessException ex) {
       throw new PassphraseException();
@@ -92,29 +93,45 @@ public class ConcreteExportService implements ExportService {
     }
   }
 
-  private CredentialExportProvider findProvider(ExportRequest request) {
-    for (CredentialExportProvider provider : exportProvider) {
-      if (provider.supports(request.getFormat())) {
-        return provider;
-      }
+  private CredentialExporter findExporter(String format) {
+    ExportFormatQualifier qualifier = new ExportFormatQualifier(format);
+    Instance<CredentialExporter> exporter = exporters.select(qualifier);
+    if (exporter == null) {
+      throw new IllegalArgumentException("unsupported format: " + format);
     }
-    throw new IllegalArgumentException("unsupported format: " 
-        + request.getFormat());
+    return exporter.get();
+  }
+
+  static class ExportFormatQualifier extends AnnotationLiteral<ExportFormat>
+      implements ExportFormat {
+
+    private static final long serialVersionUID = -1081540987292172502L;
+    private final String value;
+
+    ExportFormatQualifier(String value) {
+      this.value = value;
+    }
+
+    @Override
+    public String value() {
+      return value;
+    }
+
   }
 
   /**
-   * A wrapper for a {@link ProtectionParameters} that overrides the 
-   * specified group with a given value.
+   * A wrapper for a {@link ProtectionParameters} that overrides the specified
+   * group with a given value.
    * <p>
-   * This wrapper is used to ensure that the credential's owner group is
-   * used instead of the value provided by the caller.
+   * This wrapper is used to ensure that the credential's owner group is used
+   * instead of the value provided by the caller.
    */
-  public static class ProtectionParametersWrapper 
+  public static class ProtectionParametersWrapper
       implements ProtectionParameters {
 
     private final ProtectionParameters delegate;
     private final String groupName;
-    
+
     /**
      * Constructs a new instance.
      * @param delegate
@@ -149,7 +166,7 @@ public class ConcreteExportService implements ExportService {
     public Password getPassword() {
       return delegate.getPassword();
     }
-        
+
   }
-  
+
 }

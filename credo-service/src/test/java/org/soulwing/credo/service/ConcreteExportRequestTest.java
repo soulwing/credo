@@ -59,9 +59,7 @@ public class ConcreteExportRequestTest {
     } });
     
     request.setFileName(null);
-    request.setFormat(ExportFormat.PEM_ARCHIVE);
-    String expectedName = "some_dotted_and_spaced_name" 
-        + request.getFormat().getFileSuffix();
+    String expectedName = "some_dotted_and_spaced_name"; 
     assertThat(request.getFileName(), is(equalTo(expectedName)));
   }
 

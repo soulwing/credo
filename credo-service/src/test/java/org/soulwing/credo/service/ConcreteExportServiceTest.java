@@ -19,6 +19,7 @@
 package org.soulwing.credo.service;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.arrayContaining;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasProperty;
 import static org.hamcrest.Matchers.is;
@@ -29,7 +30,7 @@ import static org.jmock.Expectations.returnValue;
 import static org.jmock.Expectations.throwException;
 
 import java.io.IOException;
-import java.util.Iterator;
+import java.lang.annotation.Annotation;
 
 import javax.enterprise.inject.Instance;
 
@@ -43,7 +44,6 @@ import org.junit.Test;
 import org.soulwing.credo.Credential;
 import org.soulwing.credo.UserGroup;
 import org.soulwing.credo.service.crypto.PrivateKeyWrapper;
-import org.soulwing.credo.service.exporter.CredentialExportProvider;
 import org.soulwing.credo.service.exporter.CredentialExporter;
 import org.soulwing.credo.service.protect.CredentialProtectionService;
 import org.soulwing.credo.service.protect.GroupAccessException;
@@ -63,14 +63,8 @@ public class ConcreteExportServiceTest {
   private CredentialService credentialService;
   
   @Mock
-  private Instance<CredentialExportProvider> exportProvider;
-  
-  @Mock
-  private Iterator<CredentialExportProvider> providerIterator;
-  
-  @Mock
-  private CredentialExportProvider provider;
-  
+  private Instance<CredentialExporter> exporters;
+
   @Mock
   private CredentialExporter exporter;
 
@@ -97,7 +91,7 @@ public class ConcreteExportServiceTest {
   @Before
   public void setUp() throws Exception {
     exportService.credentialService = credentialService;
-    exportService.exportProvider = exportProvider;
+    exportService.exporters = exporters;
     exportService.protectionService = protectionService;
   }
   
@@ -127,12 +121,10 @@ public class ConcreteExportServiceTest {
 
   @Test
   public void testPrepareExport() throws Exception {
-    context.checking(prepareExportExpectations(true));
     context.checking(unprotectCredentialExpectations(
         returnValue(credentialPrivateKey)));
+    context.checking(findExporterExpectations(returnValue(exporters)));
     context.checking(new Expectations() { { 
-      oneOf(provider).newExporter();
-      will(returnValue(exporter));
       oneOf(exporter).exportCredential(with(same(request)), 
           with(same(credentialPrivateKey)));
       will(returnValue(preparation));
@@ -143,12 +135,10 @@ public class ConcreteExportServiceTest {
 
   @Test(expected = RuntimeException.class)
   public void testPrepareExportIOException() throws Exception {
-    context.checking(prepareExportExpectations(true));
     context.checking(unprotectCredentialExpectations(
         returnValue(credentialPrivateKey)));
+    context.checking(findExporterExpectations(returnValue(exporters)));
     context.checking(new Expectations() { { 
-      oneOf(provider).newExporter();
-      will(returnValue(exporter));
       oneOf(exporter).exportCredential(with(same(request)), 
           with(credentialPrivateKey));
       will(throwException(new IOException()));
@@ -159,7 +149,6 @@ public class ConcreteExportServiceTest {
   
   @Test(expected = PassphraseException.class)
   public void testPrepareExportWhenIncorrectPassword() throws Exception {
-    context.checking(prepareExportExpectations(true));
     context.checking(unprotectCredentialExpectations(
         throwException(new UserAccessException(new Exception()))));
     exportService.prepareExport(request);
@@ -167,32 +156,20 @@ public class ConcreteExportServiceTest {
 
   @Test(expected = AccessDeniedException.class)
   public void testPrepareExportWhenNotUserGroupMember() throws Exception {
-    context.checking(prepareExportExpectations(true));
     context.checking(unprotectCredentialExpectations(
         throwException(new GroupAccessException("some message"))));
     exportService.prepareExport(request);
   }
 
-  @Test(expected = IllegalArgumentException.class)
-  public void testPrepareExportUnsupportedFormat() throws Exception {
-    context.checking(prepareExportExpectations(false));
-    exportService.prepareExport(request); 
-  }
-
-  private Expectations prepareExportExpectations(final boolean supports)
-      throws Exception {
-    final ExportFormat format = ExportFormat.PEM_ARCHIVE;
-    return new Expectations() { {
-      oneOf(exportProvider).iterator();
-      will(returnValue(providerIterator));
-      atLeast(1).of(providerIterator).hasNext();
-      will(onConsecutiveCalls(returnValue(true), returnValue(false)));
-      oneOf(providerIterator).next();
-      will(returnValue(provider));
-      allowing(request).getFormat();
-      will(returnValue(format));
-      oneOf(provider).supports(with(format));
-      will(returnValue(supports));
+  @SuppressWarnings("unchecked")
+  private Expectations findExporterExpectations(final Action outcome) {
+    return new Expectations() { { 
+      oneOf(request).getFormat();
+      will(returnValue("format"));
+      oneOf(exporters).select(with(arrayContaining(any(Annotation.class))));
+      will(outcome);
+      allowing(exporters).get();
+      will(returnValue(exporter));
     } };
   }
   

@@ -1,5 +1,5 @@
 /*
- * File created on Feb 25, 2014 
+ * File created on Mar 6, 2014 
  *
  * Copyright (c) 2014 Virginia Polytechnic Institute and State University
  *
@@ -16,33 +16,28 @@
  * limitations under the License.
  *
  */
-package org.soulwing.credo.service;
+package org.soulwing.credo.service.exporter;
+
+import javax.enterprise.context.ApplicationScoped;
 
 /**
- * An enumeration of export format types.
+ * A {@link CredentialExporter} that exports a JKS key store.
  *
  * @author Carl Harris
  */
-public enum ExportFormat {
+@ApplicationScoped
+@ExportFormat(JKSKeyStoreExporter.TYPE)
+public class JKSKeyStoreExporter extends AbstractKeyStoreExporter {
 
-  PEM_ARCHIVE(".zip");
+  public static final String TYPE = "JKS";
+  public static final String CONTENT_TYPE = "application/octet-stream";
+  public static final String SUFFIX = ".jks";
   
-  private final String fileSuffix;
-
   /**
    * Constructs a new instance.
-   * @param fileSuffix
    */
-  private ExportFormat(String fileSuffix) {
-    this.fileSuffix = fileSuffix;
+  public JKSKeyStoreExporter() {
+    super(TYPE, CONTENT_TYPE, SUFFIX);
   }
-
-  /**
-   * Gets the {@code fileSuffix} property.
-   * @return
-   */
-  public String getFileSuffix() {
-    return fileSuffix;
-  }
-
+  
 }

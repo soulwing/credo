@@ -37,7 +37,7 @@ public class ConcreteExportRequest
   
   private Password exportPassphrase;
   private String fileName;  
-  private ExportFormat format = ExportFormat.PEM_ARCHIVE;
+  private String format;
   private ProtectionParameters protectionParameters;
   
   /**
@@ -62,8 +62,7 @@ public class ConcreteExportRequest
   @Override
   public String getFileName() {
     if (fileName != null) return fileName;
-    return credential.getName().trim().replaceAll("\\.|\\s+", "_")
-        + format.getFileSuffix();
+    return credential.getName().trim().replaceAll("\\.|\\s+", "_");
   }
 
   /**
@@ -72,6 +71,20 @@ public class ConcreteExportRequest
   @Override
   public void setFileName(String fileName) {
     this.fileName = fileName;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public String getSuffixedFileName(String suffix) {
+    if (fileName == null) {
+      throw new IllegalStateException("no file name set");
+    }
+    if (fileName.indexOf('.') != -1) {
+      return fileName;
+    }
+    return fileName + suffix;
   }
 
   /**
@@ -94,8 +107,7 @@ public class ConcreteExportRequest
    * {@inheritDoc}
    */
   @Override
-  public ExportFormat getFormat() {
-    if (format == null) return ExportFormat.PEM_ARCHIVE;
+  public String getFormat() {    
     return format;
   }
 
@@ -103,7 +115,7 @@ public class ConcreteExportRequest
    * {@inheritDoc}
    */
   @Override
-  public void setFormat(ExportFormat format) {
+  public void setFormat(String format) {
     this.format = format;
   }
 

@@ -21,13 +21,16 @@ package org.soulwing.credo.service.exporter;
 import java.io.IOException;
 import java.util.List;
 
+import javax.enterprise.context.ApplicationScoped;
+import javax.inject.Inject;
+
 import org.soulwing.credo.CredentialCertificate;
 import org.soulwing.credo.service.ExportException;
-import org.soulwing.credo.service.ExportFormat;
 import org.soulwing.credo.service.ExportPreparation;
 import org.soulwing.credo.service.ExportRequest;
 import org.soulwing.credo.service.PassphraseException;
 import org.soulwing.credo.service.archive.ArchiveBuilder;
+import org.soulwing.credo.service.archive.ArchiveBuilderFactory;
 import org.soulwing.credo.service.crypto.PKCS8EncryptionService;
 import org.soulwing.credo.service.crypto.PrivateKeyWrapper;
 
@@ -36,6 +39,8 @@ import org.soulwing.credo.service.crypto.PrivateKeyWrapper;
  *
  * @author Carl Harris
  */
+@ApplicationScoped
+@ExportFormat("PEM")
 public class PemArchiveExporter implements CredentialExporter {
 
   static final String KEY_ENTRY_NAME = "server.key";
@@ -48,21 +53,14 @@ public class PemArchiveExporter implements CredentialExporter {
   
   static final String CHARACTER_ENCODING = "UTF-8";
   
-  private final ArchiveBuilder archiveBuilder;
+  static final String SUFFIX = ".zip";
   
-  private final PKCS8EncryptionService pkcs8EncryptionService;
+  @Inject
+  protected ArchiveBuilderFactory archiveBuilderFactory;
   
-  /**
-   * Constructs a new instance.
-   * @param archiveBuilder
-   * @param pkcs8EncryptionService
-   */
-  public PemArchiveExporter(ArchiveBuilder archiveBuilder,
-      PKCS8EncryptionService pkcs8EncryptionService) {
-    this.archiveBuilder = archiveBuilder;
-    this.pkcs8EncryptionService = pkcs8EncryptionService;
-  }
-
+  @Inject
+  protected PKCS8EncryptionService pkcs8EncryptionService;
+  
   /**
    * {@inheritDoc}
    */
@@ -76,6 +74,7 @@ public class PemArchiveExporter implements CredentialExporter {
           request.getExportPassphrase());
     }
     
+    ArchiveBuilder archiveBuilder = archiveBuilderFactory.newBuilder();
     archiveBuilder.beginEntry(KEY_ENTRY_NAME, CHARACTER_ENCODING)    
       .addContent(privateKey.getContent())
       .endEntry();
@@ -96,7 +95,7 @@ public class PemArchiveExporter implements CredentialExporter {
     }
 
     return new ConcreteExportPreparation(
-        request.getFileName(), CONTENT_TYPE, 
+        request.getSuffixedFileName(SUFFIX), CONTENT_TYPE, 
         CHARACTER_ENCODING, archiveBuilder.build());
   }
 
