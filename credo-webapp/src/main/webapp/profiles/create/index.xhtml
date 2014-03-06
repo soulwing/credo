@@ -19,9 +19,9 @@
 			  <h:form prependId="false" styleClass="form-horizontal">		 
           <ui:include src="/templates/messages.xhtml"/>
 	  		  <div class="form-group">
-	  		    <h:outputLabel styleClass="col-md-4 control-label" 
-	  		      for="userLoginName">#{messages.userLoginNameLabel}</h:outputLabel>
-	  		    <p class="form-control-static col-md-4" 
+	  		    <h:outputLabel styleClass="col-md-4 control-label">
+	  		      #{messages.userLoginNameLabel}</h:outputLabel>
+	  		    <p id="userLoginName" class="form-control-static col-md-4" 
               title="#{messages.userLoginNameTip}">
               #{createUserProfileBean.loginName}
             </p>
@@ -47,7 +47,8 @@
 	              redisplay="true" required="true" 
                 requiredMessage="#{messages.passwordRequired}"               	              
                 id="password" title="#{messages.passwordTip}" 
-                value="#{createUserProfileBean.password}"/>
+                value="#{createUserProfileBean.password}">
+              </h:inputSecret>
               <span class="form-control-feedback glyphicon glyphicon-warning-sign"
                   title="The selected password is weak."></span>
               <div id="pw-progress"></div>
@@ -63,7 +64,7 @@
                 requiredMessage="#{messages.passwordAgainRequired}"               
                 id="passwordAgain" title="#{messages.passwordAgainTip}" 
                 value="#{createUserProfileBean.passwordAgain}">
-                <f:validator validatorId="org.soulwing.credo.validators.Password"/>                
+                <f:validator validatorId="org.soulwing.credo.validators.Password"/>
               </h:inputSecret>
               <span class="form-control-feedback"></span>
             </div>

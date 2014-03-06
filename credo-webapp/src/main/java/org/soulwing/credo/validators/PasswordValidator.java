@@ -18,6 +18,8 @@
  */
 package org.soulwing.credo.validators;
 
+import java.io.Serializable;
+
 import javax.faces.application.FacesMessage;
 import javax.faces.component.UIComponent;
 import javax.faces.component.UIInput;
@@ -26,6 +28,7 @@ import javax.faces.validator.FacesValidator;
 import javax.faces.validator.Validator;
 import javax.faces.validator.ValidatorException;
 
+import org.soulwing.credo.Password;
 import org.soulwing.credo.resource.Bundle;
 
 /**
@@ -34,7 +37,11 @@ import org.soulwing.credo.resource.Bundle;
  * @author Carl Harris
  */
 @FacesValidator("org.soulwing.credo.validators.Password")
-public class PasswordValidator implements Validator {
+public class PasswordValidator implements Validator, Serializable {
+
+  private static final String PASSWORD_ATTR = "password";
+  
+  private static final long serialVersionUID = 7428124321407973883L;
 
   /**
    * {@inheritDoc}
@@ -42,14 +49,32 @@ public class PasswordValidator implements Validator {
   @Override
   public void validate(FacesContext context, UIComponent component, 
       Object value) throws ValidatorException {
-    String passwordAgain = value.toString();
-    UIInput passwordComponent = (UIInput) component.findComponent("password");
-    String password = passwordComponent.getLocalValue().toString();
-    if (!password.equals(passwordAgain)) {
-      throw new ValidatorException(new FacesMessage(FacesMessage.SEVERITY_ERROR,
-          Bundle.get(context.getViewRoot().getLocale()).getString(
-              "passwordValidationFailed"), null));              
-    }    
+    Object passwordId = component.getAttributes().get(PASSWORD_ATTR);
+    if (passwordId == null) {
+      // the component ID is 'password' by default
+      passwordId = PASSWORD_ATTR;  
+    }
+    
+    UIInput passwordComponent = (UIInput) component.findComponent(
+        passwordId.toString());
+    if (passwordComponent == null) {
+      throw new IllegalArgumentException(
+          "cannot find the a component with ID '" + passwordId + "'; "
+          + " specify the '" + PASSWORD_ATTR 
+          + "' attribute to identify the password component");
+    }
+    
+    Password passwordAgain = (Password) value;
+    Password password = (Password) passwordComponent.getLocalValue();
+    if (password == null && passwordAgain == null) {
+      return;
+    }
+    if (password != null && password.equals(passwordAgain)) {
+      return;
+    }
+    throw new ValidatorException(new FacesMessage(FacesMessage.SEVERITY_ERROR,
+        Bundle.get(context.getViewRoot().getLocale()).getString(
+            "passwordValidationFailed"), null));              
   }
 
 }

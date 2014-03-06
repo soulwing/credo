@@ -84,6 +84,15 @@
     </converter-class>
   </converter>
 
+  <converter>
+    <converter-for-class>
+      org.soulwing.credo.Password
+    </converter-for-class>
+    <converter-class>
+      org.soulwing.credo.converters.PasswordConverter
+    </converter-class>
+  </converter>
+
   <application>
     <resource-bundle>
       <base-name>org.soulwing.credo.resource.messages</base-name>

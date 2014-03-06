@@ -25,6 +25,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.apache.commons.lang.Validate;
+import org.soulwing.credo.Password;
 import org.soulwing.credo.service.UserProfilePreparation;
 import org.soulwing.credo.service.UserProfileService;
 
@@ -48,7 +49,7 @@ public class CreateUserProfileBean {
   protected UserProfileService userProfileService;
 
   private UserProfilePreparation preparation;
-  private String passwordAgain;
+  private Password passwordAgain;
 
   @PostConstruct
   public void init() {
@@ -87,18 +88,18 @@ public class CreateUserProfileBean {
    * Gets the password for the profile that will be created.
    * @return password or {@code null} if none has been set
    */
-  public String getPassword() {
+  public Password getPassword() {
     Validate.notNull(preparation, "not prepared");
     char[] password = preparation.getPassword();
     if (password == null) return null;
-    return new String(password);
+    return new Password(password);
   }
 
   /**
    * Gets the password for the profile that will be created.
    * @param password the password to set
    */
-  public void setPassword(String password) {
+  public void setPassword(Password password) {
     Validate.notNull(preparation, "not prepared");
     preparation.setPassword(password.toCharArray());
   }
@@ -108,7 +109,7 @@ public class CreateUserProfileBean {
    * @return alleged duplicate of the password property or {@code null}
    *   if none has been set
    */
-  public String getPasswordAgain() {
+  public Password getPasswordAgain() {
     return passwordAgain;
   }
 
@@ -116,7 +117,7 @@ public class CreateUserProfileBean {
    * Sets the password verification property.
    * @param passwordAgain the value to set
    */
-  public void setPasswordAgain(String passwordAgain) {
+  public void setPasswordAgain(Password passwordAgain) {
     this.passwordAgain = passwordAgain;
   }
 
