@@ -39,7 +39,7 @@ public class PasswordConverter implements Converter {
   @Override
   public Object getAsObject(FacesContext context, UIComponent component, 
       String text) {
-    if (text == null) return null;
+    if (text == null || text.toString().isEmpty()) return null;
     return new Password(text.toCharArray());
   }
 
