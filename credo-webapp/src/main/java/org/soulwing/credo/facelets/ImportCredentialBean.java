@@ -36,6 +36,7 @@ import javax.servlet.http.Part;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.Validate;
 import org.soulwing.credo.Credential;
+import org.soulwing.credo.Password;
 import org.soulwing.credo.Tag;
 import org.soulwing.credo.UserGroup;
 import org.soulwing.credo.service.AccessDeniedException;
@@ -244,19 +245,18 @@ public class ImportCredentialBean implements Serializable {
    * Gets the private key passphrase.
    * @return passphrase
    */
-  public String getPassphrase() {
+  public Password getPassphrase() {
     Validate.notNull(preparation, "import not prepared");
-    if (preparation.getPassphrase() == null) return null;
-    return preparation.getPassphrase().toString();
+    return preparation.getPassphrase();
   }
   
   /**
    * Sets the private key passphrase.
    * @param passphrase the passphrase to set
    */
-  public void setPassphrase(String passphrase) {
+  public void setPassphrase(Password passphrase) {
     Validate.notNull(preparation, "import not prepared");
-    preparation.setPassphrase(passphrase.toCharArray());
+    preparation.setPassphrase(passphrase);
   }
   
   /**
@@ -266,9 +266,8 @@ public class ImportCredentialBean implements Serializable {
    * protect the imported credential.
    * @return password or {@code null} if none has been set
    */
-  public String getProtectionPassword() {
-    if (protection.getPassword() == null) return null;
-    return protection.getPassword().toString();
+  public Password getProtectionPassword() {
+    return protection.getPassword();
   }
   
   /**
@@ -278,8 +277,8 @@ public class ImportCredentialBean implements Serializable {
    * protect the imported credential.
    * @param password the password to set
    */
-  public void setProtectionPassword(String password) {
-    protection.setPassword(password.toCharArray());
+  public void setProtectionPassword(Password password) {
+    protection.setPassword(password);
   }
   
   /**

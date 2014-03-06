@@ -18,6 +18,8 @@
  */
 package org.soulwing.credo.service;
 
+import org.soulwing.credo.Password;
+
 /**
  * An object that is prepared in anticipation of creating a new user profile.
  *
@@ -47,12 +49,12 @@ public interface UserProfilePreparation {
    * Gets the password associated with the new profile.
    * @return password of {@code null} if no password has been set
    */
-  char[] getPassword();
+  Password getPassword();
   
   /**
    * Sets the password associated with the new profile.
    * @param password the password to set
    */
-  void setPassword(char[] password);
+  void setPassword(Password password);
   
 }

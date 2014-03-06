@@ -18,6 +18,8 @@
  */
 package org.soulwing.credo.service;
 
+import org.soulwing.credo.Password;
+
 
 /**
  * An object that represents the prepared contents of files that represent
@@ -38,13 +40,13 @@ public interface ImportPreparation {
    * Gets the passphrase provided by the user.
    * @return passphrase
    */
-  char[] getPassphrase();
+  Password getPassphrase();
   
   /**
    * Sets the pasphrase provided by the user.
    * @param passphrase the passphrase to set
    */
-  void setPassphrase(char[] passphrase);
+  void setPassphrase(Password passphrase);
 
   /**
    * Gets the details of a fully-prepared import.

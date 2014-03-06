@@ -25,6 +25,7 @@ import java.security.SecureRandom;
 import javax.annotation.PostConstruct;
 import javax.enterprise.context.ApplicationScoped;
 
+import org.soulwing.credo.Password;
 import org.soulwing.crypt4j.Crypt;
 
 /**
@@ -59,9 +60,9 @@ public class Crypt4jPasswordEncryptionService
    * {@inheritDoc}
    */
   @Override
-  public String encrypt(char[] password) {
+  public String encrypt(Password password) {
     try {
-      return Crypt.crypt(password, randomSalt(SALT_LENGTH));
+      return Crypt.crypt(password.toCharArray(), randomSalt(SALT_LENGTH));
     }
     catch (UnsupportedEncodingException ex) {
       throw new RuntimeException(ex);
@@ -75,9 +76,9 @@ public class Crypt4jPasswordEncryptionService
    * {@inheritDoc}
    */
   @Override
-  public boolean validate(char[] presented, String expected) {
+  public boolean validate(Password presented, String expected) {
     try {
-      String actual = Crypt.crypt(presented, expected);
+      String actual = Crypt.crypt(presented.toCharArray(), expected);
       return expected.equals(actual);
     }
     catch (UnsupportedEncodingException ex) {

@@ -25,6 +25,7 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
 import org.soulwing.credo.Credential;
+import org.soulwing.credo.Password;
 import org.soulwing.credo.UserGroupMember;
 import org.soulwing.credo.repository.UserGroupMemberRepository;
 import org.soulwing.credo.service.ProtectionParameters;
@@ -101,7 +102,7 @@ public class ConcreteCredentialProtectionService
   }
 
   private String protect(PrivateKeyWrapper privateKey, 
-      UserGroupMember groupMember, char[] password) 
+      UserGroupMember groupMember, Password password) 
       throws UserAccessException {
     
     try {
@@ -121,7 +122,7 @@ public class ConcreteCredentialProtectionService
   }
   
   private PrivateKeyWrapper unprotect(String encodedPrivateKey, 
-      UserGroupMember groupMember, char[] password) 
+      UserGroupMember groupMember, Password password) 
       throws UserAccessException {
     
     try {
@@ -140,7 +141,7 @@ public class ConcreteCredentialProtectionService
   }
 
   private PrivateKey unwrapUserPrivateKey(UserGroupMember groupMember,
-      char[] password) {
+      Password password) {
     
     PrivateKeyWrapper encryptedPrivateKey = pkcs8Decoder.decode(
         groupMember.getUser().getPrivateKey());

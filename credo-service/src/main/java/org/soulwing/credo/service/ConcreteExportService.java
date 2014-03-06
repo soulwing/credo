@@ -27,6 +27,7 @@ import javax.inject.Inject;
 import javax.transaction.Transactional;
 
 import org.soulwing.credo.Credential;
+import org.soulwing.credo.Password;
 import org.soulwing.credo.service.crypto.PrivateKeyWrapper;
 import org.soulwing.credo.service.exporter.CredentialExportProvider;
 import org.soulwing.credo.service.exporter.CredentialExporter;
@@ -145,7 +146,7 @@ public class ConcreteExportService implements ExportService {
      * {@inheritDoc}
      */
     @Override
-    public char[] getPassword() {
+    public Password getPassword() {
       return delegate.getPassword();
     }
         

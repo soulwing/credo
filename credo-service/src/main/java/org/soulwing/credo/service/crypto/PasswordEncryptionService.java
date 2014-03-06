@@ -18,6 +18,8 @@
  */
 package org.soulwing.credo.service.crypto;
 
+import org.soulwing.credo.Password;
+
 /**
  * A password encryption service.
  * <p>
@@ -33,7 +35,7 @@ public interface PasswordEncryptionService {
    * @param password the password to encrypt
    * @return printable encrypted password string
    */
-  String encrypt(char[] password);
+  String encrypt(Password password);
   
   /**
    * Validates that a password presented by a user matches the given 
@@ -42,6 +44,6 @@ public interface PasswordEncryptionService {
    * @param expected expected password (encrypted) 
    * @return {@code true} if the passwords match
    */
-  boolean validate(char[] presented, String expected);
+  boolean validate(Password presented, String expected);
   
 }

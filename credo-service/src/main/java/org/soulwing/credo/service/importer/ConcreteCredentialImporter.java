@@ -27,6 +27,7 @@ import org.soulwing.credo.CredentialBuilder;
 import org.soulwing.credo.CredentialBuilderFactory;
 import org.soulwing.credo.CredentialCertificate;
 import org.soulwing.credo.CredentialCertificateBuilder;
+import org.soulwing.credo.Password;
 import org.soulwing.credo.service.Errors;
 import org.soulwing.credo.service.ImportDetails;
 import org.soulwing.credo.service.ImportException;
@@ -49,7 +50,7 @@ public class ConcreteCredentialImporter implements CredentialImporter {
   private final CredentialBuilderFactory credentialBuilderFactory;
   private final TimeOfDayService timeOfDayService;
   
-  private char[] passphrase;
+  private Password passphrase;
   private PrivateKeyWrapper privateKey;
   private CertificateWrapper certificate;
   private List<CertificateWrapper> chain;
@@ -176,7 +177,7 @@ public class ConcreteCredentialImporter implements CredentialImporter {
    * {@inheritDoc}
    */
   @Override
-  public char[] getPassphrase() {
+  public Password getPassphrase() {
     return passphrase;
   }
 
@@ -184,7 +185,7 @@ public class ConcreteCredentialImporter implements CredentialImporter {
    * {@inheritDoc}
    */
   @Override
-  public void setPassphrase(char[] passphrase) {
+  public void setPassphrase(Password passphrase) {
     this.passphrase = passphrase;
   }
 

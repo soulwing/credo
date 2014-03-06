@@ -42,6 +42,7 @@ import org.bouncycastle.operator.OperatorCreationException;
 import org.bouncycastle.operator.OutputEncryptor;
 import org.bouncycastle.pkcs.PKCS8EncryptedPrivateKeyInfo;
 import org.bouncycastle.pkcs.PKCSException;
+import org.soulwing.credo.Password;
 import org.soulwing.credo.service.crypto.IncorrectPassphraseException;
 import org.soulwing.credo.service.crypto.PrivateKeyWrapper;
 import org.soulwing.credo.service.crypto.jca.JcaPrivateKeyWrapper;
@@ -58,7 +59,7 @@ public class BcPrivateKeyWrapper implements BcWrapper, PrivateKeyWrapper {
   private final Object key;
   private final PemObjectBuilderFactory objectBuilderFactory;
   
-  private char[] passphrase;
+  private Password password;
   
   /**
    * Constructs a new instance.
@@ -84,8 +85,8 @@ public class BcPrivateKeyWrapper implements BcWrapper, PrivateKeyWrapper {
    * {@inheritDoc}
    */
   @Override
-  public char[] getProtectionParameter() {
-    return passphrase;
+  public Password getProtectionParameter() {
+    return password;
   }
 
   /**
@@ -93,9 +94,9 @@ public class BcPrivateKeyWrapper implements BcWrapper, PrivateKeyWrapper {
    */
   @Override
   public void setProtectionParameter(Object parameter) {
-    Validate.isTrue(parameter == null || parameter instanceof char[], 
-        "requires a passphrase");    
-    this.passphrase = (char[]) parameter;
+    Validate.isTrue(parameter == null || parameter instanceof Password, 
+        "requires a Password object");    
+    this.password = (Password) parameter;
   }
 
   /**
@@ -106,7 +107,7 @@ public class BcPrivateKeyWrapper implements BcWrapper, PrivateKeyWrapper {
     try {
       PrivateKeyInfo privateKeyInfo = derivePrivateKeyInfo();
       PemObjectBuilder builder = objectBuilderFactory.newBuilder();
-      if (passphrase == null) {
+      if (password == null) {
         builder.setType("RSA PRIVATE KEY");
         builder.append(privateKeyInfo.getEncoded());
       }
@@ -206,10 +207,10 @@ public class BcPrivateKeyWrapper implements BcWrapper, PrivateKeyWrapper {
   
   private OutputEncryptor createPrivateKeyEncryptor() {
     try {
-      Validate.notNull(passphrase, "passphrase is required");
+      Validate.notNull(password, "passphrase is required");
       return new JceOpenSSLPKCS8EncryptorBuilder(
           PKCS8Generator.PBE_SHA1_3DES)
-          .setPasssword(passphrase)
+          .setPasssword(password.toCharArray())
           .setIterationCount(100)
           .build();
     }
@@ -220,8 +221,9 @@ public class BcPrivateKeyWrapper implements BcWrapper, PrivateKeyWrapper {
 
   private InputDecryptorProvider createPKCS8KeyDecryptor() {
     try {
-      Validate.notNull(passphrase, "passphrase is required");
-      return new JceOpenSSLPKCS8DecryptorProviderBuilder().build(passphrase);
+      Validate.notNull(password, "passphrase is required");
+      return new JceOpenSSLPKCS8DecryptorProviderBuilder().build(
+          password.toCharArray());
     }
     catch (OperatorCreationException ex) {
       throw new RuntimeException(ex);
@@ -229,8 +231,9 @@ public class BcPrivateKeyWrapper implements BcWrapper, PrivateKeyWrapper {
   }
 
   private PEMDecryptorProvider createPEMKeyDecryptor() {
-    Validate.notNull(passphrase, "passphrase is required");
-    return new JcePEMDecryptorProviderBuilder().build(passphrase);
+    Validate.notNull(password, "passphrase is required");
+    return new JcePEMDecryptorProviderBuilder().build(
+        password.toCharArray());
   }
 
 }

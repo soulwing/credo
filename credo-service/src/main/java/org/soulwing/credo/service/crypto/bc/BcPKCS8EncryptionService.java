@@ -32,6 +32,7 @@ import org.bouncycastle.operator.OperatorCreationException;
 import org.bouncycastle.operator.OutputEncryptor;
 import org.bouncycastle.pkcs.PKCS8EncryptedPrivateKeyInfo;
 import org.bouncycastle.pkcs.jcajce.JcaPKCS8EncryptedPrivateKeyInfoBuilder;
+import org.soulwing.credo.Password;
 import org.soulwing.credo.service.crypto.PKCS8EncryptionService;
 import org.soulwing.credo.service.crypto.PrivateKeyWrapper;
 import org.soulwing.credo.service.pem.PemObjectBuilderFactory;
@@ -66,20 +67,20 @@ public class BcPKCS8EncryptionService
    */
   @Override
   public PrivateKeyWrapper encrypt(PrivateKeyWrapper privateKey,
-      char[] passphrase) {
-    Validate.notNull(passphrase, "passphrase is required");
+      Password password) {
+    Validate.notNull(password, "passphrase is required");
     PKCS8EncryptedPrivateKeyInfo encryptedKeyInfo = 
         new JcaPKCS8EncryptedPrivateKeyInfoBuilder(privateKey.derive())
-            .build(createPrivateKeyEncryptor(passphrase));
+            .build(createPrivateKeyEncryptor(password));
     return new BcPKCS8PrivateKeyWrapper(encryptedKeyInfo, keyFactory,
         objectBuilderFactory);
   }
 
-  private OutputEncryptor createPrivateKeyEncryptor(char[] passphrase) {
+  private OutputEncryptor createPrivateKeyEncryptor(Password password) {
     try {
       return new JceOpenSSLPKCS8EncryptorBuilder(
           PKCS8Generator.PBE_SHA1_3DES)
-          .setPasssword(passphrase)
+          .setPasssword(password.toCharArray())
           .setIterationCount(65536)
           .build();
     }

@@ -18,6 +18,8 @@
  */
 package org.soulwing.credo.service;
 
+import org.soulwing.credo.Password;
+
 
 /**
  * An object that represents a request to create a user profile.
@@ -29,7 +31,7 @@ public class ConcreteUserProfilePreparation
 
   private final String loginName;
   private String fullName;
-  private char[] password;
+  private Password password;
     
   /**
    * Constructs a new instance.
@@ -67,7 +69,7 @@ public class ConcreteUserProfilePreparation
    * {@inheritDoc}
    */
   @Override
-  public char[] getPassword() {
+  public Password getPassword() {
     return password;
   }
 
@@ -75,7 +77,7 @@ public class ConcreteUserProfilePreparation
    * {@inheritDoc}
    */
   @Override
-  public void setPassword(char[] password) {
+  public void setPassword(Password password) {
     this.password = password;
   }
   

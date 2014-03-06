@@ -18,6 +18,8 @@
  */
 package org.soulwing.credo.service;
 
+import org.soulwing.credo.Password;
+
 
 /**
  * An object that provides the parameters that will be used to protect
@@ -43,6 +45,6 @@ public interface ProtectionParameters {
    * Gets the user's password.
    * @return password
    */
-  char[] getPassword();
+  Password getPassword();
 
 }

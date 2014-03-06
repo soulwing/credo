@@ -18,6 +18,8 @@
  */
 package org.soulwing.credo.service.crypto;
 
+import org.soulwing.credo.Password;
+
 
 /**
  * A service that encrypts private keys using PKCS8.
@@ -33,11 +35,11 @@ public interface PKCS8EncryptionService {
    * in its wrapper, the key will be decrypted and then encrypted using
    * {@code password}.
    * @param privateKey the subject private key
-   * @param passphrase passphrase that will be used to derive an encryption 
+   * @param password passphrase that will be used to derive an encryption 
    *    key
    * @return encrypted private key
    */
   PrivateKeyWrapper encrypt(PrivateKeyWrapper privateKey,
-      char[] passphrase);
+      Password password);
   
 }

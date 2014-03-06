@@ -18,6 +18,7 @@
  */
 package org.soulwing.credo.facelets;
 
+import org.soulwing.credo.Password;
 import org.soulwing.credo.service.ProtectionParameters;
 
 /**
@@ -29,7 +30,7 @@ public class ProtectionParametersBean implements ProtectionParameters {
 
   private String groupName;
   private String loginName;
-  private char[] password;
+  private Password password;
   
   /**
    * {@inheritDoc}
@@ -67,7 +68,7 @@ public class ProtectionParametersBean implements ProtectionParameters {
    * {@inheritDoc}
    */
   @Override
-  public char[] getPassword() {
+  public Password getPassword() {
     return password;
   }
 
@@ -77,17 +78,8 @@ public class ProtectionParametersBean implements ProtectionParameters {
    * The password is cloned before being stored.
    * @param password the password to set
    */
-  public void setPassword(char[] password) {
+  public void setPassword(Password password) {
     this.password = password;
   }
-  
-  /**
-   * Clears the stored password.
-   */
-  public void clearPassword() {
-    for (int i = 0; i < password.length; i++) {
-      password[i] = 0;
-    }
-  }
-  
+    
 }

@@ -53,6 +53,7 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.soulwing.credo.Credential;
+import org.soulwing.credo.Password;
 import org.soulwing.credo.Tag;
 import org.soulwing.credo.UserGroup;
 import org.soulwing.credo.service.AccessDeniedException;
@@ -459,7 +460,7 @@ public class ImportCredentialBeanTest {
     final Part file = context.mock(Part.class);
     final ImportPreparation preparation2 = context.mock(
         ImportPreparation.class, "prepartion2");
-    final char[] passphrase = new char[0];
+    final Password passphrase = new Password(new char[0]);
     context.checking(new Expectations() { { 
       allowing(file).getInputStream();
       will(returnValue(new ByteArrayInputStream(new byte[0])));
@@ -494,7 +495,7 @@ public class ImportCredentialBeanTest {
     final Part file = context.mock(Part.class);
     final ImportPreparation preparation2 = context.mock(
         ImportPreparation.class, "preparation2");
-    final char[] passphrase = new char[0];
+    final Password passphrase = new Password(new char[0]);
     context.checking(new Expectations() { { 
       allowing(file).getInputStream();
       will(returnValue(new ByteArrayInputStream(new byte[0])));

@@ -38,6 +38,7 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.soulwing.credo.CredentialBuilderFactory;
+import org.soulwing.credo.Password;
 import org.soulwing.credo.service.Errors;
 import org.soulwing.credo.service.ImportException;
 import org.soulwing.credo.service.NoContentException;
@@ -47,7 +48,6 @@ import org.soulwing.credo.service.crypto.CertificateWrapper;
 import org.soulwing.credo.service.crypto.CredentialBag;
 import org.soulwing.credo.service.crypto.IncorrectPassphraseException;
 import org.soulwing.credo.service.crypto.PrivateKeyWrapper;
-import org.soulwing.credo.service.importer.ConcreteCredentialImporter;
 
 /**
  * Unit tests for {@link ConcreteCredentialImporter}.
@@ -77,7 +77,7 @@ public class ConcreteCredentialImporterTest {
   @Mock
   private CertificateWrapper certificate;
 
-  private final char[] passphrase = new char[0];
+  private final Password passphrase = new Password(new char[0]);
 
   private ConcreteCredentialImporter importer;
   

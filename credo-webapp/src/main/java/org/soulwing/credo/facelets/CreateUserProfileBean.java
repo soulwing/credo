@@ -90,9 +90,7 @@ public class CreateUserProfileBean {
    */
   public Password getPassword() {
     Validate.notNull(preparation, "not prepared");
-    char[] password = preparation.getPassword();
-    if (password == null) return null;
-    return new Password(password);
+    return preparation.getPassword();
   }
 
   /**
@@ -101,7 +99,7 @@ public class CreateUserProfileBean {
    */
   public void setPassword(Password password) {
     Validate.notNull(preparation, "not prepared");
-    preparation.setPassword(password.toCharArray());
+    preparation.setPassword(password);
   }
 
   /**

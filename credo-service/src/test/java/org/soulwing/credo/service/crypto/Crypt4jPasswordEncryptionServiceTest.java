@@ -24,7 +24,7 @@ import static org.hamcrest.Matchers.startsWith;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.soulwing.credo.service.crypto.Crypt4jPasswordEncryptionService;
+import org.soulwing.credo.Password;
 
 /**
  * Unit tests for {@link Crypt4jPasswordEncryptionService}.
@@ -43,7 +43,7 @@ public class Crypt4jPasswordEncryptionServiceTest {
   
   @Test
   public void testEncryptAndValidate() throws Exception {
-    char[] password = "secret".toCharArray();
+    Password password = new Password("secret".toCharArray());
     String encrypted = service.encrypt(password);
     assertThat(encrypted, 
         is(startsWith(Crypt4jPasswordEncryptionService.SALT_PREFIX)));    

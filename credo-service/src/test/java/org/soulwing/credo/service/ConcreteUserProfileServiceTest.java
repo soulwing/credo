@@ -33,6 +33,7 @@ import org.jmock.integration.junit4.JUnitRuleMockery;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.soulwing.credo.Password;
 import org.soulwing.credo.UserGroup;
 import org.soulwing.credo.UserGroupMember;
 import org.soulwing.credo.UserGroupMemberBuilder;
@@ -64,7 +65,7 @@ public class ConcreteUserProfileServiceTest {
 
   private final String loginName = new String();
   private final String fullName = new String();
-  private final char[] password = new char[0];
+  private final Password password = new Password(new char[0]);
   private final String encryptedPassword = new String();
   private final String encodedPublicKey = new String();
   private final String encodedPrivateKey = new String();

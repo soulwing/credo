@@ -78,7 +78,7 @@ public class Password implements Serializable {
    * @return char array containing the value of this password
    */
   public char[] toCharArray() {
-    return value.clone();
+    return value;
   }
   
 }

@@ -31,6 +31,7 @@ import org.bouncycastle.operator.InputDecryptorProvider;
 import org.bouncycastle.operator.OperatorCreationException;
 import org.bouncycastle.pkcs.PKCS8EncryptedPrivateKeyInfo;
 import org.bouncycastle.pkcs.PKCSException;
+import org.soulwing.credo.Password;
 import org.soulwing.credo.service.crypto.IncorrectPassphraseException;
 import org.soulwing.credo.service.crypto.PrivateKeyWrapper;
 import org.soulwing.credo.service.crypto.jca.JcaPrivateKeyWrapper;
@@ -48,7 +49,7 @@ public class BcPKCS8PrivateKeyWrapper implements PrivateKeyWrapper {
   private final KeyFactory keyFactory;
   private final PemObjectBuilderFactory objectBuilderFactory;
   
-  private char[] passphrase;
+  private Password password;
   
   /**
    * Constructs a new instance.
@@ -75,8 +76,8 @@ public class BcPKCS8PrivateKeyWrapper implements PrivateKeyWrapper {
    * {@inheritDoc}
    */
   @Override
-  public char[] getProtectionParameter() {
-    return passphrase;
+  public Password getProtectionParameter() {
+    return password;
   }
 
   /**
@@ -84,8 +85,9 @@ public class BcPKCS8PrivateKeyWrapper implements PrivateKeyWrapper {
    */
   @Override
   public void setProtectionParameter(Object parameter) {
-    Validate.isTrue(parameter instanceof char[], "requires a passphrase");
-    this.passphrase = (char[]) parameter;
+    Validate.isTrue(parameter == null || parameter instanceof Password, 
+        "requires a Password object");
+    this.password = (Password) parameter;
   }
 
   /**
@@ -110,7 +112,7 @@ public class BcPKCS8PrivateKeyWrapper implements PrivateKeyWrapper {
    */
   @Override
   public PrivateKey derive() {
-    Validate.notNull(passphrase, "passphrase is required");    
+    Validate.notNull(password, "password is required");    
     InputDecryptorProvider decryptor = createPrivateKeyDecryptor();
     try {
       PrivateKeyInfo keyInfo = delegate.decryptPrivateKeyInfo(decryptor);
@@ -140,7 +142,8 @@ public class BcPKCS8PrivateKeyWrapper implements PrivateKeyWrapper {
   private InputDecryptorProvider createPrivateKeyDecryptor() {
     try {
       InputDecryptorProvider decryptor = 
-          new JceOpenSSLPKCS8DecryptorProviderBuilder().build(passphrase);
+          new JceOpenSSLPKCS8DecryptorProviderBuilder().build(
+              password.toCharArray());
       return decryptor;
     }
     catch (OperatorCreationException ex) {

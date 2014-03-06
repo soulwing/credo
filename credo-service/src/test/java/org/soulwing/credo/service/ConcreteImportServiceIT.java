@@ -48,6 +48,7 @@ import org.jboss.shrinkwrap.resolver.api.maven.Maven;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.soulwing.credo.Credential;
+import org.soulwing.credo.Password;
 import org.soulwing.credo.UserGroup;
 import org.soulwing.credo.domain.CredentialEntity;
 import org.soulwing.credo.repository.CredentialRepository;
@@ -144,7 +145,7 @@ public class ConcreteImportServiceIT {
     assertThat(preparation.isPassphraseRequired(), is(true));
     
     preparation.setPassphrase(
-        properties.getProperty("passphrase").toCharArray());
+        new Password(properties.getProperty("passphrase").toCharArray()));
     
     Credential credential = importService.createCredential(preparation, errors);
     assertThat(preparation.getDetails().getSubject(), is(equalTo(
@@ -172,7 +173,7 @@ public class ConcreteImportServiceIT {
     assertThat(preparation.isPassphraseRequired(), is(true));
     
     preparation.setPassphrase(
-        properties.getProperty("passphrase").toCharArray());
+        new Password(properties.getProperty("passphrase").toCharArray()));
     
     Credential credential = importService.createCredential(preparation, errors);
     assertThat(preparation.getDetails().getSubject(), is(equalTo(
@@ -192,7 +193,7 @@ public class ConcreteImportServiceIT {
   public void testImportProtectAndSave() throws Exception {
     final String testCase = "pkcs8-key";
     final String loginName = "someUser";
-    final char[] password = "somePassword".toCharArray();
+    final Password password = new Password("somePassword".toCharArray());
     final ProtectionParameters protection = newProtectionParameters(loginName, 
         password);
 
@@ -206,7 +207,7 @@ public class ConcreteImportServiceIT {
     assertThat(preparation.isPassphraseRequired(), is(true));
     
     preparation.setPassphrase(
-        properties.getProperty("passphrase").toCharArray());
+        new Password(properties.getProperty("passphrase").toCharArray()));
     
     Credential credential = importService.createCredential(preparation, errors);
     credential.setName(preparation.getDetails().getSubject());
@@ -214,7 +215,7 @@ public class ConcreteImportServiceIT {
     importService.saveCredential(credential, errors);
   }
 
-  private void createUserProfile(String loginName, char[] password) {
+  private void createUserProfile(String loginName, Password password) {
     UserProfilePreparation preparation = 
         profileService.prepareProfile(loginName);
     preparation.setFullName("Some User");
@@ -223,7 +224,7 @@ public class ConcreteImportServiceIT {
   }
 
   private ProtectionParameters newProtectionParameters(final String loginName,
-      final char[] password) {
+      final Password password) {
     return new ProtectionParameters() {
 
       @Override
@@ -237,7 +238,7 @@ public class ConcreteImportServiceIT {
       }
 
       @Override
-      public char[] getPassword() {
+      public Password getPassword() {
         return password;
       } 
       
