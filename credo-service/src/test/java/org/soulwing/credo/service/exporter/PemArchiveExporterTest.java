@@ -23,6 +23,7 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.nullValue;
+import static org.jmock.Expectations.returnValue;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -31,6 +32,7 @@ import java.util.Collections;
 import java.util.List;
 
 import org.jmock.Expectations;
+import org.jmock.api.Action;
 import org.jmock.auto.Mock;
 import org.jmock.integration.junit4.JUnitRuleMockery;
 import org.junit.Before;
@@ -39,9 +41,11 @@ import org.junit.Test;
 import org.soulwing.credo.Credential;
 import org.soulwing.credo.CredentialCertificate;
 import org.soulwing.credo.CredentialKey;
+import org.soulwing.credo.Password;
 import org.soulwing.credo.service.ExportPreparation;
 import org.soulwing.credo.service.ExportRequest;
 import org.soulwing.credo.service.archive.ArchiveBuilder;
+import org.soulwing.credo.service.crypto.PKCS8EncryptionService;
 import org.soulwing.credo.service.crypto.PrivateKeyWrapper;
 
 /**
@@ -75,6 +79,9 @@ public class PemArchiveExporterTest {
   @Mock
   private ArchiveBuilder archiveBuilder;
   
+  @Mock
+  private PKCS8EncryptionService pkcs8EncryptionService;
+  
   private String fileName = "fileName";
   
   private String privateKeyContent = "privateKey";
@@ -85,19 +92,22 @@ public class PemArchiveExporterTest {
 
   private byte[] archive = new byte[] { 0, 1, 2, 3 };
   
+  private Password password = new Password(new char[0]);
+  
   private PemArchiveExporter exporter;
   
   @Before
   public void setUp() throws Exception {
-    exporter = new PemArchiveExporter(archiveBuilder);
+    exporter = new PemArchiveExporter(archiveBuilder, pkcs8EncryptionService);
   }
   
   @Test
-  public void testExportCredential() throws Exception {
+  public void testExportCredentialWithNoPassphrase() throws Exception {
     final List<CredentialCertificate> certificates = new ArrayList<>();
     certificates.add(certificate);
     certificates.add(authority);
     
+    context.checking(newPassphraseExpectations(returnValue(null)));
     context.checking(newCredentialExpectations(certificates));
     context.checking(newPrivateKeyArchiverExpectations());
     context.checking(newCertificateArchiverExpectations());
@@ -108,9 +118,28 @@ public class PemArchiveExporterTest {
   }
 
   @Test
+  public void testExportCredentialWithPassphrase() throws Exception {
+    final List<CredentialCertificate> certificates = new ArrayList<>();
+    certificates.add(certificate);
+    certificates.add(authority);
+    
+    context.checking(newPassphraseExpectations(returnValue(password)));
+    context.checking(newEncryptionServiceExpectations());
+    context.checking(newCredentialExpectations(certificates));
+    context.checking(newPrivateKeyArchiverExpectations());
+    context.checking(newCertificateArchiverExpectations());
+    context.checking(newAuthorityArchiverExpectations());
+    context.checking(newBuildArchiveExpectations());
+    
+    validatePreparation(exporter.exportCredential(request, privateKey));
+  }
+
+
+  @Test
   public void testExportCredentialWithNoAuthorities() throws Exception {
     List<CredentialCertificate> certificates = 
         Collections.singletonList(certificate);
+    context.checking(newPassphraseExpectations(returnValue(null)));
     context.checking(newCredentialExpectations(certificates));
     context.checking(newPrivateKeyArchiverExpectations());
     context.checking(newCertificateArchiverExpectations());
@@ -122,6 +151,7 @@ public class PemArchiveExporterTest {
   @Test
   public void testExportCredentialWithNoCertificates() throws Exception {
     List<CredentialCertificate> certificates = Collections.emptyList();
+    context.checking(newPassphraseExpectations(returnValue(null)));
     context.checking(newCredentialExpectations(certificates));
     context.checking(newPrivateKeyArchiverExpectations());
     context.checking(newBuildArchiveExpectations());
@@ -144,6 +174,21 @@ public class PemArchiveExporterTest {
     assertThat(bos.toByteArray(), is(equalTo(archive)));
   }
 
+  private Expectations newPassphraseExpectations(final Action outcome) { 
+    return new Expectations() { { 
+      allowing(request).getExportPassphrase();
+      will(outcome);
+    } };
+  }
+  
+  private Expectations newEncryptionServiceExpectations() {
+    return new Expectations() { { 
+      oneOf(pkcs8EncryptionService).encrypt(with(same(privateKey)), 
+          with(same(password)));
+      will(returnValue(privateKey));
+    } };
+  }
+  
   private Expectations newCredentialExpectations (
       final List<CredentialCertificate> certificates) throws Exception {
     return new Expectations() { { 

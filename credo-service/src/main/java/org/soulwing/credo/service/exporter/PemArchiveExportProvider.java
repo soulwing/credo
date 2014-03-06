@@ -23,6 +23,7 @@ import javax.inject.Inject;
 
 import org.soulwing.credo.service.ExportFormat;
 import org.soulwing.credo.service.archive.ArchiveBuilderFactory;
+import org.soulwing.credo.service.crypto.PKCS8EncryptionService;
 
 /**
  * A provider the supports the {@link ExportFormat#PEM_ARCHIVE} format.
@@ -34,6 +35,9 @@ public class PemArchiveExportProvider implements CredentialExportProvider {
 
   @Inject
   protected ArchiveBuilderFactory archiveBuilderFactory;
+  
+  @Inject
+  protected PKCS8EncryptionService pkcs8EncryptionService;
   
   /**
    * {@inheritDoc}
@@ -48,7 +52,8 @@ public class PemArchiveExportProvider implements CredentialExportProvider {
    */
   @Override
   public CredentialExporter newExporter() {
-    return new PemArchiveExporter(archiveBuilderFactory.newBuilder());
+    return new PemArchiveExporter(archiveBuilderFactory.newBuilder(),
+        pkcs8EncryptionService);
   }
 
 }

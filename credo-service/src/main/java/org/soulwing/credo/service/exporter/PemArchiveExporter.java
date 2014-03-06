@@ -28,6 +28,7 @@ import org.soulwing.credo.service.ExportPreparation;
 import org.soulwing.credo.service.ExportRequest;
 import org.soulwing.credo.service.PassphraseException;
 import org.soulwing.credo.service.archive.ArchiveBuilder;
+import org.soulwing.credo.service.crypto.PKCS8EncryptionService;
 import org.soulwing.credo.service.crypto.PrivateKeyWrapper;
 
 /**
@@ -49,12 +50,17 @@ public class PemArchiveExporter implements CredentialExporter {
   
   private final ArchiveBuilder archiveBuilder;
   
+  private final PKCS8EncryptionService pkcs8EncryptionService;
+  
   /**
    * Constructs a new instance.
    * @param archiveBuilder
+   * @param pkcs8EncryptionService
    */
-  public PemArchiveExporter(ArchiveBuilder archiveBuilder) {
+  public PemArchiveExporter(ArchiveBuilder archiveBuilder,
+      PKCS8EncryptionService pkcs8EncryptionService) {
     this.archiveBuilder = archiveBuilder;
+    this.pkcs8EncryptionService = pkcs8EncryptionService;
   }
 
   /**
@@ -64,6 +70,11 @@ public class PemArchiveExporter implements CredentialExporter {
   public ExportPreparation exportCredential(ExportRequest request, 
       PrivateKeyWrapper privateKey) throws IOException, PassphraseException, 
       ExportException {
+    
+    if (request.getExportPassphrase() != null) {
+      privateKey = pkcs8EncryptionService.encrypt(privateKey, 
+          request.getExportPassphrase());
+    }
     
     archiveBuilder.beginEntry(KEY_ENTRY_NAME, CHARACTER_ENCODING)    
       .addContent(privateKey.getContent())
