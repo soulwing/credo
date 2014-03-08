@@ -31,6 +31,7 @@ public abstract class AbstractFormatVariant implements ExportFormat.Variant {
   private final String name;
   private final String description;
   private final String suffix;
+  private final boolean defaultVariant;
   
   /**
    * Constructs a new instance.
@@ -38,10 +39,22 @@ public abstract class AbstractFormatVariant implements ExportFormat.Variant {
    * @param suffix file name suffix
    */
   protected AbstractFormatVariant(String id, String suffix) {
+    this(id, suffix, false);
+  }
+
+  /**
+   * Constructs a new instance.
+   * @param id variant identifier
+   * @param suffix file name suffix
+   * @param defaultVariant flag indicating whether this is to be the default
+   */
+  protected AbstractFormatVariant(String id, String suffix,
+      boolean defaultVariant) {
     this.id = id;
     this.name = BundlePrefix.VARIANT_NAME + id;
     this.description = BundlePrefix.VARIANT_DESCRIPTION + id;
     this.suffix = suffix;
+    this.defaultVariant = defaultVariant;
   }
 
   /**
@@ -74,6 +87,14 @@ public abstract class AbstractFormatVariant implements ExportFormat.Variant {
   @Override
   public String getSuffix() {
     return suffix;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public boolean isDefault() {
+    return defaultVariant;
   }  
   
 }

@@ -61,10 +61,30 @@ public interface ExportFormat {
   boolean isPassphraseRequired();
  
   /**
+   * Tests whether this format is the default.
+   * @return {@code true} if this variant is the default
+   */
+  boolean isDefault();
+  
+  /**
    * Gets the collection of variants for this format.
    * @return collection of variants
    */
   Collection<Variant> getVariants();
+  
+  /**
+   * Gets the default variant for this format.
+   * @return default variant.
+   */
+  Variant getDefaultVariant();
+  
+  /**
+   * Finds a variant using its unique identifier.
+   * @param id unique identifier of the variant to match
+   * @return variant
+   * @throws IllegalArgumentException if the variant does not exist
+   */
+  Variant findVariant(String id);
   
   /**
    * Describes a variant for an export format.
@@ -102,6 +122,12 @@ public interface ExportFormat {
      * @return
      */
     String getSuffix();
+    
+    /**
+     * Tests whether this variant is the default variant for the format.
+     * @return {@code true} if this variant is the default variant
+     */
+    boolean isDefault();
     
   }
   

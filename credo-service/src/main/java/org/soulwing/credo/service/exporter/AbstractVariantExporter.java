@@ -83,13 +83,23 @@ public abstract class AbstractVariantExporter<T extends ExportFormat.Variant>
   }
 
   /**
-   * Finds the variant with the given identifier.
-   * @param id of the variant to find
-   * @return matching variant
-   * @throws IllegalArgumentException if no variant exists with the given
-   *    identifier
+   * {@inheritDoc}
    */
-  protected T findVariant(String id) {
+  @Override
+  public Variant getDefaultVariant() {
+    Iterator<T> i = variants.iterator();
+    while (i.hasNext()) {
+      T variant = i.next();
+      if (variant.isDefault()) return variant;
+    }
+    return variants.iterator().next();
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public T findVariant(String id) {
     Iterator<T> i = variants.iterator();
     while (i.hasNext()) {
       T variant = i.next();

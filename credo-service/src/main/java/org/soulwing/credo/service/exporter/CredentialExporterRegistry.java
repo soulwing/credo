@@ -37,11 +37,25 @@ public interface CredentialExporterRegistry {
   Collection<ExportFormat> getFormats();
   
   /**
+   * Gets the default format.
+   * @return default format
+   */
+  ExportFormat getDefaultFormat();
+  
+  /**
    * Gets the collection of supported variants for the given export format.
    * @param format the subject export format
    * @return format variants
    */
   Collection<ExportFormat.Variant> getVariants(String format);
+  
+  /**
+   * Finds a format using it's unique identifier.
+   * @param id identifier of the format to match
+   * @return export format
+   * @throws IllegalArgumentException if the specified format does not exist
+   */
+  ExportFormat findFormat(String id);
   
   /**
    * Finds an exporter that supports a export request.

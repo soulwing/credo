@@ -49,7 +49,7 @@ public class ZipArchiveVariant extends AbstractFormatVariant
    * Constructs a new instance.
    */
   public ZipArchiveVariant() {
-    super(ID, SUFFIX);
+    super(ID, SUFFIX, true);
   }
 
   /**

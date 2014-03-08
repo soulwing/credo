@@ -30,6 +30,7 @@ abstract class AbstractCredentialExporter implements CredentialExporter {
   private final String name;
   private final String description;
   private final boolean passphraseRequired;
+  private final boolean defaultFormat;
   
   /**
    * Constructs a new instance.
@@ -38,12 +39,25 @@ abstract class AbstractCredentialExporter implements CredentialExporter {
    */
   protected AbstractCredentialExporter(String id, 
       boolean passphraseRequired) {
+    this(id, passphraseRequired, false);
+  }
+
+  /**
+   * Constructs a new instance.
+   * @param id format identifier
+   * @param passphraseRequired
+   * @param defaultFormat
+   */
+  protected AbstractCredentialExporter(String id, 
+      boolean passphraseRequired, boolean defaultFormat) {
     this.id = id;
     this.name = BundlePrefix.FORMAT_NAME + id;
     this.description = BundlePrefix.FORMAT_DESCRIPTION + id;
     this.passphraseRequired = passphraseRequired;
+    this.defaultFormat = defaultFormat;
   }
   
+
   /**
    * {@inheritDoc}
    */
@@ -76,5 +90,12 @@ abstract class AbstractCredentialExporter implements CredentialExporter {
     return passphraseRequired;
   }
 
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public boolean isDefault() {    
+    return defaultFormat;
+  }  
 
 }

@@ -39,10 +39,23 @@ abstract class AbstractKeyStoreVariant extends AbstractFormatVariant
    */
   protected AbstractKeyStoreVariant(String type, String contentType,
       String suffix) {
-    super(type, suffix);
+    this(type, contentType, suffix, false);
+  }
+
+  /** 
+   * Constructs a new instance.
+   * @param type JCA key store type
+   * @param contentType MIME content type
+   * @param suffix file name suffix
+   * @param defaultVariant flag indicating whether this is the default
+   */
+  protected AbstractKeyStoreVariant(String type, String contentType,
+      String suffix, boolean defaultVariant) {
+    super(type, suffix, defaultVariant);
     this.type = type;
     this.contentType = contentType;
   }
+
 
   /**
    * {@inheritDoc}

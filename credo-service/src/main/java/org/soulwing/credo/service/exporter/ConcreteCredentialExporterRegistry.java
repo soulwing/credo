@@ -68,8 +68,21 @@ public class ConcreteCredentialExporterRegistry
    * {@inheritDoc}
    */
   @Override
+  public ExportFormat getDefaultFormat() {
+    Iterator<CredentialExporter> i = exporters.iterator();
+    while (i.hasNext()) {
+      CredentialExporter exporter = i.next();
+      if (exporter.isDefault()) return exporter;
+    }
+    return exporters.iterator().next();
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
   public Collection<Variant> getVariants(String format) {
-    return findExporter(format).getVariants();
+    return findFormat(format).getVariants();
   }
 
   /**
@@ -77,16 +90,14 @@ public class ConcreteCredentialExporterRegistry
    */
   @Override
   public CredentialExporter findExporter(ExportRequest request) {
-    return findExporter(request.getFormat());
+    return findFormat(request.getFormat());
   }
 
   /**
-   * Find exporter with the given format identifier.
-   * @param format the subject format identifier
-   * @return exporter
-   * @throws IllegalArgumentException if format is unrecognized
+   * {@inheritDoc}
    */
-  private CredentialExporter findExporter(String format) {
+  @Override
+  public CredentialExporter findFormat(String format) {
     Iterator<CredentialExporter> i = exporters.iterator();
     while (i.hasNext()) {
       CredentialExporter exporter = i.next();

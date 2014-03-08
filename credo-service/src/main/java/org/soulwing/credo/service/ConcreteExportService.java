@@ -74,8 +74,22 @@ public class ConcreteExportService implements ExportService {
    * {@inheritDoc}
    */
   @Override
+  public ExportFormat getDefaultFormat() {
+    return exporterRegistry.getDefaultFormat();        
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
   public Collection<Variant> getVariants(String format) {
     return exporterRegistry.getVariants(format);
+  }
+
+
+  @Override
+  public ExportFormat findFormat(String id) {
+    return exporterRegistry.findFormat(id);
   }
 
   /**

@@ -38,7 +38,7 @@ public class PKCS12KeyStoreVariant extends AbstractKeyStoreVariant {
    * Constructs a new instance.
    */
   public PKCS12KeyStoreVariant() {
-    super(TYPE, CONTENT_TYPE, SUFFIX);
+    super(TYPE, CONTENT_TYPE, SUFFIX, true);
   }
   
 }
