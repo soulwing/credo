@@ -34,6 +34,7 @@ import java.io.OutputStream;
 import javax.enterprise.context.Conversation;
 import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
+import javax.faces.event.AjaxBehaviorEvent;
 
 import org.jmock.Expectations;
 import org.jmock.auto.Mock;
@@ -47,6 +48,7 @@ import org.soulwing.credo.UserGroup;
 import org.soulwing.credo.service.AccessDeniedException;
 import org.soulwing.credo.service.Errors;
 import org.soulwing.credo.service.ExportException;
+import org.soulwing.credo.service.ExportFormat;
 import org.soulwing.credo.service.ExportPreparation;
 import org.soulwing.credo.service.ExportRequest;
 import org.soulwing.credo.service.ExportService;
@@ -59,6 +61,14 @@ import org.soulwing.credo.service.PassphraseException;
  * @author Carl Harris
  */
 public class ExportCredentialBeanTest {
+
+  private static final String SUFFIX = ".suffix";
+
+  private static final String FILE_NAME = "fileName";
+
+  private static final String VARIANT_ID = "variantId";
+
+  private static final String FORMAT_ID = "formatId";
 
   @Rule
   public final JUnitRuleMockery context = new JUnitRuleMockery() {
@@ -87,6 +97,12 @@ public class ExportCredentialBeanTest {
   
   @Mock
   private ExternalContext externalContext;
+  
+  @Mock
+  private ExportFormat format;
+  
+  @Mock
+  private ExportFormat.Variant variant;
   
   private ExportCredentialBean bean = new ExportCredentialBean();
   
@@ -128,11 +144,17 @@ public class ExportCredentialBeanTest {
       oneOf(group).getName();
       will(returnValue(groupName));
       oneOf(request).setProtectionParameters(with(same(bean.getProtection())));
+      oneOf(exportService).getDefaultFormat();
+      will(returnValue(format));
+      oneOf(format).getId();
+      will(returnValue(FORMAT_ID));
+      oneOf(request).setFormat(FORMAT_ID);
       oneOf(conversation).isTransient();
       will(returnValue(true));
       oneOf(conversation).begin();
     } });
-    
+    context.checking(newFormatSelectedExpectations());
+    context.checking(newVariantSelectedExpectations());
     bean.setId(id);
     assertThat(bean.createExportRequest(), is(nullValue()));
     assertThat(bean.getExportRequest(), is(sameInstance(request)));
@@ -287,4 +309,55 @@ public class ExportCredentialBeanTest {
         is(equalTo(ExportCredentialBean.CANCEL_OUTCOME_ID)));
   }
 
+  @Test
+  public void testFormatSelected() throws Exception {
+    context.checking(new Expectations() { { 
+      oneOf(request).setFormat(with(FORMAT_ID));
+    } });
+    context.checking(newFormatSelectedExpectations());
+    context.checking(newVariantSelectedExpectations());
+    bean.setExportRequest(request);
+    bean.setFormat(FORMAT_ID);
+    bean.formatSelected(context.mock(AjaxBehaviorEvent.class));
+  }
+
+  @Test
+  public void testVariantSelected() throws Exception {
+    context.checking(new Expectations() { { 
+      oneOf(request).setVariant(with(VARIANT_ID));
+    } });
+    context.checking(newVariantSelectedExpectations());
+    bean.setSelectedFormat(format);
+    bean.setExportRequest(request);
+    bean.setVariant(VARIANT_ID);
+    bean.variantSelected(context.mock(AjaxBehaviorEvent.class));
+  }
+
+  private Expectations newFormatSelectedExpectations() {
+    return new Expectations() { { 
+      oneOf(request).getFormat();
+      will(returnValue(FORMAT_ID));
+      oneOf(exportService).findFormat(with(FORMAT_ID));
+      will(returnValue(format));      
+      oneOf(format).getDefaultVariant();
+      will(returnValue(variant));
+      oneOf(variant).getId();
+      will(returnValue(VARIANT_ID));
+      oneOf(request).setVariant(VARIANT_ID);
+    } };
+  }
+  
+  private Expectations newVariantSelectedExpectations() {
+    return new Expectations() { { 
+      oneOf(request).getVariant();
+      will(returnValue(VARIANT_ID));
+      oneOf(format).findVariant(with(VARIANT_ID));
+      will(returnValue(variant));
+      oneOf(request).getFileName();
+      will(returnValue(FILE_NAME));
+      oneOf(variant).getSuffix();
+      will(returnValue(SUFFIX));
+      oneOf(request).setFileName(with(FILE_NAME + SUFFIX));      
+    } };
+  }
 }

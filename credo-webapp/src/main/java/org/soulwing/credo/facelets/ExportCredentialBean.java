@@ -20,6 +20,7 @@ package org.soulwing.credo.facelets;
 
 import java.io.IOException;
 import java.io.Serializable;
+import java.util.Collection;
 import java.util.Date;
 import java.util.Set;
 
@@ -28,6 +29,7 @@ import javax.enterprise.context.Conversation;
 import javax.enterprise.context.ConversationScoped;
 import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
+import javax.faces.event.AjaxBehaviorEvent;
 import javax.inject.Inject;
 import javax.inject.Named;
 
@@ -37,6 +39,7 @@ import org.soulwing.credo.Tag;
 import org.soulwing.credo.service.AccessDeniedException;
 import org.soulwing.credo.service.Errors;
 import org.soulwing.credo.service.ExportException;
+import org.soulwing.credo.service.ExportFormat;
 import org.soulwing.credo.service.ExportPreparation;
 import org.soulwing.credo.service.ExportRequest;
 import org.soulwing.credo.service.ExportService;
@@ -83,6 +86,10 @@ public class ExportCredentialBean implements Serializable {
   private ExportPreparation preparation;
 
   private Password passphraseAgain;
+
+  private ExportFormat selectedFormat;
+  
+  private ExportFormat.Variant selectedVariant;
   
   /**
    * Initializes the receiver.
@@ -182,21 +189,138 @@ public class ExportCredentialBean implements Serializable {
     request.setFileName(fileName);
   }
   
+  /**
+   * Gets the supported export formats.
+   * @return export formats
+   */
+  public Collection<ExportFormat> getSupportedFormats() {
+    return exportService.getFormats();
+  }
+
+  /**
+   * Gets the supported variants for the selected export format.
+   * @return supported variants
+   */
+  public Collection<ExportFormat.Variant> getSupportedVariants() {
+    return selectedFormat.getVariants();
+  }
+  
+  /**
+   * Gets the export format identifier.
+   * @return format identifier or {@code null} if none has been set
+   */
+  public String getFormat() {
+    if (request == null) return null;
+    return request.getFormat();
+  }
+
+  /**
+   * Sets the export format identifier.
+   * @param format the format identifier to set
+   */
+  public void setFormat(String format) {
+    System.out.println("setting format: " + format);
+    Validate.notNull(request, "request not prepared");
+    request.setFormat(format);
+  }
+  
+  /**
+   * Sets the selected format.
+   * <p>
+   * This method is exposed for unit testing.
+   * @param selectedFormat the format to set
+   */
+  void setSelectedFormat(ExportFormat selectedFormat) {
+    this.selectedFormat = selectedFormat;
+  }
+  
+  /**
+   * Gets the export format variant identifier.
+   * @return variant identifier or {@code null} if none has been set
+   */
+  public String getVariant() {
+    if (request == null) return null;
+    return request.getVariant();    
+  }
+  
+  /**
+   * Sets the export format variant identifier.
+   * @param variant the variant identifier to set
+   */
+  public void setVariant(String variant) {
+    System.out.println("setting variant: " + variant);
+    Validate.notNull(request, "request not prepared");
+    request.setVariant(variant);
+  }
+  
+  /**
+   * A listener method that is invoked when a format is selected.
+   * @param event subject event
+   */
+  public void formatSelected(AjaxBehaviorEvent event) {   
+    selectedFormat = exportService.findFormat(getFormat());
+    setVariant(selectedFormat.getDefaultVariant().getId());
+    variantSelected(event);
+  }
+
+  /**
+   * A listener method that is invoked when a variant is selected.
+   * @param event subject event
+   */
+  public void variantSelected(AjaxBehaviorEvent event) {   
+    selectedVariant = selectedFormat.findVariant(getVariant());
+    setFileName(replaceSuffix(getFileName(), 
+        selectedVariant.getSuffix()));
+  }
+
+  private String replaceSuffix(String fileName, String suffix) {
+    int index = fileName.lastIndexOf('.');
+    if (index == -1) {
+      index = fileName.length();
+    }
+    return fileName.substring(0, index) + suffix;
+  }
+
+  /**
+   * Tests whether the selected format requires a passphrase.
+   * @return {@code true} if a passphrase is required
+   */
+  public boolean isPassphraseRequired() {
+    if (selectedFormat == null) return false;
+    return selectedFormat.isPassphraseRequired();
+  }
+
+  /**
+   * Gets the export passphrase.
+   * @return the export passphrase or {@code null} if none has been set
+   */
   public Password getExportPassphrase() { 
     if (request == null) return null;
     return request.getExportPassphrase();
   }
-  
+
+  /**
+   * Sets the export passphrase.
+   * @param exportPassphase the passphrase to set
+   */
   public void setExportPassphrase(Password exportPassphrase) {
     Validate.notNull(request, "request not prepared");
     request.setExportPassphrase(exportPassphrase);
   }
 
+  /**
+   * Gets the export passphrase validation property.
+   * @return validation property value or {@code null} if none has been set
+   */
   public Password getExportPassphraseAgain() { 
     if (request == null) return null;
     return passphraseAgain;
   }
-  
+
+  /**
+   * Sets the export passphrase validation property.
+   * @param passphraseAgain the validation property value to set
+   */
   public void setExportPassphraseAgain(Password passphraseAgain) {
     Validate.notNull(request, "request not prepared");
     this.passphraseAgain = passphraseAgain;
@@ -263,11 +387,16 @@ public class ExportCredentialBean implements Serializable {
    * @return outcome ID
    */
   public String createExportRequest() {
-    Validate.notNull(id, "id is required");
+    if (id == null) {
+      errors.addError("id", "credentialIdIsRequired");
+      return null;
+    }
     try {
       request = exportService.newExportRequest(id);
       protection.setGroupName(request.getCredential().getOwner().getName());
       request.setProtectionParameters(protection);
+      setFormat(exportService.getDefaultFormat().getId());
+      formatSelected(null);
       if (conversation.isTransient()) {
         conversation.begin();
       }
