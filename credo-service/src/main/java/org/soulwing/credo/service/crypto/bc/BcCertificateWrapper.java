@@ -21,11 +21,14 @@ package org.soulwing.credo.service.crypto.bc;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.math.BigInteger;
+import java.security.cert.Certificate;
+import java.security.cert.CertificateException;
 import java.util.Date;
 
 import javax.security.auth.x500.X500Principal;
 
 import org.bouncycastle.cert.X509CertificateHolder;
+import org.bouncycastle.cert.jcajce.JcaX509CertificateConverter;
 import org.bouncycastle.crypto.params.AsymmetricKeyParameter;
 import org.bouncycastle.crypto.params.RSAKeyParameters;
 import org.bouncycastle.crypto.params.RSAPrivateCrtKeyParameters;
@@ -108,6 +111,20 @@ public class BcCertificateWrapper implements BcWrapper, CertificateWrapper {
       pemWriter.writeObject(certificate);
       pemWriter.flush();
       return writer.toString();
+    }
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public Certificate derive() {
+    JcaX509CertificateConverter converter = new JcaX509CertificateConverter();
+    try {
+      return converter.getCertificate(certificate);
+    }
+    catch (CertificateException ex) {
+      throw new RuntimeException(ex);
     }
   }
 

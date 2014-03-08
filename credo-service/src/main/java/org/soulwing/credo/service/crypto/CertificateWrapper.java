@@ -20,6 +20,7 @@ package org.soulwing.credo.service.crypto;
 
 import java.io.IOException;
 import java.math.BigInteger;
+import java.security.cert.Certificate;
 import java.util.Date;
 
 import javax.security.auth.x500.X500Principal;
@@ -74,5 +75,12 @@ public interface CertificateWrapper {
    * @throws IOException
    */
   String getContent() throws IOException;
+  
+  /**
+   * Derives a JCA {@link Certificate} for the certificate represented by
+   * this wrapper.
+   * @return JCA certificate
+   */
+  Certificate derive();
   
 }
