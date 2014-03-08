@@ -32,7 +32,7 @@ public class JKSKeyStoreVariant extends AbstractKeyStoreVariant {
 
   private static final String TYPE = "JKS";
   private static final String CONTENT_TYPE = "application/octet-stream";
-  private static final String SUFFIX = ".bks";
+  private static final String SUFFIX = ".jks";
 
   /**
    * Constructs a new instance.
