@@ -1,5 +1,5 @@
 /*
- * File created on Mar 6, 2014 
+ * File created on Mar 7, 2014 
  *
  * Copyright (c) 2014 Virginia Polytechnic Institute and State University
  *
@@ -18,29 +18,31 @@
  */
 package org.soulwing.credo.service.exporter;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import java.util.Collection;
 
-import javax.inject.Qualifier;
+import org.soulwing.credo.service.ExportFormat;
+import org.soulwing.credo.service.ExportRequest;
 
 /**
- * An annotation that identifies a component as supporting a particular
- * export format.
+ * An object that keeps track of available {@link CredentialExporter} objects.
  *
  * @author Carl Harris
  */
-@Qualifier
-@Retention(RetentionPolicy.RUNTIME)
-@Target({ ElementType.TYPE, ElementType.METHOD, ElementType.FIELD, 
-    ElementType.PARAMETER })
-public @interface ExportFormat {
+public interface CredentialExporterRegistry {
 
   /**
-   * Specifies an identifier for the export format.
-   * @return format identifier
+   * Gets the collection of all available formats.
+   * @return collection of formats
    */
-  String value();
+  Collection<ExportFormat> getFormats();
+  
+  /**
+   * Finds an exporter that supports a export request.
+   * @param request export request
+   * @return exporter
+   * @throws IllegalArgumentException if the given request cannot be
+   *    satisfied
+   */
+  CredentialExporter findExporter(ExportRequest request);
   
 }

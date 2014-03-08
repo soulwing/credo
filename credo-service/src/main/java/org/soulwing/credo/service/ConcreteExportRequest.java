@@ -38,6 +38,7 @@ public class ConcreteExportRequest
   private Password exportPassphrase;
   private String fileName;  
   private String format;
+  private String variant;
   private ProtectionParameters protectionParameters;
   
   /**
@@ -117,6 +118,22 @@ public class ConcreteExportRequest
   @Override
   public void setFormat(String format) {
     this.format = format;
+  }
+
+  /**
+   * Gets the {@code variant} property.
+   * @return
+   */
+  public String getVariant() {
+    return variant;
+  }
+
+  /**
+   * Sets the {@code variant} property.
+   * @param variant
+   */
+  public void setVariant(String variant) {
+    this.variant = variant;
   }
 
   /**

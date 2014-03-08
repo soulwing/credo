@@ -29,7 +29,10 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
+
+import javax.enterprise.inject.Instance;
 
 import org.jmock.Expectations;
 import org.jmock.api.Action;
@@ -45,7 +48,6 @@ import org.soulwing.credo.Password;
 import org.soulwing.credo.service.ExportPreparation;
 import org.soulwing.credo.service.ExportRequest;
 import org.soulwing.credo.service.archive.ArchiveBuilder;
-import org.soulwing.credo.service.archive.ArchiveBuilderFactory;
 import org.soulwing.credo.service.crypto.PKCS8EncryptionService;
 import org.soulwing.credo.service.crypto.PrivateKeyWrapper;
 
@@ -60,6 +62,10 @@ public class PemArchiveExporterTest {
   public final JUnitRuleMockery context = new JUnitRuleMockery();
   
   private final String fileName = "fileName";
+  
+  private final String contentType = "contentType";
+  
+  private final String suffix = "suffix";
   
   private final String privateKeyContent = "privateKey";
   
@@ -90,19 +96,25 @@ public class PemArchiveExporterTest {
   private CredentialCertificate authority;
   
   @Mock
-  private ArchiveBuilderFactory archiveBuilderFactory;
-  
-  @Mock
   private ArchiveBuilder archiveBuilder;
   
   @Mock
   private PKCS8EncryptionService pkcs8EncryptionService;
+
+  @Mock
+  private Instance<PemArchiveVariant> variants;
+  
+  @Mock
+  private Iterator<PemArchiveVariant> variantIterator;
+  
+  @Mock
+  private PemArchiveVariant variant;
   
   private PemArchiveExporter exporter = new PemArchiveExporter();
   
   @Before
   public void setUp() throws Exception {
-    exporter.archiveBuilderFactory = archiveBuilderFactory;
+    exporter.variants = variants;
     exporter.pkcs8EncryptionService = pkcs8EncryptionService;
   }
   
@@ -113,7 +125,8 @@ public class PemArchiveExporterTest {
     certificates.add(authority);
     
     context.checking(newPassphraseExpectations(returnValue(null)));
-    context.checking(newBuilderFactoryExpectations());
+    context.checking(newFindVariantExpectations(returnValue(variant)));
+    context.checking(newUseVariantExpectations());
     context.checking(newCredentialExpectations(certificates));
     context.checking(newPrivateKeyArchiverExpectations());
     context.checking(newCertificateArchiverExpectations());
@@ -130,7 +143,8 @@ public class PemArchiveExporterTest {
     certificates.add(authority);
     
     context.checking(newPassphraseExpectations(returnValue(password)));
-    context.checking(newBuilderFactoryExpectations());
+    context.checking(newFindVariantExpectations(returnValue(variant)));
+    context.checking(newUseVariantExpectations());
     context.checking(newEncryptionServiceExpectations());
     context.checking(newCredentialExpectations(certificates));
     context.checking(newPrivateKeyArchiverExpectations());
@@ -147,7 +161,8 @@ public class PemArchiveExporterTest {
     List<CredentialCertificate> certificates = 
         Collections.singletonList(certificate);
     context.checking(newPassphraseExpectations(returnValue(null)));
-    context.checking(newBuilderFactoryExpectations());
+    context.checking(newFindVariantExpectations(returnValue(variant)));
+    context.checking(newUseVariantExpectations());
     context.checking(newCredentialExpectations(certificates));
     context.checking(newPrivateKeyArchiverExpectations());
     context.checking(newCertificateArchiverExpectations());
@@ -160,7 +175,8 @@ public class PemArchiveExporterTest {
   public void testExportCredentialWithNoCertificates() throws Exception {
     List<CredentialCertificate> certificates = Collections.emptyList();
     context.checking(newPassphraseExpectations(returnValue(null)));
-    context.checking(newBuilderFactoryExpectations());
+    context.checking(newFindVariantExpectations(returnValue(variant)));
+    context.checking(newUseVariantExpectations());
     context.checking(newCredentialExpectations(certificates));
     context.checking(newPrivateKeyArchiverExpectations());
     context.checking(newBuildArchiveExpectations());
@@ -172,7 +188,7 @@ public class PemArchiveExporterTest {
       throws Exception {
     assertThat(preparation, is(not(nullValue())));
     assertThat(preparation.getContentType(), 
-        is(equalTo(PemArchiveExporter.CONTENT_TYPE)));
+        is(equalTo(contentType)));
     assertThat(preparation.getCharacterEncoding(),
         is(equalTo(PemArchiveExporter.CHARACTER_ENCODING)));
     assertThat(preparation.getFileName(), is(equalTo(fileName)));
@@ -188,14 +204,31 @@ public class PemArchiveExporterTest {
       will(outcome);
     } };
   }
+  
+  private Expectations newFindVariantExpectations(final Action outcome) {
+    final String variantId = "variantId";
+    return new Expectations() { {
+      oneOf(request).getVariant();
+      will(returnValue(variantId));
+      oneOf(variants).iterator();
+      will(returnValue(variantIterator));
+      atMost(2).of(variantIterator).hasNext();
+      will(onConsecutiveCalls(returnValue(true), returnValue(false)));
+      oneOf(variantIterator).next();
+      will(outcome);
+      allowing(variant).getId();
+      will(returnValue(variantId));
+    } };
+  }
 
-  private Expectations newBuilderFactoryExpectations() {
+  private Expectations newUseVariantExpectations() {
     return new Expectations() { { 
-      oneOf(archiveBuilderFactory).newBuilder();
+      oneOf(variant).newArchiveBuilder();
       will(returnValue(archiveBuilder));
     } };
   }
   
+
   private Expectations newEncryptionServiceExpectations() {
     return new Expectations() { { 
       oneOf(pkcs8EncryptionService).encrypt(with(same(privateKey)), 
@@ -261,7 +294,11 @@ public class PemArchiveExporterTest {
 
   private Expectations newBuildArchiveExpectations() throws IOException {
     return new Expectations() { {
-      oneOf(request).getSuffixedFileName(with(PemArchiveExporter.SUFFIX));
+      oneOf(variant).getSuffix();
+      will(returnValue(suffix));
+      oneOf(variant).getContentType();
+      will(returnValue(contentType));
+      oneOf(request).getSuffixedFileName(with(suffix));
       will(returnValue(fileName));
       oneOf(archiveBuilder).build();
       will(returnValue(archive));

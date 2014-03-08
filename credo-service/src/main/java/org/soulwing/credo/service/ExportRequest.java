@@ -71,7 +71,7 @@ public interface ExportRequest {
 
   /**
    * Gets the format for the exported credential.
-   * @return export format
+   * @return export format identifier
    */
   String getFormat();
   
@@ -81,6 +81,18 @@ public interface ExportRequest {
    */
   void setFormat(String format);
 
+  /**
+   * Gets the format variant for the exported credential.
+   * @return format variant identifier
+   */
+  String getVariant();
+  
+  /**
+   * Sets the format variant for the exported credential.
+   * @param variant the format variant to set
+   */
+  void setVariant(String variant);
+  
   /**
    * Gets the protection parameters assigned to this request.
    * @return parameters object or {@code null} if none has been set

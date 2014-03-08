@@ -21,6 +21,7 @@ package org.soulwing.credo.service.exporter;
 import java.io.IOException;
 
 import org.soulwing.credo.service.ExportException;
+import org.soulwing.credo.service.ExportFormat;
 import org.soulwing.credo.service.ExportPreparation;
 import org.soulwing.credo.service.ExportRequest;
 import org.soulwing.credo.service.PassphraseException;
@@ -31,7 +32,7 @@ import org.soulwing.credo.service.crypto.PrivateKeyWrapper;
  *
  * @author Carl Harris
  */
-public interface CredentialExporter {
+public interface CredentialExporter extends ExportFormat {
 
   /**
    * Performs the export of a credential represented by the given request.

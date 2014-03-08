@@ -26,11 +26,11 @@ import javax.inject.Inject;
 
 import org.soulwing.credo.CredentialCertificate;
 import org.soulwing.credo.service.ExportException;
+import org.soulwing.credo.service.ExportFormat;
 import org.soulwing.credo.service.ExportPreparation;
 import org.soulwing.credo.service.ExportRequest;
 import org.soulwing.credo.service.PassphraseException;
 import org.soulwing.credo.service.archive.ArchiveBuilder;
-import org.soulwing.credo.service.archive.ArchiveBuilderFactory;
 import org.soulwing.credo.service.crypto.PKCS8EncryptionService;
 import org.soulwing.credo.service.crypto.PrivateKeyWrapper;
 
@@ -40,26 +40,28 @@ import org.soulwing.credo.service.crypto.PrivateKeyWrapper;
  * @author Carl Harris
  */
 @ApplicationScoped
-@ExportFormat("PEM")
-public class PemArchiveExporter implements CredentialExporter {
+public class PemArchiveExporter 
+    extends AbstractVariantExporter<PemArchiveVariant> {
 
+  static final String ID = "PemArchive";
+  
   static final String KEY_ENTRY_NAME = "server.key";
 
   static final String CERT_ENTRY_NAME = "server.crt";
 
   static final String CA_CERTS_ENTRY_NAME = "server-ca.crt";
 
-  static final String CONTENT_TYPE = "text/plain";
-  
   static final String CHARACTER_ENCODING = "UTF-8";
-  
-  static final String SUFFIX = ".zip";
-  
-  @Inject
-  protected ArchiveBuilderFactory archiveBuilderFactory;
-  
+    
   @Inject
   protected PKCS8EncryptionService pkcs8EncryptionService;
+  
+  /**
+   * Constructs a new instance.
+   */
+  public PemArchiveExporter() {
+    super(ID, false);
+  }
   
   /**
    * {@inheritDoc}
@@ -74,7 +76,9 @@ public class PemArchiveExporter implements CredentialExporter {
           request.getExportPassphrase());
     }
     
-    ArchiveBuilder archiveBuilder = archiveBuilderFactory.newBuilder();
+    PemArchiveVariant variant = findVariant(request.getVariant());
+    
+    ArchiveBuilder archiveBuilder = variant.newArchiveBuilder();
     archiveBuilder.beginEntry(KEY_ENTRY_NAME, CHARACTER_ENCODING)    
       .addContent(privateKey.getContent())
       .endEntry();
@@ -95,7 +99,8 @@ public class PemArchiveExporter implements CredentialExporter {
     }
 
     return new ConcreteExportPreparation(
-        request.getSuffixedFileName(SUFFIX), CONTENT_TYPE, 
+        request.getSuffixedFileName(variant.getSuffix()), 
+        variant.getContentType(), 
         CHARACTER_ENCODING, archiveBuilder.build());
   }
 

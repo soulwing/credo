@@ -21,9 +21,6 @@ package org.soulwing.credo.service;
 import java.io.IOException;
 
 import javax.enterprise.context.ApplicationScoped;
-import javax.enterprise.inject.Any;
-import javax.enterprise.inject.Instance;
-import javax.enterprise.util.AnnotationLiteral;
 import javax.inject.Inject;
 import javax.transaction.Transactional;
 
@@ -31,7 +28,7 @@ import org.soulwing.credo.Credential;
 import org.soulwing.credo.Password;
 import org.soulwing.credo.service.crypto.PrivateKeyWrapper;
 import org.soulwing.credo.service.exporter.CredentialExporter;
-import org.soulwing.credo.service.exporter.ExportFormat;
+import org.soulwing.credo.service.exporter.CredentialExporterRegistry;
 import org.soulwing.credo.service.protect.CredentialProtectionService;
 import org.soulwing.credo.service.protect.GroupAccessException;
 import org.soulwing.credo.service.protect.UserAccessException;
@@ -48,9 +45,8 @@ public class ConcreteExportService implements ExportService {
   protected CredentialService credentialService;
 
   @Inject
-  @Any
-  protected Instance<CredentialExporter> exporters;
-
+  protected CredentialExporterRegistry exporterRegistry;
+  
   @Inject
   protected CredentialProtectionService protectionService;
 
@@ -79,7 +75,7 @@ public class ConcreteExportService implements ExportService {
               credential.getOwner().getName());
       PrivateKeyWrapper privateKey =
           protectionService.unprotect(credential, protection);
-      CredentialExporter exporter = findExporter(request.getFormat());
+      CredentialExporter exporter = exporterRegistry.findExporter(request);
       return exporter.exportCredential(request, privateKey);
     }
     catch (GroupAccessException ex) {
@@ -91,32 +87,6 @@ public class ConcreteExportService implements ExportService {
     catch (IOException ex) {
       throw new RuntimeException(ex);
     }
-  }
-
-  private CredentialExporter findExporter(String format) {
-    ExportFormatQualifier qualifier = new ExportFormatQualifier(format);
-    Instance<CredentialExporter> exporter = exporters.select(qualifier);
-    if (exporter == null) {
-      throw new IllegalArgumentException("unsupported format: " + format);
-    }
-    return exporter.get();
-  }
-
-  static class ExportFormatQualifier extends AnnotationLiteral<ExportFormat>
-      implements ExportFormat {
-
-    private static final long serialVersionUID = -1081540987292172502L;
-    private final String value;
-
-    ExportFormatQualifier(String value) {
-      this.value = value;
-    }
-
-    @Override
-    public String value() {
-      return value;
-    }
-
   }
 
   /**
