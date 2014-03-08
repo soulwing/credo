@@ -18,8 +18,6 @@
  */
 package org.soulwing.credo.service.crypto;
 
-import java.security.NoSuchAlgorithmException;
-
 import org.soulwing.credo.Password;
 
 
@@ -68,8 +66,7 @@ public interface KeyStoreBuilder {
    * Builds the key store.
    * @param passphrase a passphrase that will be used to protect the key store
    * @return a byte array encoding of the key store content
-   * @throws NoSuchAlgorithmException
    */
-  byte[] build(Password passphrase) throws NoSuchAlgorithmException;
+  byte[] build(Password passphrase);
   
 }

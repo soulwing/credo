@@ -18,6 +18,8 @@
  */
 package org.soulwing.credo.service.crypto;
 
+import java.security.NoSuchAlgorithmException;
+
 /**
  * A factory that produces {@link KeyStoreBuilder} objects.
  *
@@ -29,7 +31,9 @@ public interface KeyStoreBuilderFactory {
    * Creates a new key store builder.
    * @param type key store type
    * @return builder
+   * @throws NoSuchAlgorithmException if the requested key store type 
+   *    is not available
    */
-  KeyStoreBuilder newBuilder(String type);
+  KeyStoreBuilder newBuilder(String type) throws NoSuchAlgorithmException;
   
 }

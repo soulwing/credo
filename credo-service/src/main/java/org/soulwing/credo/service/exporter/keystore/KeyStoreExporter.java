@@ -72,9 +72,9 @@ public class KeyStoreExporter extends AbstractVariantExporter<KeyStoreVariant> {
       ExportException {
     Validate.notNull(request.getExportPassphrase());
     KeyStoreVariant variant = findVariant(request.getVariant());  
-    KeyStoreBuilder builder = keyStoreBuilderFactory.newBuilder(
-        variant.getType());
     try {
+      KeyStoreBuilder builder = keyStoreBuilderFactory.newBuilder(
+          variant.getType());
       builder.beginEntry(request.getFileName());
       builder.setPrivateKey(privateKey);
       builder.setPassphrase(null);
