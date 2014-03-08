@@ -19,6 +19,7 @@
 package org.soulwing.credo.service;
 
 import java.io.IOException;
+import java.util.Collection;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
@@ -26,6 +27,7 @@ import javax.transaction.Transactional;
 
 import org.soulwing.credo.Credential;
 import org.soulwing.credo.Password;
+import org.soulwing.credo.service.ExportFormat.Variant;
 import org.soulwing.credo.service.crypto.PrivateKeyWrapper;
 import org.soulwing.credo.service.exporter.CredentialExporter;
 import org.soulwing.credo.service.exporter.CredentialExporterRegistry;
@@ -58,6 +60,22 @@ public class ConcreteExportService implements ExportService {
       throws NoSuchCredentialException {
     return new ConcreteExportRequest(
         credentialService.findCredentialById(credentialId));
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public Collection<ExportFormat> getFormats() {
+    return exporterRegistry.getFormats();
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public Collection<Variant> getVariants(String format) {
+    return exporterRegistry.getVariants(format);
   }
 
   /**

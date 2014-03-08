@@ -30,6 +30,7 @@ import javax.enterprise.inject.Instance;
 import javax.inject.Inject;
 
 import org.soulwing.credo.service.ExportFormat;
+import org.soulwing.credo.service.ExportFormat.Variant;
 import org.soulwing.credo.service.ExportRequest;
 
 /**
@@ -67,17 +68,34 @@ public class ConcreteCredentialExporterRegistry
    * {@inheritDoc}
    */
   @Override
+  public Collection<Variant> getVariants(String format) {
+    return findExporter(format).getVariants();
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
   public CredentialExporter findExporter(ExportRequest request) {
+    return findExporter(request.getFormat());
+  }
+
+  /**
+   * Find exporter with the given format identifier.
+   * @param format the subject format identifier
+   * @return exporter
+   * @throws IllegalArgumentException if format is unrecognized
+   */
+  private CredentialExporter findExporter(String format) {
     Iterator<CredentialExporter> i = exporters.iterator();
     while (i.hasNext()) {
       CredentialExporter exporter = i.next();
-      if (exporter.getId().equals(request.getFormat())) {
+      if (exporter.getId().equals(format)) {
         return exporter;
       }
     }
     throw new IllegalArgumentException("unrecognized format: " 
-        + request.getFormat());
+        + format);
   }
 
-  
 }

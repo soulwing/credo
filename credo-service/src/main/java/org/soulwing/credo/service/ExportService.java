@@ -18,6 +18,8 @@
  */
 package org.soulwing.credo.service;
 
+import java.util.Collection;
+
 
 /**
  * A service that supports the Export Credential function.
@@ -36,6 +38,19 @@ public interface ExportService {
    */
   ExportRequest newExportRequest(Long credentialId) 
       throws NoSuchCredentialException;
+  
+  /**
+   * Gets the collection of supported export formats.
+   * @return export formats
+   */
+  Collection<ExportFormat> getFormats();
+  
+  /**
+   * Gets the collection of supported variants for the given export format
+   * @param format the subject export format
+   * @return format variants
+   */
+  Collection<ExportFormat.Variant> getVariants(String format);
   
   /**
    * Performs the work required to export a credential.

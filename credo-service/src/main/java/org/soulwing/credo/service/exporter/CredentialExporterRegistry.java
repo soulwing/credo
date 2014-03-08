@@ -37,6 +37,13 @@ public interface CredentialExporterRegistry {
   Collection<ExportFormat> getFormats();
   
   /**
+   * Gets the collection of supported variants for the given export format.
+   * @param format the subject export format
+   * @return format variants
+   */
+  Collection<ExportFormat.Variant> getVariants(String format);
+  
+  /**
    * Finds an exporter that supports a export request.
    * @param request export request
    * @return exporter
