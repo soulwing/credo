@@ -1,5 +1,5 @@
 /*
- * File created on Mar 7, 2014 
+ * File created on Mar 6, 2014 
  *
  * Copyright (c) 2014 Virginia Polytechnic Institute and State University
  *
@@ -16,27 +16,29 @@
  * limitations under the License.
  *
  */
-package org.soulwing.credo.service.exporter;
+package org.soulwing.credo.service.exporter.keystore;
 
-import org.soulwing.credo.service.ExportFormat;
+import javax.enterprise.context.ApplicationScoped;
+
+import org.soulwing.credo.service.exporter.CredentialExporter;
 
 /**
- * A description of a {@link KeyStoreExporter} variant.
+ * A {@link CredentialExporter} that exports a PKCS12 key store.
  *
  * @author Carl Harris
  */
-public interface KeyStoreVariant extends ExportFormat.Variant {
+@ApplicationScoped
+public class PKCS12KeyStoreVariant extends AbstractKeyStoreVariant {
+
+  private static final String TYPE = "PKCS12";
+  private static final String CONTENT_TYPE = "application/pkcs12";
+  private static final String SUFFIX = ".p12";
 
   /**
-   * Gets the {@link KeyStore} type.
-   * @return JCA key store type identifier
+   * Constructs a new instance.
    */
-  String getType();
-  
-  /**
-   * Gets the MIME content type.
-   * @return content type
-   */
-  String getContentType();
+  public PKCS12KeyStoreVariant() {
+    super(TYPE, CONTENT_TYPE, SUFFIX);
+  }
   
 }

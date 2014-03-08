@@ -36,11 +36,11 @@ import org.soulwing.credo.service.ExportFormat;
  *
  * @author Carl Harris
  */
-abstract class AbstractVariantExporter<T extends ExportFormat.Variant> 
+public abstract class AbstractVariantExporter<T extends ExportFormat.Variant> 
     extends AbstractCredentialExporter {
 
   @Inject
-  protected Instance<T> variants;
+  private Instance<T> variants;
 
   /**
    * Constructs a new instance.
@@ -49,6 +49,16 @@ abstract class AbstractVariantExporter<T extends ExportFormat.Variant>
    */
   protected AbstractVariantExporter(String id, boolean passphraseRequired) {
     super(id, passphraseRequired);
+  }
+
+  /**
+   * Sets the {@code variants} property.
+   * <p>
+   * This method is exposed to support unit testing.
+   * @param variants the variants to set
+   */
+  public void setVariants(Instance<T> variants) {
+    this.variants = variants;
   }
 
   /**

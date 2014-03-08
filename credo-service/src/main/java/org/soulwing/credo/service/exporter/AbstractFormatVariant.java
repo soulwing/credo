@@ -25,7 +25,7 @@ import org.soulwing.credo.service.ExportFormat;
  *
  * @author Carl Harris
  */
-abstract class AbstractFormatVariant implements ExportFormat.Variant {
+public abstract class AbstractFormatVariant implements ExportFormat.Variant {
 
   private final String id;
   private final String name;

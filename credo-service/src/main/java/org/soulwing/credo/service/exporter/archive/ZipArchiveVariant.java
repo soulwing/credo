@@ -16,7 +16,7 @@
  * limitations under the License.
  *
  */
-package org.soulwing.credo.service.exporter;
+package org.soulwing.credo.service.exporter.archive;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
@@ -24,6 +24,7 @@ import javax.inject.Inject;
 import org.soulwing.credo.service.archive.ArchiveBuilder;
 import org.soulwing.credo.service.archive.ArchiveBuilderFactory;
 import org.soulwing.credo.service.archive.Archiver;
+import org.soulwing.credo.service.exporter.AbstractFormatVariant;
 
 
 /**

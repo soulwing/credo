@@ -16,7 +16,7 @@
  * limitations under the License.
  *
  */
-package org.soulwing.credo.service.exporter;
+package org.soulwing.credo.service.exporter.archive;
 
 import java.io.IOException;
 import java.util.List;
@@ -33,6 +33,8 @@ import org.soulwing.credo.service.PassphraseException;
 import org.soulwing.credo.service.archive.ArchiveBuilder;
 import org.soulwing.credo.service.crypto.PKCS8EncryptionService;
 import org.soulwing.credo.service.crypto.PrivateKeyWrapper;
+import org.soulwing.credo.service.exporter.AbstractVariantExporter;
+import org.soulwing.credo.service.exporter.ConcreteExportPreparation;
 
 /**
  * An exporter that exports in the {@link ExportFormat#PEM_ARCHIVE} format.

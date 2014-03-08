@@ -16,7 +16,9 @@
  * limitations under the License.
  *
  */
-package org.soulwing.credo.service.exporter;
+package org.soulwing.credo.service.exporter.keystore;
+
+import org.soulwing.credo.service.exporter.AbstractFormatVariant;
 
 /**
  * An abstract base for {@link KeyStoreVariant}.

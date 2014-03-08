@@ -16,7 +16,7 @@
  * limitations under the License.
  *
  */
-package org.soulwing.credo.service.exporter;
+package org.soulwing.credo.service.exporter.keystore;
 
 import java.io.IOException;
 import java.security.KeyStore;
@@ -35,6 +35,9 @@ import org.soulwing.credo.service.crypto.CertificateWrapperFactory;
 import org.soulwing.credo.service.crypto.KeyStoreBuilder;
 import org.soulwing.credo.service.crypto.KeyStoreBuilderFactory;
 import org.soulwing.credo.service.crypto.PrivateKeyWrapper;
+import org.soulwing.credo.service.exporter.AbstractVariantExporter;
+import org.soulwing.credo.service.exporter.ConcreteExportPreparation;
+import org.soulwing.credo.service.exporter.CredentialExporter;
 
 /**
  * An abstract base for {@link CredentialExporter} implementations that 

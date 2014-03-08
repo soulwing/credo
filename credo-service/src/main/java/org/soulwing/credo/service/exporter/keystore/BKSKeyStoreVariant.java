@@ -16,9 +16,11 @@
  * limitations under the License.
  *
  */
-package org.soulwing.credo.service.exporter;
+package org.soulwing.credo.service.exporter.keystore;
 
 import javax.enterprise.context.ApplicationScoped;
+
+import org.soulwing.credo.service.exporter.CredentialExporter;
 
 /**
  * A {@link CredentialExporter} that exports a JKS key store.

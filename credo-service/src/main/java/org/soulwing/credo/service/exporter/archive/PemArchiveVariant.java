@@ -16,7 +16,7 @@
  * limitations under the License.
  *
  */
-package org.soulwing.credo.service.exporter;
+package org.soulwing.credo.service.exporter.archive;
 
 import org.soulwing.credo.service.ExportFormat;
 import org.soulwing.credo.service.archive.ArchiveBuilder;

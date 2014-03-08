@@ -16,7 +16,7 @@
  * limitations under the License.
  *
  */
-package org.soulwing.credo.service.exporter;
+package org.soulwing.credo.service.exporter.archive;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
@@ -50,6 +50,8 @@ import org.soulwing.credo.service.ExportRequest;
 import org.soulwing.credo.service.archive.ArchiveBuilder;
 import org.soulwing.credo.service.crypto.PKCS8EncryptionService;
 import org.soulwing.credo.service.crypto.PrivateKeyWrapper;
+import org.soulwing.credo.service.exporter.archive.PemArchiveExporter;
+import org.soulwing.credo.service.exporter.archive.PemArchiveVariant;
 
 /**
  * Unit tests for {@link PemArchiveExporter}.
@@ -114,7 +116,7 @@ public class PemArchiveExporterTest {
   
   @Before
   public void setUp() throws Exception {
-    exporter.variants = variants;
+    exporter.setVariants(variants);
     exporter.pkcs8EncryptionService = pkcs8EncryptionService;
   }
   
