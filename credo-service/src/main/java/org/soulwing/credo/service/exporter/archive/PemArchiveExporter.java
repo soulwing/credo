@@ -45,7 +45,7 @@ import org.soulwing.credo.service.exporter.ConcreteExportPreparation;
 public class PemArchiveExporter 
     extends AbstractVariantExporter<PemArchiveVariant> {
 
-  static final String ID = "PemArchive";
+  static final String ID = "Archive";
   
   static final String KEY_ENTRY_NAME = "server.key";
 
