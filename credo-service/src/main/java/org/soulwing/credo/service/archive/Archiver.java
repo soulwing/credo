@@ -1,5 +1,5 @@
 /*
- * File created on Feb 26, 2014 
+ * File created on Mar 7, 2014 
  *
  * Copyright (c) 2014 Virginia Polytechnic Institute and State University
  *
@@ -18,24 +18,24 @@
  */
 package org.soulwing.credo.service.archive;
 
-import javax.enterprise.context.ApplicationScoped;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
+
+import javax.inject.Qualifier;
 
 /**
- * An {@link ArchiveBuilderFactory} that produces {@link ZipArchiveBuilder}
- * objects.
+ * An annotation that qualifies an archiver.
  *
  * @author Carl Harris
  */
-@ApplicationScoped
-@Archiver(".zip")
-public class ZipArchiveBuilderFactory implements ArchiveBuilderFactory {
+@Qualifier
+@Retention(RetentionPolicy.RUNTIME)
+@Target({ ElementType.TYPE, ElementType.METHOD, 
+  ElementType.FIELD, ElementType.PARAMETER})
+public @interface Archiver {
 
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public ArchiveBuilder newBuilder() {
-    return new ZipArchiveBuilder();
-  }
-
+  String value();
+  
 }
