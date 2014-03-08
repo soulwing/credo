@@ -28,6 +28,7 @@ import java.security.cert.CertificateException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.jsoup.helper.Validate;
 import org.soulwing.credo.Password;
 import org.soulwing.credo.service.crypto.CertificateWrapper;
 import org.soulwing.credo.service.crypto.KeyStoreBuilder;
@@ -163,6 +164,8 @@ public class JcaKeyStoreBuilder implements KeyStoreBuilder {
     }
     
     public void putEntry(KeyStore keyStore) throws KeyStoreException {
+      Validate.notNull(privateKey, "privateKey is required");
+      Validate.notNull(passphrase, "passphrase is required");
       keyStore.setKeyEntry(alias, privateKey.derive(), 
           passphrase.toCharArray(), createCertificateChain());
     }
