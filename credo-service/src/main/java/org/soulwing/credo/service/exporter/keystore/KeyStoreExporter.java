@@ -77,7 +77,7 @@ public class KeyStoreExporter extends AbstractVariantExporter<KeyStoreVariant> {
           variant.getType());
       builder.beginEntry(request.getFileName());
       builder.setPrivateKey(privateKey);
-      builder.setPassphrase(null);
+      builder.setPassphrase(request.getExportPassphrase());
       for (CredentialCertificate certificate : 
         request.getCredential().getCertificates()) {
         builder.addCertificate(certificateFactory.newCertificateWrapper(certificate));

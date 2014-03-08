@@ -21,7 +21,6 @@ package org.soulwing.credo.service.exporter.keystore;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.nullValue;
 
 import java.io.ByteArrayOutputStream;
 import java.util.Collections;
@@ -45,8 +44,6 @@ import org.soulwing.credo.service.crypto.CertificateWrapperFactory;
 import org.soulwing.credo.service.crypto.KeyStoreBuilder;
 import org.soulwing.credo.service.crypto.KeyStoreBuilderFactory;
 import org.soulwing.credo.service.crypto.PrivateKeyWrapper;
-import org.soulwing.credo.service.exporter.keystore.KeyStoreExporter;
-import org.soulwing.credo.service.exporter.keystore.KeyStoreVariant;
 
 /**
  * Unit tests for {@link KeyStoreExporter}.
@@ -175,7 +172,7 @@ public class KeyStoreExporterTest {
       will(returnValue(keyStoreBuilder));
       oneOf(keyStoreBuilder).setPrivateKey(with(same(privateKey)));
       will(returnValue(keyStoreBuilder));
-      oneOf(keyStoreBuilder).setPassphrase(with(nullValue(Password.class)));
+      oneOf(keyStoreBuilder).setPassphrase(with(same(password)));
       will(returnValue(keyStoreBuilder));
       oneOf(keyStoreBuilder).addCertificate(with(same(certificate)));
       will(returnValue(keyStoreBuilder));
