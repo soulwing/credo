@@ -28,7 +28,7 @@ import java.security.cert.CertificateException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.jsoup.helper.Validate;
+import org.apache.commons.lang.Validate;
 import org.soulwing.credo.Password;
 import org.soulwing.credo.service.crypto.CertificateWrapper;
 import org.soulwing.credo.service.crypto.KeyStoreBuilder;
