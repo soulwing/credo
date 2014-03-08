@@ -85,7 +85,9 @@ public abstract class AbstractVariantExporter<T extends ExportFormat.Variant>
   /**
    * Finds the variant with the given identifier.
    * @param id of the variant to find
-   * @return variant or {@code null} if no such variant was injected
+   * @return matching variant
+   * @throws IllegalArgumentException if no variant exists with the given
+   *    identifier
    */
   protected T findVariant(String id) {
     Iterator<T> i = variants.iterator();
@@ -95,7 +97,7 @@ public abstract class AbstractVariantExporter<T extends ExportFormat.Variant>
         return variant;
       }
     }
-    return null;
+    throw new IllegalArgumentException("unrecognized variant: " + id);
   }
 
 }

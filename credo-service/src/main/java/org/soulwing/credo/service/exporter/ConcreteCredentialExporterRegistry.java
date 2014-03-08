@@ -75,7 +75,8 @@ public class ConcreteCredentialExporterRegistry
         return exporter;
       }
     }
-    return null;
+    throw new IllegalArgumentException("unrecognized format: " 
+        + request.getFormat());
   }
 
   
