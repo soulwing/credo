@@ -21,22 +21,21 @@ package org.soulwing.credo.service.exporter;
 import javax.enterprise.context.ApplicationScoped;
 
 /**
- * A {@link CredentialExporter} that exports a PKCS12 key store.
+ * A {@link CredentialExporter} that exports a JKS key store.
  *
  * @author Carl Harris
  */
 @ApplicationScoped
-@ExportFormat(PKCS12KeyStoreExporter.TYPE)
-public class PKCS12KeyStoreExporter extends AbstractKeyStoreExporter {
+public class JKSKeyStoreVariant extends AbstractKeyStoreVariant {
 
-  public static final String TYPE = "PKCS12";
-  public static final String CONTENT_TYPE = "application/pkcs12";
-  public static final String SUFFIX = ".p12";
-  
+  private static final String TYPE = "JKS";
+  private static final String CONTENT_TYPE = "application/octet-stream";
+  private static final String SUFFIX = ".bks";
+
   /**
    * Constructs a new instance.
    */
-  public PKCS12KeyStoreExporter() {
+  public JKSKeyStoreVariant() {
     super(TYPE, CONTENT_TYPE, SUFFIX);
   }
   

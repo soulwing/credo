@@ -22,21 +22,20 @@ import javax.enterprise.context.ApplicationScoped;
 
 /**
  * A {@link CredentialExporter} that exports a JKS key store.
- *
+ * 
  * @author Carl Harris
  */
 @ApplicationScoped
-@ExportFormat(JKSKeyStoreExporter.TYPE)
-public class JKSKeyStoreExporter extends AbstractKeyStoreExporter {
+public class BKSKeyStoreVariant extends AbstractKeyStoreVariant {
 
-  public static final String TYPE = "JKS";
-  public static final String CONTENT_TYPE = "application/octet-stream";
-  public static final String SUFFIX = ".jks";
-  
+  private static final String TYPE = "BKS";
+  private static final String CONTENT_TYPE = "application/octet-stream";
+  private static final String SUFFIX = ".bks";
+
   /**
    * Constructs a new instance.
    */
-  public JKSKeyStoreExporter() {
+  public BKSKeyStoreVariant() {
     super(TYPE, CONTENT_TYPE, SUFFIX);
   }
   
