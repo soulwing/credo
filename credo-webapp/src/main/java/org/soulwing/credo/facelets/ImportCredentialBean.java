@@ -47,6 +47,7 @@ import org.soulwing.credo.service.ImportPreparation;
 import org.soulwing.credo.service.ImportService;
 import org.soulwing.credo.service.NoSuchGroupException;
 import org.soulwing.credo.service.PassphraseException;
+import org.soulwing.credo.service.UserProfileService;
 
 /**
  * A bean that supports the Import Credential interaction.
@@ -77,8 +78,8 @@ public class ImportCredentialBean implements Serializable {
   private final PartContent file1 = new PartContent();
   private final PartContent file2 = new PartContent();
 
-  private final ProtectionParametersBean protection =
-      new ProtectionParametersBean();
+  private final PasswordFormBean passwordFormBean =
+      new PasswordFormBean();
   
   @Inject
   protected Conversation conversation;
@@ -90,6 +91,9 @@ public class ImportCredentialBean implements Serializable {
   protected ImportService importService;
   
   @Inject
+  protected UserProfileService profileService;
+  
+  @Inject
   protected FacesContext facesContext;
   
   private ImportPreparation preparation;
@@ -98,9 +102,11 @@ public class ImportCredentialBean implements Serializable {
   
   @PostConstruct
   public void init() {
-    protection.setGroupName(UserGroup.SELF_GROUP_NAME);
-    protection.setLoginName(
-        facesContext.getExternalContext().getRemoteUser());
+    passwordFormBean.setGroupName(UserGroup.SELF_GROUP_NAME);
+    String loginName = facesContext.getExternalContext().getRemoteUser();
+    passwordFormBean.setLoginName(loginName);
+    passwordFormBean.setExpected(
+        profileService.findProfile(loginName).getPassword());
   }
   
   /**
@@ -174,7 +180,7 @@ public class ImportCredentialBean implements Serializable {
    */
   public boolean isMemberOfSelfGroupOnly() {
     return importService.getGroupMemberships(
-        protection.getLoginName()).size() <= 1;
+        passwordFormBean.getLoginName()).size() <= 1;
   }
   
   /**
@@ -182,7 +188,7 @@ public class ImportCredentialBean implements Serializable {
    * @return owner name or {@code null} if none has been set
    */
   public String getOwner() {
-    return protection.getGroupName();
+    return passwordFormBean.getGroupName();
   }
   
   /**
@@ -190,7 +196,7 @@ public class ImportCredentialBean implements Serializable {
    * @param owner the owner name to set
    */
   public void setOwner(String owner) {
-    protection.setGroupName(owner);
+    passwordFormBean.setGroupName(owner);
   }
   
   /**
@@ -260,34 +266,10 @@ public class ImportCredentialBean implements Serializable {
   }
   
   /**
-   * Gets the user's password.
-   * <p>
-   * This password is used to access the owner group's secret key to 
-   * protect the imported credential.
-   * @return password or {@code null} if none has been set
+   * Gets the supporting bean for the password entry form.
    */
-  public Password getProtectionPassword() {
-    return protection.getPassword();
-  }
-  
-  /**
-   * Sets the user's password.
-   * <p>
-   * This password is used to access the owner group's secret key to 
-   * protect the imported credential.
-   * @param password the password to set
-   */
-  public void setProtectionPassword(Password password) {
-    protection.setPassword(password);
-  }
-  
-  /**
-   * Gets the protection parameters object.
-   * <p>
-   * This method is exposed to support unit testing.
-   */
-  public ProtectionParametersBean getProtectionParameters() {
-    return protection;
+  public PasswordFormBean getPasswordFormBean() {
+    return passwordFormBean;
   }
   
   /**
@@ -385,7 +367,7 @@ public class ImportCredentialBean implements Serializable {
    */
   public String protect() {
     try {
-      importService.protectCredential(credential, preparation, protection, 
+      importService.protectCredential(credential, preparation, passwordFormBean, 
           errors);
       return CONFIRM_OUTCOME_ID;
     }

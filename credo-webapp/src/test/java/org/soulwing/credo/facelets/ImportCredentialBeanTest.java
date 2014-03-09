@@ -56,6 +56,7 @@ import org.soulwing.credo.Credential;
 import org.soulwing.credo.Password;
 import org.soulwing.credo.Tag;
 import org.soulwing.credo.UserGroup;
+import org.soulwing.credo.UserProfile;
 import org.soulwing.credo.service.AccessDeniedException;
 import org.soulwing.credo.service.Errors;
 import org.soulwing.credo.service.FileContentModel;
@@ -66,6 +67,7 @@ import org.soulwing.credo.service.ImportService;
 import org.soulwing.credo.service.NoSuchGroupException;
 import org.soulwing.credo.service.PassphraseException;
 import org.soulwing.credo.service.ProtectionParameters;
+import org.soulwing.credo.service.UserProfileService;
 
 /**
  * Unit tests for {@link ImportCredentialBean}.
@@ -82,28 +84,34 @@ public class ImportCredentialBeanTest {
   } };
   
   @Mock
-  public Conversation conversation;
+  private Conversation conversation;
   
   @Mock
-  public Errors errors;
+  private Errors errors;
   
   @Mock
-  public ImportService importService;
+  private ImportService importService;
   
   @Mock
-  public FacesContext facesContext;
+  private UserProfileService profileService;
   
   @Mock
-  public ExternalContext externalContext;
+  private UserProfile profile;
   
   @Mock
-  public ImportPreparation preparation;
+  private FacesContext facesContext;
   
   @Mock
-  public ImportDetails details;
+  private ExternalContext externalContext;
   
   @Mock
-  public Credential credential;
+  private ImportPreparation preparation;
+  
+  @Mock
+  private ImportDetails details;
+  
+  @Mock
+  private Credential credential;
   
   private ImportCredentialBean bean = new ImportCredentialBean();
   
@@ -112,22 +120,30 @@ public class ImportCredentialBeanTest {
     bean.conversation = conversation;
     bean.errors = errors;
     bean.importService = importService;
+    bean.profileService = profileService;
     bean.facesContext = facesContext;
   }
 
   @Test
   public void testInit() throws Exception {
     final String loginName = "someUser";
+    final String expectedPassword = "password";
     context.checking(new Expectations() { { 
       oneOf(facesContext).getExternalContext();
       will(returnValue(externalContext));
       oneOf(externalContext).getRemoteUser();
       will(returnValue(loginName));
+      oneOf(profileService).findProfile(with(loginName));
+      will(returnValue(profile));
+      oneOf(profile).getPassword();
+      will(returnValue(expectedPassword));
     } });
     
     bean.init();
-    assertThat(bean.getProtectionParameters().getLoginName(),
+    assertThat(bean.getPasswordFormBean().getLoginName(),
         is(equalTo(loginName)));
+    assertThat(bean.getPasswordFormBean().getExpected(),
+        is(equalTo(expectedPassword)));
   }
 
   @Test
@@ -255,7 +271,7 @@ public class ImportCredentialBeanTest {
       will(returnValue(groupMemberships));
     } });
 
-    bean.getProtectionParameters().setLoginName(loginName);
+    bean.getPasswordFormBean().setLoginName(loginName);
     assertThat(bean.isMemberOfSelfGroupOnly(), is(false));
   }
   
@@ -271,7 +287,7 @@ public class ImportCredentialBeanTest {
       will(returnValue(groupMemberships));
     } });
     
-    bean.getProtectionParameters().setLoginName(loginName);
+    bean.getPasswordFormBean().setLoginName(loginName);
     assertThat(bean.isMemberOfSelfGroupOnly(), is(true));
   }
 
