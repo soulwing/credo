@@ -1,36 +1,47 @@
 
 function validatePassword($password, $passwordAgain) {
 	var validator = {
+		updateFeedback: function(ok, $inputGroup, $feedback) {
+	    	$inputGroup.toggleClass("has-success", ok);
+	    	$feedback.toggleClass("glyphicon glyphicon-ok", ok);
+	    	$feedback.css("display", ok ? "block" : "none");			
+		},
+		negativeFeedback: function($inputGroup, $feedback) {
+	    	$inputGroup.removeClass("has-success");
+	    	$feedback.removeClass("glyphicon glyphicon-ok");
+	    	$inputGroup.addClass("has-error");
+    		$feedback.addClass("glyphicon glyphicon-exclamation-sign");
+	    	$feedback.css("display", "block");			
+    		$feedback.attr("title", "Password entries do not match.");
+		},
+		removeFeedback: function($inputGroup, $feedback) {
+	    	$inputGroup.removeClass("has-success has-error");
+			$feedback.removeClass("glyphicon glyphicon-ok glyphicon-exclamation-sign");
+			$feedback.attr("title", "");
+		},
 	    validatePassword: function(source) {
 	    	var $password = $(source).data("$password");
+	    	var $inputGroup = $(source).parent().parent();
+	    	var $feedback = $(source).parent().children(".form-control-feedback");
 	    	var matches = $password.val() == $(source).val()
 	    	           && $password.val().length > 0;
-	    	var $inputGroup = $(source).parent().parent();
-	    	$inputGroup.toggleClass("has-success", matches);
-	    	var $feedback = $(source).parent().children(".form-control-feedback");
-	    	$feedback.toggleClass("glyphicon glyphicon-ok", matches);
-	    	$feedback.css("display", matches ? "block" : "none");
+	    	this.updateFeedback(matches, $inputGroup, $feedback);
 	    },
-		setup: function() {
-			$(this).parent().parent().removeClass("has-success has-error");
-			$(this).parent().children(".form-control-feedback")
-				.removeClass("glyphicon glyphicon-ok glyphicon-exclamation-sign");
+		setup: function(source) {
+	    	var $inputGroup = $(source).parent().parent();
+	    	var $feedback = $(source).parent().children(".form-control-feedback");
+	    	this.removeFeedback($inputGroup, $feedback);
 		},
-	    teardown: function() {
-	    	var $password = $(this).data("$password");
-	    	var matches = $password.val() == $(this).val();
-	    	var $inputGroup = $(this).parent().parent();
-	    	$inputGroup.removeClass("has-success");
-	    	$inputGroup.toggleClass("has-error", !matches);
-	    	var $feedback = $(this).parent().children(".form-control-feedback");
+	    teardown: function(source) {
+	    	var $password = $(source).data("$password");
+	    	var $inputGroup = $(source).parent().parent();
+	    	var $feedback = $(source).parent().children(".form-control-feedback");
+	    	var matches = $password.val() == $(source).val();
 	    	if (matches) {
-	    		$feedback.removeClass("glyphicon glyphicon-ok");
-	    		$feedback.attr("title", "");
+	    		this.removeFeedback($inputGroup, $feedback);
 	    	}
 	    	else {
-	    		$feedback.toggleClass("glyphicon glyphicon-exclamation-sign", !matches);
-	    		$feedback.attr("title", "Password entries do not match.");
-	    		$feedback.css("display", "block");
+	    		this.negativeFeedback($inputGroup, $feedback);
 	    	}
 	    }
 	};
@@ -38,21 +49,23 @@ function validatePassword($password, $passwordAgain) {
     $password.data("$passwordAgain", $passwordAgain);
     $passwordAgain.data("$password", $password);
 
-    $password.keyup(function() { 
+    $password.on("input", function() { 
     	var $passwordAgain = $(this).data("$passwordAgain");
     	if ($(this).val() != $passwordAgain.val()) {
     		$passwordAgain.val("");
     	}
     });
     
-    $passwordAgain.focus(function() { 
-    	validator.setup(); 
-    	validator.validatePassword(this); 
+    $passwordAgain.focus(function() {
+    	validator.setup.call(validator, this);
+    	validator.validatePassword.call(validator, this); 
     });
     
-    $passwordAgain.blur(validator.teardown);
+    $passwordAgain.blur(function() { 
+    	validator.teardown.call(validator, this); 
+    });
     
-    $passwordAgain.keyup(function() { 
-    	validator.validatePassword(this); 
+    $passwordAgain.on("input", function() { 
+    	validator.validatePassword.call(validator, this); 
     });
 };
