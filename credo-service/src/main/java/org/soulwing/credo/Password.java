@@ -81,4 +81,12 @@ public class Password implements Serializable {
     return value;
   }
   
+  /**
+   * Tests whether this password contains no characters.
+   * @return {@code true} if this password contains no characters.
+   */
+  public boolean isEmpty() {
+    return value.length == 0;
+  }
+
 }
