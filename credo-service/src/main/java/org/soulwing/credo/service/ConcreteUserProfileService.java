@@ -87,6 +87,18 @@ public class ConcreteUserProfileService
    * {@inheritDoc}
    */
   @Override
+  public UserProfile findProfile(String loginName) {
+    UserProfile profile = profileRepository.findByLoginName(loginName);
+    if (profile == null) {
+      throw new IllegalArgumentException("no such user: " + loginName);
+    }
+    return profile;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
   public UserProfilePreparation prepareProfile(String loginName) {
     return new ConcreteUserProfilePreparation(loginName);
   }

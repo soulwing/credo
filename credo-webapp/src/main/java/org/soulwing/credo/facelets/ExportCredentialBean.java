@@ -45,7 +45,7 @@ import org.soulwing.credo.service.ExportRequest;
 import org.soulwing.credo.service.ExportService;
 import org.soulwing.credo.service.NoSuchCredentialException;
 import org.soulwing.credo.service.PassphraseException;
-import org.soulwing.credo.service.ProtectionParameters;
+import org.soulwing.credo.service.UserProfileService;
 
 /**
  * A bean that supports the Export Credential interaction.
@@ -63,15 +63,17 @@ public class ExportCredentialBean implements Serializable {
   static final String FAILURE_OUTCOME_ID = "failure";
   
   static final String CONTENT_DISPOSITION_HEADER = "Content-Disposition";
-
-  private final ProtectionParametersBean protection = 
-      new ProtectionParametersBean();
  
+  private final PasswordFormBean passwordFormBean = new PasswordFormBean();
+
   @Inject
   protected Conversation conversation;
   
   @Inject
   protected ExportService exportService;
+  
+  @Inject
+  protected UserProfileService profileService;
   
   @Inject
   protected FacesContext facesContext;
@@ -80,7 +82,7 @@ public class ExportCredentialBean implements Serializable {
   protected Errors errors;
   
   protected Long id;
-  
+    
   private ExportRequest request;
   
   private ExportPreparation preparation;
@@ -96,8 +98,9 @@ public class ExportCredentialBean implements Serializable {
    */
   @PostConstruct
   public void init() {
-    protection.setLoginName(
-        facesContext.getExternalContext().getRemoteUser());
+    String loginName = facesContext.getExternalContext().getRemoteUser();
+    passwordFormBean.setLoginName(loginName);
+    passwordFormBean.setExpected(profileService.findProfile(loginName).getPassword());
   }
   
   /**
@@ -327,13 +330,13 @@ public class ExportCredentialBean implements Serializable {
   }
 
   /**
-   * Gets the protection parameters.
-   * @return protection parameters
+   * Gets the bean that supports the password entry form.
+   * @return
    */
-  public ProtectionParameters getProtection() {
-    return protection;
+  public PasswordFormBean getPasswordFormBean() {
+    return passwordFormBean;
   }
-
+  
   /**
    * Gets the export request.
    * <p>
@@ -393,8 +396,8 @@ public class ExportCredentialBean implements Serializable {
     }
     try {
       request = exportService.newExportRequest(id);
-      protection.setGroupName(request.getCredential().getOwner().getName());
-      request.setProtectionParameters(protection);
+      passwordFormBean.setGroupName(request.getCredential().getOwner().getName());
+      request.setProtectionParameters(passwordFormBean);
       setFormat(exportService.getDefaultFormat().getId());
       formatSelected(null);
       if (conversation.isTransient()) {

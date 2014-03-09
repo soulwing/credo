@@ -18,6 +18,8 @@
  */
 package org.soulwing.credo.service;
 
+import org.soulwing.credo.UserProfile;
+
 /**
  * A service that provides access to user profiles.
  *
@@ -25,6 +27,13 @@ package org.soulwing.credo.service;
  */
 public interface UserProfileService {
 
+  /**
+   * Finds a user profile.
+   * @param loginName login name to match
+   * @return profile name
+   */
+  UserProfile findProfile(String loginName);
+  
   /**
    * Prepares to create a new user profile.
    * @param loginName login name to associate with the profile
