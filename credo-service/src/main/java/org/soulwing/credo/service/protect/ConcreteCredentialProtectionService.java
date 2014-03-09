@@ -86,6 +86,10 @@ public class ConcreteCredentialProtectionService
       GroupAccessException {
     UserGroupMember groupMember = findGroupMember(
         protection.getGroupName(), protection.getLoginName());
+    if (!groupMember.getGroup().equals(credential.getOwner())) {
+      throw new GroupAccessException(protection.getGroupName() 
+          + " is not the owner of " + credential.getName());
+    }
     return unprotect(credential.getPrivateKey().getContent(), groupMember, 
         protection.getPassword());
   }

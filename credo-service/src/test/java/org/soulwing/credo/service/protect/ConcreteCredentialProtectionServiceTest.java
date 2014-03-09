@@ -95,6 +95,9 @@ public class ConcreteCredentialProtectionServiceTest {
   private UserGroup group;
 
   @Mock
+  private UserGroup otherGroup;
+  
+  @Mock
   private UserProfile user;
   
   @Mock
@@ -163,6 +166,7 @@ public class ConcreteCredentialProtectionServiceTest {
   public void testUnprotectSuccess() throws Exception {
     context.checking(findGroupMemberExpectations(returnValue(groupMember)));
     context.checking(accessGroupMemberExpectations());
+    context.checking(checkOwnershipExpectations(returnValue(group)));
     context.checking(accessCredentialKeyExpectations());
     context.checking(unwrapUserPrivateKeyExpectations(
         returnValue(userPrivateKey)));
@@ -176,11 +180,20 @@ public class ConcreteCredentialProtectionServiceTest {
     context.checking(findGroupMemberExpectations(returnValue(null)));
     service.unprotect(credential, protection);
   }
+
+  @Test(expected = GroupAccessException.class)
+  public void testUnprotectWhenNotSameOwnerGroup() throws Exception {
+    context.checking(findGroupMemberExpectations(returnValue(groupMember)));
+    context.checking(accessGroupMemberExpectations());
+    context.checking(checkOwnershipExpectations(returnValue(otherGroup)));
+    service.unprotect(credential, protection);
+  }
   
   @Test(expected = UserAccessException.class)
   public void testUnprotectWhenPasswordIncorrect() throws Exception {
     context.checking(findGroupMemberExpectations(returnValue(groupMember)));
     context.checking(accessGroupMemberExpectations());
+    context.checking(checkOwnershipExpectations(returnValue(group)));
     context.checking(accessCredentialKeyExpectations());
     context.checking(unwrapUserPrivateKeyExpectations(
         throwException(new IncorrectPassphraseException())));
@@ -197,6 +210,17 @@ public class ConcreteCredentialProtectionServiceTest {
           with(same(groupName)), with(same(loginName)));
       will(outcome);
     } };    
+  }
+  
+  private Expectations checkOwnershipExpectations(final Action outcome) {
+    return new Expectations() { { 
+      allowing(groupMember).getGroup();
+      will(returnValue(group));
+      oneOf(credential).getOwner();
+      will(outcome);
+      allowing(credential).getName();
+      will(returnValue("credentialName"));
+    } };
   }
   
   private Expectations accessCredentialKeyExpectations() { 
