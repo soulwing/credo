@@ -119,4 +119,19 @@ public class UserGroupEntity extends AbstractEntity implements UserGroup {
     this.dateModified = dateModified;
   }
 
+  @Override
+  public int hashCode() {
+    if (getId() == 0) return 0;
+    return getId().hashCode();
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (obj == this) return true;
+    if (!(obj instanceof UserGroupEntity)) return false;
+    UserGroupEntity that = (UserGroupEntity) obj;
+    if (this.getId() == null || that.getId() == null) return false;
+    return this.getId().equals(that.getId());
+  }
+
 }
