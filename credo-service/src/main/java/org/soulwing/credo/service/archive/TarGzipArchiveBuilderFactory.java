@@ -18,49 +18,24 @@
  */
 package org.soulwing.credo.service.archive;
 
-import java.io.IOException;
-import java.io.OutputStream;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipOutputStream;
+import javax.enterprise.context.ApplicationScoped;
 
 /**
- * An {@link ArchiveBuilder} that builds ZIP archives.
+ * An {@link ArchiveBuilderFactory} that produces {@link TarGzipArchiveBuilder}
+ * objects.
  *
  * @author Carl Harris
  */
-public class ZipArchiveBuilder extends AbstractArchiveBuilder {
-
-  private final ZipOutputStream zos = new ZipOutputStream(buffer);
-  
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public void onBeginEntry(String name, String charset)
-      throws IOException {
-    ZipEntry entry = new ZipEntry(name);
-    zos.putNextEntry(entry);
-  }
+@ApplicationScoped
+@Archiver(".tgz")
+public class TarGzipArchiveBuilderFactory implements ArchiveBuilderFactory {
 
   /**
    * {@inheritDoc}
    */
   @Override
-  public void onEndEntry() throws IOException {
-    zos.closeEntry();
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public void onBuild() throws IOException {
-    zos.close();
-  }
-
-  @Override
-  protected OutputStream getOutputStream() {
-    return zos;
+  public ArchiveBuilder newBuilder() {
+    return new TarGzipArchiveBuilder();
   }
 
 }
