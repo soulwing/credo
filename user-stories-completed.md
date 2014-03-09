@@ -127,6 +127,36 @@ group's secret key).
 
 * The user's password is required to decrypt the group's secret key.
 
+Protect Private Key of Exported Credential
+------------------------------------------
+
+When exporting a credential, the user can specify a passphrase that will be
+used to encrypt the credential's private key.
+
+* If the export format requires a passphrase, the passphrase must be specified
+* If the export format does not require a passphrase, and the user chooses not
+  to provide one, a warning is issued.
+  
+
+Export Credential in Common Key Store Format
+--------------------------------------------
+
+When exporting a credential, the user can choose a key store format as an
+alternative to receiving the credential as a ZIP file containing PEM-encoded
+files.
+
+* Supported key store formats should include PKCS12, JKS, and BKS, as well as 
+  the concatenated PEM files format used by curl.
+
+
+Password Entry Feedback
+-----------------------
+
+When the user is required to enter her password, the password field displays 
+a visual indicator when the correct password is entered, without the need to
+submit the form.
+
+
 
 
     
