@@ -1,3 +1,5 @@
+Form Field Foc
+
 Assign a Group Owner for an Imported Credential
 -----------------------------------------------
 
@@ -15,7 +17,9 @@ When importing a credential, a user can create a new group containing herself
 by specifying the new group name as the owner.
 
 
+Logged In User
+--------------
 
-
+A user sees her full name as the logged-in user in the top navigation bar.
  
   
