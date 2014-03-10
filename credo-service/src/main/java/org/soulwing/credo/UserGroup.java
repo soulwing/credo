@@ -42,6 +42,18 @@ public interface UserGroup {
    * @param name
    */
   void setName(String name);
+  
+  /**
+   * Gets the group description.
+   * @return description
+   */
+  String getDescription();
+  
+  /**
+   * Sets the group description.
+   * @param description the description to set
+   */
+  void setDescription(String description);
 
 }
 

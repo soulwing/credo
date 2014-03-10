@@ -42,6 +42,9 @@ public class UserGroupEntity extends AbstractEntity implements UserGroup {
   @Column(name = "group_name", unique = true)
   private String name;
   
+  @Column(name = "description")
+  private String description;
+  
   @Temporal(TemporalType.TIMESTAMP)
   @Column(name = "date_created")
   private Date dateCreated;
@@ -77,9 +80,9 @@ public class UserGroupEntity extends AbstractEntity implements UserGroup {
   }
 
   /**
-   * Sets the group name.
-   * @param name the name of the group to set
+   * {@inheritDoc} 
    */
+  @Override
   public void setName(String name) {
     if (UserGroup.SELF_GROUP_NAME.equals(name)) {
       name = null;
@@ -87,6 +90,22 @@ public class UserGroupEntity extends AbstractEntity implements UserGroup {
     this.name = name;
   }
   
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public String getDescription() {
+    return description;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public void setDescription(String description) {
+    this.description = description;
+  }
+
   /**
    * Gets the {@code dateCreated} property.
    * @return
