@@ -25,7 +25,6 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.nullValue;
 
-import java.util.Date;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -50,6 +49,8 @@ import org.soulwing.credo.domain.CredentialEntity;
 import org.soulwing.credo.domain.CredentialKeyEntity;
 import org.soulwing.credo.domain.TagEntity;
 import org.soulwing.credo.domain.UserGroupEntity;
+import org.soulwing.credo.domain.UserGroupMemberEntity;
+import org.soulwing.credo.domain.UserProfileEntity;
 
 /**
  * Integration tests for {@link JpaCredentialRepository}.
@@ -92,26 +93,32 @@ public class JpaCredentialRepositoryIT {
   
   @Test
   public void testAdd() throws Exception {
-    CredentialEntity credential = newCredential();
+    UserGroupEntity group = EntityUtil.newGroup("someGroup");
+    CredentialEntity credential = EntityUtil.newCredential(group, 
+        EntityUtil.newPrivateKey());
+    entityManager.persist(group);
     repository.add(credential);
     entityManager.flush();
     entityManager.clear();
-    CredentialEntity entity = entityManager.find(CredentialEntity.class, 
+    CredentialEntity actual = entityManager.find(CredentialEntity.class, 
         credential.getId());
-    assertThat(entity.getName(), is(equalTo(credential.getName())));
-    assertThat(entity.getNote(), is(equalTo(credential.getNote())));
-    assertThat(entity.getIssuer(), is(equalTo(credential.getIssuer())));
-    assertThat(entity.getExpiration().getTime(), 
+    assertThat(actual.getName(), is(equalTo(credential.getName())));
+    assertThat(actual.getNote(), is(equalTo(credential.getNote())));
+    assertThat(actual.getIssuer(), is(equalTo(credential.getIssuer())));
+    assertThat(actual.getExpiration().getTime(), 
         is(equalTo(credential.getExpiration().getTime())));
   }
 
   @Test(expected = PersistenceException.class)
   public void testAddWithDuplicateName() throws Exception {
-    CredentialEntity credential = newCredential();
+    UserGroupEntity group = EntityUtil.newGroup("someGroup");
+    CredentialEntity credential = EntityUtil.newCredential(
+        group, EntityUtil.newPrivateKey());
+    entityManager.persist(group);
     repository.add(credential);
     entityManager.flush();
     entityManager.clear();
-    credential = newCredential();
+    credential =  EntityUtil.newCredential(group, EntityUtil.newPrivateKey());
     repository.add(credential);
     entityManager.flush();
     entityManager.clear();
@@ -119,9 +126,12 @@ public class JpaCredentialRepositoryIT {
 
   @Test
   public void testAddWithTags() throws Exception {
-    CredentialEntity credential = newCredential();
+    UserGroupEntity group = EntityUtil.newGroup("someGroup");
+    CredentialKeyEntity privateKey = EntityUtil.newPrivateKey();
+    CredentialEntity credential = EntityUtil.newCredential(group, privateKey);
     credential.addTag(new TagEntity("tag1"));
     credential.addTag(new TagEntity("tag2"));
+    entityManager.persist(group);
     repository.add(credential);
     entityManager.flush();
     entityManager.clear();
@@ -136,31 +146,33 @@ public class JpaCredentialRepositoryIT {
 
   @Test
   public void testAddWithComponents() throws Exception {
-    CredentialKeyEntity privateKey = newPrivateKey();
-    CredentialCertificateEntity certificate = newCertificate();
-    CredentialCertificateEntity authority = newCertificate();
+    UserGroupEntity group = EntityUtil.newGroup("someGroup");
+    CredentialKeyEntity privateKey = EntityUtil.newPrivateKey();
+    CredentialCertificateEntity certificate = EntityUtil.newCertificate();
+    CredentialCertificateEntity authority = EntityUtil.newCertificate();
     
-    CredentialEntity credential = newCredential();
+    CredentialEntity credential = EntityUtil.newCredential(group, privateKey);
     credential.setPrivateKey(privateKey);
     credential.addCertificate(certificate);
     credential.addCertificate(authority);
     
+    entityManager.persist(group);
     repository.add(credential);
     entityManager.flush();
     entityManager.clear();
     
-    CredentialEntity credentialEntity = entityManager.find(CredentialEntity.class, 
+    CredentialEntity actual = entityManager.find(CredentialEntity.class, 
         credential.getId());
     
-    assertThat(credentialEntity.getName(), is(equalTo(credential.getName())));
-    assertThat(credentialEntity.getPrivateKey(), is(not(nullValue())));    
-    assertThat(credentialEntity.getPrivateKey().getEncoded(),
+    assertThat(actual.getName(), is(equalTo(credential.getName())));
+    assertThat(actual.getPrivateKey(), is(not(nullValue())));    
+    assertThat(actual.getPrivateKey().getEncoded(),
         is(equalTo(privateKey.getEncoded())));
     
-    assertThat(credentialEntity.getCertificates(), is(not(empty())));
+    assertThat(actual.getCertificates(), is(not(empty())));
 
     CredentialCertificateEntity certificateEntity = 
-        credentialEntity.getCertificates().get(0);
+        actual.getCertificates().get(0);
     assertThat(certificateEntity.getSubject(), 
         is(equalTo(certificate.getSubject())));
     assertThat(certificateEntity.getIssuer(), 
@@ -176,66 +188,46 @@ public class JpaCredentialRepositoryIT {
   }
 
   @Test
-  public void testFindAll() throws Exception {
-    CredentialEntity entity = newCredential();
-    repository.add(entity);
+  public void testFindAllByLoginName() throws Exception {
+    final String loginName = "someUser";
+    final String groupName = "someGroup";
+    UserProfileEntity user = EntityUtil.newUser(loginName);
+    UserGroupEntity group = EntityUtil.newGroup(groupName);
+    UserGroupEntity otherGroup = EntityUtil.newGroup("someOtherGroup");
+    UserGroupMemberEntity groupMember = EntityUtil.newGroupMember(user, group);
+    CredentialEntity credential = EntityUtil.newCredential(group, 
+        EntityUtil.newPrivateKey());
+    CredentialEntity otherCredential = EntityUtil.newCredential(otherGroup, 
+        EntityUtil.newPrivateKey());
+    otherCredential.setName(otherCredential.getName() + "other");
+    entityManager.persist(user);
+    entityManager.persist(group);
+    entityManager.persist(otherGroup);
+    entityManager.persist(groupMember);
+    entityManager.persist(credential);
+    entityManager.persist(otherCredential);
     entityManager.flush();
     entityManager.clear();
-    List<Credential> credentials = repository.findAll();
+    List<Credential> credentials = repository.findAllByLoginName(loginName);
     assertThat(credentials, is(not(nullValue())));
-    assertThat(credentials, is(not(empty())));
-    Credential credential = credentials.get(0);
-    assertThat(credential.getName(), is(equalTo(entity.getName())));
+    assertThat(credentials.size(), is(equalTo(1)));
+    Credential actual = credentials.get(0);
+    assertThat(actual.getName(), is(equalTo(credential.getName())));
   }
 
   @Test
   public void testFindById() throws Exception {
-    CredentialEntity entity = newCredential();
-    repository.add(entity);
+    UserGroupEntity group = EntityUtil.newGroup("someGroup");
+    CredentialEntity credential = EntityUtil.newCredential(group, 
+        EntityUtil.newPrivateKey());
+    entityManager.persist(group);
+    repository.add(credential);
     entityManager.flush();
     entityManager.clear();
-    Credential credential = repository.findById(entity.getId());
-    assertThat(credential, is(not(nullValue())));
-    assertThat(credential.getName(), is(equalTo(entity.getName())));
+    Credential actual = repository.findById(credential.getId());
+    assertThat(actual, is(not(nullValue())));
+    assertThat(actual.getName(), is(equalTo(credential.getName())));
   }
 
 
-  private CredentialEntity newCredential() {
-    CredentialEntity credential = new CredentialEntity();
-    credential.setName("Test");
-    credential.setOwner(newGroup("someGroup"));
-    credential.setNote("This is a test.");
-    credential.setIssuer("TestIssuer");
-    credential.setExpiration(new Date());
-    credential.setPrivateKey(newPrivateKey());
-    return credential;
   }
-
-  private UserGroupEntity newGroup(String name) {
-    UserGroupEntity group = new UserGroupEntity();
-    Date now = new Date();
-    group.setName("someGroup");
-    group.setDateCreated(now);
-    group.setDateModified(now);
-    entityManager.persist(group);
-    return group;
-  }
-
-  private CredentialKeyEntity newPrivateKey() {
-    CredentialKeyEntity privateKey = new CredentialKeyEntity();
-    privateKey.setEncoded("testContent");
-    return privateKey;
-  }
-
-  private CredentialCertificateEntity newCertificate() {
-    CredentialCertificateEntity certificate = new CredentialCertificateEntity();
-    certificate.setSubject("testSubject");
-    certificate.setIssuer("testIssuer");
-    certificate.setNotBefore(new Date(0));
-    certificate.setNotAfter(new Date(1));
-    certificate.setSerialNumber("testSerialNumber");
-    certificate.setEncoded("testContent");
-    return certificate;
-  }
-  
-}

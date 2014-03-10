@@ -95,9 +95,10 @@ public class JpaCredentialRepository implements CredentialRepository {
    * {@inheritDoc}
    */
   @Override
-  public List<Credential> findAll() {
+  public List<Credential> findAllByLoginName(String loginName) {
     TypedQuery<Credential> query = entityManager.createNamedQuery(
-        "findAllCredentials", Credential.class);
+        "findAllCredentialsByLoginName", Credential.class);
+    query.setParameter("loginName", loginName);
     return query.getResultList();
   }
 

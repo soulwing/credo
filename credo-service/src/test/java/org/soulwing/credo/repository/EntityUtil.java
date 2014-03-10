@@ -20,6 +20,9 @@ package org.soulwing.credo.repository;
 
 import java.util.Date;
 
+import org.soulwing.credo.domain.CredentialCertificateEntity;
+import org.soulwing.credo.domain.CredentialEntity;
+import org.soulwing.credo.domain.CredentialKeyEntity;
 import org.soulwing.credo.domain.UserGroupEntity;
 import org.soulwing.credo.domain.UserGroupMemberEntity;
 import org.soulwing.credo.domain.UserProfileEntity;
@@ -63,6 +66,38 @@ public class EntityUtil {
     groupMember.setSecretKey("some secret key");
     groupMember.setDateCreated(now);
     return groupMember;
+  }
+
+  public static CredentialEntity newCredential(UserGroupEntity group,
+      CredentialKeyEntity privateKey) {
+    CredentialEntity credential = new CredentialEntity();
+    Date now = new Date();
+    credential.setName("Test");
+    credential.setOwner(group);
+    credential.setNote("This is a test.");
+    credential.setIssuer("TestIssuer");
+    credential.setExpiration(new Date());
+    credential.setPrivateKey(privateKey);
+    credential.setDateCreated(now);
+    credential.setDateModified(now);
+    return credential;
+  }
+
+  public static CredentialKeyEntity newPrivateKey() {
+    CredentialKeyEntity privateKey = new CredentialKeyEntity();
+    privateKey.setEncoded("testContent");
+    return privateKey;
+  }
+
+  public static CredentialCertificateEntity newCertificate() {
+    CredentialCertificateEntity certificate = new CredentialCertificateEntity();
+    certificate.setSubject("testSubject");
+    certificate.setIssuer("testIssuer");
+    certificate.setNotBefore(new Date(0));
+    certificate.setNotAfter(new Date(1));
+    certificate.setSerialNumber("testSerialNumber");
+    certificate.setEncoded("testContent");
+    return certificate;
   }
 
 }

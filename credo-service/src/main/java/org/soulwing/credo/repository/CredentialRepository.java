@@ -44,9 +44,11 @@ public interface CredentialRepository {
   Credential findById(Long id);
   
   /**
-   * Finds all credentials in the repository.
+   * Finds all credentials in the repository that are accessible to the given
+   * user.
+   * @param loginName login name of the subject user 
    * @return list of credentials
    */
-  List<Credential> findAll();
+  List<Credential> findAllByLoginName(String loginName);
   
 }

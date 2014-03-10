@@ -55,8 +55,8 @@ public class ConcreteCredentialService implements CredentialService {
    * {@inheritDoc}
    */
   @Override
-  public List<Credential> findAllCredentials() {
-    return credentialRepository.findAll();
+  public List<Credential> findAllCredentials(String loginName) {
+    return credentialRepository.findAllByLoginName(loginName);
   }
 
 }

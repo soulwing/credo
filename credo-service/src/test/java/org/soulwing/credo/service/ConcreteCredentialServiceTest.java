@@ -82,13 +82,14 @@ public class ConcreteCredentialServiceTest {
   }
 
   @Test
-  public void testFindAllCredentials() throws Exception {
+  public void testFindAllCredentialsByLoginName() throws Exception {
+    final String loginName = "loginName";
     context.checking(new Expectations() { { 
-      oneOf(credentialRepository).findAll();
+      oneOf(credentialRepository).findAllByLoginName(with(loginName));
       will(returnValue(Collections.singletonList(credential)));
     } });
     
-    List<Credential> credentials = service.findAllCredentials();
+    List<Credential> credentials = service.findAllCredentials(loginName);
     assertThat(credentials, is(not(empty())));
     assertThat(credentials.get(0), is(sameInstance(credential)));
   }

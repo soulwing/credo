@@ -40,9 +40,10 @@ public interface CredentialService {
   Credential findCredentialById(Long id) throws NoSuchCredentialException;
   
   /**
-   * Finds all credentials managed by the application.
+   * Finds all credentials accessible to the given user.
+   * @param loginName login name of the user
    * @return list of credentials
    */
-  List<Credential> findAllCredentials();
+  List<Credential> findAllCredentials(String loginName);
   
 }
