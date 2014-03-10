@@ -28,7 +28,6 @@ import java.util.Set;
 import javax.annotation.PostConstruct;
 import javax.enterprise.context.Conversation;
 import javax.enterprise.context.ConversationScoped;
-import javax.faces.context.FacesContext;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.servlet.http.Part;
@@ -93,8 +92,8 @@ public class ImportCredentialBean implements Serializable {
   @Inject
   protected UserProfileService profileService;
   
-  @Inject
-  protected FacesContext facesContext;
+//  @Inject
+//  protected FacesContext facesContext;
   
   private ImportPreparation preparation;
 
@@ -103,10 +102,8 @@ public class ImportCredentialBean implements Serializable {
   @PostConstruct
   public void init() {
     passwordFormBean.setGroupName(UserGroup.SELF_GROUP_NAME);
-    String loginName = facesContext.getExternalContext().getRemoteUser();
-    passwordFormBean.setLoginName(loginName);
     passwordFormBean.setExpected(
-        profileService.findProfile(loginName).getPassword());
+        profileService.getLoggedInUserProfile().getPassword());
   }
   
   /**
@@ -179,8 +176,7 @@ public class ImportCredentialBean implements Serializable {
    *    the "self" group 
    */
   public boolean isMemberOfSelfGroupOnly() {
-    return importService.getGroupMemberships(
-        passwordFormBean.getLoginName()).size() <= 1;
+    return importService.getGroupMemberships().size() <= 1;
   }
   
   /**

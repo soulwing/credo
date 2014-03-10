@@ -29,7 +29,6 @@ import org.soulwing.credo.service.ProtectionParameters;
 public class ProtectionParametersBean implements ProtectionParameters {
 
   private String groupName;
-  private String loginName;
   private Password password;
   
   /**
@@ -46,22 +45,6 @@ public class ProtectionParametersBean implements ProtectionParameters {
    */
   public void setGroupName(String groupName) {
     this.groupName = groupName;
-  }
-  
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public String getLoginName() {
-    return loginName;
-  }
-
-  /**
-   * Sets the login name.
-   * @param loginName the login name to set
-   */
-  public void setLoginName(String loginName) {
-    this.loginName = loginName;
   }
   
   /**

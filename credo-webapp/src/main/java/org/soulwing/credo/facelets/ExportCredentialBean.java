@@ -97,9 +97,8 @@ public class ExportCredentialBean implements Serializable {
    */
   @PostConstruct
   public void init() {
-    String loginName = facesContext.getExternalContext().getRemoteUser();
-    passwordFormBean.setLoginName(loginName);
-    passwordFormBean.setExpected(profileService.findProfile(loginName).getPassword());
+    passwordFormBean.setExpected(
+        profileService.getLoggedInUserProfile().getPassword());
   }
   
   /**
@@ -221,7 +220,6 @@ public class ExportCredentialBean implements Serializable {
    * @param format the format identifier to set
    */
   public void setFormat(String format) {
-    System.out.println("setting format: " + format);
     Validate.notNull(request, "request not prepared");
     request.setFormat(format);
   }
@@ -250,7 +248,6 @@ public class ExportCredentialBean implements Serializable {
    * @param variant the variant identifier to set
    */
   public void setVariant(String variant) {
-    System.out.println("setting variant: " + variant);
     Validate.notNull(request, "request not prepared");
     request.setVariant(variant);
   }

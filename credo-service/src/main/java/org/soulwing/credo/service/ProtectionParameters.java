@@ -36,12 +36,6 @@ public interface ProtectionParameters {
   String getGroupName();
   
   /**
-   * Gets the user's login name.
-   * @return login name
-   */
-  String getLoginName();
-
-  /**
    * Gets the user's password.
    * @return password
    */

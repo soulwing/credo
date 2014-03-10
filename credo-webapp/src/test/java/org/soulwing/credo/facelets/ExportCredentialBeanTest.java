@@ -125,22 +125,15 @@ public class ExportCredentialBeanTest {
   
   @Test
   public void testInit() throws Exception {
-    final String loginName = "someUser";
     final String expectedPassword = "password";
     context.checking(new Expectations() { { 
-      oneOf(facesContext).getExternalContext();
-      will(returnValue(externalContext));
-      oneOf(externalContext).getRemoteUser();
-      will(returnValue(loginName));
-      oneOf(profileService).findProfile(with(loginName));
+      oneOf(profileService).getLoggedInUserProfile();
       will(returnValue(profile));
       oneOf(profile).getPassword();
       will(returnValue(expectedPassword));
     } });
     
     bean.init();
-    assertThat(bean.getPasswordFormBean().getLoginName(), 
-        is(equalTo(loginName)));
     assertThat(bean.getPasswordFormBean().getExpected(),
         is(equalTo(expectedPassword)));
   }

@@ -33,8 +33,8 @@ import org.soulwing.credo.repository.UserGroupRepository;
 import org.soulwing.credo.repository.UserProfileRepository;
 import org.soulwing.credo.service.crypto.KeyGeneratorService;
 import org.soulwing.credo.service.crypto.KeyPairWrapper;
-import org.soulwing.credo.service.crypto.PasswordEncryptionService;
 import org.soulwing.credo.service.crypto.PKCS8EncryptionService;
+import org.soulwing.credo.service.crypto.PasswordEncryptionService;
 import org.soulwing.credo.service.crypto.PublicKeyWrapper;
 import org.soulwing.credo.service.crypto.SecretKeyEncryptionService;
 
@@ -64,6 +64,9 @@ public class ConcreteUserProfileService
   protected UserGroupMemberBuilderFactory groupMemberBuilderFactory;
   
   @Inject
+  protected UserContextService userContextService;
+  
+  @Inject
   protected PasswordEncryptionService passwordEncryptionService;
   
   @Inject
@@ -87,12 +90,21 @@ public class ConcreteUserProfileService
    * {@inheritDoc}
    */
   @Override
-  public UserProfile findProfile(String loginName) {
-    UserProfile profile = profileRepository.findByLoginName(loginName);
+  public UserProfile getLoggedInUserProfile() {
+    String loginName = userContextService.getLoginName();
+    UserProfile profile = findProfile(loginName);
     if (profile == null) {
-      throw new IllegalArgumentException("no such user: " + loginName);
+      throw new IllegalStateException("no such user: " + loginName);
     }
     return profile;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public UserProfile findProfile(String loginName) {
+    return profileRepository.findByLoginName(loginName);
   }
 
   /**

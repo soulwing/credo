@@ -41,9 +41,8 @@ public interface CredentialService {
   
   /**
    * Finds all credentials accessible to the given user.
-   * @param loginName login name of the user
    * @return list of credentials
    */
-  List<Credential> findAllCredentials(String loginName);
+  List<Credential> findAllCredentials();
   
 }

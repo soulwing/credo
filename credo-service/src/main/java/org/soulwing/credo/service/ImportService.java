@@ -98,11 +98,9 @@ public interface ImportService {
   Set<? extends Tag> resolveTags(String[] tokens);
 
   /**
-   * Gets the set of access groups for which the user represented by
-   * {@code loginName} is a member.
-   * @param loginName the subject login name
+   * Gets the set of access groups for which the logged in user is a member.
    * @return set of access groups
    */
-  Set<? extends UserGroup> getGroupMemberships(String loginName);
+  Set<? extends UserGroup> getGroupMemberships();
 
 }

@@ -231,12 +231,6 @@ public class ConcreteImportServiceIT {
       public String getGroupName() {
         return UserGroup.SELF_GROUP_NAME;
       }
-
-      @Override
-      public String getLoginName() {
-        return loginName; 
-      }
-
       @Override
       public Password getPassword() {
         return password;

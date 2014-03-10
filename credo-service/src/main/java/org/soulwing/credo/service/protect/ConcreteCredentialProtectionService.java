@@ -29,6 +29,7 @@ import org.soulwing.credo.Password;
 import org.soulwing.credo.UserGroupMember;
 import org.soulwing.credo.repository.UserGroupMemberRepository;
 import org.soulwing.credo.service.ProtectionParameters;
+import org.soulwing.credo.service.UserContextService;
 import org.soulwing.credo.service.crypto.Encoded;
 import org.soulwing.credo.service.crypto.Encoded.Type;
 import org.soulwing.credo.service.crypto.IncorrectPassphraseException;
@@ -51,6 +52,9 @@ public class ConcreteCredentialProtectionService
   protected UserGroupMemberRepository groupMemberRepository; 
   
   @Inject
+  protected UserContextService userContextService;
+  
+  @Inject
   protected PrivateKeyEncryptionService privateKeyEncryptionService;
   
   @Inject @Encoded(type = Type.PKCS8)
@@ -71,7 +75,7 @@ public class ConcreteCredentialProtectionService
       GroupAccessException {
     
     UserGroupMember groupMember = findGroupMember(
-        protection.getGroupName(), protection.getLoginName());
+        protection.getGroupName(), userContextService.getLoginName());
     
     credential.getPrivateKey().setContent(protect(privateKey, groupMember, 
         protection.getPassword()));
@@ -85,7 +89,7 @@ public class ConcreteCredentialProtectionService
       ProtectionParameters protection) throws UserAccessException,
       GroupAccessException {
     UserGroupMember groupMember = findGroupMember(
-        protection.getGroupName(), protection.getLoginName());
+        protection.getGroupName(), userContextService.getLoginName());
     if (!groupMember.getGroup().equals(credential.getOwner())) {
       throw new GroupAccessException(protection.getGroupName() 
           + " is not the owner of " + credential.getName());

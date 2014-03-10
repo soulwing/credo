@@ -108,6 +108,9 @@ public class ConcreteImportServiceTest {
   private UserGroupRepository groupRepository;
   
   @Mock
+  private UserContextService userContextService;
+  
+  @Mock
   private CredentialProtectionService protectionService;
   
   public ConcreteImportService importService = new ConcreteImportService();
@@ -118,6 +121,7 @@ public class ConcreteImportServiceTest {
     importService.credentialRepository = credentialRepository;
     importService.tagRepository = tagRepository;
     importService.groupRepository = groupRepository;
+    importService.userContextService = userContextService;
     importService.protectionService = protectionService;
   }
   
@@ -260,7 +264,7 @@ public class ConcreteImportServiceTest {
     return new Expectations() { { 
       allowing(protection).getGroupName();
       will(returnValue(GROUP_NAME));
-      allowing(protection).getLoginName();
+      allowing(userContextService).getLoginName();
       will(returnValue(LOGIN_NAME));
       oneOf(groupRepository).findByGroupName(with(same(GROUP_NAME)), 
           with(same(LOGIN_NAME)));
@@ -362,7 +366,7 @@ public class ConcreteImportServiceTest {
       will(returnValue(groupMemberships));
     } });
     
-    assertThat((Set) importService.getGroupMemberships(loginName), 
+    assertThat((Set) importService.getGroupMemberships(), 
         is(sameInstance((Set) groupMemberships)));
   }
 

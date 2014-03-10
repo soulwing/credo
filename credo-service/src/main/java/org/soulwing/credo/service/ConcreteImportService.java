@@ -64,6 +64,9 @@ public class ConcreteImportService implements ImportService {
   protected UserGroupRepository groupRepository;
   
   @Inject
+  protected UserContextService userContextService;
+  
+  @Inject
   protected CredentialProtectionService protectionService;
   
   /**
@@ -148,7 +151,7 @@ public class ConcreteImportService implements ImportService {
   private void resolveOwner(Credential credential, 
       ProtectionParameters protection) throws NoSuchGroupException {
     UserGroup group = groupRepository.findByGroupName(
-        protection.getGroupName(), protection.getLoginName());
+        protection.getGroupName(), userContextService.getLoginName());
     if (group == null) {
       throw new NoSuchGroupException();
     }
@@ -185,8 +188,8 @@ public class ConcreteImportService implements ImportService {
    * {@inheritDoc}
    */
   @Override
-  public Set<? extends UserGroup> getGroupMemberships(String loginName) {
-    return groupRepository.findByLoginName(loginName);
+  public Set<? extends UserGroup> getGroupMemberships() {
+    return groupRepository.findByLoginName(userContextService.getLoginName());
   }
   
 }

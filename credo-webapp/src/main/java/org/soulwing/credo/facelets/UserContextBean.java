@@ -19,8 +19,8 @@
 package org.soulwing.credo.facelets;
 
 import java.io.Serializable;
-import java.util.concurrent.locks.ReadWriteLock;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 import javax.enterprise.context.SessionScoped;
 import javax.faces.context.FacesContext;
@@ -38,7 +38,7 @@ public class UserContextBean implements UserContextService, Serializable {
 
   private static final long serialVersionUID = -3825612074731463595L;
 
-  private final ReadWriteLock lock = new ReentrantReadWriteLock();
+  private final Lock lock = new ReentrantLock();
   
   @Inject
   protected FacesContext facesContext;
@@ -50,7 +50,6 @@ public class UserContextBean implements UserContextService, Serializable {
    */
   @Override
   public String getLoginName() {
-    String loginName = getCachedLoginName();
     if (loginName == null) {
       loginName = getRemoteLoginName();
     }
@@ -61,7 +60,7 @@ public class UserContextBean implements UserContextService, Serializable {
   }
 
   private String getRemoteLoginName() {
-    lock.writeLock().lock();
+    lock.lock();
     try {
       // check again while we're holding the write lock
       if (loginName == null) {
@@ -70,18 +69,8 @@ public class UserContextBean implements UserContextService, Serializable {
       return loginName;
     }
     finally {
-      lock.writeLock().unlock();        
+      lock.unlock();        
     }
   }
 
-  private String getCachedLoginName() {
-    lock.readLock().lock();
-    try {
-      return loginName;
-    }
-    finally {
-      lock.readLock().unlock();
-    }
-  }
-  
 }

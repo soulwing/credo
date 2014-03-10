@@ -157,14 +157,6 @@ public class ConcreteExportService implements ExportService {
      * {@inheritDoc}
      */
     @Override
-    public String getLoginName() {
-      return delegate.getLoginName();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public Password getPassword() {
       return delegate.getPassword();
     }

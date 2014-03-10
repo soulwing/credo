@@ -40,8 +40,6 @@ import java.util.List;
 import java.util.Set;
 
 import javax.enterprise.context.Conversation;
-import javax.faces.context.ExternalContext;
-import javax.faces.context.FacesContext;
 import javax.servlet.http.Part;
 
 import org.jmock.Expectations;
@@ -97,13 +95,7 @@ public class ImportCredentialBeanTest {
   
   @Mock
   private UserProfile profile;
-  
-  @Mock
-  private FacesContext facesContext;
-  
-  @Mock
-  private ExternalContext externalContext;
-  
+    
   @Mock
   private ImportPreparation preparation;
   
@@ -121,27 +113,19 @@ public class ImportCredentialBeanTest {
     bean.errors = errors;
     bean.importService = importService;
     bean.profileService = profileService;
-    bean.facesContext = facesContext;
   }
 
   @Test
   public void testInit() throws Exception {
-    final String loginName = "someUser";
     final String expectedPassword = "password";
     context.checking(new Expectations() { { 
-      oneOf(facesContext).getExternalContext();
-      will(returnValue(externalContext));
-      oneOf(externalContext).getRemoteUser();
-      will(returnValue(loginName));
-      oneOf(profileService).findProfile(with(loginName));
+      oneOf(profileService).getLoggedInUserProfile();
       will(returnValue(profile));
       oneOf(profile).getPassword();
       will(returnValue(expectedPassword));
     } });
     
     bean.init();
-    assertThat(bean.getPasswordFormBean().getLoginName(),
-        is(equalTo(loginName)));
     assertThat(bean.getPasswordFormBean().getExpected(),
         is(equalTo(expectedPassword)));
   }
@@ -258,7 +242,6 @@ public class ImportCredentialBeanTest {
   
   @Test
   public void testIsMemberOfSelfGroupOnlyWhenFalse() throws Exception {
-    final String loginName = "someUser";
     final UserGroup group1 = context.mock(UserGroup.class, "group1");
     final UserGroup group2 = context.mock(UserGroup.class, "group2");
     final Set<UserGroup> groupMemberships =
@@ -267,27 +250,24 @@ public class ImportCredentialBeanTest {
     groupMemberships.add(group2);
 
     context.checking(new Expectations() { { 
-      oneOf(importService).getGroupMemberships(with(same(loginName)));
+      oneOf(importService).getGroupMemberships();
       will(returnValue(groupMemberships));
     } });
 
-    bean.getPasswordFormBean().setLoginName(loginName);
     assertThat(bean.isMemberOfSelfGroupOnly(), is(false));
   }
   
   @Test
   public void testIsMemberOfSelfGroupOnlyWhenTrue() throws Exception {
-    final String loginName = "someUser";
     final UserGroup group = context.mock(UserGroup.class);
     final Set<? extends UserGroup> groupMemberships =
         Collections.singleton(group);
   
     context.checking(new Expectations() { { 
-      oneOf(importService).getGroupMemberships(with(same(loginName)));
+      oneOf(importService).getGroupMemberships();
       will(returnValue(groupMemberships));
     } });
     
-    bean.getPasswordFormBean().setLoginName(loginName);
     assertThat(bean.isMemberOfSelfGroupOnly(), is(true));
   }
 

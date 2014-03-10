@@ -28,9 +28,18 @@ import org.soulwing.credo.UserProfile;
 public interface UserProfileService {
 
   /**
+   * Gets the profile for the logged in user.
+   * @return user profile
+   * @throws IllegalStateException if there is no user logged in
+   */
+  UserProfile getLoggedInUserProfile();
+  
+  /**
    * Finds a user profile.
    * @param loginName login name to match
    * @return profile name
+   * @throws NoSuchUserException if there exists no profile with the given
+   *    login name
    */
   UserProfile findProfile(String loginName);
   

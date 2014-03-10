@@ -40,6 +40,7 @@ import org.soulwing.credo.UserGroupMember;
 import org.soulwing.credo.UserProfile;
 import org.soulwing.credo.repository.UserGroupMemberRepository;
 import org.soulwing.credo.service.ProtectionParameters;
+import org.soulwing.credo.service.UserContextService;
 import org.soulwing.credo.service.crypto.IncorrectPassphraseException;
 import org.soulwing.credo.service.crypto.PrivateKeyDecoder;
 import org.soulwing.credo.service.crypto.PrivateKeyEncryptionService;
@@ -79,6 +80,9 @@ public class ConcreteCredentialProtectionServiceTest {
   @Mock
   private SecretKeyDecoder secretKeyDecoder;
 
+  @Mock
+  private UserContextService userContextService;
+  
   @Mock
   private PrivateKeyEncryptionService privateKeyEncryptionService;
   
@@ -130,6 +134,7 @@ public class ConcreteCredentialProtectionServiceTest {
     service.pkcs8Decoder = pkcs8Decoder;
     service.aesDecoder = aesDecoder;
     service.secretKeyDecoder = secretKeyDecoder;
+    service.userContextService = userContextService;
     service.privateKeyEncryptionService = privateKeyEncryptionService;
   }
 
@@ -201,8 +206,8 @@ public class ConcreteCredentialProtectionServiceTest {
   }
   
   private Expectations findGroupMemberExpectations(final Action outcome) {
-    return new Expectations() { { 
-      allowing(protection).getLoginName();
+    return new Expectations() { {
+      allowing(userContextService).getLoginName();
       will(returnValue(loginName));
       allowing(protection).getGroupName();
       will(returnValue(groupName));
