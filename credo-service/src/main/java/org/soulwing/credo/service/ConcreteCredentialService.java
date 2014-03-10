@@ -38,6 +38,9 @@ public class ConcreteCredentialService implements CredentialService {
   @Inject
   protected CredentialRepository credentialRepository;
   
+  @Inject
+  protected UserContextService userContextService;
+  
   /**
    * {@inheritDoc}
    */
@@ -55,8 +58,9 @@ public class ConcreteCredentialService implements CredentialService {
    * {@inheritDoc}
    */
   @Override
-  public List<Credential> findAllCredentials(String loginName) {
-    return credentialRepository.findAllByLoginName(loginName);
+  public List<Credential> findAllCredentials() {
+    return credentialRepository.findAllByLoginName(
+        userContextService.getLoginName());
   }
 
 }

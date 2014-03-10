@@ -22,7 +22,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.enterprise.context.RequestScoped;
-import javax.faces.context.FacesContext;
 import javax.inject.Inject;
 import javax.inject.Named;
 
@@ -41,9 +40,6 @@ public class CredentialTableBean {
   @Inject
   protected CredentialService credentialService;
 
-  @Inject
-  protected FacesContext facesContext;
-  
   private List<CredentialBean> beans;
   
   /**
@@ -52,8 +48,7 @@ public class CredentialTableBean {
    */
   public List<CredentialBean> getCredentials() {
     if (beans == null) {
-      List<Credential> credentials = credentialService.findAllCredentials(
-          facesContext.getExternalContext().getRemoteUser());
+      List<Credential> credentials = credentialService.findAllCredentials();
       beans = new ArrayList<>(credentials.size());
       for (Credential credential : credentials) {
         beans.add(new CredentialBean(credential));

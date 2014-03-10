@@ -52,11 +52,15 @@ public class ConcreteCredentialServiceTest {
   @Mock
   private CredentialRepository credentialRepository;
   
+  @Mock
+  private UserContextService userContextService;
+  
   private ConcreteCredentialService service = new ConcreteCredentialService();
   
   @Before
   public void setUp() throws Exception {
     service.credentialRepository = credentialRepository;
+    service.userContextService = userContextService;
   }
   
   @Test
@@ -84,12 +88,14 @@ public class ConcreteCredentialServiceTest {
   @Test
   public void testFindAllCredentialsByLoginName() throws Exception {
     final String loginName = "loginName";
-    context.checking(new Expectations() { { 
+    context.checking(new Expectations() { {
+      oneOf(userContextService).getLoginName();
+      will(returnValue(loginName));
       oneOf(credentialRepository).findAllByLoginName(with(loginName));
       will(returnValue(Collections.singletonList(credential)));
     } });
     
-    List<Credential> credentials = service.findAllCredentials(loginName);
+    List<Credential> credentials = service.findAllCredentials();
     assertThat(credentials, is(not(empty())));
     assertThat(credentials.get(0), is(sameInstance(credential)));
   }

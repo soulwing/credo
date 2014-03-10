@@ -26,9 +26,6 @@ import static org.hamcrest.Matchers.sameInstance;
 import java.util.Collections;
 import java.util.List;
 
-import javax.faces.context.ExternalContext;
-import javax.faces.context.FacesContext;
-
 import org.jmock.Expectations;
 import org.jmock.auto.Mock;
 import org.jmock.integration.junit4.JUnitRuleMockery;
@@ -57,29 +54,17 @@ public class CredentialTableBeanTest {
   @Mock
   private CredentialService credentialService;
   
-  @Mock
-  private FacesContext facesContext;
-
-  @Mock
-  private ExternalContext externalContext;
-
   private CredentialTableBean bean = new CredentialTableBean();
   
   @Before
   public void setUp() throws Exception {
     bean.credentialService = credentialService;
-    bean.facesContext = facesContext;
   }
   
   @Test
   public void testGetCredentials() throws Exception {
-    final String loginName = "someUser";
     context.checking(new Expectations() { {
-      oneOf(facesContext).getExternalContext();
-      will(returnValue(externalContext));
-      oneOf(externalContext).getRemoteUser();
-      will(returnValue(loginName));
-      oneOf(credentialService).findAllCredentials(with(loginName));
+      oneOf(credentialService).findAllCredentials();
       will(returnValue(Collections.singletonList(credential)));
     } });
     
