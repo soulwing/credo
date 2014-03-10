@@ -1,13 +1,3 @@
-Restricted Credential Table View
---------------------------------
-
-A user who navigates to the Credential Table View will see only those 
-credentials for which the user is an owner.
-
-* A user is an owner of a credential if she is a member of group that owns
-  the credential.
-  
- 
 Assign a Group Owner for an Imported Credential
 -----------------------------------------------
 
