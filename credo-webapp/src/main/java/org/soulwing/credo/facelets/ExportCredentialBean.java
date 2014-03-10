@@ -36,7 +36,6 @@ import javax.inject.Named;
 import org.apache.commons.lang.Validate;
 import org.soulwing.credo.Password;
 import org.soulwing.credo.Tag;
-import org.soulwing.credo.service.AccessDeniedException;
 import org.soulwing.credo.service.Errors;
 import org.soulwing.credo.service.ExportException;
 import org.soulwing.credo.service.ExportFormat;
@@ -419,10 +418,6 @@ public class ExportCredentialBean implements Serializable {
     try {
       preparation = exportService.prepareExport(request);
       return PREPARED_OUTCOME_ID;
-    }
-    catch (AccessDeniedException ex) {
-      // FIXME -- should divert to an error view for this
-      throw new RuntimeException(ex);
     }
     catch (PassphraseException ex) {
       errors.addError("passphrase", "passphraseIncorrect");

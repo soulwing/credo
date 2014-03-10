@@ -23,7 +23,7 @@ package org.soulwing.credo.service;
  *
  * @author Carl Harris
  */
-public class AccessDeniedException extends Exception {
+public class AccessDeniedException extends RuntimeException {
 
   private static final long serialVersionUID = 6881023063582553022L;
 
