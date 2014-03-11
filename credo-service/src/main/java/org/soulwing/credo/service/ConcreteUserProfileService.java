@@ -18,9 +18,12 @@
  */
 package org.soulwing.credo.service;
 
-import javax.enterprise.context.ApplicationScoped;
+import javax.ejb.ConcurrencyManagement;
+import javax.ejb.ConcurrencyManagementType;
+import javax.ejb.Singleton;
+import javax.ejb.TransactionAttribute;
+import javax.ejb.TransactionAttributeType;
 import javax.inject.Inject;
-import javax.transaction.Transactional;
 
 import org.apache.commons.lang.Validate;
 import org.soulwing.credo.UserGroup;
@@ -43,8 +46,9 @@ import org.soulwing.credo.service.crypto.SecretKeyEncryptionService;
  *
  * @author Carl Harris
  */
-@ApplicationScoped
-@Transactional
+@Singleton
+@ConcurrencyManagement(ConcurrencyManagementType.BEAN)
+@TransactionAttribute(TransactionAttributeType.REQUIRED)
 public class ConcreteUserProfileService 
     implements WelcomeService, UserProfileService {
 

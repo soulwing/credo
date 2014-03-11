@@ -21,9 +21,12 @@ package org.soulwing.credo.service;
 import java.io.IOException;
 import java.util.Collection;
 
-import javax.enterprise.context.ApplicationScoped;
+import javax.ejb.ConcurrencyManagement;
+import javax.ejb.ConcurrencyManagementType;
+import javax.ejb.Singleton;
+import javax.ejb.TransactionAttribute;
+import javax.ejb.TransactionAttributeType;
 import javax.inject.Inject;
-import javax.transaction.Transactional;
 
 import org.soulwing.credo.Credential;
 import org.soulwing.credo.Password;
@@ -40,7 +43,8 @@ import org.soulwing.credo.service.protect.UserAccessException;
  * 
  * @author Carl Harris
  */
-@ApplicationScoped
+@Singleton
+@ConcurrencyManagement(ConcurrencyManagementType.BEAN)
 public class ConcreteExportService implements ExportService {
 
   @Inject
@@ -56,6 +60,7 @@ public class ConcreteExportService implements ExportService {
    * {@inheritDoc}
    */
   @Override
+  @TransactionAttribute(TransactionAttributeType.REQUIRED)
   public ExportRequest newExportRequest(Long credentialId)
       throws NoSuchCredentialException {
     return new ConcreteExportRequest(
@@ -96,7 +101,7 @@ public class ConcreteExportService implements ExportService {
    * {@inheritDoc}
    */
   @Override
-  @Transactional
+  @TransactionAttribute(TransactionAttributeType.REQUIRED)
   public ExportPreparation prepareExport(ExportRequest request)
       throws ExportException, AccessDeniedException, PassphraseException {
 

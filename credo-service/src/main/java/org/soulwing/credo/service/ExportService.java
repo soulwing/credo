@@ -20,12 +20,15 @@ package org.soulwing.credo.service;
 
 import java.util.Collection;
 
+import javax.ejb.Local;
+
 
 /**
  * A service that supports the Export Credential function.
  *
  * @author Carl Harris
  */
+@Local
 public interface ExportService {
 
   /**

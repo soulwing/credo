@@ -18,11 +18,14 @@
  */
 package org.soulwing.credo.service;
 
+import javax.ejb.Local;
+
 /**
  * An object that provides API for handling new users.
  *
  * @author Carl Harris
  */
+@Local
 public interface WelcomeService {
 
   /**

@@ -26,8 +26,9 @@ import java.util.Set;
 import javax.ejb.ConcurrencyManagement;
 import javax.ejb.ConcurrencyManagementType;
 import javax.ejb.Singleton;
+import javax.ejb.TransactionAttribute;
+import javax.ejb.TransactionAttributeType;
 import javax.inject.Inject;
-import javax.transaction.Transactional;
 
 import org.soulwing.credo.Credential;
 import org.soulwing.credo.Tag;
@@ -162,7 +163,7 @@ public class ConcreteImportService implements ImportService {
    * {@inheritDoc}
    */
   @Override
-  @Transactional
+  @TransactionAttribute(TransactionAttributeType.REQUIRED)
   public void saveCredential(Credential credential, Errors errors)
       throws ImportException {
     credentialRepository.add(credential);

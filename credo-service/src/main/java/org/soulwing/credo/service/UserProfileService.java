@@ -18,6 +18,8 @@
  */
 package org.soulwing.credo.service;
 
+import javax.ejb.Local;
+
 import org.soulwing.credo.UserProfile;
 
 /**
@@ -25,6 +27,7 @@ import org.soulwing.credo.UserProfile;
  *
  * @author Carl Harris
  */
+@Local
 public interface UserProfileService {
 
   /**

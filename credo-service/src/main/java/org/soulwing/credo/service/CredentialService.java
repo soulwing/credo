@@ -20,6 +20,8 @@ package org.soulwing.credo.service;
 
 import java.util.List;
 
+import javax.ejb.Local;
+
 import org.soulwing.credo.Credential;
 
 /**
@@ -28,6 +30,7 @@ import org.soulwing.credo.Credential;
  *
  * @author Carl Harris
  */
+@Local
 public interface CredentialService {
 
   /**

@@ -20,9 +20,12 @@ package org.soulwing.credo.service;
 
 import java.util.List;
 
-import javax.enterprise.context.ApplicationScoped;
+import javax.ejb.ConcurrencyManagement;
+import javax.ejb.ConcurrencyManagementType;
+import javax.ejb.Singleton;
+import javax.ejb.TransactionAttribute;
+import javax.ejb.TransactionAttributeType;
 import javax.inject.Inject;
-import javax.transaction.Transactional;
 
 import org.soulwing.credo.Credential;
 import org.soulwing.credo.repository.CredentialRepository;
@@ -31,8 +34,9 @@ import org.soulwing.credo.repository.CredentialRepository;
  * A concrete {@link CredentialService} implementation.
  * @author Carl Harris
  */
-@ApplicationScoped
-@Transactional
+@Singleton
+@ConcurrencyManagement(ConcurrencyManagementType.BEAN)
+@TransactionAttribute(TransactionAttributeType.REQUIRED)
 public class ConcreteCredentialService implements CredentialService {
 
   @Inject
