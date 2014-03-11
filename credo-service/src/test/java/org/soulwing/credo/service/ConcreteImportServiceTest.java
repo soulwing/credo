@@ -362,6 +362,8 @@ public class ConcreteImportServiceTest {
         new HashSet<>();
         
     context.checking(new Expectations() { { 
+      oneOf(userContextService).getLoginName();
+      will(returnValue(loginName));
       oneOf(groupRepository).findByLoginName(with(same(loginName)));
       will(returnValue(groupMemberships));
     } });
