@@ -45,6 +45,7 @@ import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.asset.EmptyAsset;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.jboss.shrinkwrap.resolver.api.maven.Maven;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.soulwing.credo.Credential;
@@ -70,6 +71,8 @@ import org.soulwing.credo.service.protect.CredentialProtectionService;
 @RunWith(Arquillian.class)
 public class ConcreteImportServiceIT {
 
+  private static final String LOGIN_NAME = "someUser";
+
   @Deployment
   public static Archive<?> createDeployment() {
     WebArchive archive = ShrinkWrap.create(WebArchive.class)
@@ -88,6 +91,7 @@ public class ConcreteImportServiceIT {
         .addPackage(PemObjectBuilder.class.getPackage())
         .addPackage(BcPemObjectBuilder.class.getPackage())
         .addPackage(CredentialProtectionService.class.getPackage())
+        .addClass(MockUserContextService.class)
         .addAsResource("testcases")
         .addAsResource("persistence-test.xml", "META-INF/persistence.xml")
         .addAsResource("META-INF/orm.xml", "META-INF/orm.xml")
@@ -102,7 +106,15 @@ public class ConcreteImportServiceIT {
   @Inject
   private ImportService importService;
 
+  @Inject
+  private MockUserContextService userContextService;
+  
   private Errors errors = new SimpleErrors();
+  
+  @Before
+  public void init() {
+    userContextService.setLoginName(LOGIN_NAME);
+  }
   
   @Test
   public void testResolveTags() throws Exception {
@@ -192,12 +204,10 @@ public class ConcreteImportServiceIT {
   @Test
   public void testImportProtectAndSave() throws Exception {
     final String testCase = "pkcs8-key";
-    final String loginName = "someUser";
     final Password password = new Password("somePassword".toCharArray());
-    final ProtectionParameters protection = newProtectionParameters(loginName, 
-        password);
+    final ProtectionParameters protection = newProtectionParameters(password);
 
-    createUserProfile(loginName, password);
+    createUserProfile(LOGIN_NAME, password);
 
     Properties properties = properties(testCase);
     
@@ -223,7 +233,7 @@ public class ConcreteImportServiceIT {
     profileService.createProfile(preparation);
   }
 
-  private ProtectionParameters newProtectionParameters(final String loginName,
+  private ProtectionParameters newProtectionParameters(
       final Password password) {
     return new ProtectionParameters() {
 
