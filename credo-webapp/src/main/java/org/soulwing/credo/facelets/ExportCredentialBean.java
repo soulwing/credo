@@ -326,6 +326,25 @@ public class ExportCredentialBean implements Serializable {
   }
 
   /**
+   * Generates a random export passphrase.
+   * @param event source event
+   */
+  public void generateExportPassphrase(AjaxBehaviorEvent event) {
+    generateExportPassphrase();
+  }
+
+  /**
+   * Generates a random export passphrase.
+   * <p>
+   * This method is exposed to support unit testing.
+   */
+  void generateExportPassphrase() {
+    Password passphrase = exportService.generatePassphrase();
+    setExportPassphrase(passphrase);
+    setExportPassphraseAgain(passphrase);
+  }
+  
+  /**
    * Gets the bean that supports the password entry form.
    * @return
    */

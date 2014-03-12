@@ -44,6 +44,7 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.soulwing.credo.Credential;
+import org.soulwing.credo.Password;
 import org.soulwing.credo.UserGroup;
 import org.soulwing.credo.UserProfile;
 import org.soulwing.credo.service.AccessDeniedException;
@@ -370,4 +371,19 @@ public class ExportCredentialBeanTest {
       oneOf(request).setFileName(with(FILE_NAME + SUFFIX));      
     } };
   }
+  
+  @Test
+  public void testGenerateExportPassphrase() throws Exception {
+    final Password passphrase = new Password(new char[0]);
+    context.checking(new Expectations() { { 
+      oneOf(exportService).generatePassphrase();
+      will(returnValue(passphrase));
+      oneOf(request).setExportPassphrase(with(same(passphrase)));
+    } });
+  
+    bean.setExportRequest(request);
+    bean.generateExportPassphrase();
+    assertThat(bean.getExportPassphraseAgain(), is(sameInstance(passphrase)));
+  }
+  
 }

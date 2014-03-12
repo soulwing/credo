@@ -37,6 +37,10 @@ body {
 	padding-left: 4px;
 }
 
+.has-feedback .form-control-feedback.passphrase-feedback {
+	right: 35px;
+}
+
 .has-feedback .form-control-feedback {
 	position: absolute;
 	top: 0;
@@ -91,6 +95,10 @@ body {
 
 .jumbotron {
 	margin-top: 30px;
+}
+
+input.passphrase {
+	font-size: small;
 }
 
 select {
