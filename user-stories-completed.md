@@ -165,7 +165,16 @@ credentials for which the user is an owner.
 
 * A user is an owner of a credential if she is a member of group that owns
   the credential.
-  
+
+
+Form Field Focus
+----------------
+
+When a form is displayed, the user does not need to click to draw focus to
+the first field.
+
+* Assign focus to the first input field in the form.
+
  
 
 
