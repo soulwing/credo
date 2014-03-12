@@ -175,6 +175,15 @@ the first field.
 
 * Assign focus to the first input field in the form.
 
+
+Generate Export Passphrase
+--------------------------
+
+When exporting a credential the user can choose to generate a random
+export passphrase.
+
+
+
  
 
 
