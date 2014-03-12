@@ -38,7 +38,9 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.soulwing.credo.Credential;
+import org.soulwing.credo.Password;
 import org.soulwing.credo.UserGroup;
+import org.soulwing.credo.service.crypto.PasswordGenerator;
 import org.soulwing.credo.service.crypto.PrivateKeyWrapper;
 import org.soulwing.credo.service.exporter.CredentialExporter;
 import org.soulwing.credo.service.exporter.CredentialExporterRegistry;
@@ -83,6 +85,9 @@ public class ConcreteExportServiceTest {
   @Mock
   private CredentialProtectionService protectionService;
   
+  @Mock
+  private PasswordGenerator passwordGenerator;
+  
   private ConcreteExportService exportService = new ConcreteExportService();
   
   @Before
@@ -90,6 +95,7 @@ public class ConcreteExportServiceTest {
     exportService.credentialService = credentialService;
     exportService.exporterRegistry = exporterRegistry;
     exportService.protectionService = protectionService;
+    exportService.passwordGenerator = passwordGenerator;
   }
   
   @Test
@@ -158,6 +164,18 @@ public class ConcreteExportServiceTest {
     exportService.prepareExport(request);
   }
 
+  @Test
+  public void testGeneratePassword() throws Exception {
+    final Password password = new Password(new char[0]);
+    
+    context.checking(new Expectations() { { 
+      oneOf(passwordGenerator).generatePassword();
+      will(returnValue(password));
+    } });
+    
+    assertThat(exportService.generatePassphrase(), is(sameInstance(password)));
+  }
+  
   private Expectations findExporterExpectations(final Action outcome) {
     return new Expectations() { { 
       oneOf(exporterRegistry).findExporter(request);

@@ -31,6 +31,7 @@ import javax.inject.Inject;
 import org.soulwing.credo.Credential;
 import org.soulwing.credo.Password;
 import org.soulwing.credo.service.ExportFormat.Variant;
+import org.soulwing.credo.service.crypto.PasswordGenerator;
 import org.soulwing.credo.service.crypto.PrivateKeyWrapper;
 import org.soulwing.credo.service.exporter.CredentialExporter;
 import org.soulwing.credo.service.exporter.CredentialExporterRegistry;
@@ -56,6 +57,9 @@ public class ConcreteExportService implements ExportService {
   @Inject
   protected CredentialProtectionService protectionService;
 
+  @Inject
+  protected PasswordGenerator passwordGenerator;
+  
   /**
    * {@inheritDoc}
    */
@@ -95,6 +99,14 @@ public class ConcreteExportService implements ExportService {
   @Override
   public ExportFormat findFormat(String id) {
     return exporterRegistry.findFormat(id);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public Password generatePassphrase() {
+    return passwordGenerator.generatePassword();
   }
 
   /**

@@ -22,6 +22,8 @@ import java.util.Collection;
 
 import javax.ejb.Local;
 
+import org.soulwing.credo.Password;
+
 
 /**
  * A service that supports the Export Credential function.
@@ -68,6 +70,12 @@ public interface ExportService {
    * @return format variants
    */
   Collection<ExportFormat.Variant> getVariants(String format);
+  
+  /**
+   * Generates a random passphrase. 
+   * @return random passphrase
+   */
+  Password generatePassphrase();
   
   /**
    * Performs the work required to export a credential.
