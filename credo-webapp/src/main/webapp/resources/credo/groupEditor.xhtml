@@ -1,0 +1,127 @@
+<!DOCTYPE html [
+    <!ENTITY nbsp "&#160;"> 
+]>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+	xmlns:cc="http://xmlns.jcp.org/jsf/composite">
+
+<h:body>
+	<cc:interface>
+		<cc:attribute name="editor"
+			type="org.soulwing.credo.service.GroupEditor" />
+		<cc:attribute name="heading" type="java.lang.String" />
+		<cc:attribute name="detail" type="java.lang.String" />
+		<cc:attribute name="submit"
+			method-signature="java.lang.String submit()" />
+		<cc:attribute name="cancel"
+			method-signature="java.lang.String cancel()" />
+	</cc:interface>
+
+	<cc:implementation>
+		<div class="col-md-10">
+			<h1>#{cc.attrs.heading}</h1>
+			<p>
+				<h:outputFormat escape="false" value="#{cc.attrs.detail}" />
+			</p>
+			<h:form prependId="false" styleClass="form-horizontal">
+				<ui:include src="/templates/messages.xhtml" />
+				<div class="form-group">
+					<h:outputLabel for="name" styleClass="col-md-2 control-label">
+					    #{messages.groupEditorNameLabel}</h:outputLabel>
+					<div class="col-md-4">
+						<h:inputText id="name" required="true"
+							requiredMessage="#{messages.groupEditorNameRequired}"
+							styleClass="form-control" title="#{messages.groupEditorNameTip}"
+							value="#{cc.attrs.editor.name}" />
+					</div>
+				</div>
+				<div class="form-group">
+					<h:outputLabel for="description"
+						styleClass="col-md-2 control-label">
+              #{messages.groupEditorDescriptionLabel}</h:outputLabel>
+					<div class="col-md-8">
+						<h:inputText id="description" required="true"
+							requiredMessage="#{messages.groupEditorDescriptionRequired}"
+							styleClass="form-control"
+							title="#{messages.groupEditorDescriptionTip}"
+							value="#{cc.attrs.editor.description}" />
+					</div>
+				</div>
+				<div class="form-group">
+				  <span class="col-md-2 control-label"/>
+					<div class="col-md-3">
+						<h:outputLabel for="members">
+              #{messages.groupEditorMembersLabel}</h:outputLabel>
+            <div class="input-group">
+	            <input id="member-filter" type="text" placeholder="Filter"
+	              class="form-control" title="#{messages.groupEditorFilterTip}"/>
+	            <span class="input-group-btn">
+	              <button id="btn-member-filter" class="btn btn-default"
+	                title="#{messages.groupEditorFilterClearTip}">
+	                <i class="glyphicon glyphicon-remove-circle"/>
+	              </button>
+	            </span>
+						</div>
+						<h:selectManyListbox id="members" size="8"
+							styleClass="form-control select-list-pair">
+							<f:selectItems var="member" value="#{cc.attrs.editor.members}" 
+							  itemValue="#{member.id}"
+							  itemLabel='#{member}'/>
+						</h:selectManyListbox>
+						<select id="filtered-members" class="hidden"/>
+					</div>
+					<div class="col-md-2 select-list-pair-controls">
+					  <button id="btn-add" class="btn btn-default btn-xs"
+					    title="#{messages.groupEditorAddTip}">
+					    <i class="glyphicon glyphicon-chevron-left"/><i class="glyphicon glyphicon-chevron-left"/>
+					  </button>
+            <button id="btn-remove" class="btn btn-default btn-xs"
+              title="#{messages.groupEditorRemoveTip}">
+              <i class="glyphicon glyphicon-chevron-right"/><i class="glyphicon glyphicon-chevron-right"/>
+            </button>
+            <span>&nbsp;</span>
+            <button id="btn-reset" class="btn btn-default btn-xs"
+              title="#{messages.groupEditorResetTip}">
+              <i class="glyphicon glyphicon-repeat"/>
+            </button>
+					</div>
+					<div class="col-md-3">
+						<h:outputLabel for="available">
+               #{messages.groupEditorAvailableLabel}</h:outputLabel>
+            <div class="input-group">
+	            <input id="available-filter" type="text" placeholder="Filter"
+	              class="form-control" title="#{messages.groupEditorFilterTip}"/>   
+              <span class="input-group-btn">
+                <button id="btn-available-filter" class="btn btn-default"
+                  title="#{messages.groupEditorFilterClearTip}">
+                  <i class="glyphicon glyphicon-remove-circle"/>
+                </button>
+              </span>
+            </div>
+						<h:selectManyListbox id="available" size="8" 
+						    styleClass="form-control select-list-pair">
+							<f:selectItems var="user" value="#{cc.attrs.editor.availableUsers}" 
+                itemValue="#{user.id}"
+                itemLabel='#{user}'/>               							
+						</h:selectManyListbox>
+            <select id="filtered-available" class="hidden"/>
+				  </div>
+				</div>
+				<div class="form-group">
+					<div class="col-md-offset-2 col-md-3">
+						<h:commandLink styleClass="btn btn-default"
+							value="#{messages.cancelLabel}" action="#{cc.attrs.cancel}"
+							immediate="true" />
+						&nbsp;
+						<h:commandButton styleClass="btn btn-primary"
+							value="#{messages.saveLabel}" action="#{cc.attrs.submit}" />
+					</div>
+				</div>
+			</h:form>
+		</div>
+	</cc:implementation>
+</h:body>
+
+</html>

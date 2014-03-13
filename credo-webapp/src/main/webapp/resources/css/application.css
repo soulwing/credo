@@ -97,6 +97,10 @@ body {
 	margin-top: 30px;
 }
 
+.hidden {
+	display: none;
+}
+
 input.passphrase {
 	font-size: small;
 }
@@ -104,3 +108,19 @@ input.passphrase {
 select {
 	margin-top: 7px;
 }
+
+.select-list-pair-controls {
+	margin-top: 90px; 
+	text-align: center;
+}
+
+.select-list-pair-controls button {
+  width: 100%;
+  margin-bottom: 5px;
+}
+
+.form-control.select-list-pair {
+	font-size: small;
+}
+
+
