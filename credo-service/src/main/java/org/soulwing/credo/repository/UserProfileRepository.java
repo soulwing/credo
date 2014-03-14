@@ -18,6 +18,8 @@
  */
 package org.soulwing.credo.repository;
 
+import java.util.List;
+
 import org.soulwing.credo.UserProfile;
 
 /**
@@ -32,6 +34,19 @@ public interface UserProfileRepository {
    * @param profile the profile to add
    */
   void add(UserProfile profile);
+  
+  /**
+   * Finds all existing user profiles.
+   * @return list of user profiles
+   */
+  List<UserProfile> findAll();
+  
+  /**
+   * Finds a user profile by it's unique identifier.
+   * @param id ID of the profile to find
+   * @return matching user profile or {@code null} if no such profile exists
+   */
+  UserProfile findById(Long id);
   
   /**
    * Finds the user profile with the given login name, if it exists.

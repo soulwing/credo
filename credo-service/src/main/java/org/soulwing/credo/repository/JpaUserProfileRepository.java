@@ -19,6 +19,7 @@
 package org.soulwing.credo.repository;
 
 import java.util.Date;
+import java.util.List;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.persistence.EntityManager;
@@ -53,6 +54,24 @@ public class JpaUserProfileRepository implements UserProfileRepository {
     ((UserProfileEntity) profile).setDateCreated(now);
     ((UserProfileEntity) profile).setDateModified(now);
     entityManager.persist(profile);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public List<UserProfile> findAll() {
+    TypedQuery<UserProfile> query = entityManager.createNamedQuery(
+        "findAllUserProfiles", UserProfile.class);
+    return query.getResultList();
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public UserProfile findById(Long id) {
+    return entityManager.find(UserProfileEntity.class, id);
   }
 
   /**

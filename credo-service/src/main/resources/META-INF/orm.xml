@@ -4,6 +4,13 @@
   xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/persistence/orm http://xmlns.jcp.org/xml/ns/persistence/orm_2_1.xsd"
   version="2.1">
   
+  <named-query name="findAllUserProfiles">
+    <query>
+      select distinct u from UserProfileEntity u
+      order by u.loginName
+    </query>
+  </named-query>
+  
   <named-query name="findUserProfileByLoginName">
     <query>
       select distinct u from UserProfileEntity u
