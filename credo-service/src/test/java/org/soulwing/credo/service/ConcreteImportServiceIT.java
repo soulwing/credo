@@ -58,6 +58,7 @@ import org.soulwing.credo.service.crypto.PrivateKeyWrapper;
 import org.soulwing.credo.service.crypto.bc.BcPrivateKeyWrapper;
 import org.soulwing.credo.service.crypto.jca.JcaPrivateKeyWrapper;
 import org.soulwing.credo.service.exporter.CredentialExporter;
+import org.soulwing.credo.service.group.GroupEditorFactory;
 import org.soulwing.credo.service.importer.CredentialImporter;
 import org.soulwing.credo.service.pem.PemObjectBuilder;
 import org.soulwing.credo.service.pem.bc.BcPemObjectBuilder;
@@ -90,6 +91,7 @@ public class ConcreteImportServiceIT {
         .addPackage(JcaPrivateKeyWrapper.class.getPackage())
         .addPackage(PemObjectBuilder.class.getPackage())
         .addPackage(BcPemObjectBuilder.class.getPackage())
+        .addPackage(GroupEditorFactory.class.getPackage())
         .addPackage(CredentialProtectionService.class.getPackage())
         .addClass(MockUserContextService.class)
         .addAsResource("testcases")
