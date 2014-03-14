@@ -18,8 +18,8 @@
  */
 package org.soulwing.credo.service;
 
-import java.io.Serializable;
-import java.util.Set;
+import java.util.Collection;
+
 
 /**
  * An editor for a group.
@@ -41,12 +41,24 @@ public interface GroupEditor extends GroupDetail {
   void setDescription(String description);
   
   /**
+   * Gets the membership of the group.
+   * @return array of member user IDs
+   */
+  Long[] getMembership();
+  
+  /**
    * Sets the membership of the group.
    * <p>
    * This method replaces the group's existing members with the members in 
    * the given set.
-   * @param userIds the set of member user IDs
+   * @param members the set of member user IDs
    */ 
-  void setMembers(Set<Serializable> userIds);
+  void setMembership(Long[] members);
   
+  /**
+   * Gets the collection of all users.
+   * @return collection of users
+   */
+  Collection<UserDetail> getAvailableUsers();
+
 }

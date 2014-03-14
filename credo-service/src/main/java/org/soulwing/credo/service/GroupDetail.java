@@ -18,7 +18,6 @@
  */
 package org.soulwing.credo.service;
 
-import java.io.Serializable;
 import java.util.Collection;
 
 /**
@@ -32,7 +31,7 @@ public interface GroupDetail {
    * Gets the group's unique identifier.
    * @return unique identifier
    */
-  Serializable getId();
+  String getId();
   
   /**
    * Gets the group's name.
@@ -47,9 +46,9 @@ public interface GroupDetail {
   String getDescription();
   
   /**
-   * Gets the user profiles for the group's members.
-   * @return collection of user profiles.
+   * Gets the users that are members of this group.
+   * @return collection of members
    */
   Collection<UserDetail> getMembers();
-  
+    
 }

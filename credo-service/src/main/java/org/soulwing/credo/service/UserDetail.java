@@ -18,7 +18,6 @@
  */
 package org.soulwing.credo.service;
 
-import java.io.Serializable;
 
 /**
  * An object that describes the details of a user profile.
@@ -31,7 +30,7 @@ public interface UserDetail {
    * Gets the profile's unique identifier.
    * @return unique identifier
    */
-  Serializable getId();
+  Long getId();
   
   /**
    * Gets the user's login name.
