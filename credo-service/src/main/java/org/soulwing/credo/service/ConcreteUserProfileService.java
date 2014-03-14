@@ -90,8 +90,10 @@ public class ConcreteUserProfileService
    * {@inheritDoc}
    */
   @Override
-  public boolean isNewUser(String loginName) {
-    return profileRepository.findByLoginName(loginName) == null;
+  public boolean isNewUser() {
+    UserProfile profile = profileRepository.findByLoginName(
+        userContextService.getLoginName());
+    return profile == null;
   }
 
   /**
@@ -100,19 +102,11 @@ public class ConcreteUserProfileService
   @Override
   public UserProfile getLoggedInUserProfile() {
     String loginName = userContextService.getLoginName();
-    UserProfile profile = findProfile(loginName);
+    UserProfile profile = profileRepository.findByLoginName(loginName);
     if (profile == null) {
       throw new IllegalStateException("no such user: " + loginName);
     }
     return profile;
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public UserProfile findProfile(String loginName) {
-    return profileRepository.findByLoginName(loginName);
   }
 
   /**

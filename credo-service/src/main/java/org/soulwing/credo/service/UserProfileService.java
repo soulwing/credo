@@ -40,15 +40,6 @@ public interface UserProfileService {
   UserProfile getLoggedInUserProfile();
   
   /**
-   * Finds a user profile.
-   * @param loginName login name to match
-   * @return profile name
-   * @throws NoSuchUserException if there exists no profile with the given
-   *    login name
-   */
-  UserProfile findProfile(String loginName);
-  
-  /**
    * Finds all available user profiles.
    * @return user profile details
    */

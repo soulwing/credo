@@ -106,15 +106,12 @@ public class RootViewBeanTest {
    * @return expectations
    */
   private Expectations newContextExpectations(final boolean newUser) {
-    final String userName = "someUser";
     return new Expectations() { { 
       allowing(facesContext).getExternalContext();
       will(returnValue(externalContext));
       oneOf(externalContext).getRequestContextPath();
       will(returnValue(CONTEXT_PATH));
-      oneOf(externalContext).getRemoteUser();
-      will(returnValue(userName));
-      oneOf(welcomeService).isNewUser(with(same(userName)));
+      oneOf(welcomeService).isNewUser();
       will(returnValue(newUser));
     } };
   }

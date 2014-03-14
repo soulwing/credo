@@ -54,9 +54,8 @@ public class RootViewBean {
     try {
       StringBuilder sb = new StringBuilder();
       ExternalContext externalContext = facesContext.getExternalContext();
-      String userName = externalContext.getRemoteUser();
       sb.append(externalContext.getRequestContextPath());
-      sb.append(welcomeService.isNewUser(userName) ? 
+      sb.append(welcomeService.isNewUser() ? 
           NEW_USER_PATH : EXISTING_USER_PATH);
       externalContext.redirect(sb.toString());
       facesContext.responseComplete();

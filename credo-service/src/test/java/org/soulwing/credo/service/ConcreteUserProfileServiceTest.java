@@ -60,6 +60,8 @@ import org.soulwing.credo.service.crypto.SecretKeyWrapper;
  */
 public class ConcreteUserProfileServiceTest {
 
+  private static final String LOGIN_NAME = "someUser";
+
   @Rule
   public final JUnitRuleMockery context = new JUnitRuleMockery();
 
@@ -97,6 +99,9 @@ public class ConcreteUserProfileServiceTest {
   
   @Mock
   private SecretKeyEncryptionService secretKeyEncryptionService;
+  
+  @Mock
+  private UserContextService userContextService;
   
   @Mock
   private KeyPairWrapper keyPair;
@@ -150,37 +155,40 @@ public class ConcreteUserProfileServiceTest {
     service.passwordEncryptionService = passwordEncryptionService;
     service.privateKeyEncryptionService = privateKeyEncryptionService;
     service.secretKeyEncryptionService = secretKeyEncryptionService;
+    service.userContextService = userContextService;
   }
   
   @Test
   public void testIsNewUserWithNewUser() throws Exception {
-    final String loginName = "someUser";
-    context.checking(new Expectations() { { 
-      oneOf(profileRepository).findByLoginName(with(same(loginName)));
+    context.checking(new Expectations() { {
+      oneOf(userContextService).getLoginName();
+      will(returnValue(LOGIN_NAME));
+      oneOf(profileRepository).findByLoginName(with(same(LOGIN_NAME)));
       will(returnValue(null));
     } });
     
-    assertThat(service.isNewUser(loginName), is(true));
+    assertThat(service.isNewUser(), is(true));
   }
 
   @Test
   public void testIsNewUserWithExistingUser() throws Exception {
-    final String loginName = "someUser";
     final UserProfile profile = context.mock(UserProfile.class);
     context.checking(new Expectations() { { 
-      oneOf(profileRepository).findByLoginName(with(same(loginName)));
+      oneOf(userContextService).getLoginName();
+      will(returnValue(LOGIN_NAME));
+      oneOf(profileRepository).findByLoginName(with(same(LOGIN_NAME)));
       will(returnValue(profile));
     } });
     
-    assertThat(service.isNewUser(loginName), is(false));
+    assertThat(service.isNewUser(), is(false));
   }
   
 
   @Test
   public void testPrepareProfile() throws Exception {
-    UserProfilePreparation preparation = service.prepareProfile("someUser");
+    UserProfilePreparation preparation = service.prepareProfile(LOGIN_NAME);
     assertThat(preparation, is(not(nullValue())));
-    assertThat(preparation, hasProperty("loginName", equalTo("someUser")));
+    assertThat(preparation, hasProperty("loginName", equalTo(LOGIN_NAME)));
   }
   
   @Test

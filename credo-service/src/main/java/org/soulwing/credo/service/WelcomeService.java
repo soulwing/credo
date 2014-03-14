@@ -29,11 +29,9 @@ import javax.ejb.Local;
 public interface WelcomeService {
 
   /**
-   * Tests whether the given loginName represents a new user.
-   * @param loginName the subject login name
-   * @return {@code true} if there exists no user profile with the given
-   *    {@code loginName}
+   * Tests whether the logged in remote user has an existing profile
+   * @return {@code true} if the logged in user has no profile
    */
-  boolean isNewUser(String loginName);
+  boolean isNewUser();
   
 }
