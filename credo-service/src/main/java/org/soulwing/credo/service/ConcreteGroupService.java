@@ -18,6 +18,10 @@
  */
 package org.soulwing.credo.service;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Set;
+
 import javax.ejb.ConcurrencyManagement;
 import javax.ejb.ConcurrencyManagementType;
 import javax.ejb.Singleton;
@@ -26,6 +30,11 @@ import javax.ejb.TransactionAttributeType;
 import javax.inject.Inject;
 
 import org.apache.commons.lang.Validate;
+import org.soulwing.credo.UserGroup;
+import org.soulwing.credo.UserGroupMember;
+import org.soulwing.credo.UserProfile;
+import org.soulwing.credo.repository.UserGroupMemberRepository;
+import org.soulwing.credo.repository.UserGroupRepository;
 import org.soulwing.credo.service.group.ConfigurableGroupEditor;
 import org.soulwing.credo.service.group.GroupEditorFactory;
 
@@ -41,6 +50,15 @@ public class ConcreteGroupService implements GroupService {
   @Inject
   protected GroupEditorFactory editorFactory;
   
+  @Inject
+  protected UserGroupRepository groupRepository;
+  
+  @Inject
+  protected UserGroupMemberRepository memberRepository;
+  
+  @Inject
+  protected UserContextService userContextService;
+  
   /**
    * {@inheritDoc}
    */
@@ -53,11 +71,109 @@ public class ConcreteGroupService implements GroupService {
    * {@inheritDoc}
    */
   @Override
+  public Collection<GroupDetail> findAllGroups() {
+    Set<? extends UserGroup> groups = groupRepository.findByLoginName(
+        userContextService.getLoginName());
+    Collection<GroupDetail> groupDetails = new ArrayList<>();
+    for (UserGroup group : groups) {
+      UserGroupWrapper groupDetail = new UserGroupWrapper(group);
+      groupDetails.add(groupDetail);
+      Collection<UserGroupMember> members = 
+          memberRepository.findAllMembers(group.getName());
+      for (UserGroupMember member : members) {
+        groupDetail.addMember(new UserProfileWrapper(member.getUser()));
+      }
+    }
+    return groupDetails;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
   @TransactionAttribute(TransactionAttributeType.REQUIRED)
   public void saveGroup(GroupEditor editor, Errors errors)
       throws NoSuchGroupException, GroupEditException {
     Validate.isTrue(editor instanceof ConfigurableGroupEditor);
     ((ConfigurableGroupEditor) editor).save(errors);
   }
+ 
   
+  private static class UserGroupWrapper implements GroupDetail {
+
+    private final UserGroup delegate;
+    private final Collection<UserDetail> members = new ArrayList<>();
+    
+    /**
+     * Constructs a new instance.
+     * @param delegate
+     */
+    public UserGroupWrapper(UserGroup delegate) {
+      this.delegate = delegate;
+    }
+
+    public void addMember(UserDetail member) {
+      this.members.add(member);
+    }
+    
+    @Override
+    public Long getId() {
+      return delegate.getId();
+    }
+
+    @Override
+    public String getName() {
+      return delegate.getName();
+    }
+
+    @Override
+    public String getDescription() {
+      return delegate.getDescription();
+    }
+
+    @Override
+    public Collection<UserDetail> getMembers() {
+      return members;
+    }
+    
+  }
+  
+  private static class UserProfileWrapper implements UserDetail {
+
+    private UserProfile delegate;
+    
+    /**
+     * Constructs a new instance.
+     * @param delegate
+     */
+    public UserProfileWrapper(UserProfile delegate) {
+      this.delegate = delegate;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Long getId() {
+      return delegate.getId();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getLoginName() {
+      return delegate.getLoginName();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getFullName() {
+      return delegate.getFullName();
+    }
+    
+  }
+
 }

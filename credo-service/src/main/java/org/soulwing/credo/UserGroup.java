@@ -31,6 +31,12 @@ public interface UserGroup {
   String SELF_GROUP_NAME = "self";
   
   /**
+   * Gets the unique identifier of the group.
+   * @return group's unique identifier
+   */
+  Long getId();
+  
+  /**
    * Gets the name of the group.
    * @return group name
    */
