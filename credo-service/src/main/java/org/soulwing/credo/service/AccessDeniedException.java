@@ -18,6 +18,7 @@
  */
 package org.soulwing.credo.service;
 
+
 /**
  * An exception thrown when access to a protected resource is denied.
  *
