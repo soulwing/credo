@@ -52,8 +52,8 @@
 				<div class="form-group">
 				  <span class="col-md-2 control-label"/>
 					<div class="col-md-3">
-						<h:outputLabel for="members">
-              #{messages.groupEditorMembersLabel}</h:outputLabel>
+						<label for="members">
+              #{messages.groupEditorMembersLabel}</label>
             <div class="input-group">
 	            <input id="member-filter" type="text" placeholder="Filter"
 	              class="form-control" title="#{messages.groupEditorFilterTip}"/>
@@ -64,12 +64,8 @@
 	              </button>
 	            </span>
 						</div>
-						<h:selectManyListbox id="members" size="8"
-							styleClass="form-control select-list-pair">
-							<f:selectItems var="member" value="#{cc.attrs.editor.members}" 
-							  itemValue="#{member.id}"
-							  itemLabel='#{member}'/>
-						</h:selectManyListbox>
+						<select id="members" class="form-control select-list-pair" 
+						  size="8" multiple="multiple"/> 
 						<select id="filtered-members" class="hidden"/>
 					</div>
 					<div class="col-md-2 select-list-pair-controls">
@@ -83,13 +79,14 @@
             </button>
             <span>&nbsp;</span>
             <button id="btn-reset" class="btn btn-default btn-xs"
-              title="#{messages.groupEditorResetTip}">
+              title="#{messages.groupEditorResetTip}" 
+              data-enabled="#{not empty cc.attrs.editor.id}">
               <i class="glyphicon glyphicon-repeat"/>
             </button>
 					</div>
 					<div class="col-md-3">
-						<h:outputLabel for="available">
-               #{messages.groupEditorAvailableLabel}</h:outputLabel>
+						<label for="available">
+               #{messages.groupEditorAvailableLabel}</label>
             <div class="input-group">
 	            <input id="available-filter" type="text" placeholder="Filter"
 	              class="form-control" title="#{messages.groupEditorFilterTip}"/>   
@@ -100,14 +97,15 @@
                 </button>
               </span>
             </div>
-						<h:selectManyListbox id="available" size="8" 
-						    styleClass="form-control select-list-pair">
-							<f:selectItems var="user" value="#{cc.attrs.editor.availableUsers}" 
-                itemValue="#{user.id}"
-                itemLabel='#{user}'/>               							
-						</h:selectManyListbox>
+            <select id="available" class="form-control select-list-pair" 
+              size="8" multiple="multiple"/>
             <select id="filtered-available" class="hidden"/>
 				  </div>
+          <h:selectManyListbox id="members" value="#{cc.attrs.editor.membership}" 
+            styleClass="hidden">
+            <f:selectItems var="user" value="#{cc.attrs.editor.availableUsers}" 
+              itemValue="#{user.id}" itemLabel="#{user}"/>
+          </h:selectManyListbox>
 				</div>
 				<div class="form-group">
 					<div class="col-md-offset-2 col-md-3">

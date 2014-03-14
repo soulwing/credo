@@ -1,6 +1,6 @@
 $(document).ready(function() {
-	var $members = null;
-	var $available = null;
+	var $members = $("#members");
+	var $available = $("#available");
 	var $memberFilter = $("#member-filter");
 	var $memberFilterButton = $("#btn-member-filter");
 	var $availableFilter = $("#available-filter");
@@ -10,8 +10,21 @@ $(document).ready(function() {
 	var $addButton = $("#btn-add");
 	var $removeButton = $("#btn-remove");
 	var $resetButton = $("#btn-reset");
+	var $submitButton = $("input[type='submit']");
 	
 	var optionSort = function(a, b) { return a.text > b.text; };
+	
+	var split = function($a, $b) {
+		var $source = $("[id$=':members']");
+		var $m = $source.children().filter("option:selected");
+		$m.remove();
+		$m.prop("selected", false);
+		$a.empty();
+		$a.append($m);
+		$b.empty();
+		$b.append($source.children());
+		$source.empty();
+	};
 	
 	var transfer = function($a, $b) {
 		var $selected = $a.children().filter("option:selected");
@@ -39,18 +52,18 @@ $(document).ready(function() {
 	};
 	
 	var bindListeners = function() {
-		$members = $("[id$=':members']");
-		$members.on("focus", function(event) { 
-			$available.children().filter("option:selected").prop("selected", false);
-		});
-
-		$available = $("[id$=':available']");
-		$available.on("focus", function(event) { 
-			$members.children().filter("option:selected").prop("selected", false);
-		});
+		split($members, $available);
 
 	};
+
+	$members.on("focus", function(event) { 
+		$available.children().filter("option:selected").prop("selected", false);
+	});
 	
+	$available.on("focus", function(event) { 
+		$members.children().filter("option:selected").prop("selected", false);
+	});
+
 	$memberFilter.on("input", function(event) {
 		var text = $(this).val();
 		filter(text, $members, $filteredMembers);
@@ -92,18 +105,33 @@ $(document).ready(function() {
 	$resetButton.on("click", function(event) {
 		$memberFilter.val("");
 		$availableFilter.val("");
+		$available.empty();
 		$filteredMembers.empty();
 		$filteredAvailable.empty();
+		var boundMembers = $("[id$=':members']").attr("id");
 		jsf.ajax.request(this, event, {
-			render: $members.attr("id") + " " + $available.attr("id"),
+			render: boundMembers,
 			onevent: function(data) {
 				if (data.status == "success") {
-					bindListeners();
+					split($members, $available);
 				}			
 			}
 		});
 		return false;
 	});
 
+	if (!$resetButton.data("enabled")) {
+		$resetButton.prop("disabled", true);
+	}
+	
+	$submitButton.on("click", function(event) { 
+		var $boundMembers = $("[id$=':members']");
+		var $selected = $members.children().prop("selected", true);
+		var $notSelected = $available.children().prop("selected", false);
+		$boundMembers.append($selected);
+		$boundMembers.append($notSelected);
+		return true;
+	});
+	
 	bindListeners();
 });
