@@ -51,9 +51,9 @@ public interface GroupEditor extends GroupDetail {
    * <p>
    * This method replaces the group's existing members with the members in 
    * the given set.
-   * @param members the set of member user IDs
+   * @param membership the set of member user IDs
    */ 
-  void setMembership(Long[] members);
+  void setMembership(Long[] membership);
   
   /**
    * Gets the collection of all users.
