@@ -282,7 +282,7 @@ public class ConcreteUserProfileServiceTest {
       will(returnValue(groupMemberBuilder));
       oneOf(groupMemberBuilder).setGroup(with(same(group)));
       will(returnValue(groupMemberBuilder));
-      oneOf(groupMemberBuilder).setSecretKey(with(any(String.class)));  //FIXME
+      oneOf(groupMemberBuilder).setSecretKey(with(encodedSecretKey));
       will(returnValue(groupMemberBuilder));
       oneOf(groupMemberBuilder).build();
       will(returnValue(groupMember));
