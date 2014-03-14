@@ -18,12 +18,15 @@
  */
 package org.soulwing.credo.service;
 
+import javax.ejb.ApplicationException;
+
 /**
  * An exception thrown when a group name does not match an existing group
  * object.
  *
  * @author Carl Harris
  */
+@ApplicationException(rollback = true)
 public class NoSuchGroupException extends Exception {
 
   private static final long serialVersionUID = 1122147862739400494L;

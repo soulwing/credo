@@ -18,11 +18,14 @@
  */
 package org.soulwing.credo.service;
 
+import javax.ejb.ApplicationException;
+
 /**
  * An exception thrown when a group editing operation fails.
  *
  * @author Carl Harris
  */
+@ApplicationException(rollback = true)
 public class GroupEditException extends Exception {
 
   private static final long serialVersionUID = -4617035829971622339L;
