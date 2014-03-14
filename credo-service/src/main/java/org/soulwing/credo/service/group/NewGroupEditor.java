@@ -183,7 +183,6 @@ public class NewGroupEditor implements ConfigurableGroupEditor {
     
     SecretKeyWrapper secretKey = keyGeneratorService.generateSecretKey();
     for (Long userId : membership) {
-      if (userId.equals(ownerId)) continue;
       UserProfile profile = profileRepository.findById(userId);
       if (profile != null) {
         protectionService.protect(group, secretKey, profile);

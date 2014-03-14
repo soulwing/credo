@@ -21,6 +21,7 @@ package org.soulwing.credo.service.group;
 import static org.hamcrest.Matchers.arrayContaining;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.emptyArray;
+import static org.jmock.Expectations.onConsecutiveCalls;
 import static org.jmock.Expectations.returnValue;
 
 import java.util.Collections;
@@ -122,15 +123,17 @@ public class NewGroupEditorTest {
   public void testSaveWhenUserNotFound() throws Exception {
     Long ownerId = 1L;
     Long userId = 2L;
-    Long[] membership = new Long[] { ownerId, userId }; 
+    Long[] membership = new Long[] { ownerId, userId };
     context.checking(groupExpectations());
     context.checking(keyGeneratorExpectations());
     context.checking(profileExpectations(membership.length,
-        returnValue(null)));
+        onConsecutiveCalls(returnValue(profile), returnValue(null))));
+    context.checking(protectionExpectations(membership.length));
     context.checking(errorExpectations(userId, membership.length));
     context.checking(errorCheckExpectations(returnValue(true)));
     editor.setOwner(ownerId);
     editor.setMembership(membership);
+    editor.setUsers(Collections.singleton(user));
     editor.save(errors);
   }
 
@@ -146,9 +149,9 @@ public class NewGroupEditorTest {
     Long[] membership = new Long[] { 1L }; 
     context.checking(groupExpectations());
     context.checking(keyGeneratorExpectations());
-    context.checking(profileExpectations(membership.length,
+    context.checking(profileExpectations(membership.length + 1,
         returnValue(profile)));
-    context.checking(protectionExpectations(membership.length));
+    context.checking(protectionExpectations(membership.length + 1));
     context.checking(errorCheckExpectations(returnValue(true)));
     
     editor.setOwner(-1L);
