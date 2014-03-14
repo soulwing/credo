@@ -47,11 +47,12 @@ public class CreateGroupBean {
   
   @Inject
   protected Errors errors;
-  
+ 
   private GroupEditor editor;
+ 
 
   @PostConstruct
-  public void init() throws Exception {
+  public void init() {
     editor = groupService.newGroup();
   }
   
