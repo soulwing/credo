@@ -177,4 +177,25 @@ public class UserProfileEntity extends AbstractEntity implements UserProfile {
     this.dateModified = dateModified;
   }
 
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public int hashCode() {
+    if (getId() == 0) return 0;
+    return getId().hashCode();
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public boolean equals(Object obj) {
+    if (obj == this) return true;
+    if (!(obj instanceof UserProfileEntity)) return false;
+    UserProfileEntity that = (UserProfileEntity) obj;
+    if (this.getId() == null || that.getId() == null) return false;
+    return this.getId().equals(that.getId());
+  }
+
 }
