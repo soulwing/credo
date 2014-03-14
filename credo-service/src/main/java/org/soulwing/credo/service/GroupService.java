@@ -18,7 +18,6 @@
  */
 package org.soulwing.credo.service;
 
-import java.io.Serializable;
 import java.util.Collection;
 
 import javax.ejb.Local;
@@ -32,20 +31,26 @@ import javax.ejb.Local;
 public interface GroupService {
 
   /**
-   * Finds the collection of all groups that are accessible to the logged in
-   * user.
-   * @return collection of groups
+   * Creates a new group.
+   * @return editor for the new group
    */
-  Collection<GroupDetail> findAllGroups();
+  GroupEditor newGroup();
   
-  /**
-   * Creates an editor for the given group.
-   * @param id unique identifier for the group
-   * @return editor instance
-   * @throws NoSuchGroupException if the specified group does not exist
-   *    (or is not visible to logged in user)
-   */
-  GroupEditor createEditor(Serializable id) throws NoSuchGroupException;
+//  /**
+//   * Finds the collection of all groups that are accessible to the logged in
+//   * user.
+//   * @return collection of groups
+//   */
+//  Collection<GroupDetail> findAllGroups();
+//  
+//  /**
+//   * Creates an editor for the given group.
+//   * @param id unique identifier for the group
+//   * @return editor instance
+//   * @throws NoSuchGroupException if the specified group does not exist
+//   *    (or is not visible to logged in user)
+//   */
+//  GroupEditor editGroup(Long id) throws NoSuchGroupException;
   
   /**
    * Applies the changes in the given editor to the group it represents, 
@@ -53,12 +58,12 @@ public interface GroupService {
    * @param editor the editor to apply
    * @param errors an errors object that will be updated if the edits cannot
    *    be successfully applied
-   * @throws NoSuchGroupException if the group represented in the editor
-   *    no longer exists (or is no longer visible to the logged in user)
+   * @throws NoSuchGroupException if an existing was removed after the
+   *    editor was created
    * @throws GroupEditException if a recoverable error occurs in applying
    *    the editor to the target group
    */
-  void applyEditor(GroupEditor editor, Errors errors) 
+  void saveGroup(GroupEditor editor, Errors errors) 
       throws NoSuchGroupException, GroupEditException;
   
 }
