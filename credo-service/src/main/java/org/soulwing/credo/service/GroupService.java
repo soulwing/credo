@@ -18,6 +18,8 @@
  */
 package org.soulwing.credo.service;
 
+import java.util.Collection;
+
 import javax.ejb.Local;
 
 /**
@@ -34,12 +36,12 @@ public interface GroupService {
    */
   GroupEditor newGroup();
   
-//  /**
-//   * Finds the collection of all groups that are accessible to the logged in
-//   * user.
-//   * @return collection of groups
-//   */
-//  Collection<GroupDetail> findAllGroups();
+  /**
+   * Finds the collection of all groups that are accessible to the logged in
+   * user.
+   * @return collection of groups
+   */
+  Collection<GroupDetail> findAllGroups();
 //  
 //  /**
 //   * Creates an editor for the given group.

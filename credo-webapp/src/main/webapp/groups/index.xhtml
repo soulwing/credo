@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+  xmlns:f="http://xmlns.jcp.org/jsf/core"
+  xmlns:h="http://xmlns.jcp.org/jsf/html"
+  xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+
+<h:body>
+  <ui:composition template="/templates/masterTemplate.xhtml">
+    <ui:define name="windowTitle">
+      #{messages.applicationName}::#{messages.groupsSubtitle}
+    </ui:define>
+    <ui:define name="content">
+      <div class="container">
+        <h1>#{messages.groupsSubtitle}</h1>
+        <p>
+          <h:outputFormat escape="false" value="#{messages.groupsDetail}"/>
+        </p>
+        <div class="button-bar">
+          <button class="btn btn-success btn-sm" 
+            onclick="window.location.href='create/'; return false;">
+            <i class="icon-white glyphicon glyphicon-plus"/>
+            <span>#{messages.createGroupButtonLabel}</span>
+          </button>
+        </div>
+        <h:dataTable id="groups" var="group" 
+          value="#{groupTableBean.groups}"
+          styleClass="">
+          
+          <h:column>
+            <f:facet name="header">#{messages.groupTableNameHeader}</f:facet>
+            #{group.name}
+          </h:column>
+
+          <h:column>
+            <f:facet name="header">#{messages.groupTableDescriptionHeader}</f:facet>          
+            #{group.description}
+          </h:column>
+                    
+          <h:column>
+            <f:facet name="header">#{messages.groupTableMembersHeader}</f:facet>
+            #{group.members}
+          </h:column>
+          
+          <h:column>
+            <h:outputLink styleClass="btn btn-default btn-xs" value="edit">
+              <f:param name="id" value="#{group.id}"/>
+              #{messages.editButtonLabel}
+            </h:outputLink>
+          </h:column>
+        </h:dataTable>
+      </div>
+    </ui:define>
+    <ui:define name="scripts">
+      <h:outputScript library="js" name="groups/index.js"/>     
+    </ui:define>
+  </ui:composition>
+</h:body>
+
+</html>
