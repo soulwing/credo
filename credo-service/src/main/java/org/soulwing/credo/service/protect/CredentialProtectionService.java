@@ -23,7 +23,8 @@ import org.soulwing.credo.service.ProtectionParameters;
 import org.soulwing.credo.service.crypto.PrivateKeyWrapper;
 
 /**
- * DESCRIBE THE TYPE HERE.
+ * A service that provides encryption services for the private key of a 
+ * {@link Credential}.
  *
  * @author Carl Harris
  */

@@ -19,7 +19,7 @@
 package org.soulwing.credo.service.crypto;
 
 /**
- * A decoder for a PEM-encoded secret key.
+ * A decoder for a PEM-encoded private key.
  *
  * @author Carl Harris
  */
