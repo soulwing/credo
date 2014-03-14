@@ -21,7 +21,6 @@ package org.soulwing.credo.service.protect;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 
-import javax.crypto.SecretKey;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
@@ -94,7 +93,7 @@ public class ConcreteGroupProtectionService
    * {@inheritDoc}
    */
   @Override
-  public SecretKey unprotect(UserGroup group, Password password) 
+  public SecretKeyWrapper unprotect(UserGroup group, Password password) 
       throws GroupAccessException, UserAccessException {
     UserGroupMember member = findGroupMember(group.getName(), 
         userContextService.getLoginName());
@@ -150,7 +149,7 @@ public class ConcreteGroupProtectionService
    * @param privateKey (unwrapped) private key of the group member 
    * @return unwrapped secret key
    */
-  private SecretKey unwrapSecretKey(UserGroupMember member,
+  private SecretKeyWrapper unwrapSecretKey(UserGroupMember member,
       PrivateKey privateKey) {
     
     SecretKeyWrapper encryptedSecretKey = secretKeyDecoder.decode(
@@ -158,7 +157,7 @@ public class ConcreteGroupProtectionService
     
     encryptedSecretKey.setPrivateKey(privateKey);
     
-    return encryptedSecretKey.derive();
+    return encryptedSecretKey.deriveWrapper();
   }
 
 }

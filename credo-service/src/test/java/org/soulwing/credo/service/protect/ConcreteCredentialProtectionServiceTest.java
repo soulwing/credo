@@ -44,6 +44,7 @@ import org.soulwing.credo.service.UserContextService;
 import org.soulwing.credo.service.crypto.PrivateKeyDecoder;
 import org.soulwing.credo.service.crypto.PrivateKeyEncryptionService;
 import org.soulwing.credo.service.crypto.PrivateKeyWrapper;
+import org.soulwing.credo.service.crypto.SecretKeyWrapper;
 
 /**
  * Unit tests for {@link ConcreteCredentialProtectionService}.
@@ -99,6 +100,9 @@ public class ConcreteCredentialProtectionServiceTest {
   
   @Mock
   private PrivateKey userPrivateKey;
+  
+  @Mock
+  private SecretKeyWrapper groupSecretKeyWrapper;
   
   @Mock
   private SecretKey groupSecretKey;
@@ -166,6 +170,8 @@ public class ConcreteCredentialProtectionServiceTest {
       will(returnValue(PASSWORD));
       oneOf(groupProtectionService).unprotect(with(same(group)), 
           with(same(PASSWORD)));
+      will(returnValue(groupSecretKeyWrapper));
+      oneOf(groupSecretKeyWrapper).derive();
       will(returnValue(groupSecretKey));
     } };
   }

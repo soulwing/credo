@@ -18,8 +18,6 @@
  */
 package org.soulwing.credo.service.protect;
 
-import javax.crypto.SecretKey;
-
 import org.soulwing.credo.Password;
 import org.soulwing.credo.UserGroup;
 import org.soulwing.credo.UserProfile;
@@ -53,7 +51,7 @@ public interface GroupProtectionService {
    * @param password password provided by the logged in user
    * @return secret key
    */
-  SecretKey unprotect(UserGroup group, Password password) 
+  SecretKeyWrapper unprotect(UserGroup group, Password password) 
       throws GroupAccessException, UserAccessException;
   
 }

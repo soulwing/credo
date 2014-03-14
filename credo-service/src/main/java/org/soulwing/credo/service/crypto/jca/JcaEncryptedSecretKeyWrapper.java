@@ -115,4 +115,12 @@ public class JcaEncryptedSecretKeyWrapper implements SecretKeyWrapper {
     }
   }
 
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public SecretKeyWrapper deriveWrapper() {
+    return new JcaSecretKeyWrapper(derive(), objectBuilderFactory);
+  }
+
 }

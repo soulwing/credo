@@ -27,8 +27,6 @@ import static org.jmock.Expectations.throwException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 
-import javax.crypto.SecretKey;
-
 import org.jmock.Expectations;
 import org.jmock.api.Action;
 import org.jmock.auto.Mock;
@@ -112,9 +110,6 @@ public class ConcreteGroupProtectionServiceTest {
   private PrivateKeyWrapper privateKeyWrapper;
   
   @Mock
-  private SecretKey secretKey;
-  
-  @Mock
   private PublicKey publicKey;
   
   @Mock
@@ -148,7 +143,8 @@ public class ConcreteGroupProtectionServiceTest {
     context.checking(memberExpectationsOnUnprotect(returnValue(member)));
     context.checking(privateKeyExpectations(returnValue(privateKey)));
     context.checking(secretKeyExpectationsOnUnprotect());
-    assertThat(service.unprotect(group, PASSWORD), is(sameInstance(secretKey)));
+    assertThat(service.unprotect(group, PASSWORD), 
+        is(sameInstance(secretKeyWrapper)));
   }
   
   @Test(expected = GroupAccessException.class)
@@ -228,8 +224,8 @@ public class ConcreteGroupProtectionServiceTest {
       oneOf(secretKeyDecoder).decode(with(same(encodedSecretKey)));
       will(returnValue(secretKeyWrapper));
       oneOf(secretKeyWrapper).setPrivateKey(with(same(privateKey)));
-      oneOf(secretKeyWrapper).derive();
-      will(returnValue(secretKey));
+      oneOf(secretKeyWrapper).deriveWrapper();
+      will(returnValue(secretKeyWrapper));
     } };
   }
   

@@ -68,7 +68,7 @@ public class ConcreteCredentialProtectionService
     
     UserGroup group = findGroup(protection.getGroupName());
     SecretKey secretKey = groupProtectionService.unprotect(group, 
-        protection.getPassword());
+        protection.getPassword()).derive();
     
     credential.getPrivateKey().setContent(wrapCredentialPrivateKey(privateKey, secretKey)
     .getContent());
@@ -90,9 +90,10 @@ public class ConcreteCredentialProtectionService
       }
   
       SecretKey secretKey = groupProtectionService.unprotect(group, 
-          protection.getPassword());
+          protection.getPassword()).derive();
   
-      return unwrapCredentialPrivateKey(credential.getPrivateKey().getContent(), secretKey);
+      return unwrapCredentialPrivateKey(credential.getPrivateKey().getContent(), 
+          secretKey);
     }
     catch (NoSuchGroupException ex) {
       throw new RuntimeException(ex);

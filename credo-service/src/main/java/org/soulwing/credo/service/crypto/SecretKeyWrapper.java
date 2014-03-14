@@ -62,4 +62,11 @@ public interface SecretKeyWrapper {
    */
   SecretKey derive();
 
+  /**
+   * Derives and re-wraps the JCP {@link SecretKey} that corresponds to this
+   * wrapper.
+   * @return secret key wrapper
+   */
+  SecretKeyWrapper deriveWrapper();
+
 }

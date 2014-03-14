@@ -88,5 +88,13 @@ public class JcaSecretKeyWrapper implements SecretKeyWrapper {
   public SecretKey derive() {
     return delegate;
   }
+  
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public SecretKeyWrapper deriveWrapper() {
+    return new JcaSecretKeyWrapper(derive(), objectBuilderFactory);
+  }
 
 }
