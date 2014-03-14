@@ -18,8 +18,6 @@
  */
 package org.soulwing.credo.service;
 
-import java.util.Collection;
-
 import javax.ejb.Local;
 
 /**
