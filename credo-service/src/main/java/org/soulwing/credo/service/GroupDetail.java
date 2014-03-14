@@ -31,7 +31,7 @@ public interface GroupDetail {
    * Gets the group's unique identifier.
    * @return unique identifier
    */
-  String getId();
+  Long getId();
   
   /**
    * Gets the group's name.
