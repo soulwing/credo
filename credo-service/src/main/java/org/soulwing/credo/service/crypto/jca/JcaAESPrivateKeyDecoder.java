@@ -25,6 +25,7 @@ import org.apache.commons.codec.DecoderException;
 import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.lang.Validate;
 import org.soulwing.credo.service.crypto.Encoded;
+import org.soulwing.credo.service.crypto.Encoded.Type;
 import org.soulwing.credo.service.crypto.PrivateKeyDecoder;
 import org.soulwing.credo.service.crypto.PrivateKeyWrapper;
 import org.soulwing.credo.service.pem.PemHeaderWrapper;
@@ -38,7 +39,7 @@ import org.soulwing.credo.service.pem.PemObjectWrapper;
  *
  * @author Carl Harris
  */
-@Encoded(type = Encoded.Type.AES)
+@Encoded(Type.AES)
 @ApplicationScoped
 public class JcaAESPrivateKeyDecoder implements PrivateKeyDecoder {
 

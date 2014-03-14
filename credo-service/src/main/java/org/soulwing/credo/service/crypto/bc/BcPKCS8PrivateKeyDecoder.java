@@ -25,6 +25,7 @@ import javax.inject.Inject;
 
 import org.bouncycastle.pkcs.PKCS8EncryptedPrivateKeyInfo;
 import org.soulwing.credo.service.crypto.Encoded;
+import org.soulwing.credo.service.crypto.Encoded.Type;
 import org.soulwing.credo.service.crypto.PrivateKeyDecoder;
 import org.soulwing.credo.service.crypto.PrivateKeyWrapper;
 import org.soulwing.credo.service.pem.PemObjectBuilderFactory;
@@ -37,7 +38,7 @@ import org.soulwing.credo.service.pem.PemObjectWrapper;
  *
  * @author Carl Harris
  */
-@Encoded(type = Encoded.Type.PKCS8)
+@Encoded(Type.PKCS8)
 @ApplicationScoped
 public class BcPKCS8PrivateKeyDecoder implements PrivateKeyDecoder {
 

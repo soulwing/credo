@@ -41,6 +41,6 @@ public @interface Encoded {
     PKCS8;
   }
   
-  Type type();
+  Type value();
   
 }

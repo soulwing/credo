@@ -55,7 +55,7 @@ public class ConcreteCredentialProtectionService
   @Inject
   protected PrivateKeyEncryptionService privateKeyEncryptionService;
   
-  @Inject @Encoded(type = Type.AES)
+  @Inject @Encoded(Type.AES)
   protected PrivateKeyDecoder aesDecoder;
 
   /**

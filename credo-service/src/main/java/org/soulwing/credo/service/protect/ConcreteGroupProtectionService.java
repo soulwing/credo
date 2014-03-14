@@ -54,7 +54,7 @@ public class ConcreteGroupProtectionService
   @Inject
   protected PublicKeyDecoder publicKeyDecoder;
   
-  @Inject @Encoded(type = Type.PKCS8)
+  @Inject @Encoded(Type.PKCS8)
   protected PrivateKeyDecoder pkcs8Decoder;
   
   @Inject
