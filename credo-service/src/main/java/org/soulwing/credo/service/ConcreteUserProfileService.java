@@ -165,42 +165,4 @@ public class ConcreteUserProfileService
     groupMemberRepository.add(groupMember);
   }
 
-  private static class UserProfileWrapper implements UserDetail {
-
-    private final UserProfile delegate;
-    
-    /**
-     * Constructs a new instance.
-     * @param delegate
-     */
-    public UserProfileWrapper(UserProfile delegate) {
-      this.delegate = delegate;
-    }
-
-    @Override
-    public Long getId() {
-      return delegate.getId();
-    }
-
-    @Override
-    public String getLoginName() {
-      return delegate.getLoginName();
-    }
-
-    @Override
-    public String getFullName() {
-      return delegate.getFullName();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String toString() {
-      return String.format("%s (%s)", getFullName(), getLoginName());
-    }
-    
-  }
-  
-
 }

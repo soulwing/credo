@@ -32,7 +32,6 @@ import javax.inject.Inject;
 import org.apache.commons.lang.Validate;
 import org.soulwing.credo.UserGroup;
 import org.soulwing.credo.UserGroupMember;
-import org.soulwing.credo.UserProfile;
 import org.soulwing.credo.repository.UserGroupMemberRepository;
 import org.soulwing.credo.repository.UserGroupRepository;
 import org.soulwing.credo.service.group.ConfigurableGroupEditor;
@@ -76,10 +75,12 @@ public class ConcreteGroupService implements GroupService {
         userContextService.getLoginName());
     Collection<GroupDetail> groupDetails = new ArrayList<>();
     for (UserGroup group : groups) {
+      String groupName = group.getName();
+      if (UserGroup.SELF_GROUP_NAME.equals(groupName)) continue;
       UserGroupWrapper groupDetail = new UserGroupWrapper(group);
       groupDetails.add(groupDetail);
       Collection<UserGroupMember> members = 
-          memberRepository.findAllMembers(group.getName());
+          memberRepository.findAllMembers(groupName);
       for (UserGroupMember member : members) {
         groupDetail.addMember(new UserProfileWrapper(member.getUser()));
       }
@@ -97,83 +98,5 @@ public class ConcreteGroupService implements GroupService {
     Validate.isTrue(editor instanceof ConfigurableGroupEditor);
     ((ConfigurableGroupEditor) editor).save(errors);
   }
- 
   
-  private static class UserGroupWrapper implements GroupDetail {
-
-    private final UserGroup delegate;
-    private final Collection<UserDetail> members = new ArrayList<>();
-    
-    /**
-     * Constructs a new instance.
-     * @param delegate
-     */
-    public UserGroupWrapper(UserGroup delegate) {
-      this.delegate = delegate;
-    }
-
-    public void addMember(UserDetail member) {
-      this.members.add(member);
-    }
-    
-    @Override
-    public Long getId() {
-      return delegate.getId();
-    }
-
-    @Override
-    public String getName() {
-      return delegate.getName();
-    }
-
-    @Override
-    public String getDescription() {
-      return delegate.getDescription();
-    }
-
-    @Override
-    public Collection<UserDetail> getMembers() {
-      return members;
-    }
-    
-  }
-  
-  private static class UserProfileWrapper implements UserDetail {
-
-    private UserProfile delegate;
-    
-    /**
-     * Constructs a new instance.
-     * @param delegate
-     */
-    public UserProfileWrapper(UserProfile delegate) {
-      this.delegate = delegate;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Long getId() {
-      return delegate.getId();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String getLoginName() {
-      return delegate.getLoginName();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String getFullName() {
-      return delegate.getFullName();
-    }
-    
-  }
-
 }
