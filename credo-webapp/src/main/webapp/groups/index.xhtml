@@ -19,7 +19,7 @@
           <button class="btn btn-success btn-sm" 
             onclick="window.location.href='create/'; return false;">
             <i class="icon-white glyphicon glyphicon-plus"/>
-            <span>#{messages.createGroupButtonLabel}</span>
+            <span>#{messages.groupCreateButtonLabel}</span>
           </button>
         </div>
         <h:dataTable id="groups" var="group" 
@@ -36,12 +36,14 @@
             #{group.description}
           </h:column>
                     
-          <h:column>
+          <h:column headerClass="sorter-false">
             <f:facet name="header">#{messages.groupTableMembersHeader}</f:facet>
-            #{group.members}
+            <h:outputText value="#{group.members}">
+              <f:converter converterId="org.soulwing.credo.converters.CommaSeparated"/>
+            </h:outputText>
           </h:column>
           
-          <h:column>
+          <h:column headerClass="sorter-false filter-false">
             <h:outputLink styleClass="btn btn-default btn-xs" value="edit">
               <f:param name="id" value="#{group.id}"/>
               #{messages.editButtonLabel}
