@@ -34,7 +34,9 @@
 						<h:inputText id="name" required="true"
 							requiredMessage="#{messages.groupEditorNameRequired}"
 							styleClass="form-control" title="#{messages.groupEditorNameTip}"
-							value="#{cc.attrs.editor.name}" />
+							value="#{cc.attrs.editor.name}">
+							<f:validator validatorId="org.soulwing.credo.validators.GroupName"/>
+						</h:inputText>
 					</div>
 				</div>
 				<div class="form-group">
@@ -42,8 +44,7 @@
 						styleClass="col-md-2 control-label">
               #{messages.groupEditorDescriptionLabel}</h:outputLabel>
 					<div class="col-md-8">
-						<h:inputText id="description" required="true"
-							requiredMessage="#{messages.groupEditorDescriptionRequired}"
+						<h:inputText id="description"
 							styleClass="form-control"
 							title="#{messages.groupEditorDescriptionTip}"
 							value="#{cc.attrs.editor.description}" />
