@@ -19,7 +19,6 @@
 package org.soulwing.credo.service.protect;
 
 import static org.jmock.Expectations.returnValue;
-import static org.jmock.Expectations.throwException;
 
 import java.security.PrivateKey;
 
@@ -38,15 +37,13 @@ import org.soulwing.credo.Password;
 import org.soulwing.credo.UserGroup;
 import org.soulwing.credo.UserGroupMember;
 import org.soulwing.credo.UserProfile;
-import org.soulwing.credo.repository.UserGroupMemberRepository;
+import org.soulwing.credo.repository.UserGroupRepository;
+import org.soulwing.credo.service.NoSuchGroupException;
 import org.soulwing.credo.service.ProtectionParameters;
 import org.soulwing.credo.service.UserContextService;
-import org.soulwing.credo.service.crypto.IncorrectPassphraseException;
 import org.soulwing.credo.service.crypto.PrivateKeyDecoder;
 import org.soulwing.credo.service.crypto.PrivateKeyEncryptionService;
 import org.soulwing.credo.service.crypto.PrivateKeyWrapper;
-import org.soulwing.credo.service.crypto.SecretKeyDecoder;
-import org.soulwing.credo.service.crypto.SecretKeyWrapper;
 
 /**
  * Unit tests for {@link ConcreteCredentialProtectionService}.
@@ -58,28 +55,21 @@ public class ConcreteCredentialProtectionServiceTest {
   @Rule
   public final JUnitRuleMockery context = new JUnitRuleMockery();
   
-  private final String loginName = "someUser";
+  private static final String LOGIN_NAME = "someUser";
   
-  private final String groupName = "someGroup";
+  private static final String GROUP_NAME = "someGroup";
 
-  private final Password password = new Password("somePassword".toCharArray());
+  private static final Password PASSWORD = new Password(new char[0]);
 
-  private final String encodedPrivateKey = "privateKey";
-  
-  private final String encodedSecretKey = "secretKey";
+  @Mock
+  private UserGroupRepository groupRepository; 
   
   @Mock
-  private UserGroupMemberRepository groupMemberRepository; 
-  
-  @Mock
-  private PrivateKeyDecoder pkcs8Decoder;
+  private GroupProtectionService groupProtectionService;
   
   @Mock
   private PrivateKeyDecoder aesDecoder;
   
-  @Mock
-  private SecretKeyDecoder secretKeyDecoder;
-
   @Mock
   private UserContextService userContextService;
   
@@ -108,15 +98,6 @@ public class ConcreteCredentialProtectionServiceTest {
   private UserGroupMember groupMember;
   
   @Mock
-  private PrivateKeyWrapper encryptedUserPrivateKey;
-  
-  @Mock
-  private SecretKeyWrapper encryptedSecretKey;
-  
-  @Mock
-  private PrivateKeyWrapper encryptedCredentialPrivateKey;
-  
-  @Mock
   private PrivateKey userPrivateKey;
   
   @Mock
@@ -130,91 +111,63 @@ public class ConcreteCredentialProtectionServiceTest {
   
   @Before
   public void setUp() throws Exception {
-    service.groupMemberRepository = groupMemberRepository;
-    service.pkcs8Decoder = pkcs8Decoder;
+    service.groupRepository = groupRepository;
+    service.groupProtectionService = groupProtectionService;
     service.aesDecoder = aesDecoder;
-    service.secretKeyDecoder = secretKeyDecoder;
     service.userContextService = userContextService;
     service.privateKeyEncryptionService = privateKeyEncryptionService;
   }
 
   @Test
   public void testProtectSuccess() throws Exception {
-    context.checking(findGroupMemberExpectations(returnValue(groupMember)));
-    context.checking(accessGroupMemberExpectations());
-    context.checking(accessCredentialKeyExpectations());
-    context.checking(unwrapUserPrivateKeyExpectations(
-        returnValue(userPrivateKey)));
-    context.checking(unwrapGroupSecretKeyExpectations());
+    context.checking(groupExpectations(returnValue(group)));
+    context.checking(groupUnprotectExpectations());
     context.checking(wrapCredentialPrivateKeyExpectations());
-    context.checking(storeCredentialPrivateKeyExpectations());
     service.protect(credential, credentialPrivateKey, protection);
   }
   
-  @Test(expected = GroupAccessException.class)
-  public void testProtectWhenNotGroupMember() throws Exception {
-    context.checking(findGroupMemberExpectations(returnValue(null)));
-    service.protect(credential, credentialPrivateKey, protection);
-  }
-  
-  @Test(expected = UserAccessException.class)
-  public void testProtectWhenPasswordIncorrect() throws Exception {
-    context.checking(findGroupMemberExpectations(returnValue(groupMember)));
-    context.checking(accessGroupMemberExpectations());
-    context.checking(accessCredentialKeyExpectations());
-    context.checking(unwrapUserPrivateKeyExpectations(
-        throwException(new IncorrectPassphraseException())));
+  @Test(expected = NoSuchGroupException.class)
+  public void testProtectWhenGroupDoesNotExist() throws Exception {
+    context.checking(groupExpectations(returnValue(null)));
     service.protect(credential, credentialPrivateKey, protection);
   }
   
   @Test
   public void testUnprotectSuccess() throws Exception {
-    context.checking(findGroupMemberExpectations(returnValue(groupMember)));
-    context.checking(accessGroupMemberExpectations());
+    context.checking(groupExpectations(returnValue(group)));
+    context.checking(groupUnprotectExpectations());
     context.checking(checkOwnershipExpectations(returnValue(group)));
-    context.checking(accessCredentialKeyExpectations());
-    context.checking(unwrapUserPrivateKeyExpectations(
-        returnValue(userPrivateKey)));
-    context.checking(unwrapGroupSecretKeyExpectations());
     context.checking(unwrapCredentialPrivateKeyExpectations());
     service.unprotect(credential, protection);
   }
   
   @Test(expected = GroupAccessException.class)
-  public void testUnprotectWhenNotGroupMember() throws Exception {
-    context.checking(findGroupMemberExpectations(returnValue(null)));
-    service.unprotect(credential, protection);
-  }
-
-  @Test(expected = GroupAccessException.class)
   public void testUnprotectWhenNotSameOwnerGroup() throws Exception {
-    context.checking(findGroupMemberExpectations(returnValue(groupMember)));
-    context.checking(accessGroupMemberExpectations());
+    context.checking(groupExpectations(returnValue(group)));
     context.checking(checkOwnershipExpectations(returnValue(otherGroup)));
     service.unprotect(credential, protection);
   }
   
-  @Test(expected = UserAccessException.class)
-  public void testUnprotectWhenPasswordIncorrect() throws Exception {
-    context.checking(findGroupMemberExpectations(returnValue(groupMember)));
-    context.checking(accessGroupMemberExpectations());
-    context.checking(checkOwnershipExpectations(returnValue(group)));
-    context.checking(accessCredentialKeyExpectations());
-    context.checking(unwrapUserPrivateKeyExpectations(
-        throwException(new IncorrectPassphraseException())));
-    service.unprotect(credential, protection);
-  }
-  
-  private Expectations findGroupMemberExpectations(final Action outcome) {
+  private Expectations groupExpectations(final Action outcome) {
     return new Expectations() { {
       allowing(userContextService).getLoginName();
-      will(returnValue(loginName));
+      will(returnValue(LOGIN_NAME));
       allowing(protection).getGroupName();
-      will(returnValue(groupName));
-      oneOf(groupMemberRepository).findByGroupAndLoginName(
-          with(same(groupName)), with(same(loginName)));
+      will(returnValue(GROUP_NAME));
+      oneOf(groupRepository).findByGroupName(
+          with(same(GROUP_NAME)), with(same(LOGIN_NAME)));
       will(outcome);
     } };    
+  }
+  
+  private Expectations groupUnprotectExpectations() throws Exception {
+    return new Expectations() { {
+      oneOf(protection).getPassword();
+      will(returnValue(PASSWORD));
+      oneOf(groupProtectionService).unprotect(with(same(group)), 
+          with(same(PASSWORD)));
+      will(returnValue(groupSecretKey));
+    } };
   }
   
   private Expectations checkOwnershipExpectations(final Action outcome) {
@@ -224,78 +177,37 @@ public class ConcreteCredentialProtectionServiceTest {
       oneOf(credential).getOwner();
       will(outcome);
       allowing(credential).getName();
-      will(returnValue("credentialName"));
+      will(returnValue("some credential name"));
     } };
   }
   
-  private Expectations accessCredentialKeyExpectations() { 
+  private Expectations unwrapCredentialPrivateKeyExpectations() { 
+    final String encodedPrivateKey = new String();
     return new Expectations() { { 
       oneOf(credential).getPrivateKey();
       will(returnValue(credentialKey));
       allowing(credentialKey).getContent();
       will(returnValue(encodedPrivateKey));
-    } };
-  }
-
-  private Expectations accessGroupMemberExpectations() {
-    return new Expectations() { { 
-      allowing(groupMember).getUser();
-      will(returnValue(user));
-      allowing(user).getPrivateKey();
-      will(returnValue(encodedPrivateKey));
-      allowing(groupMember).getSecretKey();
-      will(returnValue(encodedSecretKey));
-    } };
-  }
-  
-  private Expectations unwrapUserPrivateKeyExpectations(
-      final Action outcome) {
-    return new Expectations() { { 
-      oneOf(protection).getPassword();
-      will(returnValue(password));
-      oneOf(pkcs8Decoder).decode(with(same(encodedPrivateKey)));
-      will(returnValue(encryptedUserPrivateKey));
-      oneOf(encryptedUserPrivateKey).setProtectionParameter(
-          with(same(password)));
-      oneOf(encryptedUserPrivateKey).derive();
-      will(outcome);
-    } };
-  }
-  
-  private Expectations unwrapGroupSecretKeyExpectations() { 
-    return new Expectations() { { 
-      oneOf(secretKeyDecoder).decode(encodedSecretKey);
-      will(returnValue(encryptedSecretKey));
-      oneOf(encryptedSecretKey).setPrivateKey(userPrivateKey);
-      oneOf(encryptedSecretKey).derive();
-      will(returnValue(groupSecretKey));
-    } };
-  }
-
-  private Expectations unwrapCredentialPrivateKeyExpectations() { 
-    return new Expectations() { { 
       oneOf(aesDecoder).decode(encodedPrivateKey);
-      will(returnValue(encryptedCredentialPrivateKey));
-      oneOf(encryptedCredentialPrivateKey).setProtectionParameter(
+      will(returnValue(credentialPrivateKey));
+      oneOf(credentialPrivateKey).setProtectionParameter(
           groupSecretKey);
-      oneOf(encryptedCredentialPrivateKey).deriveWrapper();
+      oneOf(credentialPrivateKey).deriveWrapper();
       will(returnValue(credentialPrivateKey));
     } };
   }
 
-  private Expectations wrapCredentialPrivateKeyExpectations() { 
-    return new Expectations() { { 
+  private Expectations wrapCredentialPrivateKeyExpectations() {
+    final String encodedPrivateKey = new String();
+    return new Expectations() { {
       oneOf(privateKeyEncryptionService).encrypt(with(credentialPrivateKey), 
           with(groupSecretKey));
       will(returnValue(credentialPrivateKey));
-    } };
-  }
-
-  private Expectations storeCredentialPrivateKeyExpectations() { 
-    return new Expectations() { { 
       oneOf(credentialPrivateKey).getContent();
       will(returnValue(encodedPrivateKey));
-      oneOf(credentialKey).setContent(with(encodedPrivateKey));
+      oneOf(credential).getPrivateKey();
+      will(returnValue(credentialKey));
+      oneOf(credentialKey).setContent(with(same(encodedPrivateKey)));
     } };
   }
 

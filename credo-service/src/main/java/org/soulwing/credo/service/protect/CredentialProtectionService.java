@@ -19,6 +19,7 @@
 package org.soulwing.credo.service.protect;
 
 import org.soulwing.credo.Credential;
+import org.soulwing.credo.service.NoSuchGroupException;
 import org.soulwing.credo.service.ProtectionParameters;
 import org.soulwing.credo.service.crypto.PrivateKeyWrapper;
 
@@ -37,10 +38,11 @@ public interface CredentialProtectionService {
    * @param protection protect parameters
    * @throws UserAccessException if the user profile cannot be accessed
    * @throws GroupAccessException if the credential's group cannot be accessed
+   * @throws NoSuchGroupException if the credential's group does not exist
    */
   void protect(Credential credential, PrivateKeyWrapper privateKey, 
       ProtectionParameters protection)
-      throws UserAccessException, GroupAccessException;
+      throws UserAccessException, GroupAccessException, NoSuchGroupException;
   
   /**
    * Removes the cryptographic protection from a credential's private key.

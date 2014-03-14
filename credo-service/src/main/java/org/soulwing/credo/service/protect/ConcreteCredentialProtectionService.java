@@ -18,26 +18,21 @@
  */
 package org.soulwing.credo.service.protect;
 
-import java.security.PrivateKey;
-
 import javax.crypto.SecretKey;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
 import org.soulwing.credo.Credential;
-import org.soulwing.credo.Password;
-import org.soulwing.credo.UserGroupMember;
-import org.soulwing.credo.repository.UserGroupMemberRepository;
+import org.soulwing.credo.UserGroup;
+import org.soulwing.credo.repository.UserGroupRepository;
+import org.soulwing.credo.service.NoSuchGroupException;
 import org.soulwing.credo.service.ProtectionParameters;
 import org.soulwing.credo.service.UserContextService;
 import org.soulwing.credo.service.crypto.Encoded;
 import org.soulwing.credo.service.crypto.Encoded.Type;
-import org.soulwing.credo.service.crypto.IncorrectPassphraseException;
 import org.soulwing.credo.service.crypto.PrivateKeyDecoder;
 import org.soulwing.credo.service.crypto.PrivateKeyEncryptionService;
 import org.soulwing.credo.service.crypto.PrivateKeyWrapper;
-import org.soulwing.credo.service.crypto.SecretKeyDecoder;
-import org.soulwing.credo.service.crypto.SecretKeyWrapper;
 
 /**
  * A concrete {@link CredentialProtectionService} implementation.
@@ -49,22 +44,19 @@ public class ConcreteCredentialProtectionService
     implements CredentialProtectionService {
 
   @Inject
-  protected UserGroupMemberRepository groupMemberRepository; 
+  protected UserGroupRepository groupRepository; 
   
   @Inject
   protected UserContextService userContextService;
   
   @Inject
-  protected PrivateKeyEncryptionService privateKeyEncryptionService;
+  protected GroupProtectionService groupProtectionService;
   
-  @Inject @Encoded(type = Type.PKCS8)
-  protected PrivateKeyDecoder pkcs8Decoder;
+  @Inject
+  protected PrivateKeyEncryptionService privateKeyEncryptionService;
   
   @Inject @Encoded(type = Type.AES)
   protected PrivateKeyDecoder aesDecoder;
-  
-  @Inject
-  protected SecretKeyDecoder secretKeyDecoder;
 
   /**
    * {@inheritDoc}
@@ -72,13 +64,14 @@ public class ConcreteCredentialProtectionService
   @Override
   public void protect(Credential credential, PrivateKeyWrapper privateKey,
       ProtectionParameters protection) throws UserAccessException,
-      GroupAccessException {
+      GroupAccessException, NoSuchGroupException {
     
-    UserGroupMember groupMember = findGroupMember(
-        protection.getGroupName(), userContextService.getLoginName());
+    UserGroup group = findGroup(protection.getGroupName());
+    SecretKey secretKey = groupProtectionService.unprotect(group, 
+        protection.getPassword());
     
-    credential.getPrivateKey().setContent(protect(privateKey, groupMember, 
-        protection.getPassword()));
+    credential.getPrivateKey().setContent(wrapCredentialPrivateKey(privateKey, secretKey)
+    .getContent());
   }
 
   /**
@@ -88,86 +81,38 @@ public class ConcreteCredentialProtectionService
   public PrivateKeyWrapper unprotect(Credential credential,
       ProtectionParameters protection) throws UserAccessException,
       GroupAccessException {
-    UserGroupMember groupMember = findGroupMember(
-        protection.getGroupName(), userContextService.getLoginName());
-    if (!groupMember.getGroup().equals(credential.getOwner())) {
-      throw new GroupAccessException(protection.getGroupName() 
-          + " is not the owner of " + credential.getName());
-    }
-    return unprotect(credential.getPrivateKey().getContent(), groupMember, 
-        protection.getPassword());
-  }
-  
-  private UserGroupMember findGroupMember(String groupName, 
-      String loginName) throws GroupAccessException {
-    UserGroupMember groupMember = groupMemberRepository
-        .findByGroupAndLoginName(groupName, loginName);
-    if (groupMember == null) {
-      throw new GroupAccessException(
-          loginName + " is not a member of group " + groupName);
-    }
-    return groupMember;
-  }
-
-  private String protect(PrivateKeyWrapper privateKey, 
-      UserGroupMember groupMember, Password password) 
-      throws UserAccessException {
     
     try {
-      PrivateKey userPrivateKey = 
-          unwrapUserPrivateKey(groupMember, password);
+      UserGroup group = findGroup(protection.getGroupName());
+      if (!group.equals(credential.getOwner())) {
+        throw new GroupAccessException(protection.getGroupName() 
+            + " is not the owner of " + credential.getName());
+      }
   
-      SecretKey groupSecretKey =
-          unwrapGroupSecretKey(groupMember, userPrivateKey);
-      
-      return wrapCredentialPrivateKey(privateKey, groupSecretKey)
-          .getContent();
-      
+      SecretKey secretKey = groupProtectionService.unprotect(group, 
+          protection.getPassword());
+  
+      return unwrapCredentialPrivateKey(credential.getPrivateKey().getContent(), secretKey);
     }
-    catch (IncorrectPassphraseException ex) {
-      throw new UserAccessException(ex);
+    catch (NoSuchGroupException ex) {
+      throw new RuntimeException(ex);
     }
   }
   
-  private PrivateKeyWrapper unprotect(String encodedPrivateKey, 
-      UserGroupMember groupMember, Password password) 
-      throws UserAccessException {
-    
-    try {
-      PrivateKey userPrivateKey = 
-          unwrapUserPrivateKey(groupMember, password);
-  
-      SecretKey groupSecretKey =
-          unwrapGroupSecretKey(groupMember, userPrivateKey);
-      
-      return unwrapCredentialPrivateKey(encodedPrivateKey, groupSecretKey);
-      
+  /**
+   * Finds a group by name.
+   * @param groupName name of the group to match
+   * @return group object
+   * @throws NoSuchGroupException if the group does not exist
+   */
+  private UserGroup findGroup(String groupName) 
+      throws NoSuchGroupException {
+    UserGroup group = groupRepository.findByGroupName(groupName, 
+        userContextService.getLoginName());
+    if (group == null) {
+      throw new NoSuchGroupException();
     }
-    catch (IncorrectPassphraseException ex) {
-      throw new UserAccessException(ex);
-    }
-  }
-
-  private PrivateKey unwrapUserPrivateKey(UserGroupMember groupMember,
-      Password password) {
-    
-    PrivateKeyWrapper encryptedPrivateKey = pkcs8Decoder.decode(
-        groupMember.getUser().getPrivateKey());
-    
-    encryptedPrivateKey.setProtectionParameter(password);
-    
-    return encryptedPrivateKey.derive();
-  }
-
-  private SecretKey unwrapGroupSecretKey(UserGroupMember groupMember,
-      PrivateKey privateKey) {
-    
-    SecretKeyWrapper encryptedSecretKey = secretKeyDecoder.decode(
-        groupMember.getSecretKey());     
-    
-    encryptedSecretKey.setPrivateKey(privateKey);
-    
-    return encryptedSecretKey.derive();
+    return group;
   }
 
   private PrivateKeyWrapper wrapCredentialPrivateKey(
