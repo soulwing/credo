@@ -18,6 +18,9 @@
  */
 package org.soulwing.credo.service.group;
 
+import java.util.ArrayList;
+import java.util.Collection;
+
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.inject.Instance;
 import javax.inject.Inject;
@@ -25,6 +28,7 @@ import javax.inject.Inject;
 import org.soulwing.credo.UserGroup;
 import org.soulwing.credo.repository.UserGroupRepository;
 import org.soulwing.credo.service.GroupEditor;
+import org.soulwing.credo.service.UserDetail;
 import org.soulwing.credo.service.UserProfileService;
 
 /**
@@ -49,14 +53,16 @@ public class ConcreteGroupEditorFactory implements GroupEditorFactory {
    */
   @Override
   public ConfigurableGroupEditor newEditor() {
-    return configure(newGroupEditor.get(), groupRepository.newGroup(""));
+    return configure(newGroupEditor.get(), groupRepository.newGroup(""),
+        new ArrayList<UserDetail>());
   }
 
   private ConfigurableGroupEditor configure(ConfigurableGroupEditor editor,
-      UserGroup group) {
+      UserGroup group, Collection<UserDetail> members) {
     Long ownerId = profileService.getLoggedInUserProfile().getId();
     editor.setGroup(group);
     editor.setOwner(ownerId);
+    editor.setMembers(members);
     editor.setUsers(profileService.findAllProfiles());
     editor.setMembership(new Long[] { ownerId });
     return editor;

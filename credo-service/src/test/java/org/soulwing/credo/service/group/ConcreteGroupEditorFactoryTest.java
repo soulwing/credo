@@ -20,6 +20,8 @@ package org.soulwing.credo.service.group;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.arrayContaining;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasProperty;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.sameInstance;
 
@@ -83,6 +85,7 @@ public class ConcreteGroupEditorFactoryTest {
   }
 
   @Test
+  @SuppressWarnings("unchecked")
   public void testNewEditor() throws Exception {
     context.checking(new Expectations() { { 
       oneOf(newGroupEditor).get();
@@ -97,6 +100,8 @@ public class ConcreteGroupEditorFactoryTest {
       will(returnValue(OWNER_ID));
       oneOf(editor).setGroup(with(same(group)));
       oneOf(editor).setOwner(with(OWNER_ID));
+      oneOf(editor).setMembers((Collection<UserDetail>) 
+          with(hasProperty("empty", equalTo(true))));
       oneOf(editor).setMembership(with(arrayContaining(OWNER_ID)));
       oneOf(editor).setUsers(with(same(users)));
     } });
