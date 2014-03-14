@@ -18,18 +18,41 @@
  */
 package org.soulwing.credo.service.group;
 
+import java.util.Collection;
+
+import org.soulwing.credo.UserGroup;
 import org.soulwing.credo.service.Errors;
 import org.soulwing.credo.service.GroupEditException;
 import org.soulwing.credo.service.GroupEditor;
 import org.soulwing.credo.service.NoSuchGroupException;
+import org.soulwing.credo.service.UserDetail;
 
 /**
  * A {@link GroupEditor} with a save method.
  *
  * @author Carl Harris
  */
-public interface SaveableGroupEditor extends GroupEditor {
+public interface ConfigurableGroupEditor extends GroupEditor {
 
+  /**
+   * Sets the group to edit.
+   * @param group the group to set
+   */
+  void setGroup(UserGroup group);
+  
+  /**
+   * Sets the ID of the group owner.
+   * @param id the ID to set
+   */
+  void setOwner(Long id);
+  
+  /**
+   * Sets the collection of users who will be made available to set as 
+   * group members.
+   * @param users the users to set
+   */
+  void setUsers(Collection<UserDetail> users);
+  
   /**
    * Applies the state of this editor, effectively making the edits it 
    * represents persistent.
@@ -40,5 +63,6 @@ public interface SaveableGroupEditor extends GroupEditor {
    * @throws GroupEditException if a recoverable error occurs
    */
   void save(Errors errors) throws NoSuchGroupException, GroupEditException;
+ 
   
 }

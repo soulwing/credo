@@ -16,21 +16,7 @@
  * limitations under the License.
  *
  */
-package org.soulwing.credo.service.group;
-
-import org.soulwing.credo.service.GroupEditor;
-
 /**
- * A factory that produces {@link GroupEditor} objects.
- *
- * @author Carl Harris
+ * Provides service support for user groups
  */
-public interface GroupEditorFactory {
-
-  /**
-   * Creates an editor for a new group.
-   * @return group editor
-   */
-  ConfigurableGroupEditor newEditor();
-  
-}
+package org.soulwing.credo.service.group;

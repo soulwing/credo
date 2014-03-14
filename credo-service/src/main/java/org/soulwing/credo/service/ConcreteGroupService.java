@@ -25,9 +25,9 @@ import javax.ejb.TransactionAttribute;
 import javax.ejb.TransactionAttributeType;
 import javax.inject.Inject;
 
-import org.jsoup.helper.Validate;
+import org.apache.commons.lang.Validate;
+import org.soulwing.credo.service.group.ConfigurableGroupEditor;
 import org.soulwing.credo.service.group.GroupEditorFactory;
-import org.soulwing.credo.service.group.SaveableGroupEditor;
 
 /**
  * A concrete {@link GroupService} implementation.
@@ -56,8 +56,8 @@ public class ConcreteGroupService implements GroupService {
   @TransactionAttribute(TransactionAttributeType.REQUIRED)
   public void saveGroup(GroupEditor editor, Errors errors)
       throws NoSuchGroupException, GroupEditException {
-    Validate.isTrue(editor instanceof SaveableGroupEditor);
-    ((SaveableGroupEditor) editor).save(errors);
+    Validate.isTrue(editor instanceof ConfigurableGroupEditor);
+    ((ConfigurableGroupEditor) editor).save(errors);
   }
   
 }
