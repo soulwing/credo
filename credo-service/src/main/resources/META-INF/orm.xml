@@ -44,6 +44,14 @@
     </query>
   </named-query>
 
+  <named-query name="findAllGroupMembers">
+    <query>
+      select distinct gm from UserGroupMemberEntity gm
+      inner join gm.group g
+      where g.name = :groupName
+    </query>
+  </named-query>
+  
   <named-query name="findGroupMemberWithGroupAndLoginName">
     <query>
       select distinct gm from UserGroupMemberEntity gm

@@ -18,6 +18,9 @@
  */
 package org.soulwing.credo.repository;
 
+import java.util.Collection;
+
+import org.soulwing.credo.UserGroup;
 import org.soulwing.credo.UserGroupMember;
 
 /**
@@ -40,5 +43,13 @@ public interface UserGroupMemberRepository {
    * @return matching group member or {@code null} if no such member exists
    */
   UserGroupMember findByGroupAndLoginName(String groupName, String loginName);
+  
+  /**
+   * Finds the set of all members of a given group.
+   * @param groupName group name (which must be neither {@code null} nor
+   *    equal to {@link UserGroup#SELF_GROUP_NAME}.
+   * @return set of group members
+   */
+  Collection<UserGroupMember> findAllMembers(String groupName);
   
 }

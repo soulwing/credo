@@ -25,11 +25,15 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.nullValue;
 
+import java.util.Collection;
+import java.util.Iterator;
+
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.transaction.UserTransaction;
 
+import org.apache.commons.lang.Validate;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.shrinkwrap.api.Archive;
@@ -62,6 +66,7 @@ public class JpaUserGroupMemberRepositoryIT {
           .addClasses(UserGroupMemberRepository.class, 
               JpaUserGroupMemberRepository.class)
           .addClass(EntityUtil.class)
+          .addClass(Validate.class)
           .addAsResource("persistence-test.xml", "META-INF/persistence.xml")
           .addAsResource("META-INF/orm.xml", "META-INF/orm.xml")
           .addAsWebInfResource(EmptyAsset.INSTANCE, "beans.xml");
@@ -111,10 +116,52 @@ public class JpaUserGroupMemberRepositoryIT {
   }
   
   @Test
+  public void testFindAllGroupMembers() throws Exception {
+    final String loginName1 = "someUser1";
+    final String loginName2 = "someUser2";
+    final String groupName = "someGroup";
+    UserProfileEntity user1 = EntityUtil.newUser(loginName1);
+    UserProfileEntity user2 = EntityUtil.newUser(loginName2);
+    UserGroupEntity group = EntityUtil.newGroup(groupName);
+    
+    UserGroupMemberEntity groupMember1 = EntityUtil.newGroupMember(user1, group);
+    UserGroupMemberEntity groupMember2 = EntityUtil.newGroupMember(user2, group);
+    
+    entityManager.persist(user1);
+    entityManager.persist(user2);
+    entityManager.persist(group);
+    entityManager.persist(groupMember1);
+    entityManager.persist(groupMember2);
+    entityManager.flush();
+    entityManager.clear();
+    
+    Collection<UserGroupMember> actual = repository.findAllMembers(groupName);
+    assertThat(actual, hasProperty("empty", equalTo(false)));
+    
+    Iterator<UserGroupMember> i = actual.iterator();
+
+    assertThat(i.hasNext(), is(true));
+    UserGroupMember member = i.next();
+    assertThat(member, 
+        hasProperty("group", hasProperty("name", equalTo(groupName))));
+    assertThat(member, 
+        hasProperty("user", hasProperty("loginName", equalTo(loginName1))));
+
+    assertThat(i.hasNext(), is(true));
+    member = i.next();
+    assertThat(member, 
+        hasProperty("group", hasProperty("name", equalTo(groupName))));
+    assertThat(member, 
+        hasProperty("user", hasProperty("loginName", equalTo(loginName2))));
+
+    assertThat(i.hasNext(), is(false));
+  }
+  
+  @Test
   public void testFindByGroupAndLoginName() throws Exception {
     final String loginName = "someUser";
     final String groupName = "someGroup";
-    UserProfileEntity user = EntityUtil.newUser("someUser");
+    UserProfileEntity user = EntityUtil.newUser(loginName);
     UserGroupEntity group = EntityUtil.newGroup(groupName);
     
     UserGroupMemberEntity groupMember = EntityUtil.newGroupMember(user, group);
@@ -138,7 +185,7 @@ public class JpaUserGroupMemberRepositoryIT {
   public void testFindByGroupAndLoginNameWhenGroupNotFound() throws Exception {
     final String loginName = "someUser";
     final String groupName = "someGroup";
-    UserProfileEntity user = EntityUtil.newUser("someUser");
+    UserProfileEntity user = EntityUtil.newUser(loginName);
     UserGroupEntity group = EntityUtil.newGroup(groupName);
     
     UserGroupMemberEntity groupMember = EntityUtil.newGroupMember(user, group);

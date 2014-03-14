@@ -18,6 +18,7 @@
  */
 package org.soulwing.credo.repository;
 
+import java.util.Collection;
 import java.util.Date;
 
 import javax.enterprise.context.ApplicationScoped;
@@ -26,6 +27,7 @@ import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
 import javax.persistence.TypedQuery;
 
+import org.apache.commons.lang.Validate;
 import org.soulwing.credo.UserGroup;
 import org.soulwing.credo.UserGroupMember;
 import org.soulwing.credo.domain.UserGroupMemberEntity;
@@ -84,4 +86,20 @@ public class JpaUserGroupMemberRepository
       return null;
     }
   }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public Collection<UserGroupMember> findAllMembers(String groupName) {
+    Validate.notEmpty(groupName, "groupName is required");
+    Validate.isTrue(!UserGroup.SELF_GROUP_NAME.equals(groupName));
+    
+    TypedQuery<UserGroupMember> query = entityManager.createNamedQuery(
+        "findAllGroupMembers", UserGroupMember.class);
+    query.setParameter("groupName", groupName);
+  
+    return query.getResultList();
+  }
+
 }
