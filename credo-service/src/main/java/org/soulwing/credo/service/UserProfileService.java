@@ -18,6 +18,8 @@
  */
 package org.soulwing.credo.service;
 
+import java.util.Collection;
+
 import javax.ejb.Local;
 
 import org.soulwing.credo.UserProfile;
@@ -45,6 +47,12 @@ public interface UserProfileService {
    *    login name
    */
   UserProfile findProfile(String loginName);
+  
+  /**
+   * Finds all available user profiles.
+   * @return user profile details
+   */
+  Collection<UserDetail> findAllProfiles();
   
   /**
    * Prepares to create a new user profile.

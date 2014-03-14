@@ -18,6 +18,10 @@
  */
 package org.soulwing.credo.service;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+
 import javax.ejb.ConcurrencyManagement;
 import javax.ejb.ConcurrencyManagementType;
 import javax.ejb.Singleton;
@@ -115,6 +119,19 @@ public class ConcreteUserProfileService
    * {@inheritDoc}
    */
   @Override
+  public Collection<UserDetail> findAllProfiles() {
+    List<UserProfile> profiles = profileRepository.findAll();
+    Collection<UserDetail> details = new ArrayList<>(profiles.size());
+    for (UserProfile profile : profiles) {
+      details.add(new UserProfileWrapper(profile));
+    }
+    return details;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
   public UserProfilePreparation prepareProfile(String loginName) {
     return new ConcreteUserProfilePreparation(loginName);
   }
@@ -153,5 +170,43 @@ public class ConcreteUserProfileService
     groupRepository.add(group);
     groupMemberRepository.add(groupMember);
   }
+
+  private static class UserProfileWrapper implements UserDetail {
+
+    private final UserProfile delegate;
+    
+    /**
+     * Constructs a new instance.
+     * @param delegate
+     */
+    public UserProfileWrapper(UserProfile delegate) {
+      this.delegate = delegate;
+    }
+
+    @Override
+    public Long getId() {
+      return delegate.getId();
+    }
+
+    @Override
+    public String getLoginName() {
+      return delegate.getLoginName();
+    }
+
+    @Override
+    public String getFullName() {
+      return delegate.getFullName();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String toString() {
+      return String.format("%s (%s)", getFullName(), getLoginName());
+    }
+    
+  }
+  
 
 }
