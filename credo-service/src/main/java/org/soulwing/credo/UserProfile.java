@@ -26,6 +26,12 @@ package org.soulwing.credo;
 public interface UserProfile {
 
   /**
+   * Gets the unique identifier for the user.
+   * @return unique identifier (or {@code null} if the receiver is transient)
+   */
+  Long getId();
+  
+  /**
    * Gets the login name for the user.
    * @return login name
    */
