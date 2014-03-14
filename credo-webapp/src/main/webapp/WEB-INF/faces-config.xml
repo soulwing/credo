@@ -62,6 +62,20 @@
   </navigation-rule>
 
   <navigation-rule>
+    <from-view-id>/groups/*</from-view-id>
+    <navigation-case>
+      <from-outcome>success</from-outcome>
+      <to-view-id>/groups/index.xhtml</to-view-id>
+      <redirect/>
+    </navigation-case>
+    <navigation-case>
+      <from-outcome>cancel</from-outcome>
+      <to-view-id>/groups/index.xhtml</to-view-id>
+      <redirect/>
+    </navigation-case>
+  </navigation-rule>
+
+  <navigation-rule>
     <from-view-id>/profiles/create/*</from-view-id>
     <navigation-case>
       <from-outcome>cancel</from-outcome>
