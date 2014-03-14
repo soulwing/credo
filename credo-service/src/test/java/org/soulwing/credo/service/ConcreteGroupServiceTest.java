@@ -29,7 +29,7 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.soulwing.credo.service.group.GroupEditorFactory;
-import org.soulwing.credo.service.group.SaveableGroupEditor;
+import org.soulwing.credo.service.group.ConfigurableGroupEditor;
 
 /**
  * Unit tests for {@link ConcreteGroupService}.
@@ -45,7 +45,7 @@ public class ConcreteGroupServiceTest {
   private GroupEditorFactory editorFactory;
   
   @Mock
-  private SaveableGroupEditor editor;
+  private ConfigurableGroupEditor editor;
   
   @Mock
   private Errors errors;
