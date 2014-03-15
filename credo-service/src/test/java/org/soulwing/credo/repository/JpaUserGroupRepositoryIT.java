@@ -19,6 +19,7 @@
 package org.soulwing.credo.repository;
 
 import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasProperty;
 import static org.hamcrest.Matchers.is;
@@ -102,7 +103,27 @@ public class JpaUserGroupRepositoryIT {
     assertThat(actual.getDateCreated(), is(not(nullValue())));
     assertThat(actual.getDateModified(), is(equalTo(actual.getDateCreated())));
   }
-  
+
+  @Test
+  public void testUpdate() throws Exception {
+    UserGroupEntity expected = new UserGroupEntity("someGroup");
+    repository.add(expected);
+    entityManager.flush();
+    entityManager.clear();
+    Thread.sleep(250);
+    expected.setDescription("updated description");
+    repository.update(expected);
+    entityManager.flush();
+    entityManager.clear();
+    UserGroupEntity actual = entityManager.find(UserGroupEntity.class,
+        expected.getId());
+    assertThat(actual, is(not(nullValue())));
+    assertThat(actual.getName(), is(equalTo(expected.getName())));
+    assertThat(actual.getDescription(), containsString("updated"));
+    assertThat(actual.getDateCreated(), is(not(nullValue())));
+    assertThat(actual.getDateModified(), is(not(equalTo(actual.getDateCreated()))));
+  }
+
   @Test
   public void testFindByGroupName() throws Exception {
     final String groupName = "someGroup";

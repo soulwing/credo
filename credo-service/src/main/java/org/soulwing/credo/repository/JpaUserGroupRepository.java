@@ -65,6 +65,21 @@ public class JpaUserGroupRepository implements UserGroupRepository {
     entityManager.persist(group);    
   }
 
+  
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public UserGroup update(UserGroup group) {
+    if (!(group instanceof UserGroupEntity)) {
+      throw new IllegalArgumentException("unrecognized group type: "
+          + group.getClass().getName());
+    }
+    Date now = new Date();
+    ((UserGroupEntity) group).setDateModified(now);
+    return entityManager.merge(group);
+  }
+
   /**
    * {@inheritDoc}
    */

@@ -37,6 +37,14 @@ public interface UserGroupRepository extends UserGroupFactory {
   void add(UserGroup group);
   
   /**
+   * Updates the given group, merging the state of the given (perhaps detached)
+   * instance with the corresponding persistent instance.
+   * @param group the group to update
+   * @return the resulting persistent group
+   */
+  UserGroup update(UserGroup group);
+  
+  /**
    * Finds a group by its unique identifier.
    * @param id the unique identifier to match
    * @return group or {@code null} if no such group exists
