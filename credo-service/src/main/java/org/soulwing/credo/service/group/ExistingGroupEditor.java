@@ -43,6 +43,8 @@ import org.soulwing.credo.service.protect.UserAccessException;
 @Dependent
 public class ExistingGroupEditor extends AbstractGroupEditor {
 
+  private static final long serialVersionUID = 7325864887394597055L;
+
   @Inject
   protected UserGroupMemberRepository memberRepository;
 
@@ -52,7 +54,7 @@ public class ExistingGroupEditor extends AbstractGroupEditor {
    * {@inheritDoc}
    */
   @Override
-  protected SecretKeyWrapper createSecretKey(UserGroup group) 
+  protected SecretKeyWrapper createSecretKey(UserGroup group, Errors errors) 
       throws PassphraseException, GroupAccessException {
     if (getPassword() == null) {
       throw new PassphraseException();
@@ -61,6 +63,7 @@ public class ExistingGroupEditor extends AbstractGroupEditor {
       return protectionService.unprotect(group, getPassword());
     }
     catch (UserAccessException ex) {
+      errors.addError("password", "passwordIncorrect");
       throw new PassphraseException();
     }
   }

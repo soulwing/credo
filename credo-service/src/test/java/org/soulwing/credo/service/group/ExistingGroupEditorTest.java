@@ -18,14 +18,21 @@
  */
 package org.soulwing.credo.service.group;
 
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.emptyArray;
+import static org.jmock.Expectations.throwException;
+
 import java.util.Collections;
 
 import org.jmock.Expectations;
+import org.jmock.api.Action;
 import org.jmock.auto.Mock;
+import org.junit.Test;
 import org.soulwing.credo.Password;
 import org.soulwing.credo.UserGroupMember;
 import org.soulwing.credo.repository.UserGroupMemberRepository;
-import org.soulwing.credo.service.crypto.SecretKeyWrapper;
+import org.soulwing.credo.service.PassphraseException;
+import org.soulwing.credo.service.protect.UserAccessException;
 
 /**
  * Unit tests for {@link ExistingGroupEditor}.
@@ -42,9 +49,6 @@ public class ExistingGroupEditorTest
   private UserGroupMemberRepository memberRepository;
   
   @Mock
-  private SecretKeyWrapper secretKey;
-  
-  @Mock
   private UserGroupMember member;
   
   /**
@@ -55,13 +59,26 @@ public class ExistingGroupEditorTest
     return new ExistingGroupEditor();
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
   protected void onSetUp(ExistingGroupEditor editor) throws Exception {
     editor.setPassword(PASSWORD);
     editor.memberRepository = memberRepository;
+  }
+
+  @Test(expected = PassphraseException.class)
+  public void testSaveWhenPassphaseException() throws Exception {
+    Long[] membership = new Long[] { 1L, 2L, 3L };
+    context.checking(beforeSaveExpectations(membership));
+    context.checking(groupExpectations());
+    context.checking(secretKeyExpectations(
+        throwException(new UserAccessException(null))));
+    context.checking(new Expectations() { { 
+      oneOf(errors).addError(with("password"), with(containsString("Incorrect")),
+          with(emptyArray()));
+    } });
+    editor.setOwner(1L);
+    editor.setMembership(membership);
+    editor.save(errors);
   }
 
   /**
@@ -96,15 +113,29 @@ public class ExistingGroupEditorTest
     } };
   }
 
-  /**
-   * {@inheritDoc}
-   */
+  @Override
+  protected Expectations groupExpectations() throws Exception {
+    return new Expectations() { { 
+      allowing(group).getName();
+      will(returnValue(GROUP_NAME));
+      oneOf(groupRepository).update(group);
+      will(returnValue(group));
+    } };
+  }
+
+  @Override
+  protected Expectations secretKeyExpectations(final Action outcome) 
+      throws Exception {
+    return new Expectations() { { 
+      oneOf(protectionService).unprotect(group, PASSWORD);
+      will(outcome);
+    } };
+  }
+
   @Override
   protected Expectations protectionExpectations(final int memberCount) 
       throws Exception {
     return new Expectations() { {
-      oneOf(protectionService).unprotect(group, PASSWORD);
-      will(returnValue(secretKey));
       between(1, memberCount).of(protectionService).protect(group, secretKey, 
           profile);
     } };

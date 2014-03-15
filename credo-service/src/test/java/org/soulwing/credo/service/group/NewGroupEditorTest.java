@@ -19,9 +19,9 @@
 package org.soulwing.credo.service.group;
 
 import org.jmock.Expectations;
+import org.jmock.api.Action;
 import org.jmock.auto.Mock;
 import org.soulwing.credo.service.crypto.KeyGeneratorService;
-import org.soulwing.credo.service.crypto.SecretKeyWrapper;
 
 /**
  * Unit tests for {@link NewGroupEditor}.
@@ -34,9 +34,6 @@ public class NewGroupEditorTest
   @Mock
   private KeyGeneratorService keyGeneratorService;
   
-  @Mock
-  private SecretKeyWrapper secretKey;
-  
   @Override
   protected NewGroupEditor newEditor() {
     return new NewGroupEditor();
@@ -48,14 +45,28 @@ public class NewGroupEditorTest
   }
   
   @Override
-  protected Expectations protectionExpectations(final int memberCount) {
+  protected Expectations groupExpectations() {
+    return new Expectations() { { 
+      allowing(group).getName();
+      will(returnValue(GROUP_NAME));
+      oneOf(groupRepository).add(group);
+    } };
+  }
+
+  @Override
+  protected Expectations secretKeyExpectations(final Action outcome) {
     return new Expectations() { { 
       oneOf(keyGeneratorService).generateSecretKey();
-      will(returnValue(secretKey));
+      will(outcome);
+    } };
+  }
+
+  @Override
+  protected Expectations protectionExpectations(final int memberCount) {
+    return new Expectations() { { 
       between(1, memberCount).of(protectionService).protect(
           with(same(group)), with(same(secretKey)), with(same(profile)));
     } };
   }
-  
   
 }

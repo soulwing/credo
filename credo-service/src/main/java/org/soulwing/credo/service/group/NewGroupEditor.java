@@ -22,6 +22,7 @@ import javax.enterprise.context.Dependent;
 import javax.inject.Inject;
 
 import org.soulwing.credo.UserGroup;
+import org.soulwing.credo.service.Errors;
 import org.soulwing.credo.service.crypto.KeyGeneratorService;
 import org.soulwing.credo.service.crypto.SecretKeyWrapper;
 
@@ -34,6 +35,8 @@ import org.soulwing.credo.service.crypto.SecretKeyWrapper;
 @Dependent
 public class NewGroupEditor extends AbstractGroupEditor {
 
+  private static final long serialVersionUID = 8597883480608481992L;
+
   @Inject
   protected KeyGeneratorService keyGeneratorService;
 
@@ -41,7 +44,7 @@ public class NewGroupEditor extends AbstractGroupEditor {
    * {@inheritDoc}
    */
   @Override
-  protected SecretKeyWrapper createSecretKey(UserGroup group) {
+  protected SecretKeyWrapper createSecretKey(UserGroup group, Errors errors) {
     return keyGeneratorService.generateSecretKey();
   }
 

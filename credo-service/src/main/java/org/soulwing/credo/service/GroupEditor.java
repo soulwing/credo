@@ -20,6 +20,8 @@ package org.soulwing.credo.service;
 
 import java.util.Collection;
 
+import org.soulwing.credo.Password;
+
 
 /**
  * An editor for a group.
@@ -80,4 +82,16 @@ public interface GroupEditor {
    */
   Collection<UserDetail> getAvailableUsers();
 
+  /**
+   * Gets the password to be used to gain access to the group's secret key.
+   * @return password or {@code null} if none has been set
+   */
+  Password getPassword();
+  
+  /**
+   * Sets the password to be used to gain access to the group's secret key.
+   * @param password the password to set
+   */
+  void setPassword(Password password);
+    
 }

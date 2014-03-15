@@ -18,6 +18,7 @@
  */
 package org.soulwing.credo.service.group;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -45,8 +46,11 @@ import org.soulwing.credo.service.protect.GroupProtectionService;
  * 
  * @author Carl Harris
  */
-abstract class AbstractGroupEditor implements ConfigurableGroupEditor {
+abstract class AbstractGroupEditor implements ConfigurableGroupEditor,
+    Serializable {
 
+  private static final long serialVersionUID = 1017537361170816221L;
+  
   private UserGroup group;
   private Long ownerId;
   private Collection<UserDetail> users;
@@ -173,6 +177,7 @@ abstract class AbstractGroupEditor implements ConfigurableGroupEditor {
   @Override
   public void save(Errors errors) throws GroupEditException,
       NoSuchGroupException, PassphraseException, GroupAccessException {
+    
     Validate.isTrue(!UserGroup.SELF_GROUP_NAME.equals(getName()),
         "group name cannot be '" + UserGroup.SELF_GROUP_NAME + "'");
 
@@ -183,8 +188,8 @@ abstract class AbstractGroupEditor implements ConfigurableGroupEditor {
       membership.add(ownerId);
       errors.addWarning("members", "groupEditorUserMustBeMember");
     }
-
-    SecretKeyWrapper secretKey = createSecretKey(group);
+    
+    SecretKeyWrapper secretKey = createSecretKey(group, errors);
     for (Long userId : membership) {
       if (isNewMember(userId)) {
         UserProfile profile = profileRepository.findById(userId);
@@ -204,7 +209,7 @@ abstract class AbstractGroupEditor implements ConfigurableGroupEditor {
     afterSave(errors);
   }
   
-  protected abstract SecretKeyWrapper createSecretKey(UserGroup group)
+  protected abstract SecretKeyWrapper createSecretKey(UserGroup group, Errors errors)
       throws PassphraseException, GroupAccessException;
 
   protected abstract boolean isNewMember(Long userId);

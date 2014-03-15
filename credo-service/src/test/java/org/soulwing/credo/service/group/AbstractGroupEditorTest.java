@@ -41,6 +41,7 @@ import org.soulwing.credo.service.Errors;
 import org.soulwing.credo.service.GroupEditException;
 import org.soulwing.credo.service.UserContextService;
 import org.soulwing.credo.service.UserDetail;
+import org.soulwing.credo.service.crypto.SecretKeyWrapper;
 import org.soulwing.credo.service.protect.GroupProtectionService;
 
 /**
@@ -61,13 +62,13 @@ public abstract class AbstractGroupEditorTest<T extends AbstractGroupEditor> {
   public final JUnitRuleMockery context = new JUnitRuleMockery();
   
   @Mock
-  private UserProfileRepository profileRepository;
-  
-  @Mock
-  private UserGroupRepository groupRepository;
+  private UserProfileRepository profileRepository;  
   
   @Mock
   private UserContextService userContextService;
+  
+  @Mock
+  protected UserGroupRepository groupRepository;
   
   @Mock
   protected UserGroup group;
@@ -79,11 +80,14 @@ public abstract class AbstractGroupEditorTest<T extends AbstractGroupEditor> {
   protected GroupProtectionService protectionService;
   
   @Mock
+  protected SecretKeyWrapper secretKey;
+
+  @Mock
+  protected Errors errors;
+
+  @Mock
   private UserDetail user;
   
-  @Mock
-  private Errors errors;
-
   protected T editor;
   
   @Before
@@ -109,6 +113,7 @@ public abstract class AbstractGroupEditorTest<T extends AbstractGroupEditor> {
     context.checking(groupExpectations());
     context.checking(profileExpectations(membership.length,
         returnValue(profile)));
+    context.checking(secretKeyExpectations(returnValue(secretKey)));
     context.checking(protectionExpectations(membership.length));
     context.checking(errorCheckExpectations(returnValue(false)));
     context.checking(afterSaveExpectations(membership));
@@ -127,6 +132,7 @@ public abstract class AbstractGroupEditorTest<T extends AbstractGroupEditor> {
     context.checking(groupExpectations());
     context.checking(profileExpectations(membership.length,
         onConsecutiveCalls(returnValue(profile), returnValue(null))));
+    context.checking(secretKeyExpectations(returnValue(secretKey)));
     context.checking(protectionExpectations(membership.length));
     context.checking(errorExpectations(userId, membership.length));
     context.checking(errorCheckExpectations(returnValue(true)));
@@ -149,6 +155,7 @@ public abstract class AbstractGroupEditorTest<T extends AbstractGroupEditor> {
     context.checking(groupExpectations());
     context.checking(profileExpectations(membership.length + 1,
         returnValue(profile)));
+    context.checking(secretKeyExpectations(returnValue(secretKey)));
     context.checking(protectionExpectations(membership.length + 1));
     context.checking(errorCheckExpectations(returnValue(true)));
     
@@ -167,7 +174,7 @@ public abstract class AbstractGroupEditorTest<T extends AbstractGroupEditor> {
     return new Expectations();
   }
 
-  private Expectations profileExpectations(final int memberCount,
+  protected Expectations profileExpectations(final int memberCount,
       final Action outcome) {
     return new Expectations() { { 
       between(1, memberCount).of(profileRepository).findById(
@@ -176,17 +183,14 @@ public abstract class AbstractGroupEditorTest<T extends AbstractGroupEditor> {
     } };
   }
   
+  protected abstract Expectations groupExpectations() throws Exception;
+    
+  protected abstract Expectations secretKeyExpectations(final Action outcome) 
+      throws Exception;
+  
   protected abstract Expectations protectionExpectations(int memberCount)
       throws Exception;
   
-  private Expectations groupExpectations() {
-    return new Expectations() { { 
-      allowing(group).getName();
-      will(returnValue(GROUP_NAME));
-      oneOf(groupRepository).add(group);
-    } };
-  }
-
   private Expectations errorCheckExpectations(final Action outcome) { 
     return new Expectations() { { 
       allowing(errors).hasErrors();

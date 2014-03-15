@@ -20,7 +20,6 @@ package org.soulwing.credo.service.group;
 
 import java.util.Collection;
 
-import org.soulwing.credo.Password;
 import org.soulwing.credo.UserGroup;
 import org.soulwing.credo.service.Errors;
 import org.soulwing.credo.service.GroupEditException;
@@ -55,18 +54,6 @@ public interface ConfigurableGroupEditor extends GroupEditor {
    * @param users the users to set
    */
   void setUsers(Collection<UserDetail> users);
-  
-  /**
-   * Gets the password to be used to gain access to the group's secret key.
-   * @return password or {@code null} if none has been set
-   */
-  Password getPassword();
-  
-  /**
-   * Sets the password to be used to gain access to the group's secret key.
-   * @param password the password to set
-   */
-  void setPassword(Password password);
   
   /**
    * Applies the state of this editor, effectively making the edits it 
