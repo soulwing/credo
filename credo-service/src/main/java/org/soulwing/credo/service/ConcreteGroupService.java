@@ -36,6 +36,7 @@ import org.soulwing.credo.repository.UserGroupMemberRepository;
 import org.soulwing.credo.repository.UserGroupRepository;
 import org.soulwing.credo.service.group.ConfigurableGroupEditor;
 import org.soulwing.credo.service.group.GroupEditorFactory;
+import org.soulwing.credo.service.protect.GroupAccessException;
 
 /**
  * A concrete {@link GroupService} implementation.
@@ -94,9 +95,15 @@ public class ConcreteGroupService implements GroupService {
   @Override
   @TransactionAttribute(TransactionAttributeType.REQUIRED)
   public void saveGroup(GroupEditor editor, Errors errors)
-      throws NoSuchGroupException, GroupEditException {
-    Validate.isTrue(editor instanceof ConfigurableGroupEditor);
-    ((ConfigurableGroupEditor) editor).save(errors);
+      throws GroupEditException, NoSuchGroupException, PassphraseException, 
+          AccessDeniedException {
+    try {
+      Validate.isTrue(editor instanceof ConfigurableGroupEditor);
+      ((ConfigurableGroupEditor) editor).save(errors);
+    }
+    catch (GroupAccessException ex) {
+      throw new AccessDeniedException();
+    }
   }
   
 }

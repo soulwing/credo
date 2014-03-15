@@ -28,6 +28,7 @@ import org.soulwing.credo.service.GroupEditException;
 import org.soulwing.credo.service.GroupEditor;
 import org.soulwing.credo.service.GroupService;
 import org.soulwing.credo.service.NoSuchGroupException;
+import org.soulwing.credo.service.PassphraseException;
 
 /**
  * A bean that supports the Create Group interaction.
@@ -90,6 +91,9 @@ public class CreateGroupBean {
     try {
       groupService.saveGroup(editor, errors);
       return SUCCESS_OUTCOME_ID;
+    }
+    catch (PassphraseException ex) {
+      throw new RuntimeException(ex);
     }
     catch (GroupEditException ex) {
       return null;

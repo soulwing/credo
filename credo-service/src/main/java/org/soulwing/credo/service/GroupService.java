@@ -58,12 +58,17 @@ public interface GroupService {
    * @param editor the editor to apply
    * @param errors an errors object that will be updated if the edits cannot
    *    be successfully applied
-   * @throws NoSuchGroupException if an existing was removed after the
-   *    editor was created
    * @throws GroupEditException if a recoverable error occurs in applying
    *    the editor to the target group
+   * @throws NoSuchGroupException if an existing was removed after the
+   *    editor was created
+   * @throws PassphraseException if a password is required and was not
+   *    provided or was incorrect
+   * @throws AccessDeniedException if the logged in user is not a member
+   *    of the edited group
    */
   void saveGroup(GroupEditor editor, Errors errors) 
-      throws NoSuchGroupException, GroupEditException;
+      throws GroupEditException, NoSuchGroupException, PassphraseException,
+          AccessDeniedException;
   
 }

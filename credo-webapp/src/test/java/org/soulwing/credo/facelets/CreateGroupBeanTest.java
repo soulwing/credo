@@ -35,6 +35,7 @@ import org.soulwing.credo.service.GroupEditException;
 import org.soulwing.credo.service.GroupEditor;
 import org.soulwing.credo.service.GroupService;
 import org.soulwing.credo.service.NoSuchGroupException;
+import org.soulwing.credo.service.PassphraseException;
 
 /**
  * Unit tests for {@link CreateGroupBean}.
@@ -100,6 +101,17 @@ public class CreateGroupBeanTest {
     context.checking(new Expectations() { { 
       oneOf(groupService).saveGroup(with(same(editor)), with(same(errors)));
       will(throwException(new NoSuchGroupException()));
+    } });
+    
+    bean.setEditor(editor);
+    bean.save();
+  }
+
+  @Test(expected = RuntimeException.class)
+  public void testSaveWhenPassphraseException() throws Exception {
+    context.checking(new Expectations() { { 
+      oneOf(groupService).saveGroup(with(same(editor)), with(same(errors)));
+      will(throwException(new PassphraseException()));
     } });
     
     bean.setEditor(editor);
