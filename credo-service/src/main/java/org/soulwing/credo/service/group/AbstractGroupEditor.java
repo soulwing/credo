@@ -177,7 +177,7 @@ abstract class AbstractGroupEditor implements ConfigurableGroupEditor {
         "group name cannot be '" + UserGroup.SELF_GROUP_NAME + "'");
 
     beforeSave(errors);
-    groupRepository.add(group);
+    group = saveGroup(group);
 
     if (!membership.contains(ownerId)) {
       membership.add(ownerId);
@@ -211,6 +211,8 @@ abstract class AbstractGroupEditor implements ConfigurableGroupEditor {
   
   protected void beforeSave(Errors errors) {    
   }
+  
+  protected abstract UserGroup saveGroup(UserGroup group);
   
   protected void afterSave(Errors errors) {    
   }

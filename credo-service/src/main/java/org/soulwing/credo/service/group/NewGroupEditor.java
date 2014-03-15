@@ -53,4 +53,13 @@ public class NewGroupEditor extends AbstractGroupEditor {
     return true;    // every member is new for a new group
   }
 
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  protected UserGroup saveGroup(UserGroup group) {
+    groupRepository.add(group);   
+    return group;
+  }
+
 }

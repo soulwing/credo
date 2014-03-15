@@ -89,6 +89,14 @@ public class ExistingGroupEditor extends AbstractGroupEditor {
    * {@inheritDoc}
    */
   @Override
+  protected UserGroup saveGroup(UserGroup group) {
+    return groupRepository.update(group);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
   protected void afterSave(Errors errors) {
     membersBefore.removeAll(Arrays.asList(getMembership()));
     for (Long userId : membersBefore) {
