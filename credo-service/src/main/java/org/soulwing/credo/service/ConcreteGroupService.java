@@ -93,6 +93,14 @@ public class ConcreteGroupService implements GroupService {
    * {@inheritDoc}
    */
   @Override
+  public GroupEditor editGroup(Long id) throws NoSuchGroupException {
+    return editorFactory.newEditor(id);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
   @TransactionAttribute(TransactionAttributeType.REQUIRED)
   public void saveGroup(GroupEditor editor, Errors errors)
       throws GroupEditException, NoSuchGroupException, PassphraseException, 

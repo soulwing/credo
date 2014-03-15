@@ -42,15 +42,15 @@ public interface GroupService {
    * @return collection of groups
    */
   Collection<GroupDetail> findAllGroups();
-//  
-//  /**
-//   * Creates an editor for the given group.
-//   * @param id unique identifier for the group
-//   * @return editor instance
-//   * @throws NoSuchGroupException if the specified group does not exist
-//   *    (or is not visible to logged in user)
-//   */
-//  GroupEditor editGroup(Long id) throws NoSuchGroupException;
+  
+  /**
+   * Creates an editor for the given group.
+   * @param id unique identifier for the group
+   * @return editor instance
+   * @throws NoSuchGroupException if the specified group does not exist
+   *    (or is not visible to logged in user)
+   */
+  GroupEditor editGroup(Long id) throws NoSuchGroupException;
   
   /**
    * Applies the changes in the given editor to the group it represents, 

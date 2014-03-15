@@ -92,7 +92,7 @@ public class ConcreteGroupServiceTest {
   }
   
   @Test
-  public void testNewEditor() throws Exception {
+  public void testNewGroup() throws Exception {
     context.checking(new Expectations() { { 
       oneOf(editorFactory).newEditor();
       will(returnValue(editor));
@@ -129,6 +129,18 @@ public class ConcreteGroupServiceTest {
     assertThat(user.getLoginName(), is(equalTo(LOGIN_NAME)));        
   }
   
+  @Test
+  public void editGroup() throws Exception {
+    final Long id = -1L;
+    context.checking(new Expectations() { { 
+      oneOf(editorFactory).newEditor(with(id));
+      will(returnValue(editor));
+    } });
+    
+    assertThat(service.editGroup(id), is(sameInstance((GroupEditor) editor)));
+  }
+  
+
   @Test
   public void testSaveGroup() throws Exception {
     context.checking(new Expectations() { { 
