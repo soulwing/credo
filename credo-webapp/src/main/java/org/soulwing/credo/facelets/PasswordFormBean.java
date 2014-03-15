@@ -38,7 +38,6 @@ public class PasswordFormBean extends ProtectionParametersBean {
   
   @Override
   public void setPassword(Password password) {
-    System.out.println("password set");
     super.setPassword(password);
   }
 
@@ -59,7 +58,6 @@ public class PasswordFormBean extends ProtectionParametersBean {
   }
   
   public void passwordValueChanged(ValueChangeEvent event) {    
-    System.out.println("value change event");
     passwordChanged((Password) event.getNewValue());
   }
   
