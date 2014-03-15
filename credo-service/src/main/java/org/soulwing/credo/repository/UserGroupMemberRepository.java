@@ -66,4 +66,12 @@ public interface UserGroupMemberRepository {
    */
   Collection<UserGroupMember> findAllMembers(String groupName);
   
+  /**
+   * Finds the groups for which the given user is a member.
+   * @param loginName login name of the subject user
+   * @return set of groups for which the user with {@code loginName} is
+   *     a member
+   */
+  Collection<UserGroupMember> findByLoginName(String loginName);
+
 }

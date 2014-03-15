@@ -23,8 +23,9 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.sameInstance;
 
-import java.util.Collections;
+import java.util.Arrays;
 import java.util.Iterator;
+import java.util.List;
 
 import org.jmock.Expectations;
 import org.jmock.auto.Mock;
@@ -36,7 +37,6 @@ import org.soulwing.credo.UserGroup;
 import org.soulwing.credo.UserGroupMember;
 import org.soulwing.credo.UserProfile;
 import org.soulwing.credo.repository.UserGroupMemberRepository;
-import org.soulwing.credo.repository.UserGroupRepository;
 import org.soulwing.credo.service.group.ConfigurableGroupEditor;
 import org.soulwing.credo.service.group.GroupEditorFactory;
 
@@ -49,16 +49,15 @@ public class ConcreteGroupServiceTest {
 
   private static final String GROUP_NAME = "groupName";
 
-  private static final String LOGIN_NAME = "someUser";
+  private static final String LOGIN_NAME1 = "user1";
+  
+  private static final String LOGIN_NAME2 = "user2";
 
   @Rule
   public final JUnitRuleMockery context = new JUnitRuleMockery();
   
   @Mock
   private GroupEditorFactory editorFactory;
-  
-  @Mock
-  private UserGroupRepository groupRepository;
   
   @Mock
   private UserGroupMemberRepository memberRepository;
@@ -78,15 +77,11 @@ public class ConcreteGroupServiceTest {
   @Mock
   private UserProfile profile;
   
-  @Mock
-  private UserGroupMember member;
-  
   private ConcreteGroupService service = new ConcreteGroupService();
   
   @Before
   public void setUp() throws Exception {
     service.editorFactory = editorFactory;
-    service.groupRepository = groupRepository;
     service.memberRepository = memberRepository;
     service.userContextService = userContextService;    
   }
@@ -103,19 +98,33 @@ public class ConcreteGroupServiceTest {
   
   @Test
   public void testFindAllGroups() throws Exception {
+    final UserProfile profile1 = context.mock(UserProfile.class, "profile1");
+    final UserProfile profile2 = context.mock(UserProfile.class, "profile2");
+    final UserGroupMember member1 = context.mock(UserGroupMember.class, "member1");
+    final UserGroupMember member2 = context.mock(UserGroupMember.class, "member2");
+    final List<UserGroupMember> members = Arrays.asList(new UserGroupMember[] { 
+        member1, member2
+    });
+   
     context.checking(new Expectations() { { 
       oneOf(userContextService).getLoginName();
-      will(returnValue(LOGIN_NAME));
-      oneOf(groupRepository).findByLoginName(with(LOGIN_NAME));
-      will(returnValue(Collections.singleton(group)));
-      exactly(2).of(group).getName();
+      will(returnValue(LOGIN_NAME1));
+      oneOf(memberRepository).findByLoginName(with(LOGIN_NAME1));
+      will(returnValue(members));
+      oneOf(member1).getGroup();
+      will(returnValue(group));
+      oneOf(member2).getGroup();
+      will(returnValue(group));
+      allowing(group).getName();
       will(returnValue(GROUP_NAME));
-      oneOf(memberRepository).findAllMembers(with(GROUP_NAME));
-      will(returnValue(Collections.singleton(member)));
-      oneOf(member).getUser();
-      will(returnValue(profile));
-      oneOf(profile).getLoginName();
-      will(returnValue(LOGIN_NAME));
+      oneOf(member1).getUser();
+      will(returnValue(profile1));
+      oneOf(profile1).getLoginName();
+      will(returnValue(LOGIN_NAME1));
+      oneOf(member2).getUser();
+      will(returnValue(profile2));
+      oneOf(profile2).getLoginName();
+      will(returnValue(LOGIN_NAME2));
     } });
     
     Iterator<GroupDetail> i = service.findAllGroups().iterator();
@@ -125,8 +134,12 @@ public class ConcreteGroupServiceTest {
     
     Iterator<UserDetail> j = group.getMembers().iterator();
     assertThat(j.hasNext(), is(true));
-    UserDetail user = j.next();
-    assertThat(user.getLoginName(), is(equalTo(LOGIN_NAME)));        
+    UserDetail user1 = j.next();
+    assertThat(user1.getLoginName(), is(equalTo(LOGIN_NAME1)));        
+    assertThat(j.hasNext(), is(true));
+    UserDetail user2 = j.next();
+    assertThat(user2.getLoginName(), is(equalTo(LOGIN_NAME2)));        
+    assertThat(j.hasNext(), is(false));
   }
   
   @Test

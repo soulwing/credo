@@ -265,4 +265,37 @@ public class JpaUserGroupMemberRepositoryIT {
     assertThat(actual, is(not(nullValue())));
   }
 
+  @Test
+  public void testFindByLoginName() throws Exception {
+    UserProfileEntity user1 = EntityUtil.newUser("someUser1");
+    UserProfileEntity user2 = EntityUtil.newUser("someUser2");
+    UserGroupEntity group = EntityUtil.newGroup("someGroup");
+    
+    UserGroupMemberEntity groupMember1 = EntityUtil.newGroupMember(user1, group);
+    UserGroupMemberEntity groupMember2 = EntityUtil.newGroupMember(user2, group);
+    
+    entityManager.persist(user1);
+    entityManager.persist(user2);
+    entityManager.persist(group);
+    entityManager.persist(groupMember1);
+    entityManager.persist(groupMember2);
+    entityManager.flush();
+    entityManager.clear();
+    
+    Iterator<UserGroupMember> members = 
+        repository.findByLoginName(user1.getLoginName()).iterator();
+
+    assertThat(members.hasNext(), is(true));
+    UserGroupMember member1 = members.next();
+    assertThat(member1.getUser(), 
+        hasProperty("loginName", equalTo(user1.getLoginName())));
+
+    assertThat(members.hasNext(), is(true));
+    UserGroupMember member2 = members.next();
+    assertThat(member2.getUser(), 
+        hasProperty("loginName", equalTo(user2.getLoginName())));
+    
+    assertThat(members.hasNext(), is(false));
+  }
+
 }

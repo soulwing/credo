@@ -20,7 +20,6 @@ package org.soulwing.credo.service;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Set;
 
 import javax.ejb.ConcurrencyManagement;
 import javax.ejb.ConcurrencyManagementType;
@@ -33,7 +32,6 @@ import org.apache.commons.lang.Validate;
 import org.soulwing.credo.UserGroup;
 import org.soulwing.credo.UserGroupMember;
 import org.soulwing.credo.repository.UserGroupMemberRepository;
-import org.soulwing.credo.repository.UserGroupRepository;
 import org.soulwing.credo.service.group.ConfigurableGroupEditor;
 import org.soulwing.credo.service.group.GroupEditorFactory;
 import org.soulwing.credo.service.protect.GroupAccessException;
@@ -49,9 +47,6 @@ public class ConcreteGroupService implements GroupService {
 
   @Inject
   protected GroupEditorFactory editorFactory;
-  
-  @Inject
-  protected UserGroupRepository groupRepository;
   
   @Inject
   protected UserGroupMemberRepository memberRepository;
@@ -72,19 +67,19 @@ public class ConcreteGroupService implements GroupService {
    */
   @Override
   public Collection<GroupDetail> findAllGroups() {
-    Set<? extends UserGroup> groups = groupRepository.findByLoginName(
-        userContextService.getLoginName());
     Collection<GroupDetail> groupDetails = new ArrayList<>();
-    for (UserGroup group : groups) {
+    Collection<UserGroupMember> members = memberRepository.findByLoginName(
+        userContextService.getLoginName());
+    UserGroupWrapper wrapper = null;
+    for (UserGroupMember member : members) {
+      UserGroup group = member.getGroup();
       String groupName = group.getName();
       if (UserGroup.SELF_GROUP_NAME.equals(groupName)) continue;
-      UserGroupWrapper groupDetail = new UserGroupWrapper(group);
-      groupDetails.add(groupDetail);
-      Collection<UserGroupMember> members = 
-          memberRepository.findAllMembers(groupName);
-      for (UserGroupMember member : members) {
-        groupDetail.addMember(new UserProfileWrapper(member.getUser()));
+      if (wrapper == null || !wrapper.getName().equals(groupName)) {
+        wrapper = new UserGroupWrapper(group);
+        groupDetails.add(wrapper);
       }
+      wrapper.addMember(new UserProfileWrapper(member.getUser()));
     }
     return groupDetails;
   }

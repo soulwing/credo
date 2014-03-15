@@ -25,6 +25,7 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
+import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 
 import org.apache.commons.lang.Validate;
@@ -113,16 +114,33 @@ public class JpaUserGroupMemberRepository
    * {@inheritDoc}
    */
   @Override
+  @SuppressWarnings("unchecked")
   public Collection<UserGroupMember> findAllMembers(String groupName) {
     Validate.notEmpty(groupName, "groupName is required");
     Validate.isTrue(!UserGroup.SELF_GROUP_NAME.equals(groupName));
 
-    TypedQuery<UserGroupMember> query =
-        entityManager.createNamedQuery("findAllGroupMembers",
-            UserGroupMember.class);
+    // We can't use a typed query here because we have more than one 
+    // item in the select clause, in order to allow sorting.
+    Query query = entityManager.createNamedQuery("findAllGroupMembers");
     query.setParameter("groupName", groupName);
 
-    return query.getResultList();
+    return (Collection<UserGroupMember>) query.getResultList();
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  @SuppressWarnings("unchecked")
+  public Collection<UserGroupMember> findByLoginName(String loginName) {
+
+    // We can't use a typed query here because we have more than one 
+    // item in the select clause, in order to allow sorting.
+    Query query = entityManager.createNamedQuery(
+        "findGroupsAndMembersByLoginName");
+    query.setParameter("loginName", loginName);
+    
+    return (Collection<UserGroupMember>) query.getResultList();
   }
 
 }
