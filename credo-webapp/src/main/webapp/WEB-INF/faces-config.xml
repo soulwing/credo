@@ -15,6 +15,11 @@
       <redirect/>
     </navigation-case>
     <navigation-case>
+      <from-outcome>groups</from-outcome>
+      <to-view-id>/groups/index.xhtml</to-view-id>
+      <redirect/>
+    </navigation-case>
+    <navigation-case>
       <from-outcome>reports</from-outcome>
       <to-view-id>/reports/index.xhtml</to-view-id>
       <redirect/>
