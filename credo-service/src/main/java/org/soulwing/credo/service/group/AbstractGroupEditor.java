@@ -26,6 +26,7 @@ import java.util.List;
 import javax.inject.Inject;
 
 import org.apache.commons.lang.Validate;
+import org.soulwing.credo.Password;
 import org.soulwing.credo.UserGroup;
 import org.soulwing.credo.UserProfile;
 import org.soulwing.credo.repository.UserGroupRepository;
@@ -33,8 +34,10 @@ import org.soulwing.credo.repository.UserProfileRepository;
 import org.soulwing.credo.service.Errors;
 import org.soulwing.credo.service.GroupEditException;
 import org.soulwing.credo.service.NoSuchGroupException;
+import org.soulwing.credo.service.PassphraseException;
 import org.soulwing.credo.service.UserDetail;
 import org.soulwing.credo.service.crypto.SecretKeyWrapper;
+import org.soulwing.credo.service.protect.GroupAccessException;
 import org.soulwing.credo.service.protect.GroupProtectionService;
 
 /**
@@ -48,6 +51,7 @@ abstract class AbstractGroupEditor implements ConfigurableGroupEditor {
   private Long ownerId;
   private Collection<UserDetail> members;
   private Collection<UserDetail> users;
+  private Password password;
   private List<Long> membership = new ArrayList<>();
 
   @Inject
@@ -168,8 +172,24 @@ abstract class AbstractGroupEditor implements ConfigurableGroupEditor {
    * {@inheritDoc}
    */
   @Override
+  public Password getPassword() {
+    return password;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public void setPassword(Password password) {
+    this.password = password;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
   public void save(Errors errors) throws GroupEditException,
-      NoSuchGroupException {
+      NoSuchGroupException, PassphraseException, GroupAccessException {
     Validate.isTrue(!UserGroup.SELF_GROUP_NAME.equals(getName()),
         "group name cannot be '" + UserGroup.SELF_GROUP_NAME + "'");
 
@@ -181,7 +201,7 @@ abstract class AbstractGroupEditor implements ConfigurableGroupEditor {
       errors.addWarning("members", "groupEditorUserMustBeMember");
     }
 
-    SecretKeyWrapper secretKey = createSecretKey();
+    SecretKeyWrapper secretKey = createSecretKey(group);
     for (Long userId : membership) {
       if (isNewMember(userId)) {
         UserProfile profile = profileRepository.findById(userId);
@@ -201,7 +221,8 @@ abstract class AbstractGroupEditor implements ConfigurableGroupEditor {
     afterSave(errors);
   }
   
-  protected abstract SecretKeyWrapper createSecretKey();
+  protected abstract SecretKeyWrapper createSecretKey(UserGroup group)
+      throws PassphraseException, GroupAccessException;
 
   protected abstract boolean isNewMember(Long userId);
   

@@ -20,12 +20,15 @@ package org.soulwing.credo.service.group;
 
 import java.util.Collection;
 
+import org.soulwing.credo.Password;
 import org.soulwing.credo.UserGroup;
 import org.soulwing.credo.service.Errors;
 import org.soulwing.credo.service.GroupEditException;
 import org.soulwing.credo.service.GroupEditor;
 import org.soulwing.credo.service.NoSuchGroupException;
+import org.soulwing.credo.service.PassphraseException;
 import org.soulwing.credo.service.UserDetail;
+import org.soulwing.credo.service.protect.GroupAccessException;
 
 /**
  * A {@link GroupEditor} with a save method.
@@ -60,15 +63,31 @@ public interface ConfigurableGroupEditor extends GroupEditor {
   void setUsers(Collection<UserDetail> users);
   
   /**
+   * Gets the password to be used to gain access to the group's secret key.
+   * @return password or {@code null} if none has been set
+   */
+  Password getPassword();
+  
+  /**
+   * Sets the password to be used to gain access to the group's secret key.
+   * @param password the password to set
+   */
+  void setPassword(Password password);
+  
+  /**
    * Applies the state of this editor, effectively making the edits it 
    * represents persistent.
    * @param errors an errors object that will be updated in the case of
    *    recoverable error(s)
+   * @throws GroupEditException if a recoverable error occurs
    * @throws NoSuchGroupException if the group identified by the editor
    *    was removed after the editor was created
-   * @throws GroupEditException if a recoverable error occurs
+   * @throws PassphraseException if a passphrase is required and was not
+   *    provided or is incorrect
+   * @throws GroupAccessException if the logged in user is not a member
+   *    of the edited group
    */
-  void save(Errors errors) throws NoSuchGroupException, GroupEditException;
+  void save(Errors errors) throws GroupEditException, NoSuchGroupException,
+      PassphraseException, GroupAccessException;
  
-  
 }

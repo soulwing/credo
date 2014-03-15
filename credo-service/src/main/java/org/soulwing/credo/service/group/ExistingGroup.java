@@ -18,39 +18,22 @@
  */
 package org.soulwing.credo.service.group;
 
-import javax.enterprise.context.Dependent;
-import javax.inject.Inject;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
-import org.soulwing.credo.UserGroup;
-import org.soulwing.credo.service.crypto.KeyGeneratorService;
-import org.soulwing.credo.service.crypto.SecretKeyWrapper;
+import javax.inject.Qualifier;
 
 /**
- * A saveable editor for a new group.
+ * A qualifier that identifies an editor for an existing group.
  *
  * @author Carl Harris
  */
-@NewGroup
-@Dependent
-public class NewGroupEditor extends AbstractGroupEditor {
-
-  @Inject
-  protected KeyGeneratorService keyGeneratorService;
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  protected SecretKeyWrapper createSecretKey(UserGroup group) {
-    return keyGeneratorService.generateSecretKey();
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  protected boolean isNewMember(Long userId) {
-    return true;    // every member is new for a new group
-  }
+@Qualifier
+@Retention(RetentionPolicy.RUNTIME)
+@Target({ ElementType.TYPE, ElementType.METHOD, 
+    ElementType.FIELD, ElementType.PARAMETER })
+public @interface ExistingGroup {
 
 }

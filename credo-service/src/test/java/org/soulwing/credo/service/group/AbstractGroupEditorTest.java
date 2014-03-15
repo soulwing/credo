@@ -51,11 +51,11 @@ import org.soulwing.credo.service.protect.GroupProtectionService;
  */
 public abstract class AbstractGroupEditorTest<T extends AbstractGroupEditor> {
 
-  private static final String FULL_NAME = "Full Name";
+  protected static final String FULL_NAME = "Full Name";
 
-  private static final String LOGIN_NAME = "loginName";
+  protected static final String LOGIN_NAME = "loginName";
 
-  private static final String GROUP_NAME = "groupName";
+  protected static final String GROUP_NAME = "groupName";
   
   @Rule
   public final JUnitRuleMockery context = new JUnitRuleMockery();
@@ -105,11 +105,13 @@ public abstract class AbstractGroupEditorTest<T extends AbstractGroupEditor> {
   @Test
   public void testSave() throws Exception {
     Long[] membership = new Long[] { 1L, 2L, 3L };
+    context.checking(beforeSaveExpectations(membership));
     context.checking(groupExpectations());
     context.checking(profileExpectations(membership.length,
         returnValue(profile)));
     context.checking(protectionExpectations(membership.length));
     context.checking(errorCheckExpectations(returnValue(false)));
+    context.checking(afterSaveExpectations(membership));
     
     editor.setOwner(1L);
     editor.setMembership(membership);
@@ -121,6 +123,7 @@ public abstract class AbstractGroupEditorTest<T extends AbstractGroupEditor> {
     Long ownerId = 1L;
     Long userId = 2L;
     Long[] membership = new Long[] { ownerId, userId };
+    context.checking(beforeSaveExpectations(membership));
     context.checking(groupExpectations());
     context.checking(profileExpectations(membership.length,
         onConsecutiveCalls(returnValue(profile), returnValue(null))));
@@ -135,14 +138,14 @@ public abstract class AbstractGroupEditorTest<T extends AbstractGroupEditor> {
 
   @Test(expected = GroupEditException.class)
   public void testSaveWhenUserNotMember() throws Exception {
-    
+    Long[] membership = new Long[] { 1L }; 
+    context.checking(beforeSaveExpectations(membership));
     context.checking(new Expectations() { { 
       allowing(errors).addWarning(with("members"),
           with(containsString("MustBeMember")), 
           with(emptyArray()));
     } });
     
-    Long[] membership = new Long[] { 1L }; 
     context.checking(groupExpectations());
     context.checking(profileExpectations(membership.length + 1,
         returnValue(profile)));
@@ -154,6 +157,15 @@ public abstract class AbstractGroupEditorTest<T extends AbstractGroupEditor> {
     editor.save(errors);
   }
 
+  protected Expectations beforeSaveExpectations(Long[] membership) 
+      throws Exception {
+    return new Expectations();
+  }
+
+  protected Expectations afterSaveExpectations(Long[] membership) 
+      throws Exception {
+    return new Expectations();
+  }
 
   private Expectations profileExpectations(final int memberCount,
       final Action outcome) {
@@ -164,7 +176,8 @@ public abstract class AbstractGroupEditorTest<T extends AbstractGroupEditor> {
     } };
   }
   
-  protected abstract Expectations protectionExpectations(final int memberCount);
+  protected abstract Expectations protectionExpectations(int memberCount)
+      throws Exception;
   
   private Expectations groupExpectations() {
     return new Expectations() { { 
