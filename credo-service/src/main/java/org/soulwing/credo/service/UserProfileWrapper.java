@@ -18,6 +18,8 @@
  */
 package org.soulwing.credo.service;
 
+import java.io.Serializable;
+
 import org.soulwing.credo.UserProfile;
 
 /**
@@ -25,7 +27,9 @@ import org.soulwing.credo.UserProfile;
  *
  * @author Carl Harris
  */
-class UserProfileWrapper implements UserDetail {
+class UserProfileWrapper implements UserDetail, Serializable {
+
+  private static final long serialVersionUID = -1089401072011563554L;
 
   private final UserProfile delegate;
   

@@ -18,6 +18,7 @@
  */
 package org.soulwing.credo.service;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 
@@ -28,8 +29,10 @@ import org.soulwing.credo.UserGroup;
  *
  * @author Carl Harris
  */
-class UserGroupWrapper implements GroupDetail {
+class UserGroupWrapper implements GroupDetail, Serializable {
 
+  private static final long serialVersionUID = -591688369847856465L;
+  
   private final UserGroup delegate;
   private final Collection<UserDetail> members = new ArrayList<>();
   
