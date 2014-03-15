@@ -50,12 +50,6 @@ public interface ConfigurableGroupEditor extends GroupEditor {
   void setOwner(Long id);
   
   /**
-   * Sets the collection of users who are existing members of the group.
-   * @param members the members to set
-   */
-  void setMembers(Collection<UserDetail> members);
-  
-  /**
    * Sets the collection of users who will be made available to set as 
    * group members.
    * @param users the users to set

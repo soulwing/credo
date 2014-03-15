@@ -26,13 +26,32 @@ import java.util.Collection;
  *
  * @author Carl Harris
  */
-public interface GroupEditor extends GroupDetail {
+public interface GroupEditor {
 
+  /**
+   * Gets the group's unique identifier.
+   * @return unique identifier or {@code null} if the group in the editor
+   *    is transient
+   */
+  Long getId();
+  
+  /**
+   * Gets the group name.
+   * @return group name
+   */
+  String getName();
+  
   /**
    * Sets the group name.
    * @param name the name to set
    */
   void setName(String name);
+  
+  /**
+   * Gets the group description.
+   * @return group description
+   */
+  String getDescription();
   
   /**
    * Sets the group description.

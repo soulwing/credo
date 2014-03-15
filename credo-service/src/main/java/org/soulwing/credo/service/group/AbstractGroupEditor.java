@@ -49,7 +49,6 @@ abstract class AbstractGroupEditor implements ConfigurableGroupEditor {
 
   private UserGroup group;
   private Long ownerId;
-  private Collection<UserDetail> members;
   private Collection<UserDetail> users;
   private Password password;
   private List<Long> membership = new ArrayList<>();
@@ -77,14 +76,6 @@ abstract class AbstractGroupEditor implements ConfigurableGroupEditor {
   @Override
   public void setOwner(Long id) {
     this.ownerId = id;
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public void setMembers(Collection<UserDetail> members) {
-    this.members = members;
   }
 
   /**
@@ -150,14 +141,6 @@ abstract class AbstractGroupEditor implements ConfigurableGroupEditor {
   public void setMembership(Long[] membership) {
     this.membership.clear();
     this.membership.addAll(Arrays.asList(membership));
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public Collection<UserDetail> getMembers() {
-    return members;
   }
 
   /**
