@@ -18,12 +18,15 @@
  */
 package org.soulwing.credo.service;
 
+import javax.ejb.ApplicationException;
+
 /**
  * An exception thrown to indicate that the passphrase provided by the user
  * could not be used to successfully decrypt a credential's private key.
  *
  * @author Carl Harris
  */
+@ApplicationException(rollback = true)
 public class PassphraseException extends Exception {
 
   private static final long serialVersionUID = -4797305467764987599L;
