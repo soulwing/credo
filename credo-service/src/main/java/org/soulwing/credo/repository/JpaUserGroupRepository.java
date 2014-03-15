@@ -69,6 +69,14 @@ public class JpaUserGroupRepository implements UserGroupRepository {
    * {@inheritDoc}
    */
   @Override
+  public UserGroup findById(Long id) {
+    return entityManager.find(UserGroupEntity.class, id);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
   public UserGroup findByGroupName(String groupName, String loginName) {
     
     if (UserGroup.SELF_GROUP_NAME.equals(groupName)) {

@@ -37,6 +37,13 @@ public interface UserGroupRepository extends UserGroupFactory {
   void add(UserGroup group);
   
   /**
+   * Finds a group by its unique identifier.
+   * @param id the unique identifier to match
+   * @return group or {@code null} if no such group exists
+   */
+  UserGroup findById(Long id);
+  
+  /**
    * Finds a group by name.
    * @param groupName the group name to match or {@code null} to match the
    *   {@link UserGroup#SELF_GROUP_NAME}
