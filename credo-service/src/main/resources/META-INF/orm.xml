@@ -52,6 +52,16 @@
       where g.name = :groupName
     </query>
   </named-query>
+
+  <named-query name="findGroupMemberWithGroupAndProfileId">
+    <query>
+      select distinct gm from UserGroupMemberEntity gm
+      inner join gm.group g
+      inner join gm.user u
+      where u.id = :profileId
+      and g.name = :groupName
+    </query>
+  </named-query>
   
   <named-query name="findGroupMemberWithGroupAndLoginName">
     <query>

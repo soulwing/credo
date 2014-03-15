@@ -158,6 +158,30 @@ public class JpaUserGroupMemberRepositoryIT {
   }
   
   @Test
+  public void testFindByGroupAndProfileId() throws Exception {
+    final String loginName = "someUser";
+    final String groupName = "someGroup";
+    UserProfileEntity user = EntityUtil.newUser(loginName);
+    UserGroupEntity group = EntityUtil.newGroup(groupName);
+    
+    UserGroupMemberEntity groupMember = EntityUtil.newGroupMember(user, group);
+    
+    entityManager.persist(user);
+    entityManager.persist(group);
+    entityManager.persist(groupMember);
+    entityManager.flush();
+    entityManager.clear();
+    
+    UserGroupMember actual = repository.findByGroupAndProfileId(
+        groupName, user.getId());
+    assertThat(actual, is(not(nullValue())));
+    assertThat(actual, 
+        hasProperty("group", hasProperty("name", equalTo(groupName))));
+    assertThat(actual, 
+        hasProperty("user", hasProperty("loginName", equalTo(loginName))));
+  }
+
+  @Test
   public void testFindByGroupAndLoginName() throws Exception {
     final String loginName = "someUser";
     final String groupName = "someGroup";

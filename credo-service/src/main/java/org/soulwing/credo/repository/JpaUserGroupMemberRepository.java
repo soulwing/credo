@@ -34,7 +34,7 @@ import org.soulwing.credo.domain.UserGroupMemberEntity;
 
 /**
  * A {@link UserGroupMemberRepository} that is implemented using JPA.
- *
+ * 
  * @author Carl Harris
  */
 @ApplicationScoped
@@ -43,7 +43,7 @@ public class JpaUserGroupMemberRepository
 
   @PersistenceContext
   protected EntityManager entityManager;
-  
+
   /**
    * {@inheritDoc}
    */
@@ -53,7 +53,7 @@ public class JpaUserGroupMemberRepository
       throw new IllegalArgumentException("unrecognized member type: "
           + groupMember.getClass().getName());
     }
-    
+
     ((UserGroupMemberEntity) groupMember).setDateCreated(new Date());
     entityManager.persist(groupMember);
   }
@@ -62,23 +62,45 @@ public class JpaUserGroupMemberRepository
    * {@inheritDoc}
    */
   @Override
-  public UserGroupMember findByGroupAndLoginName(String groupName, 
+  public void remove(UserGroupMember groupMember) {
+    entityManager.remove(groupMember);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public UserGroupMember findByGroupAndProfileId(String groupName, 
+      Long profileId) {
+    TypedQuery<UserGroupMember> query = entityManager.createNamedQuery(
+        "findGroupMemberWithGroupAndProfileId", UserGroupMember.class);
+    query.setParameter("groupName", groupName);
+    query.setParameter("profileId", profileId);    
+    return query.getSingleResult();
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public UserGroupMember findByGroupAndLoginName(String groupName,
       String loginName) {
-    
+
     if (UserGroup.SELF_GROUP_NAME.equals(groupName)) {
       groupName = null;
     }
-    
-    String queryName = groupName != null ? 
-        "findGroupMemberWithGroupAndLoginName" : "findGroupMemberSelf";
-    TypedQuery<UserGroupMember> query = entityManager.createNamedQuery(
-        queryName, UserGroupMember.class);
-    
+
+    String queryName =
+        groupName != null ? "findGroupMemberWithGroupAndLoginName"
+            : "findGroupMemberSelf";
+    TypedQuery<UserGroupMember> query =
+        entityManager.createNamedQuery(queryName, UserGroupMember.class);
+
     if (groupName != null) {
       query.setParameter("groupName", groupName);
     }
     query.setParameter("loginName", loginName);
-    
+
     try {
       return query.getSingleResult();
     }
@@ -94,11 +116,12 @@ public class JpaUserGroupMemberRepository
   public Collection<UserGroupMember> findAllMembers(String groupName) {
     Validate.notEmpty(groupName, "groupName is required");
     Validate.isTrue(!UserGroup.SELF_GROUP_NAME.equals(groupName));
-    
-    TypedQuery<UserGroupMember> query = entityManager.createNamedQuery(
-        "findAllGroupMembers", UserGroupMember.class);
+
+    TypedQuery<UserGroupMember> query =
+        entityManager.createNamedQuery("findAllGroupMembers",
+            UserGroupMember.class);
     query.setParameter("groupName", groupName);
-  
+
     return query.getResultList();
   }
 

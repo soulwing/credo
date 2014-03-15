@@ -37,6 +37,20 @@ public interface UserGroupMemberRepository {
   void add(UserGroupMember groupMember);
   
   /**
+   * Removes a group member from the repository.
+   * @param groupMember the member to remove
+   */
+  void remove(UserGroupMember groupMember);
+  
+  /**
+   * Finds a group member by the associated user's unique ID.
+   * @param groupName the subject group name
+   * @param profile the user's profile identifier
+   * @return group member or {@code null} if no such member exists
+   */
+  UserGroupMember findByGroupAndProfileId(String groupName, Long profileId);
+  
+  /**
    * Finds a group member for the given group and login name.
    * @param groupName the subject group name
    * @param loginName the subject user's login name
