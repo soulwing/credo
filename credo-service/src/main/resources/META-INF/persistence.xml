@@ -5,7 +5,7 @@
     <jta-data-source>${persistence.dataSource}</jta-data-source>
     <properties>
       <property name="javax.persistence.schema-generation.database.action"
-        value="drop-and-create" />
+        value="none" />
       <property name="javax.persistence.schema-generation.create-source"
         value="metadata" />
       <property name="javax.persistence.schema-generation.drop-source"
@@ -13,7 +13,7 @@
       <!-- property name="javax.persistence.sql-load-script-source"
         value="META-INF/load-script.sql" /-->
       <property name="hibernate.show_sql" value="true"/>
-      <property name="hibernate.format_sql" value="true"/>
+      <property name="hibernate.format_sql" value="false"/>
     </properties>
   </persistence-unit>
 </persistence>
