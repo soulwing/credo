@@ -183,6 +183,36 @@ When exporting a credential the user can choose to generate a random
 export passphrase.
 
 
+Create New Group
+----------------
+
+A user can create a new group.
+
+* The user who creates the group becomes the group's owner.
+* The user must specify the name of the group and may specify a description
+  for the group
+* The owner is always a member of the group (at least in the sense that the 
+  owner can decrypt the group's secret key using her own private key)
+* The user can choose zero or more additional group members before saving the
+  new group.
+  
+
+View Groups
+-----------
+
+A user can view all groups in which she is a member.
+
+
+Edit Group
+----------
+
+A user can edit an existing group for which she is a member.
+
+* The user can change the name and/or the description for the group, and 
+  can add and remove group members as desired (except that she cannot remove
+  herself from the group).  
+
+
 
  
 

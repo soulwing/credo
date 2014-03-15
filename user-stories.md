@@ -1,25 +1,8 @@
-Create New Group
-----------------
+Remove Group
+------------
 
-A user can create a new group.
-
-* The user who creates the group becomes the group's owner.
-* The user must specify the name of the group and may specify a description
-  for the group
-* The owner is always a member of the group (at least in the sense that the 
-  owner can decrypt the group's secret key using her own private key)
-* The user can choose zero or more additional group members before saving the
-  new group.
-  
-  
-Edit Group
-----------
-
-A user can edit an existing group for which she is the owner.
-
-* The user can change the name and/or the description for the group, and 
-  can add and remove group members as desired (except that she cannot remove
-  herself from the group).  
+A user can remove a group in which she is a member, provided that the group
+is not assigned as the owner of any credential.
 
 
 Assign a Group Owner for an Imported Credential
