@@ -20,12 +20,11 @@ package org.soulwing.credo.service.group;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.arrayContaining;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.hasProperty;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.sameInstance;
 
 import java.util.Collection;
+import java.util.Collections;
 
 import javax.enterprise.inject.Instance;
 
@@ -36,7 +35,9 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.soulwing.credo.UserGroup;
+import org.soulwing.credo.UserGroupMember;
 import org.soulwing.credo.UserProfile;
+import org.soulwing.credo.repository.UserGroupMemberRepository;
 import org.soulwing.credo.repository.UserGroupRepository;
 import org.soulwing.credo.service.UserDetail;
 import org.soulwing.credo.service.UserProfileService;
@@ -50,6 +51,12 @@ public class ConcreteGroupEditorFactoryTest {
 
   private static final Long OWNER_ID = -1L;
   
+  private static final Long USER_ID = -2L;
+  
+  private static final Long GROUP_ID = -1L;
+  
+  private static final String GROUP_NAME = "someGroup";
+  
   @Rule
   public final JUnitRuleMockery context = new JUnitRuleMockery();
   
@@ -57,10 +64,16 @@ public class ConcreteGroupEditorFactoryTest {
   private Instance<ConfigurableGroupEditor> newGroupEditor;
   
   @Mock
+  private Instance<ConfigurableGroupEditor> existingGroupEditor;
+  
+  @Mock
   private UserProfileService profileService;
   
   @Mock
   private UserGroupRepository groupRepository;
+  
+  @Mock
+  private UserGroupMemberRepository memberRepository;
   
   @Mock
   private ConfigurableGroupEditor editor;
@@ -72,6 +85,9 @@ public class ConcreteGroupEditorFactoryTest {
   private UserProfile profile;
   
   @Mock
+  private UserGroupMember member;
+  
+  @Mock
   private Collection<UserDetail> users;
   
   private ConcreteGroupEditorFactory editorFactory =
@@ -80,13 +96,14 @@ public class ConcreteGroupEditorFactoryTest {
   @Before
   public void setUp() throws Exception {
     editorFactory.newGroupEditor = newGroupEditor;
+    editorFactory.existingGroupEditor = existingGroupEditor;
     editorFactory.profileService = profileService;
     editorFactory.groupRepository = groupRepository;   
+    editorFactory.memberRepository = memberRepository;
   }
 
   @Test
-  @SuppressWarnings("unchecked")
-  public void testNewEditor() throws Exception {
+  public void testNewEditorForNewGroup() throws Exception {
     context.checking(new Expectations() { { 
       oneOf(newGroupEditor).get();
       will(returnValue(editor));
@@ -100,13 +117,40 @@ public class ConcreteGroupEditorFactoryTest {
       will(returnValue(OWNER_ID));
       oneOf(editor).setGroup(with(same(group)));
       oneOf(editor).setOwner(with(OWNER_ID));
-      oneOf(editor).setMembers((Collection<UserDetail>) 
-          with(hasProperty("empty", equalTo(true))));
       oneOf(editor).setMembership(with(arrayContaining(OWNER_ID)));
       oneOf(editor).setUsers(with(same(users)));
     } });
     
     assertThat(editorFactory.newEditor(), is(sameInstance(editor)));
   }
+
+  @Test
+  public void testNewEditorForExistingGroup() throws Exception {
+    context.checking(new Expectations() { { 
+      oneOf(existingGroupEditor).get();
+      will(returnValue(editor));
+      oneOf(groupRepository).findById(with(GROUP_ID));
+      will(returnValue(group));
+      oneOf(group).getName();
+      will(returnValue(GROUP_NAME));
+      oneOf(memberRepository).findAllMembers(with(GROUP_NAME));
+      will(returnValue(Collections.singleton(member)));
+      oneOf(member).getUser();
+      will(returnValue(profile));
+      oneOf(profileService).findAllProfiles();
+      will(returnValue(users));
+      oneOf(profileService).getLoggedInUserProfile();
+      will(returnValue(profile));
+      exactly(2).of(profile).getId();
+      will(onConsecutiveCalls(returnValue(USER_ID), returnValue(OWNER_ID)));
+      oneOf(editor).setGroup(with(same(group)));
+      oneOf(editor).setOwner(with(OWNER_ID));
+      oneOf(editor).setMembership(with(arrayContaining(USER_ID, OWNER_ID)));
+      oneOf(editor).setUsers(with(same(users)));
+    } });
+    
+    assertThat(editorFactory.newEditor(GROUP_ID), is(sameInstance(editor)));
+  }
+
 }
 

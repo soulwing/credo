@@ -19,6 +19,7 @@
 package org.soulwing.credo.service.group;
 
 import org.soulwing.credo.service.GroupEditor;
+import org.soulwing.credo.service.NoSuchGroupException;
 
 /**
  * A factory that produces {@link GroupEditor} objects.
@@ -32,5 +33,15 @@ public interface GroupEditorFactory {
    * @return group editor
    */
   ConfigurableGroupEditor newEditor();
+  
+  /**
+   * Creates an editor for an existing group.
+   * @param groupId unique identifier of the group to edit
+   * @return group editor
+   * @throws NoSuchGroupException if there exists no group with the given
+   *    identifier
+   */
+  ConfigurableGroupEditor newEditor(Long groupId)
+      throws NoSuchGroupException;
   
 }

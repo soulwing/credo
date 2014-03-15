@@ -18,17 +18,19 @@
  */
 package org.soulwing.credo.service.group;
 
-import java.util.ArrayList;
-import java.util.Collection;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.inject.Instance;
 import javax.inject.Inject;
 
 import org.soulwing.credo.UserGroup;
+import org.soulwing.credo.UserGroupMember;
+import org.soulwing.credo.repository.UserGroupMemberRepository;
 import org.soulwing.credo.repository.UserGroupRepository;
 import org.soulwing.credo.service.GroupEditor;
-import org.soulwing.credo.service.UserDetail;
+import org.soulwing.credo.service.NoSuchGroupException;
 import org.soulwing.credo.service.UserProfileService;
 
 /**
@@ -42,9 +44,15 @@ public class ConcreteGroupEditorFactory implements GroupEditorFactory {
   @Inject @NewGroup
   protected Instance<ConfigurableGroupEditor> newGroupEditor;
 
+  @Inject @ExistingGroup
+  protected Instance<ConfigurableGroupEditor> existingGroupEditor;
+  
   @Inject
   protected UserGroupRepository groupRepository; 
 
+  @Inject
+  protected UserGroupMemberRepository memberRepository;
+  
   @Inject
   protected UserProfileService profileService;
   
@@ -54,17 +62,45 @@ public class ConcreteGroupEditorFactory implements GroupEditorFactory {
   @Override
   public ConfigurableGroupEditor newEditor() {
     return configure(newGroupEditor.get(), groupRepository.newGroup(""),
-        new ArrayList<UserDetail>());
+        new LinkedHashSet<Long>());
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public ConfigurableGroupEditor newEditor(Long groupId) 
+      throws NoSuchGroupException {
+    UserGroup group = findGroupById(groupId);
+    Set<Long> members = findMembers(group);
+    return configure(existingGroupEditor.get(), group, members);      
+  }
+  
+  private UserGroup findGroupById(Long groupId) throws NoSuchGroupException {
+    UserGroup group = groupRepository.findById(groupId);
+    if (group == null) {
+      throw new NoSuchGroupException();
+    }
+    return group;
+  }
+
+  private Set<Long> findMembers(UserGroup group) {
+    Set<Long> members = new LinkedHashSet<>();
+    for (UserGroupMember member : 
+        memberRepository.findAllMembers(group.getName())) { 
+      members.add(member.getUser().getId());
+    }
+    return members;
   }
 
   private ConfigurableGroupEditor configure(ConfigurableGroupEditor editor,
-      UserGroup group, Collection<UserDetail> members) {
+      UserGroup group, Set<Long> membership) {
     Long ownerId = profileService.getLoggedInUserProfile().getId();
+    membership.add(ownerId);
     editor.setGroup(group);
     editor.setOwner(ownerId);
-    editor.setMembers(members);
     editor.setUsers(profileService.findAllProfiles());
-    editor.setMembership(new Long[] { ownerId });
+    editor.setMembership(membership.toArray(new Long[membership.size()]));
     return editor;
   }
   
