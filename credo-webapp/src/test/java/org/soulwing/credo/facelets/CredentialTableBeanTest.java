@@ -68,9 +68,9 @@ public class CredentialTableBeanTest {
       will(returnValue(Collections.singletonList(credential)));
     } });
     
-    List<CredentialBean> credentials = bean.getCredentials();
+    List<Credential> credentials = bean.getCredentials();
     assertThat(credentials, not(empty()));
-    assertThat(credentials.get(0).getDelegate(), sameInstance(credential));
+    assertThat(credentials.get(0), sameInstance(credential));
   }
   
 }

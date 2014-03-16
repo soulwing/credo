@@ -18,7 +18,6 @@
  */
 package org.soulwing.credo.facelets;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.enterprise.context.RequestScoped;
@@ -40,21 +39,17 @@ public class CredentialTableBean {
   @Inject
   protected CredentialService credentialService;
 
-  private List<CredentialBean> beans;
+  private List<Credential> credentials;
   
   /**
    * Gets the collection of credentials to display in the table.
    * @return credential list
    */
-  public List<CredentialBean> getCredentials() {
-    if (beans == null) {
-      List<Credential> credentials = credentialService.findAllCredentials();
-      beans = new ArrayList<>(credentials.size());
-      for (Credential credential : credentials) {
-        beans.add(new CredentialBean(credential));
-      }
+  public List<Credential> getCredentials() {
+    if (credentials == null) {
+      credentials = credentialService.findAllCredentials();
     }
-    return beans;
+    return credentials;
   }
   
 }
