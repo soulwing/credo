@@ -143,7 +143,7 @@ public class ConcreteImportService implements ImportService {
       throw new AccessDeniedException();
     }
     catch (NoSuchGroupException ex) {
-      errors.addError("owner", "credentialGroupNotFound", 
+      errors.addError("owner", "credentialOwnerNotFound", 
           protection.getGroupName());
       throw ex;
     }
