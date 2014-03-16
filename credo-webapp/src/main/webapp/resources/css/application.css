@@ -123,6 +123,13 @@ select {
 	font-size: small;
 }
 
+td.column-nowrap {
+	white-space: nowrap;
+}
+
+td.column-width30 {
+	width: 30%;
+}
 td.table-tools a {
 	margin-right: 5px;
 }
