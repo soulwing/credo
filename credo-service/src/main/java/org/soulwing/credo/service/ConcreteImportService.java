@@ -133,7 +133,7 @@ public class ConcreteImportService implements ImportService {
 
     try {
       PrivateKeyWrapper privateKey = preparation.getDetails().getPrivateKey();
-      resolveOwner(credential, protection);
+      resolveOwner(credential, protection, errors);
       protectionService.protect(credential, privateKey, protection);
     }
     catch (UserAccessException ex) {
@@ -153,13 +153,39 @@ public class ConcreteImportService implements ImportService {
   }
   
   private void resolveOwner(Credential credential, 
-      ProtectionParameters protection) throws NoSuchGroupException {
+      ProtectionParameters protection, Errors errors) 
+      throws NoSuchGroupException {
+    UserGroup group = null;
+    try {
+      group = findOwnerGroup(protection);
+    }
+    catch (NoSuchGroupException ex) {
+      GroupEditor editor = groupService.newGroup();
+      editor.setName(protection.getGroupName());
+      try {
+        groupService.saveGroup(editor, errors);
+        group = findOwnerGroup(protection);
+      }
+      catch (GroupEditException gex) {
+        throw new RuntimeException(gex);
+      }
+      catch (PassphraseException pex) {
+        throw new RuntimeException(pex);
+      }      
+    }
+    finally {
+      credential.setOwner(group);
+    }
+  }
+
+  private UserGroup findOwnerGroup(ProtectionParameters protection)
+      throws NoSuchGroupException {
     UserGroup group = groupRepository.findByGroupName(
         protection.getGroupName(), userContextService.getLoginName());
     if (group == null) {
       throw new NoSuchGroupException();
     }
-    credential.setOwner(group);
+    return group;
   }
   
   /**

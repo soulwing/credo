@@ -216,24 +216,26 @@ public class ConcreteImportServiceTest {
   @Test
   public void testProtectCredential() throws Exception {
     context.checking(requestDetailsExpectations());
-    context.checking(resolveOwnerExpectations(returnValue(group)));
+    context.checking(findOwnerGroupExpectations(returnValue(group)));
     context.checking(storeOwnerExpectations());
     context.checking(protectionExpectations(returnValue(null)));
     importService.protectCredential(credential, importer, protection, errors);
   }
   
-  @Test(expected = NoSuchGroupException.class)
+  @Test
   public void testProtectCredentialWhenGroupNotFound() throws Exception {
     context.checking(requestDetailsExpectations());
-    context.checking(resolveOwnerExpectations(returnValue(null)));
-    context.checking(groupErrorExpectations());
+    context.checking(findOwnerGroupExpectations(returnValue(null)));
+    context.checking(createOwnerGroupExpectations());
+    context.checking(storeOwnerExpectations());
+    context.checking(protectionExpectations(returnValue(null)));
     importService.protectCredential(credential, importer, protection, errors);
   }
   
   @Test(expected = PassphraseException.class)
   public void testProtectCredentialWhenPasswordIncorrect() throws Exception {
     context.checking(requestDetailsExpectations());
-    context.checking(resolveOwnerExpectations(returnValue(group)));
+    context.checking(findOwnerGroupExpectations(returnValue(group)));
     context.checking(storeOwnerExpectations());
     context.checking(protectionExpectations(
         throwException(new UserAccessException(new Exception()))));
@@ -244,7 +246,7 @@ public class ConcreteImportServiceTest {
   @Test(expected = AccessDeniedException.class)
   public void testProtectCredentialWhenUserNotInGroup() throws Exception {
     context.checking(requestDetailsExpectations());
-    context.checking(resolveOwnerExpectations(returnValue(group)));
+    context.checking(findOwnerGroupExpectations(returnValue(group)));
     context.checking(storeOwnerExpectations());
     context.checking(protectionExpectations(
         throwException(new GroupAccessException("some message"))));
@@ -261,7 +263,7 @@ public class ConcreteImportServiceTest {
     } };
   }
 
-  private Expectations resolveOwnerExpectations(final Action outcome)
+  private Expectations findOwnerGroupExpectations(final Action outcome)
       throws Exception {
     return new Expectations() { { 
       allowing(protection).getGroupName();
@@ -271,6 +273,19 @@ public class ConcreteImportServiceTest {
       oneOf(groupRepository).findByGroupName(with(same(GROUP_NAME)), 
           with(same(LOGIN_NAME)));
       will(outcome);
+    } };
+  }
+
+  private Expectations createOwnerGroupExpectations() throws Exception {
+    final GroupEditor editor = context.mock(GroupEditor.class);
+    return new Expectations() { {
+      oneOf(groupService).newGroup();
+      will(returnValue(editor));
+      oneOf(editor).setName(with(GROUP_NAME));
+      oneOf(groupService).saveGroup(with(same(editor)), with(same(errors)));
+      oneOf(groupRepository).findByGroupName(with(same(GROUP_NAME)), 
+          with(same(LOGIN_NAME)));
+      will(returnValue(group));
     } };
   }
   
@@ -289,16 +304,6 @@ public class ConcreteImportServiceTest {
     } };
   }
   
-  private Expectations groupErrorExpectations() { 
-    return new Expectations() { {
-      allowing(protection).getGroupName();
-      will(returnValue(GROUP_NAME));
-      oneOf(errors).addError(with("owner"), 
-          with(containsString("NotFound")),
-          (Object[]) with(arrayContaining(GROUP_NAME)));
-    } };
-  }
-
   private Expectations passwordErrorExpectations() { 
     return new Expectations() { { 
       oneOf(errors).addError(with("password"), 
