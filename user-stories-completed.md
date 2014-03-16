@@ -213,6 +213,15 @@ A user can edit an existing group for which she is a member.
   herself from the group).  
 
 
+Remove Group
+------------
+
+A user can remove a group in which she is a member, provided that the group
+is not assigned as the owner of any credential.
+
+* The user should be prompted to confirm before the group is removed.
+
+
 
  
 

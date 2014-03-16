@@ -31,7 +31,9 @@ import javax.inject.Inject;
 import org.apache.commons.lang.Validate;
 import org.soulwing.credo.UserGroup;
 import org.soulwing.credo.UserGroupMember;
+import org.soulwing.credo.repository.CredentialRepository;
 import org.soulwing.credo.repository.UserGroupMemberRepository;
+import org.soulwing.credo.repository.UserGroupRepository;
 import org.soulwing.credo.service.group.ConfigurableGroupEditor;
 import org.soulwing.credo.service.group.GroupEditorFactory;
 import org.soulwing.credo.service.protect.GroupAccessException;
@@ -49,6 +51,12 @@ public class ConcreteGroupService implements GroupService {
   protected GroupEditorFactory editorFactory;
   
   @Inject
+  protected CredentialRepository credentialRepository;
+
+  @Inject
+  protected UserGroupRepository groupRepository;
+  
+  @Inject
   protected UserGroupMemberRepository memberRepository;
   
   @Inject
@@ -62,14 +70,31 @@ public class ConcreteGroupService implements GroupService {
     return editorFactory.newEditor();
   }
 
+  @Override
+  @TransactionAttribute(TransactionAttributeType.REQUIRED)
+  public GroupDetail findGroup(Long id) throws NoSuchGroupException {
+    String loginName = userContextService.getLoginName();
+    Collection<UserGroupMember> members = memberRepository
+        .findByGroupIdAndLoginName(id, loginName);
+    if (members.isEmpty()) {
+      throw new NoSuchGroupException();
+    }
+    return assembleGroupDetails(members).iterator().next();
+  }
+
   /**
    * {@inheritDoc}
    */
   @Override
+  @TransactionAttribute(TransactionAttributeType.REQUIRED)
   public Collection<GroupDetail> findAllGroups() {
+    return assembleGroupDetails(memberRepository.findByLoginName(
+        userContextService.getLoginName()));
+  }
+
+  private Collection<GroupDetail> assembleGroupDetails(
+      Collection<UserGroupMember> members) {
     Collection<GroupDetail> groupDetails = new ArrayList<>();
-    Collection<UserGroupMember> members = memberRepository.findByLoginName(
-        userContextService.getLoginName());
     UserGroupWrapper wrapper = null;
     for (UserGroupMember member : members) {
       UserGroup group = member.getGroup();
@@ -88,6 +113,7 @@ public class ConcreteGroupService implements GroupService {
    * {@inheritDoc}
    */
   @Override
+  @TransactionAttribute(TransactionAttributeType.REQUIRED)
   public GroupEditor editGroup(Long id) throws NoSuchGroupException {
     return editorFactory.newEditor(id);
   }
@@ -107,6 +133,29 @@ public class ConcreteGroupService implements GroupService {
     catch (GroupAccessException ex) {
       throw new AccessDeniedException();
     }
+  }
+
+  @Override
+  @TransactionAttribute(TransactionAttributeType.REQUIRED)
+  public void removeGroup(Long id, Errors errors) throws GroupEditException,
+      NoSuchGroupException {
+    String loginName = userContextService.getLoginName();
+    Collection<UserGroupMember> members = memberRepository
+        .findByGroupIdAndLoginName(id, loginName);
+    if (members.isEmpty()) {
+      errors.addError("groupNotFound", id);
+      throw new NoSuchGroupException();
+    }
+    if (!credentialRepository.findAllByOwnerId(id).isEmpty()) {
+      errors.addError("groupInUse", id);
+      throw new GroupEditException();
+    }
+    
+    for (UserGroupMember member : members) {
+      memberRepository.remove(member);
+    }
+    
+    groupRepository.remove(id);
   }
   
 }

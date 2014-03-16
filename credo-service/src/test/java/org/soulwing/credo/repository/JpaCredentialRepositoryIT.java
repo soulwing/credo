@@ -229,5 +229,22 @@ public class JpaCredentialRepositoryIT {
     assertThat(actual.getName(), is(equalTo(credential.getName())));
   }
 
-
+  @Test
+  public void testFindAllByOwnerId() throws Exception {
+    UserGroupEntity group = EntityUtil.newGroup("someGroup");
+    CredentialEntity credential = EntityUtil.newCredential(group, 
+        EntityUtil.newPrivateKey());
+    entityManager.persist(group);
+    repository.add(credential);
+    entityManager.flush();
+    entityManager.clear();
+    
+    List<Credential> credentials = repository.findAllByOwnerId(group.getId());
+    assertThat(credentials.size(), is(equalTo(1)));    
+    
+    Credential actual = credentials.get(0);
+    assertThat(actual, is(not(nullValue())));
+    assertThat(actual.getName(), is(equalTo(credential.getName())));
   }
+
+}

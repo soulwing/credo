@@ -80,6 +80,16 @@ public class JpaUserGroupRepository implements UserGroupRepository {
     return entityManager.merge(group);
   }
 
+  @Override
+  public boolean remove(Long id) {
+    UserGroupEntity group = entityManager.find(UserGroupEntity.class, id);
+    boolean found = group != null;
+    if (found) {
+      entityManager.remove(group);
+    }
+    return found;
+  }
+
   /**
    * {@inheritDoc}
    */

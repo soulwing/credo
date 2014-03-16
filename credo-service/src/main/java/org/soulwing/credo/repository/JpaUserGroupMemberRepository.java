@@ -59,12 +59,23 @@ public class JpaUserGroupMemberRepository
     entityManager.persist(groupMember);
   }
 
+  @Override
+  public void remove(UserGroupMember groupMember) {
+    entityManager.remove(groupMember);
+  }
+
   /**
    * {@inheritDoc}
    */
   @Override
-  public void remove(UserGroupMember groupMember) {
-    entityManager.remove(groupMember);
+  public boolean remove(Long id) {
+    UserGroupMember groupMember = entityManager.find(
+        UserGroupMemberEntity.class, id);
+    boolean found = groupMember != null;
+    if (found) {
+      entityManager.remove(groupMember);
+    }
+    return found;
   }
 
   /**
@@ -138,6 +149,25 @@ public class JpaUserGroupMemberRepository
     // item in the select clause, in order to allow sorting.
     Query query = entityManager.createNamedQuery(
         "findGroupsAndMembersByLoginName");
+    query.setParameter("loginName", loginName);
+    
+    return (Collection<UserGroupMember>) query.getResultList();
+  }
+
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  @SuppressWarnings("unchecked")
+  public Collection<UserGroupMember> findByGroupIdAndLoginName(
+      Long groupId, String loginName) {
+
+    // We can't use a typed query here because we have more than one 
+    // item in the select clause, in order to allow sorting.
+    Query query = entityManager.createNamedQuery(
+        "findMembersByGroupIdAndLoginName");
+    query.setParameter("groupId", groupId);
     query.setParameter("loginName", loginName);
     
     return (Collection<UserGroupMember>) query.getResultList();

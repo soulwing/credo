@@ -1,10 +1,3 @@
-Remove Group
-------------
-
-A user can remove a group in which she is a member, provided that the group
-is not assigned as the owner of any credential.
-
-
 Assign a Group Owner for an Imported Credential
 -----------------------------------------------
 

@@ -51,4 +51,11 @@ public interface CredentialRepository {
    */
   List<Credential> findAllByLoginName(String loginName);
   
+  /**
+   * Finds a credentials in the repository with a given owner.
+   * @param ownerId unique identifier of the owner.
+   * @return list of credentials
+   */
+  List<Credential> findAllByOwnerId(Long ownerId);
+  
 }

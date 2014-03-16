@@ -38,9 +38,16 @@ public interface UserGroupMemberRepository {
   
   /**
    * Removes a group member from the repository.
-   * @param groupMember the member to remove
+   * @param groupMember the group member to remove
    */
   void remove(UserGroupMember groupMember);
+  
+  /**
+   * Removes a group member from the repository.
+   * @param id unique identifier of the group to remove
+   * @return {@code true} if a group member was removed
+   */
+  boolean remove(Long id);
   
   /**
    * Finds a group member by the associated user's unique ID.
@@ -73,5 +80,14 @@ public interface UserGroupMemberRepository {
    *     a member
    */
   Collection<UserGroupMember> findByLoginName(String loginName);
+
+  /**
+   * Finds all group memebers for the given group and login name.
+   * @param groupName unique identifier of the subject group
+   * @param loginName the subject user's login name
+   * @return matching group member or {@code null} if no such member exists
+   */
+  Collection<UserGroupMember> findByGroupIdAndLoginName(
+      Long groupId, String loginName);
 
 }

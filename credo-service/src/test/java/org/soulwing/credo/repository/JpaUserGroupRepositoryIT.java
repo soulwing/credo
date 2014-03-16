@@ -105,6 +105,22 @@ public class JpaUserGroupRepositoryIT {
   }
 
   @Test
+  public void testRemove() throws Exception {
+    UserGroupEntity group = new UserGroupEntity("someGroup");
+    repository.add(group);
+    entityManager.flush();
+    entityManager.clear();
+    
+    assertThat(repository.remove(group.getId()), is(true));
+    entityManager.flush();
+    entityManager.clear();
+    
+    assertThat(entityManager.find(UserGroupEntity.class, group.getId()),
+        is(nullValue()));
+  }
+
+
+  @Test
   public void testUpdate() throws Exception {
     UserGroupEntity expected = new UserGroupEntity("someGroup");
     repository.add(expected);

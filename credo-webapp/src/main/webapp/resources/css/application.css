@@ -123,4 +123,9 @@ select {
 	font-size: small;
 }
 
+td.table-tools a {
+	margin-right: 5px;
+}
+
+
 

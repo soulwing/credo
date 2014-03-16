@@ -99,6 +99,24 @@
       order by g.name, u.loginName
     </query>
   </named-query>
+
+  <named-query name="findMembersByGroupIdAndLoginName">
+    <query>
+      select distinct gm, g, u from UserGroupMemberEntity gm
+      inner join fetch gm.group g
+      inner join fetch gm.user u
+      where exists (
+        select igm from UserGroupMemberEntity igm
+        inner join igm.user iu
+        where iu.loginName = :loginName
+        and igm.group = gm.group
+      )
+      and g.id = :groupId
+      and g.name is not null
+      order by u.loginName
+    </query>
+  </named-query>
+  
   
   <named-query name="findTagByText">
     <query>
@@ -130,6 +148,14 @@
         and gm.group = c.owner
       )      
       order by c.name
+    </query>
+  </named-query>
+
+  <named-query name="findAllCredentialsByOwnerId">
+    <query>
+      select distinct c from CredentialEntity c
+      inner join c.owner g
+      where g.id = :ownerId
     </query>
   </named-query>
 
