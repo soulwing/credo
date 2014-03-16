@@ -123,6 +123,10 @@ select {
 	font-size: small;
 }
 
+table {
+	font-size: small;
+}
+
 td.column-nowrap {
 	white-space: nowrap;
 }
