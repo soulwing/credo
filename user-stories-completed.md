@@ -239,6 +239,12 @@ When importing a credential, a user can create a new group containing herself
 by specifying the new group name as the owner.
 
 
+Disable Delete Control for In-Use Groups
+----------------------------------------
+
+The Delete control in the Groups table view should be disabled for any group
+that is assigned to one or more credentials.
+
 
  
 

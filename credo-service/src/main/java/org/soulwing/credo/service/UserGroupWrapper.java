@@ -35,6 +35,7 @@ class UserGroupWrapper implements GroupDetail, Serializable {
   
   private final UserGroup delegate;
   private final Collection<UserDetail> members = new ArrayList<>();
+  private boolean inUse;
   
   /**
    * Constructs a new instance.
@@ -82,6 +83,22 @@ class UserGroupWrapper implements GroupDetail, Serializable {
   @Override
   public Collection<UserDetail> getMembers() {
     return members;
+  }
+  
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public boolean isInUse() {
+    return inUse;
+  }
+
+  /**
+   * Sets the flag indicating whether the group is in use.
+   * @param inUse the flag state to set
+   */
+  public void setInUse(boolean inUse) {
+    this.inUse = inUse;
   }
   
 }

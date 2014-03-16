@@ -135,6 +135,7 @@ public class ConcreteGroupServiceTest {
       will(returnValue(GROUP_NAME));
     } });
     
+    context.checking(resolveInUseExpectations());
     GroupDetail detail = service.findGroup(GROUP_ID);
     assertThat(detail.getId(), is(equalTo(GROUP_ID)));
   }
@@ -183,6 +184,7 @@ public class ConcreteGroupServiceTest {
       will(returnValue(LOGIN_NAME2));
     } });
     
+    context.checking(resolveInUseExpectations());
     Iterator<GroupDetail> i = service.findAllGroups().iterator();
     assertThat(i.hasNext(), is(true));
     GroupDetail group = i.next();
@@ -267,4 +269,13 @@ public class ConcreteGroupServiceTest {
     service.removeGroup(GROUP_ID, errors);
   }
 
+  private Expectations resolveInUseExpectations() throws Exception {
+    return new Expectations() { { 
+      allowing(group).getId();
+      will(returnValue(GROUP_ID));
+      oneOf(credentialRepository).findAllByOwnerId(with(GROUP_ID));
+      will(returnValue(Collections.emptyList()));
+    } };
+  }
+  
 }

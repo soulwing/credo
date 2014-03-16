@@ -50,5 +50,13 @@ public interface GroupDetail {
    * @return collection of members
    */
   Collection<UserDetail> getMembers();
+  
+  /**
+   * Tests whether the group is in use for any purpose (e.g. as the owner 
+   * of a credential).
+   * @return {@code true} if the group is in use
+   */
+  boolean isInUse();
+  
     
 }

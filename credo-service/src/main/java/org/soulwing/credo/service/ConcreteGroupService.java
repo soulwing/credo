@@ -102,11 +102,16 @@ public class ConcreteGroupService implements GroupService {
       if (UserGroup.SELF_GROUP_NAME.equals(groupName)) continue;
       if (wrapper == null || !wrapper.getName().equals(groupName)) {
         wrapper = new UserGroupWrapper(group);
+        wrapper.setInUse(resolveGroupInUse(group));
         groupDetails.add(wrapper);
       }
       wrapper.addMember(new UserProfileWrapper(member.getUser()));
     }
     return groupDetails;
+  }
+
+  private boolean resolveGroupInUse(UserGroup group) {
+    return !credentialRepository.findAllByOwnerId(group.getId()).isEmpty();
   }
 
   /**

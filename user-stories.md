@@ -1,3 +1,36 @@
+Owner Group Auto-Create Feedback
+--------------------------------
+
+When a user specifies an non-existent group name in the Owner field
+of import credential details form, she should receive feedback that a new 
+group will be created.
+
+
+Auto-Complete Owner Group
+-------------------------
+
+As the user types a group name in the Owner field of the import credential
+details form, she should be offered auto-complete choices from which she
+can optionally choose a full group name.
+
+
+Auto-Complete Credential Tags
+-----------------------------
+
+As the user types a tag name in the Tags field of the import credential
+details form, she should be offered auto-complete choices from which she can
+optionally choose a tag.
+
+
+Remove Credential
+-----------------
+
+A user can remove a credential if she is a member of the group that owns the
+credential.
+
+* The user should be prompted to confirm before the credential is removed.
+
+
 Logged In User
 --------------
 

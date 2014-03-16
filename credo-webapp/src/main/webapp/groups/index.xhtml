@@ -50,10 +50,12 @@
               <f:param name="id" value="#{group.id}"/>
               #{messages.editButtonLabel}
             </h:outputLink>
-            <h:outputLink styleClass="btn btn-default btn-xs" value="remove">
-              <f:param name="id" value="#{group.id}"/>
-              #{messages.removeButtonLabel}
-            </h:outputLink>
+            <h:panelGroup rendered="#{not group.inUse}">
+	            <h:outputLink styleClass="btn btn-default btn-xs" value="remove">
+	              <f:param name="id" value="#{group.id}"/>
+	              #{messages.removeButtonLabel}
+	            </h:outputLink>
+            </h:panelGroup>
           </h:column>
         </h:dataTable>
       </div>
