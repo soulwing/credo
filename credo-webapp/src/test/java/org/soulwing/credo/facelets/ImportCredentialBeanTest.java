@@ -34,7 +34,6 @@ import static org.jmock.Expectations.throwException;
 
 import java.io.ByteArrayInputStream;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
@@ -53,7 +52,6 @@ import org.junit.Test;
 import org.soulwing.credo.Credential;
 import org.soulwing.credo.Password;
 import org.soulwing.credo.Tag;
-import org.soulwing.credo.UserGroup;
 import org.soulwing.credo.UserProfile;
 import org.soulwing.credo.service.AccessDeniedException;
 import org.soulwing.credo.service.Errors;
@@ -240,37 +238,6 @@ public class ImportCredentialBeanTest {
     } };
   }
   
-  @Test
-  public void testIsMemberOfSelfGroupOnlyWhenFalse() throws Exception {
-    final UserGroup group1 = context.mock(UserGroup.class, "group1");
-    final UserGroup group2 = context.mock(UserGroup.class, "group2");
-    final Set<UserGroup> groupMemberships =
-        new HashSet<>();
-    groupMemberships.add(group1);
-    groupMemberships.add(group2);
-
-    context.checking(new Expectations() { { 
-      oneOf(importService).getGroupMemberships();
-      will(returnValue(groupMemberships));
-    } });
-
-    assertThat(bean.isMemberOfSelfGroupOnly(), is(false));
-  }
-  
-  @Test
-  public void testIsMemberOfSelfGroupOnlyWhenTrue() throws Exception {
-    final UserGroup group = context.mock(UserGroup.class);
-    final Set<? extends UserGroup> groupMemberships =
-        Collections.singleton(group);
-  
-    context.checking(new Expectations() { { 
-      oneOf(importService).getGroupMemberships();
-      will(returnValue(groupMemberships));
-    } });
-    
-    assertThat(bean.isMemberOfSelfGroupOnly(), is(true));
-  }
-
   @Test
   public void testGetTagsWhenNull() throws Exception {
     context.checking(new Expectations() { { 

@@ -176,7 +176,7 @@ public class ImportCredentialBean implements Serializable {
    *    the "self" group 
    */
   public boolean isMemberOfSelfGroupOnly() {
-    return importService.getGroupMemberships().size() <= 1;
+    return importService.isMemberOfSelfGroupOnly();
   }
   
   /**

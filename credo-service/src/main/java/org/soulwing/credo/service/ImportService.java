@@ -25,7 +25,6 @@ import javax.ejb.Local;
 
 import org.soulwing.credo.Credential;
 import org.soulwing.credo.Tag;
-import org.soulwing.credo.UserGroup;
 
 /**
  * A service that imports credentials using the contents of uploaded files.
@@ -98,9 +97,11 @@ public interface ImportService {
   Set<? extends Tag> resolveTags(String[] tokens);
 
   /**
-   * Gets the set of access groups for which the logged in user is a member.
-   * @return set of access groups
+   * Tests whether the logged-in user is a member of any groups in addition
+   * to the self group.
+   * @return {@code true} if the user is a member of no groups other than
+   *    the self group
    */
-  Set<? extends UserGroup> getGroupMemberships();
+  boolean isMemberOfSelfGroupOnly();
 
 }

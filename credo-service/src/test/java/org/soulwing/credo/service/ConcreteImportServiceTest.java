@@ -32,9 +32,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import org.jmock.Expectations;
 import org.jmock.api.Action;
@@ -108,6 +106,9 @@ public class ConcreteImportServiceTest {
   private UserGroupRepository groupRepository;
   
   @Mock
+  private GroupService groupService;
+  
+  @Mock
   private UserContextService userContextService;
   
   @Mock
@@ -121,6 +122,7 @@ public class ConcreteImportServiceTest {
     importService.credentialRepository = credentialRepository;
     importService.tagRepository = tagRepository;
     importService.groupRepository = groupRepository;
+    importService.groupService = groupService;
     importService.userContextService = userContextService;
     importService.protectionService = protectionService;
   }
@@ -356,21 +358,26 @@ public class ConcreteImportServiceTest {
   }
 
   @Test
-  public void testGetGroupMemberships() throws Exception {
-    final String loginName = "someUser";
-    final Set<? extends UserGroup> groupMemberships = 
-        new HashSet<>();
-        
+  public void testUserIsNotMemberOfSelfGroupOnly() throws Exception {
     context.checking(new Expectations() { { 
-      oneOf(userContextService).getLoginName();
-      will(returnValue(loginName));
-      oneOf(groupRepository).findByLoginName(with(same(loginName)));
-      will(returnValue(groupMemberships));
+      oneOf(groupService).findAllGroups();
+      will(returnValue(Collections.singleton(
+          context.mock(GroupDetail.class))));
     } });
     
-    assertThat((Set) importService.getGroupMemberships(), 
-        is(sameInstance((Set) groupMemberships)));
+    assertThat(importService.isMemberOfSelfGroupOnly(), is(false));
   }
+
+  @Test
+  public void testUserIsMemberOfSelfGroupOnly() throws Exception {
+    context.checking(new Expectations() { { 
+      oneOf(groupService).findAllGroups();
+      will(returnValue(Collections.emptySet()));
+    } });
+    
+    assertThat(importService.isMemberOfSelfGroupOnly(), is(true));
+  }
+
 
 }
 

@@ -65,6 +65,9 @@ public class ConcreteImportService implements ImportService {
   protected UserGroupRepository groupRepository;
   
   @Inject
+  protected GroupService groupService;
+  
+  @Inject
   protected UserContextService userContextService;
   
   @Inject
@@ -185,13 +188,10 @@ public class ConcreteImportService implements ImportService {
     return tags;
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
-  public Set<? extends UserGroup> getGroupMemberships() {
-    return groupRepository.findByLoginName(userContextService.getLoginName());
+  public boolean isMemberOfSelfGroupOnly() {
+    return groupService.findAllGroups().isEmpty();
   }
-  
+ 
 }
 
