@@ -53,6 +53,7 @@ import org.soulwing.credo.service.PassphraseException;
 public class EditGroupBeanTest {
 
   private static final long GROUP_ID = -1L;
+  private static final String GROUP_NAME = "groupName";
   private static final Password PASSWORD = new Password(new char[0]);
   
   @Rule
@@ -146,6 +147,8 @@ public class EditGroupBeanTest {
   private Expectations editGroupExpectations(final Action outcome) 
       throws Exception {
     return new Expectations() { { 
+      allowing(editor).getName();
+      will(returnValue(GROUP_NAME));
       oneOf(groupService).editGroup(GROUP_ID);
       will(outcome);
     } };
