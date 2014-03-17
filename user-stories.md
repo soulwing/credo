@@ -1,11 +1,3 @@
-Auto-Complete Credential Tags
------------------------------
-
-As the user types a tag name in the Tags field of the import credential
-details form, she should be offered auto-complete choices from which she can
-optionally choose a tag.
-
-
 Remove Credential
 -----------------
 

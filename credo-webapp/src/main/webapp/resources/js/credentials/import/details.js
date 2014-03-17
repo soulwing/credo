@@ -15,6 +15,8 @@ $(document).ready(function() {
 		queryTokenizer: Bloodhound.tokenizers.whitespace,
 		prefetch: {
 			url: $owner.parent().data("autocomplete-url"),
+			// the data is returned as an array of string group names
+			// convert to an array of objects with a name property
 			filter: function(list) {
 				return $.map(list, function(group) { return { name: group }; });
 			}
@@ -35,15 +37,33 @@ $(document).ready(function() {
 		}
 	);
 	
-	$('#details\\:tags').selectize({
+	var $tags = $("#details\\:tags");
+	var tagsSelector = $tags.selectize({
 	    delimiter: ',',
-	    persist: false,
-	    create: function(input) {
-	        return {
-	            value: input,
-	            text: input
-	        };
-	    }
+	    persist: true,
+	    openOnFocus: false,
+	    sortField: [{field: 'text', direction: 'asc'}],
+	    maxOptions: 5,
+	    create: function(input) { return { value: input, text: input }; },
+	    onChange: function(value) { tagsSelector[0].selectize.close(); }
+	});
+
+	tagsSelector[0].selectize.load(function(callback) { 
+		$.ajax({
+			url: $tags.parent().data("autocomplete-url"),
+			type: "GET",
+			dataType: "json",
+			success: function(tags) {
+				// the data is returned as an array of string tags
+				// convert to an array of name/value pair objects
+				callback($.map(tags, function(tag) { 
+					return { value: tag, text: tag };
+				}));
+			},
+			error: function() {
+				callback();
+			}
+		});
 	});
 	
 	var hideFeedback = function() {
