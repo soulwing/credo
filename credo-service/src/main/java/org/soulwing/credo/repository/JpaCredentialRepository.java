@@ -30,6 +30,7 @@ import javax.persistence.PersistenceContext;
 import javax.persistence.TypedQuery;
 
 import org.soulwing.credo.Credential;
+import org.soulwing.credo.CredentialCertificate;
 import org.soulwing.credo.Tag;
 import org.soulwing.credo.domain.CredentialEntity;
 
@@ -73,6 +74,19 @@ public class JpaCredentialRepository implements CredentialRepository {
       assert true;
     }
     return tag;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public void remove(Long id) {
+    Credential credential = findById(id);
+    for (CredentialCertificate certificate : credential.getCertificates()) {
+      entityManager.remove(certificate);
+    }
+    entityManager.remove(credential);
+    entityManager.remove(credential.getPrivateKey());
   }
 
   /**

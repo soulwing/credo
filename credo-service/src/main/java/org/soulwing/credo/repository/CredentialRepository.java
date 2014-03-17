@@ -36,6 +36,12 @@ public interface CredentialRepository {
   void add(Credential credential);
 
   /**
+   * Removes a credential from the repository.
+   * @param id the unique identifier of the credential to remove
+   */
+  void remove(Long id);
+  
+  /**
    * Finds a credential using its persistent identifier
    * @param id identifier of the credential to retrieve
    * @return credential or {@code null} if no credential exists with the

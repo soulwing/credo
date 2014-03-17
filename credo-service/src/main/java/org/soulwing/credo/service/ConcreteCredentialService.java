@@ -67,4 +67,12 @@ public class ConcreteCredentialService implements CredentialService {
         userContextService.getLoginName());
   }
 
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public void removeCredential(Long id) {
+    credentialRepository.remove(id);
+  }
+
 }

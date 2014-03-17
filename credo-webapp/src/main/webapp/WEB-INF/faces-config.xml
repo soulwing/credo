@@ -40,7 +40,7 @@
   </navigation-rule>
 
   <navigation-rule>
-    <from-view-id>/credentials/import/*</from-view-id>
+    <from-view-id>/credentials/*</from-view-id>
     <navigation-case>
       <from-outcome>success</from-outcome>
       <to-view-id>/credentials/index.xhtml</to-view-id>
@@ -51,18 +51,13 @@
       <to-view-id>/credentials/index.xhtml</to-view-id>
       <redirect />
     </navigation-case>
+  </navigation-rule>
+  
+  <navigation-rule>
+    <from-view-id>/credentials/import/*</from-view-id>
     <navigation-case>
       <from-outcome>failure</from-outcome>
       <to-view-id>/credentials/import/index.xhtml</to-view-id>
-    </navigation-case>
-  </navigation-rule>
-
-  <navigation-rule>
-    <from-view-id>/credentials/export/*</from-view-id>
-    <navigation-case>
-      <from-outcome>cancel</from-outcome>
-      <to-view-id>/credentials/index.xhtml</to-view-id>
-      <redirect />
     </navigation-case>
   </navigation-rule>
 

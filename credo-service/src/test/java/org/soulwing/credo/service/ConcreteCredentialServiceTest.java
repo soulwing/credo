@@ -43,6 +43,10 @@ import org.soulwing.credo.repository.CredentialRepository;
  */
 public class ConcreteCredentialServiceTest {
 
+  private static final String LOGIN_NAME = "loginName";
+
+  private static final Long CREDENTIAL_ID = -1L;
+  
   @Rule
   public final JUnitRuleMockery context = new JUnitRuleMockery();
   
@@ -65,33 +69,31 @@ public class ConcreteCredentialServiceTest {
   
   @Test
   public void testFindCredentialById() throws Exception {
-    final Long id = -1L;
     context.checking(new Expectations() { { 
-      oneOf(credentialRepository).findById(with(same(id)));
+      oneOf(credentialRepository).findById(with(same(CREDENTIAL_ID)));
       will(returnValue(credential));
     } });
     
-    assertThat(service.findCredentialById(id), is(sameInstance(credential)));
+    assertThat(service.findCredentialById(CREDENTIAL_ID), 
+        is(sameInstance(credential)));
   }
 
   @Test(expected = NoSuchCredentialException.class)
   public void testFindCredentialByIdNotFound() throws Exception {
-    final Long id = -1L;
     context.checking(new Expectations() { { 
-      oneOf(credentialRepository).findById(with(same(id)));
+      oneOf(credentialRepository).findById(with(same(CREDENTIAL_ID)));
       will(returnValue(null));
     } });
 
-    service.findCredentialById(id);
+    service.findCredentialById(CREDENTIAL_ID);
   }
 
   @Test
   public void testFindAllCredentialsByLoginName() throws Exception {
-    final String loginName = "loginName";
     context.checking(new Expectations() { {
       oneOf(userContextService).getLoginName();
-      will(returnValue(loginName));
-      oneOf(credentialRepository).findAllByLoginName(with(loginName));
+      will(returnValue(LOGIN_NAME));
+      oneOf(credentialRepository).findAllByLoginName(with(LOGIN_NAME));
       will(returnValue(Collections.singletonList(credential)));
     } });
     
@@ -100,4 +102,13 @@ public class ConcreteCredentialServiceTest {
     assertThat(credentials.get(0), is(sameInstance(credential)));
   }
   
+  @Test
+  public void testRemoveCredential() throws Exception {
+    context.checking(new Expectations() { {
+      oneOf(credentialRepository).remove(with(CREDENTIAL_ID));
+    } });
+    
+    service.removeCredential(CREDENTIAL_ID);
+  }
+
 }

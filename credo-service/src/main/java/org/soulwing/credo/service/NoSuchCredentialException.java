@@ -18,13 +18,16 @@
  */
 package org.soulwing.credo.service;
 
+import javax.ejb.ApplicationException;
+
 /**
- * An exception thrown when a request to retrieve a credential fails because
+ * An exception thrown when a request to access a credential fails because
  * the desired credential was not found.
  *
  * @author Carl Harris
  */
-public class NoSuchCredentialException extends RuntimeException {
+@ApplicationException(rollback = true)
+public class NoSuchCredentialException extends Exception {
 
   private static final long serialVersionUID = -654742107998630429L;
 

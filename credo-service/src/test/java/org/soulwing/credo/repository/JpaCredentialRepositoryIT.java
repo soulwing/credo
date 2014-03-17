@@ -172,6 +172,31 @@ public class JpaCredentialRepositoryIT {
   }
 
   @Test
+  public void testRemove() throws Exception {
+    UserGroupEntity group = EntityUtil.newGroup("someGroup");
+    CredentialKeyEntity privateKey = EntityUtil.newPrivateKey();
+    CredentialCertificateEntity certificate = EntityUtil.newCertificate();
+    CredentialCertificateEntity authority = EntityUtil.newCertificate();
+    
+    CredentialEntity credential = EntityUtil.newCredential(group, privateKey);
+    credential.setPrivateKey(privateKey);
+    credential.addCertificate(certificate);
+    credential.addCertificate(authority);
+    
+    entityManager.persist(group);
+    repository.add(credential);
+    entityManager.flush();
+    entityManager.clear();
+  
+    repository.remove(credential.getId());
+    entityManager.flush();
+    entityManager.clear();
+    
+    assertThat(entityManager.find(CredentialEntity.class, credential.getId()),
+        is(nullValue()));
+  }
+  
+  @Test
   public void testFindAllByLoginName() throws Exception {
     final String loginName = "someUser";
     final String groupName = "someGroup";

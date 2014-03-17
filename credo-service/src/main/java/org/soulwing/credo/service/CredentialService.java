@@ -48,4 +48,16 @@ public interface CredentialService {
    */
   List<Credential> findAllCredentials();
   
+  /**
+   * Removes a credential.
+   * <p>
+   * This method does not throw an exception if the credential to remove no
+   * longer exists.
+   * 
+   * @param id unique identifier of the credential to remove
+   * @param errors errors object that will be updated in the case of an
+   *    error
+   */
+  void removeCredential(Long id);
+
 }
