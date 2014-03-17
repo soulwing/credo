@@ -270,6 +270,11 @@ details form, she should be offered auto-complete choices from which she can
 optionally choose a tag.
 
 
+Logged In User
+--------------
+
+A user sees her full name as the logged-in user in the top navigation bar.
+ 
 
 
 

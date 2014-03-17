@@ -48,6 +48,11 @@
 	        <ui:insert name="navbarLinks">
 	          <ui:include src="/navbar-links.xhtml"/>
 	        </ui:insert>
+	        <div class="nav navbar-nav navbar-right">
+	          <ui:insert name="navbarLogin">
+	            <span class="navbar-text">Logged in: #{loggedInUserBean.name}</span>        
+	          </ui:insert>
+	        </div>
 	      </div>
       </h:form>      
     </div>
