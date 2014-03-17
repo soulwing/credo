@@ -30,7 +30,6 @@ import java.util.List;
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-import javax.persistence.PersistenceException;
 import javax.transaction.UserTransaction;
 
 import org.jboss.arquillian.container.test.api.Deployment;
@@ -107,21 +106,6 @@ public class JpaCredentialRepositoryIT {
     assertThat(actual.getIssuer(), is(equalTo(credential.getIssuer())));
     assertThat(actual.getExpiration().getTime(), 
         is(equalTo(credential.getExpiration().getTime())));
-  }
-
-  @Test(expected = PersistenceException.class)
-  public void testAddWithDuplicateName() throws Exception {
-    UserGroupEntity group = EntityUtil.newGroup("someGroup");
-    CredentialEntity credential = EntityUtil.newCredential(
-        group, EntityUtil.newPrivateKey());
-    entityManager.persist(group);
-    repository.add(credential);
-    entityManager.flush();
-    entityManager.clear();
-    credential =  EntityUtil.newCredential(group, EntityUtil.newPrivateKey());
-    repository.add(credential);
-    entityManager.flush();
-    entityManager.clear();
   }
 
   @Test

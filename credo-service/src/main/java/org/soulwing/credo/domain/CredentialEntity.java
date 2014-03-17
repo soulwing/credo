@@ -55,7 +55,7 @@ public class CredentialEntity extends AbstractEntity implements Credential {
 
   private static final long serialVersionUID = 641502440794773525L;
   
-  @Column(unique = true, nullable = false, length = 100)
+  @Column(nullable = false, length = 100)
   private String name;
 
   @ManyToOne(optional = false, fetch = FetchType.LAZY)
