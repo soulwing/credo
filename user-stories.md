@@ -1,11 +1,3 @@
-Auto-Complete Owner Group
--------------------------
-
-As the user types a group name in the Owner field of the import credential
-details form, she should be offered auto-complete choices from which she
-can optionally choose a full group name.
-
-
 Auto-Complete Credential Tags
 -----------------------------
 

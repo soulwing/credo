@@ -254,8 +254,15 @@ of the import credential details form, she should receive feedback that a new
 group will be created.
 
 
+Auto-Complete Owner Group
+-------------------------
 
- 
+As the user types a group name in the Owner field of the import credential
+details form, she should be offered auto-complete choices from which she
+can optionally choose a full group name.
+
+
+
 
 
     
