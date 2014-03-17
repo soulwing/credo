@@ -246,6 +246,15 @@ The Delete control in the Groups table view should be disabled for any group
 that is assigned to one or more credentials.
 
 
+Owner Group Auto-Create Feedback
+--------------------------------
+
+When a user specifies an non-existent group name in the Owner field
+of the import credential details form, she should receive feedback that a new 
+group will be created.
+
+
+
  
 
 

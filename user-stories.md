@@ -1,11 +1,3 @@
-Owner Group Auto-Create Feedback
---------------------------------
-
-When a user specifies an non-existent group name in the Owner field
-of import credential details form, she should receive feedback that a new 
-group will be created.
-
-
 Auto-Complete Owner Group
 -------------------------
 

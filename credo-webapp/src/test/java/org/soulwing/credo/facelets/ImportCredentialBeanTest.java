@@ -39,6 +39,7 @@ import java.util.List;
 import java.util.Set;
 
 import javax.enterprise.context.Conversation;
+import javax.faces.event.ValueChangeEvent;
 import javax.servlet.http.Part;
 
 import org.jmock.Expectations;
@@ -53,9 +54,11 @@ import org.soulwing.credo.Credential;
 import org.soulwing.credo.Password;
 import org.soulwing.credo.Tag;
 import org.soulwing.credo.UserProfile;
+import org.soulwing.credo.facelets.ImportCredentialBean.OwnerStatus;
 import org.soulwing.credo.service.AccessDeniedException;
 import org.soulwing.credo.service.Errors;
 import org.soulwing.credo.service.FileContentModel;
+import org.soulwing.credo.service.GroupAccessException;
 import org.soulwing.credo.service.ImportDetails;
 import org.soulwing.credo.service.ImportException;
 import org.soulwing.credo.service.ImportPreparation;
@@ -73,6 +76,8 @@ import org.soulwing.credo.service.UserProfileService;
 public class ImportCredentialBeanTest {
 
   private static final String SUBJECT_NAME = "subjectName";
+  
+  private static final String GROUP_NAME = "groupName";
   
   @Rule
   public JUnitRuleMockery context = new JUnitRuleMockery() { {
@@ -102,6 +107,9 @@ public class ImportCredentialBeanTest {
   
   @Mock
   private Credential credential;
+  
+  @Mock
+  private ValueChangeEvent event;
   
   private ImportCredentialBean bean = new ImportCredentialBean();
   
@@ -531,4 +539,59 @@ public class ImportCredentialBeanTest {
       will(outcome);
     } };
   }
+  
+  @Test
+  public void testOwnerChangedToBlank() throws Exception {
+    context.checking(new Expectations() { { 
+      oneOf(event).getNewValue();
+      will(returnValue(""));
+    } });
+    
+    bean.setOwner(GROUP_NAME);
+    bean.ownerChanged(event);
+    assertThat(bean.getOwnerStatus(), is(equalTo(OwnerStatus.NONE)));
+  }
+
+  @Test
+  public void testOwnerChangedWhenGroupExists() throws Exception {
+    context.checking(new Expectations() { { 
+      oneOf(event).getNewValue();
+      will(returnValue(GROUP_NAME));
+      oneOf(importService).isExistingGroup(with(GROUP_NAME));
+      will(returnValue(true));
+    } });
+    
+    bean.setOwner(GROUP_NAME);
+    bean.ownerChanged(event);
+    assertThat(bean.getOwnerStatus(), is(equalTo(OwnerStatus.EXISTS)));
+  }
+
+  @Test
+  public void testOwnerChangedWhenGroupDoesNotExist() throws Exception {
+    context.checking(new Expectations() { { 
+      oneOf(event).getNewValue();
+      will(returnValue(GROUP_NAME));
+      oneOf(importService).isExistingGroup(with(GROUP_NAME));
+      will(returnValue(false));
+    } });
+    
+    bean.setOwner(GROUP_NAME);
+    bean.ownerChanged(event);
+    assertThat(bean.getOwnerStatus(), is(equalTo(OwnerStatus.WILL_CREATE)));
+  }
+
+  @Test
+  public void testOwnerChangedWhenGroupAccessDenied() throws Exception {
+    context.checking(new Expectations() { { 
+      oneOf(event).getNewValue();
+      will(returnValue(GROUP_NAME));
+      oneOf(importService).isExistingGroup(with(GROUP_NAME));
+      will(throwException(new GroupAccessException("some message")));
+    } });
+    
+    bean.setOwner(GROUP_NAME);
+    bean.ownerChanged(event);
+    assertThat(bean.getOwnerStatus(), is(equalTo(OwnerStatus.INACCESSIBLE)));
+  }
+
 }

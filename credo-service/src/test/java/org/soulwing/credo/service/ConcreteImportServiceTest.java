@@ -45,15 +45,15 @@ import org.soulwing.credo.Credential;
 import org.soulwing.credo.CredentialKey;
 import org.soulwing.credo.Tag;
 import org.soulwing.credo.UserGroup;
+import org.soulwing.credo.UserGroupMember;
 import org.soulwing.credo.repository.CredentialRepository;
 import org.soulwing.credo.repository.TagRepository;
+import org.soulwing.credo.repository.UserGroupMemberRepository;
 import org.soulwing.credo.repository.UserGroupRepository;
 import org.soulwing.credo.service.crypto.PrivateKeyWrapper;
 import org.soulwing.credo.service.importer.CredentialImporter;
 import org.soulwing.credo.service.importer.CredentialImporterFactory;
 import org.soulwing.credo.service.protect.CredentialProtectionService;
-import org.soulwing.credo.service.protect.GroupAccessException;
-import org.soulwing.credo.service.protect.UserAccessException;
 
 /**
  * Unit tests for {@link ConcreteImportService}.
@@ -91,6 +91,9 @@ public class ConcreteImportServiceTest {
   private UserGroup group;
   
   @Mock
+  private UserGroupMember member;
+  
+  @Mock
   private PrivateKeyWrapper credentialPrivateKey;
   
   @Mock
@@ -104,6 +107,9 @@ public class ConcreteImportServiceTest {
   
   @Mock
   private UserGroupRepository groupRepository;
+  
+  @Mock
+  private UserGroupMemberRepository memberRepository;
   
   @Mock
   private GroupService groupService;
@@ -122,6 +128,7 @@ public class ConcreteImportServiceTest {
     importService.credentialRepository = credentialRepository;
     importService.tagRepository = tagRepository;
     importService.groupRepository = groupRepository;
+    importService.memberRepository = memberRepository;
     importService.groupService = groupService;
     importService.userContextService = userContextService;
     importService.protectionService = protectionService;
@@ -270,8 +277,8 @@ public class ConcreteImportServiceTest {
       will(returnValue(GROUP_NAME));
       allowing(userContextService).getLoginName();
       will(returnValue(LOGIN_NAME));
-      oneOf(groupRepository).findByGroupName(with(same(GROUP_NAME)), 
-          with(same(LOGIN_NAME)));
+      oneOf(groupRepository).findByGroupName(with(GROUP_NAME),
+          with(LOGIN_NAME));
       will(outcome);
     } };
   }
@@ -283,8 +290,8 @@ public class ConcreteImportServiceTest {
       will(returnValue(editor));
       oneOf(editor).setName(with(GROUP_NAME));
       oneOf(groupService).saveGroup(with(same(editor)), with(same(errors)));
-      oneOf(groupRepository).findByGroupName(with(same(GROUP_NAME)), 
-          with(same(LOGIN_NAME)));
+      oneOf(groupRepository).findByGroupName(with(GROUP_NAME),
+          with(LOGIN_NAME));
       will(returnValue(group));
     } };
   }
@@ -381,6 +388,51 @@ public class ConcreteImportServiceTest {
     } });
     
     assertThat(importService.isMemberOfSelfGroupOnly(), is(true));
+  }
+
+  @Test
+  public void testGroupIsExistingGroup() throws Exception {
+    context.checking(new Expectations() { {
+      oneOf(userContextService).getLoginName();
+      will(returnValue(LOGIN_NAME));
+      oneOf(groupRepository).findByGroupName(with(GROUP_NAME), 
+          with(LOGIN_NAME));
+      will(returnValue(group));
+      oneOf(memberRepository).findByGroupAndLoginName(
+          with(GROUP_NAME), with(LOGIN_NAME));
+      will(returnValue(member));
+    } });
+    
+    assertThat(importService.isExistingGroup(GROUP_NAME), is(true));
+  }
+
+  @Test
+  public void testGroupIsNotExistingGroup() throws Exception {
+    context.checking(new Expectations() { {
+      oneOf(userContextService).getLoginName();
+      will(returnValue(LOGIN_NAME));
+      oneOf(groupRepository).findByGroupName(with(GROUP_NAME), 
+          with(LOGIN_NAME));
+      will(returnValue(null));
+    } });
+    
+    assertThat(importService.isExistingGroup(GROUP_NAME), is(false));
+  }
+
+  @Test(expected = GroupAccessException.class)
+  public void testGroupIsExistingGroupAndUserIsNotMember() throws Exception {
+    context.checking(new Expectations() { {
+      oneOf(userContextService).getLoginName();
+      will(returnValue(LOGIN_NAME));
+      oneOf(groupRepository).findByGroupName(with(GROUP_NAME), 
+          with(LOGIN_NAME));
+      will(returnValue(group));
+      oneOf(memberRepository).findByGroupAndLoginName(
+          with(GROUP_NAME), with(LOGIN_NAME));
+      will(returnValue(null));
+    } });
+    
+    importService.isExistingGroup(GROUP_NAME);
   }
 
 

@@ -33,15 +33,15 @@ import javax.inject.Inject;
 import org.soulwing.credo.Credential;
 import org.soulwing.credo.Tag;
 import org.soulwing.credo.UserGroup;
+import org.soulwing.credo.UserGroupMember;
 import org.soulwing.credo.repository.CredentialRepository;
 import org.soulwing.credo.repository.TagRepository;
+import org.soulwing.credo.repository.UserGroupMemberRepository;
 import org.soulwing.credo.repository.UserGroupRepository;
 import org.soulwing.credo.service.crypto.PrivateKeyWrapper;
 import org.soulwing.credo.service.importer.CredentialImporter;
 import org.soulwing.credo.service.importer.CredentialImporterFactory;
 import org.soulwing.credo.service.protect.CredentialProtectionService;
-import org.soulwing.credo.service.protect.GroupAccessException;
-import org.soulwing.credo.service.protect.UserAccessException;
 
 /**
  * A concrete implementation of {@link ImportService}.
@@ -63,6 +63,9 @@ public class ConcreteImportService implements ImportService {
   
   @Inject
   protected UserGroupRepository groupRepository;
+  
+  @Inject
+  protected UserGroupMemberRepository memberRepository;
   
   @Inject
   protected GroupService groupService;
@@ -217,6 +220,22 @@ public class ConcreteImportService implements ImportService {
   @Override
   public boolean isMemberOfSelfGroupOnly() {
     return groupService.findAllGroups().isEmpty();
+  }
+
+  @Override
+  public boolean isExistingGroup(String groupName)
+      throws GroupAccessException {
+    String loginName = userContextService.getLoginName();
+    boolean exists = groupRepository
+        .findByGroupName(groupName, loginName) != null;
+    if (exists) {
+      UserGroupMember member = memberRepository.findByGroupAndLoginName(
+          groupName, loginName);
+      if (member == null) {
+        throw new GroupAccessException("not a member of group " + groupName);
+      }
+    }
+    return exists;
   }
  
 }

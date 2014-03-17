@@ -46,6 +46,23 @@ public class GroupNameValidator implements Validator {
   private static final Pattern PATTERN = 
       Pattern.compile("^\\p{Alpha}[\\p{Alnum}_.+-]*$");
   
+  private final boolean allowSelf;
+  
+  /**
+   * Constructs a new instance.
+   */
+  public GroupNameValidator() {
+    this(false);
+  }
+  
+  /** 
+   * Constructs a new instance.
+   * @param allowSelf flag indicating whether the self group should be allowed
+   */
+  protected GroupNameValidator(boolean allowSelf) {
+    this.allowSelf = allowSelf;
+  }
+  
   /**
    * {@inheritDoc}
    */
@@ -70,7 +87,7 @@ public class GroupNameValidator implements Validator {
           null));
     }
     
-    if (groupName.equalsIgnoreCase(UserGroup.SELF_GROUP_NAME)) {
+    if (!allowSelf && groupName.equalsIgnoreCase(UserGroup.SELF_GROUP_NAME)) {
       throw new ValidatorException(new FacesMessage(FacesMessage.SEVERITY_ERROR,
           Bundle.getString("groupNameCannotBeSelf", 
               FacesContext.getCurrentInstance().getViewRoot().getLocale()),

@@ -104,4 +104,13 @@ public interface ImportService {
    */
   boolean isMemberOfSelfGroupOnly();
 
+  /**
+   * Tests whether the existing group name exists.
+   * @param groupName the subject group name
+   * @return {@code true} if group name exists
+   * @throws GroupAccessException if the logged-in user is not a member of
+   *    the given group name
+   */
+  boolean isExistingGroup(String groupName) throws GroupAccessException;
+  
 }
