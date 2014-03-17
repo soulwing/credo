@@ -354,6 +354,13 @@ public class ImportCredentialBean implements Serializable {
     }
   }
 
+  /**
+   * Resets rendered inputs on an Ajax request.  
+   * <p>
+   * This works around an issue when the form is submitted with one or more 
+   * validation errors, allowing the rendered inputs to be properly updated on 
+   * subsequent Ajax requests.
+   */
   private void resetRenderedInputs() {
     PartialViewContext partialViewContext = 
         facesContext.getPartialViewContext();
