@@ -1,5 +1,5 @@
 /*
- * File created on Feb 16, 2014 
+ * File created on Mar 17, 2014 
  *
  * Copyright (c) 2014 Virginia Polytechnic Institute and State University
  *
@@ -16,31 +16,26 @@
  * limitations under the License.
  *
  */
-package org.soulwing.credo.repository;
+package org.soulwing.credo.service;
 
 import java.util.Collection;
 
+import javax.ejb.Local;
+
 import org.soulwing.credo.Tag;
-import org.soulwing.credo.TagFactory;
 
 /**
- * A repository of persistent {@link Tag} entities.
+ * A service that provides access to tags used to label credentials.
  *
  * @author Carl Harris
  */
-public interface TagRepository extends TagFactory {
+@Local
+public interface TagService {
 
   /**
-   * Finds all tags.
-   * @return collection of tags
+   * Finds all currently defined tags.
+   * @return collection of tags.
    */
-  Collection<Tag> findAll();
-  
-  /**
-   * Finds a tag by searching for an exact match of its text.
-   * @param text the text to search
-   * @return tag or {@code null} if no matching tag was found
-   */
-  Tag findByTagText(String text);
-  
+  Collection<Tag> findAllTags();
+
 }

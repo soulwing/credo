@@ -1,5 +1,5 @@
 /*
- * File created on Feb 16, 2014 
+ * File created on Mar 17, 2014 
  *
  * Copyright (c) 2014 Virginia Polytechnic Institute and State University
  *
@@ -16,31 +16,39 @@
  * limitations under the License.
  *
  */
-package org.soulwing.credo.repository;
+package org.soulwing.credo.service;
 
 import java.util.Collection;
 
+import javax.ejb.ConcurrencyManagement;
+import javax.ejb.ConcurrencyManagementType;
+import javax.ejb.Singleton;
+import javax.ejb.TransactionAttribute;
+import javax.ejb.TransactionAttributeType;
+import javax.inject.Inject;
+
 import org.soulwing.credo.Tag;
-import org.soulwing.credo.TagFactory;
+import org.soulwing.credo.repository.TagRepository;
 
 /**
- * A repository of persistent {@link Tag} entities.
+ * A concrete {@link TagService} implementation.
  *
  * @author Carl Harris
  */
-public interface TagRepository extends TagFactory {
+@Singleton
+@ConcurrencyManagement(ConcurrencyManagementType.BEAN)
+@TransactionAttribute(TransactionAttributeType.REQUIRED)
+public class ConcreteTagService implements TagService {
 
-  /**
-   * Finds all tags.
-   * @return collection of tags
-   */
-  Collection<Tag> findAll();
+  @Inject
+  protected TagRepository tagRepository;
   
   /**
-   * Finds a tag by searching for an exact match of its text.
-   * @param text the text to search
-   * @return tag or {@code null} if no matching tag was found
+   * {@inheritDoc}
    */
-  Tag findByTagText(String text);
-  
+  @Override
+  public Collection<Tag> findAllTags() {
+    return tagRepository.findAll();
+  }
+
 }

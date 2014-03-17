@@ -18,6 +18,8 @@
  */
 package org.soulwing.credo.repository;
 
+import java.util.Collection;
+
 import javax.enterprise.context.ApplicationScoped;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
@@ -46,6 +48,13 @@ public class JpaTagRepository implements TagRepository {
     TagEntity tag = new TagEntity();
     tag.setText(text);
     return tag;
+  }
+
+  @Override
+  public Collection<Tag> findAll() {
+    TypedQuery<Tag> query = entityManager.createNamedQuery("findAllTags", 
+        Tag.class);
+    return query.getResultList();
   }
 
   /**

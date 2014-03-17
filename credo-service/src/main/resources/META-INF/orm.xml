@@ -117,6 +117,12 @@
     </query>
   </named-query>
   
+  <named-query name="findAllTags">
+    <query>
+      select distinct t from TagEntity t
+      order by t.text
+    </query>
+  </named-query>
   
   <named-query name="findTagByText">
     <query>

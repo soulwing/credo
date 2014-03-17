@@ -19,9 +19,13 @@
 package org.soulwing.credo.repository;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.nullValue;
+
+import java.util.Collection;
+import java.util.Iterator;
 
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
@@ -78,6 +82,23 @@ public class JpaTagRepositoryIT {
   @After
   public void tearDown() throws Exception {
     tx.rollback();
+  }
+  
+  @Test
+  public void testFindAllTags() throws Exception {
+    entityManager.persist(tagRepository.newTag("a-tag"));
+    entityManager.persist(tagRepository.newTag("b-tag"));
+    entityManager.flush();
+    entityManager.clear();
+    
+    Collection<Tag> tags = tagRepository.findAll();
+    
+    Iterator<Tag> i = tags.iterator();
+    assertThat(i.hasNext(), is(true));
+    assertThat(i.next().getText(), is(equalTo("a-tag")));
+    assertThat(i.hasNext(), is(true));
+    assertThat(i.next().getText(), is(equalTo("b-tag")));
+    assertThat(i.hasNext(), is(false));
   }
   
   @Test
