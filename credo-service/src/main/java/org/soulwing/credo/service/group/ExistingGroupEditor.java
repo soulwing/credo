@@ -29,10 +29,10 @@ import org.soulwing.credo.UserGroup;
 import org.soulwing.credo.UserGroupMember;
 import org.soulwing.credo.repository.UserGroupMemberRepository;
 import org.soulwing.credo.service.Errors;
+import org.soulwing.credo.service.GroupAccessException;
 import org.soulwing.credo.service.PassphraseException;
+import org.soulwing.credo.service.UserAccessException;
 import org.soulwing.credo.service.crypto.SecretKeyWrapper;
-import org.soulwing.credo.service.protect.GroupAccessException;
-import org.soulwing.credo.service.protect.UserAccessException;
 
 /**
  * A {@link ConfigurableGroupEditor} for an existing group.

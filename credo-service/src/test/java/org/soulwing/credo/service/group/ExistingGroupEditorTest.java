@@ -32,7 +32,7 @@ import org.soulwing.credo.Password;
 import org.soulwing.credo.UserGroupMember;
 import org.soulwing.credo.repository.UserGroupMemberRepository;
 import org.soulwing.credo.service.PassphraseException;
-import org.soulwing.credo.service.protect.UserAccessException;
+import org.soulwing.credo.service.UserAccessException;
 
 /**
  * Unit tests for {@link ExistingGroupEditor}.

@@ -21,6 +21,8 @@ package org.soulwing.credo.service.protect;
 import org.soulwing.credo.Password;
 import org.soulwing.credo.UserGroup;
 import org.soulwing.credo.UserProfile;
+import org.soulwing.credo.service.GroupAccessException;
+import org.soulwing.credo.service.UserAccessException;
 import org.soulwing.credo.service.crypto.SecretKeyWrapper;
 
 /**

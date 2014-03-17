@@ -45,8 +45,6 @@ import org.soulwing.credo.service.crypto.PrivateKeyWrapper;
 import org.soulwing.credo.service.exporter.CredentialExporter;
 import org.soulwing.credo.service.exporter.CredentialExporterRegistry;
 import org.soulwing.credo.service.protect.CredentialProtectionService;
-import org.soulwing.credo.service.protect.GroupAccessException;
-import org.soulwing.credo.service.protect.UserAccessException;
 
 /**
  * Unit tests for {@link ConcreteExportService}.

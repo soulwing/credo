@@ -22,12 +22,12 @@ import java.util.Collection;
 
 import org.soulwing.credo.UserGroup;
 import org.soulwing.credo.service.Errors;
+import org.soulwing.credo.service.GroupAccessException;
 import org.soulwing.credo.service.GroupEditException;
 import org.soulwing.credo.service.GroupEditor;
 import org.soulwing.credo.service.NoSuchGroupException;
 import org.soulwing.credo.service.PassphraseException;
 import org.soulwing.credo.service.UserDetail;
-import org.soulwing.credo.service.protect.GroupAccessException;
 
 /**
  * A {@link GroupEditor} with a save method.

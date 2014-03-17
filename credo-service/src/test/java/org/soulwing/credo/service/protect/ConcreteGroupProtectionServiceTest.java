@@ -41,6 +41,8 @@ import org.soulwing.credo.UserGroupMemberBuilder;
 import org.soulwing.credo.UserGroupMemberBuilderFactory;
 import org.soulwing.credo.UserProfile;
 import org.soulwing.credo.repository.UserGroupMemberRepository;
+import org.soulwing.credo.service.GroupAccessException;
+import org.soulwing.credo.service.UserAccessException;
 import org.soulwing.credo.service.UserContextService;
 import org.soulwing.credo.service.crypto.IncorrectPassphraseException;
 import org.soulwing.credo.service.crypto.PrivateKeyDecoder;

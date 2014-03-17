@@ -33,12 +33,12 @@ import org.soulwing.credo.UserProfile;
 import org.soulwing.credo.repository.UserGroupRepository;
 import org.soulwing.credo.repository.UserProfileRepository;
 import org.soulwing.credo.service.Errors;
+import org.soulwing.credo.service.GroupAccessException;
 import org.soulwing.credo.service.GroupEditException;
 import org.soulwing.credo.service.NoSuchGroupException;
 import org.soulwing.credo.service.PassphraseException;
 import org.soulwing.credo.service.UserDetail;
 import org.soulwing.credo.service.crypto.SecretKeyWrapper;
-import org.soulwing.credo.service.protect.GroupAccessException;
 import org.soulwing.credo.service.protect.GroupProtectionService;
 
 /**

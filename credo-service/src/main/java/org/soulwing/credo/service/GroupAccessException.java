@@ -16,24 +16,24 @@
  * limitations under the License.
  *
  */
-package org.soulwing.credo.service.protect;
+package org.soulwing.credo.service;
 
 /**
- * An exception thrown to indicate that access to a user profile was not
- * allowed (e.g. due to an incorrect password).
+ * An exception thrown when access to a group is not allowed (e.g. because
+ * the logged in user is not a member of the group).
  *
  * @author Carl Harris
  */
-public class UserAccessException extends Exception {
+public class GroupAccessException extends Exception {
 
-  private static final long serialVersionUID = 7632907461236227660L;
+  private static final long serialVersionUID = -6443606842556968462L;
 
   /**
    * Constructs a new instance.
-   * @param cause
+   * @param message
    */
-  public UserAccessException(Throwable cause) {
-    super(cause);
+  public GroupAccessException(String message) {
+    super(message);
   }
   
 }

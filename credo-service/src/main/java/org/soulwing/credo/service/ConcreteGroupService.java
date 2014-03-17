@@ -36,7 +36,6 @@ import org.soulwing.credo.repository.UserGroupMemberRepository;
 import org.soulwing.credo.repository.UserGroupRepository;
 import org.soulwing.credo.service.group.ConfigurableGroupEditor;
 import org.soulwing.credo.service.group.GroupEditorFactory;
-import org.soulwing.credo.service.protect.GroupAccessException;
 
 /**
  * A concrete {@link GroupService} implementation.

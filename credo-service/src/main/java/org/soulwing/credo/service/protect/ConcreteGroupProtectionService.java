@@ -30,6 +30,8 @@ import org.soulwing.credo.UserGroupMember;
 import org.soulwing.credo.UserGroupMemberBuilderFactory;
 import org.soulwing.credo.UserProfile;
 import org.soulwing.credo.repository.UserGroupMemberRepository;
+import org.soulwing.credo.service.GroupAccessException;
+import org.soulwing.credo.service.UserAccessException;
 import org.soulwing.credo.service.UserContextService;
 import org.soulwing.credo.service.crypto.Encoded;
 import org.soulwing.credo.service.crypto.Encoded.Type;
