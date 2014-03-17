@@ -3,17 +3,22 @@
   xmlns="http://xmlns.jcp.org/xml/ns/javaee"
   xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd"
   version="3.1">
-  
+
   <context-param>
     <param-name>javax.faces.PROJECT_STAGE</param-name>
     <param-value>Development</param-value>
   </context-param>
-  
+
   <context-param>
     <param-name>javax.faces.DATETIMECONVERTER_DEFAULT_TIMEZONE_IS_SYSTEM_TIMEZONE</param-name>
     <param-value>true</param-value>
   </context-param>
-  
+
+  <filter-mapping>
+    <filter-name>org.soulwing.credo.filters.UserContextFilter</filter-name>
+    <url-pattern>/*</url-pattern>
+  </filter-mapping>
+
   <servlet>
     <servlet-name>faces-servlet</servlet-name>
     <servlet-class>javax.faces.webapp.FacesServlet</servlet-class>
@@ -28,25 +33,35 @@
     </security-role-ref>
     <multipart-config />
   </servlet>
-  
+
+  <servlet>
+    <servlet-name>javax.ws.rs.core.Application</servlet-name>
+    <load-on-startup>1</load-on-startup>
+  </servlet>
+
   <servlet-mapping>
     <servlet-name>faces-servlet</servlet-name>
     <url-pattern>*.xhtml</url-pattern>
   </servlet-mapping>
-  
+
+  <servlet-mapping>
+    <servlet-name>javax.ws.rs.core.Application</servlet-name>
+    <url-pattern>/api/*</url-pattern>
+  </servlet-mapping>
+
   <security-role>
     <role-name>org.soulwing.credo.user</role-name>
   </security-role>
-  
+
   <security-role>
     <role-name>org.soulwing.credo.administrator</role-name>
   </security-role>
-  
+
   <login-config>
     <auth-method>BASIC</auth-method>
     <realm-name>Credo</realm-name>
   </login-config>
-  
+
   <security-constraint>
     <web-resource-collection>
       <web-resource-name>Public Resources</web-resource-name>
@@ -75,12 +90,12 @@
     </web-resource-collection>
     <auth-constraint>
       <role-name>*</role-name>
-    </auth-constraint> 
+    </auth-constraint>
     <user-data-constraint>
       <transport-guarantee>CONFIDENTIAL</transport-guarantee>
     </user-data-constraint>
   </security-constraint>
-  
+
   <security-constraint>
     <web-resource-collection>
       <web-resource-name>Default</web-resource-name>
@@ -101,5 +116,5 @@
   <welcome-file-list>
     <welcome-file>index.xhtml</welcome-file>
   </welcome-file-list>
-  
+
 </web-app>

@@ -16,17 +16,16 @@
  * limitations under the License.
  *
  */
-package org.soulwing.credo.facelets;
+package org.soulwing.credo.filters;
 
 import java.io.Serializable;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 import javax.enterprise.context.SessionScoped;
-import javax.faces.context.FacesContext;
-import javax.inject.Inject;
 
-import org.soulwing.credo.service.UserContextService;
+import org.apache.commons.lang.Validate;
+import org.soulwing.credo.service.MutableUserContextService;
 
 /**
  * A bean that provides the logged in user name.
@@ -34,14 +33,11 @@ import org.soulwing.credo.service.UserContextService;
  * @author Carl Harris
  */
 @SessionScoped
-public class UserContextBean implements UserContextService, Serializable {
+public class UserContextBean implements MutableUserContextService, Serializable {
 
   private static final long serialVersionUID = -3825612074731463595L;
 
   private final Lock lock = new ReentrantLock();
-  
-  @Inject
-  protected FacesContext facesContext;
   
   private String loginName;
     
@@ -54,7 +50,7 @@ public class UserContextBean implements UserContextService, Serializable {
       loginName = getRemoteLoginName();
     }
     if (loginName == null) {
-      throw new IllegalArgumentException("no user is logged in");
+      throw new IllegalStateException("no user is logged in");
     }
     return loginName;
   }
@@ -62,14 +58,26 @@ public class UserContextBean implements UserContextService, Serializable {
   private String getRemoteLoginName() {
     lock.lock();
     try {
-      // check again while we're holding the write lock
-      if (loginName == null) {
-        loginName = facesContext.getExternalContext().getRemoteUser();
-      }
       return loginName;
     }
     finally {
       lock.unlock();        
+    }
+  }
+
+  @Override
+  public void setLoginName(String loginName) {
+    Validate.notNull(loginName, "loginName must not be null");
+    lock.lock();
+    try {
+      if (this.loginName != null && !this.loginName.equals(loginName)) {
+        throw new IllegalArgumentException(
+            "login name cannot be changed in same session");
+      }
+      this.loginName = loginName;
+    }
+    finally {
+      lock.unlock();
     }
   }
 
