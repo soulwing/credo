@@ -18,6 +18,7 @@
  */
 package org.soulwing.credo;
 
+import java.util.Collection;
 import java.util.Date;
 
 /**
@@ -28,16 +29,39 @@ import java.util.Date;
 public interface CredentialBuilder {
 
   /**
+   * Sets the (friendly) name for the credential.
+   * @param name the name to set
+   * @return the receiver
+   */
+  CredentialBuilder setName(String name);
+  
+  /**
    * Sets the name of the issuer of the credential's certificate.
    * @param issuer the issuer name to set
+   * @return the receiver
    */
-  void setIssuer(String issuer);
+  CredentialBuilder setIssuer(String issuer);
   
   /**
    * Sets the expiration date of the credential's certificate
    * @param expiration the expiration date to set
+   * @return the receiver
    */
-  void setExpiration(Date expiration);
+  CredentialBuilder setExpiration(Date expiration);
+  
+  /**
+   * Sets a note for the credential.
+   * @param note the note to set
+   * @return the receiver
+   */
+  CredentialBuilder setNote(String note);
+  
+  /**
+   * Sets the tags for the credential.
+   * @param tags the tags to set
+   * @return the receiver
+   */
+  CredentialBuilder setTags(Collection<Tag> tags);
   
   /**
    * Sets the private key content for the credential.

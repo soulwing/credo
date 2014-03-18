@@ -18,11 +18,15 @@
  */
 package org.soulwing.credo.domain;
 
+import java.util.Collection;
 import java.util.Date;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 import org.soulwing.credo.Credential;
 import org.soulwing.credo.CredentialBuilder;
 import org.soulwing.credo.CredentialCertificate;
+import org.soulwing.credo.Tag;
 
 /**
  * A {@link CredentialBuilder} that builds a {@link CredentialEntity}.
@@ -33,20 +37,42 @@ public class CredentialEntityBuilder implements CredentialBuilder {
 
   private final CredentialEntity credential = new CredentialEntity();
   
-  /**
-   * {@inheritDoc}
-   */
   @Override
-  public void setIssuer(String issuer) {
-    credential.setIssuer(issuer);
+  public CredentialBuilder setName(String name) {
+    credential.setName(name);
+    return this;
+  }
+
+  @Override
+  public CredentialBuilder setNote(String note) {
+    credential.setNote(note);
+    return this;
+  }
+
+  @Override
+  public CredentialBuilder setTags(Collection<Tag> tags) {
+    Set<Tag> tagSet = new LinkedHashSet<>();
+    tagSet.addAll(tags);
+    credential.setTags(tagSet);
+    return this;
   }
 
   /**
    * {@inheritDoc}
    */
   @Override
-  public void setExpiration(Date expiration) {
+  public CredentialBuilder setIssuer(String issuer) {
+    credential.setIssuer(issuer);
+    return this;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public CredentialBuilder setExpiration(Date expiration) {
     credential.setExpiration(expiration);
+    return this;
   }
 
   /**
