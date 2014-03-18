@@ -112,7 +112,9 @@ public class BcPKCS8PrivateKeyWrapper implements PrivateKeyWrapper {
    */
   @Override
   public PrivateKey derive() {
-    Validate.notNull(password, "password is required");    
+    if (password == null || password.isEmpty()) {
+      throw new IncorrectPassphraseException();
+    }
     InputDecryptorProvider decryptor = createPrivateKeyDecryptor();
     try {
       PrivateKeyInfo keyInfo = delegate.decryptPrivateKeyInfo(decryptor);

@@ -221,7 +221,7 @@ public class BcPrivateKeyWrapper implements BcWrapper, PrivateKeyWrapper {
 
   private InputDecryptorProvider createPKCS8KeyDecryptor() {
     try {
-      Validate.notNull(password, "passphrase is required");
+      assertHavePassword();
       return new JceOpenSSLPKCS8DecryptorProviderBuilder().build(
           password.toCharArray());
     }
@@ -231,9 +231,15 @@ public class BcPrivateKeyWrapper implements BcWrapper, PrivateKeyWrapper {
   }
 
   private PEMDecryptorProvider createPEMKeyDecryptor() {
-    Validate.notNull(password, "passphrase is required");
+    assertHavePassword();
     return new JcePEMDecryptorProviderBuilder().build(
         password.toCharArray());
+  }
+
+  private void assertHavePassword() {
+    if (password == null || password.isEmpty()) {
+      throw new IncorrectPassphraseException();
+    }
   }
 
 }

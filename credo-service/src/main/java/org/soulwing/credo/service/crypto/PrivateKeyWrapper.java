@@ -55,6 +55,8 @@ public interface PrivateKeyWrapper {
   /**
    * Derive the JCA {@link PrivateKey} that corresponds to this wrapper.
    * @return JCA private key
+   * @throws IncorrectPassphraseException is a passphrase is required and
+   *    is not provided or is incorrect
    */
   PrivateKey derive();
  
