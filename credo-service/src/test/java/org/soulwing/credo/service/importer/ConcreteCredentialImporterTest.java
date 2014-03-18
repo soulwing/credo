@@ -18,12 +18,8 @@
  */
 package org.soulwing.credo.service.importer;
 
-import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.emptyArray;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.nullValue;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -56,6 +52,10 @@ import org.soulwing.credo.service.crypto.PrivateKeyWrapper;
  */
 public class ConcreteCredentialImporterTest {
 
+  private static final Password PASSPHRASE = new Password(new char[] { 'a' });
+
+  private static final Password EMPTY_PASSPHRASE = new Password(new char[0]);
+
   @Rule
   public JUnitRuleMockery context = new JUnitRuleMockery();
   
@@ -76,8 +76,6 @@ public class ConcreteCredentialImporterTest {
 
   @Mock
   private CertificateWrapper certificate;
-
-  private final Password passphrase = new Password(new char[0]);
 
   private ConcreteCredentialImporter importer;
   
@@ -129,7 +127,7 @@ public class ConcreteCredentialImporterTest {
           with(emptyArray()));
     } });
     
-    importer.validate(errors);
+    importer.validate(EMPTY_PASSPHRASE, errors);
   }
   
   @Test(expected = ImportException.class)
@@ -145,7 +143,24 @@ public class ConcreteCredentialImporterTest {
           with(emptyArray()));
     } });
     
-    importer.validate(errors);
+    importer.validate(EMPTY_PASSPHRASE, errors);
+  }
+  
+  @Test(expected = PassphraseException.class)
+  public void testVerifyWithEmptyPassphrase() throws Exception {
+    context.checking(new Expectations() { { 
+      exactly(2).of(bag).findPrivateKey();
+      will(onConsecutiveCalls(
+          returnValue(privateKey),
+          returnValue(null)));
+      oneOf(bag).removeObject(with(same(privateKey)));
+      will(returnValue(true));
+      oneOf(privateKey).setProtectionParameter(with(same(EMPTY_PASSPHRASE)));
+      oneOf(bag).findSubjectCertificate(with(same(privateKey)));
+      will(throwException(new IncorrectPassphraseException()));
+    } });
+    
+    importer.validate(EMPTY_PASSPHRASE, errors);
   }
   
   @Test(expected = PassphraseException.class)
@@ -157,48 +172,29 @@ public class ConcreteCredentialImporterTest {
           returnValue(null)));
       oneOf(bag).removeObject(with(same(privateKey)));
       will(returnValue(true));
-      oneOf(privateKey).setProtectionParameter(with(same(passphrase)));
+      oneOf(privateKey).setProtectionParameter(with(same(PASSPHRASE)));
       oneOf(bag).findSubjectCertificate(with(same(privateKey)));
       will(throwException(new IncorrectPassphraseException()));
+      oneOf(errors).addError(with("password"), 
+          with(containsString("Incorrect")), 
+          with(emptyArray()));
     } });
     
-    importer.setPassphrase(passphrase);
-    importer.validate(errors);
-  }
-  
-  @Test(expected = PassphraseException.class)
-  public void testVerifyAgainWithIncorrectPassphrase() throws Exception {
-    context.checking(privateKeyExpectations());
-    context.checking(new Expectations() { { 
-      exactly(2).of(privateKey).setProtectionParameter(with(same(passphrase)));
-      exactly(2).of(bag).findSubjectCertificate(with(same(privateKey)));
-      will(throwException(new IncorrectPassphraseException()));
-      oneOf(privateKey).isProtected();
-      will(returnValue(true));
-    } });
-    
-    importer.setPassphrase(passphrase);
-    try {
-      importer.validate(errors);
-    }
-    catch (PassphraseException ex) {
-      assertThat(importer.isPassphraseRequired(), is(equalTo(true)));
-      importer.validate(errors);
-    }
+    importer.validate(PASSPHRASE, errors);
   }
   
   @Test(expected = ImportException.class)
   public void testVerifyWhenSubjectCertificateNotFound() throws Exception {
     context.checking(privateKeyExpectations());
     context.checking(new Expectations() { { 
-      allowing(privateKey).setProtectionParameter(with(nullValue(char[].class)));
+      allowing(privateKey).setProtectionParameter(PASSPHRASE);
       oneOf(bag).findSubjectCertificate(with(same(privateKey)));
       will(returnValue(null));
       oneOf(errors).addError(with(containsString("NoSubject")), 
           with(emptyArray()));
     } });
 
-    importer.validate(errors);
+    importer.validate(PASSPHRASE, errors);
   }
 
   @Test
@@ -215,7 +211,7 @@ public class ConcreteCredentialImporterTest {
           with(emptyArray()));
     } });
 
-    importer.validate(errors);
+    importer.validate(PASSPHRASE, errors);
   }
   
 
@@ -231,7 +227,7 @@ public class ConcreteCredentialImporterTest {
           with(emptyArray()));
     } });
 
-    importer.validate(errors);
+    importer.validate(PASSPHRASE, errors);
   }
 
   @Test
@@ -248,7 +244,7 @@ public class ConcreteCredentialImporterTest {
           with(emptyArray()));
     } });
   
-    importer.validate(errors);
+    importer.validate(PASSPHRASE, errors);
   }
 
   private Expectations privateKeyExpectations() {
@@ -264,7 +260,7 @@ public class ConcreteCredentialImporterTest {
 
   private Expectations certificateExpectations() { 
     return new Expectations() { { 
-      allowing(privateKey).setProtectionParameter(with(nullValue(char[].class)));
+      allowing(privateKey).setProtectionParameter(PASSPHRASE);
       oneOf(bag).findSubjectCertificate(with(same(privateKey)));
       will(returnValue(certificate));
     } };

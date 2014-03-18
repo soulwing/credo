@@ -18,7 +18,6 @@
  */
 package org.soulwing.credo.service;
 
-import org.soulwing.credo.Password;
 
 
 /**
@@ -29,25 +28,6 @@ import org.soulwing.credo.Password;
  */
 public interface ImportPreparation {
   
-  /**
-   * Tests whether this import preparation requires a passphrase prior to
-   * validation.
-   * @return {@code true} if a passphrase is required.
-   */
-  boolean isPassphraseRequired();
-  
-  /**
-   * Gets the passphrase provided by the user.
-   * @return passphrase
-   */
-  Password getPassphrase();
-  
-  /**
-   * Sets the pasphrase provided by the user.
-   * @param passphrase the passphrase to set
-   */
-  void setPassphrase(Password passphrase);
-
   /**
    * Gets the details of a fully-prepared import.
    * @return import details or {@code null} if the import is not fully

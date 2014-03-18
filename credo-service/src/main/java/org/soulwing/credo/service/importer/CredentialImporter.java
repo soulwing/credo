@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import org.soulwing.credo.Credential;
+import org.soulwing.credo.Password;
 import org.soulwing.credo.service.Errors;
 import org.soulwing.credo.service.ImportException;
 import org.soulwing.credo.service.ImportPreparation;
@@ -47,12 +48,14 @@ public interface CredentialImporter extends ImportPreparation {
   
   /**
    * Validates the credential content.
+   * @param passphrase passphrase for the private key 
    * @param errors errors object that will be updated with errors/warnings
    *    during validation
    * @throws ImportException if a validation error occurs
    * @throws PassphraseException if a provided password is incorrect
    */
-  void validate(Errors errors) throws ImportException, PassphraseException;
+  void validate(Password passphrase, Errors errors) 
+      throws ImportException, PassphraseException;
   
   /**
    * Creates a {@link Credential} containing the uploaded key and certificate 

@@ -50,7 +50,6 @@ public class ConcreteCredentialImporter implements CredentialImporter {
   private final CredentialBuilderFactory credentialBuilderFactory;
   private final TimeOfDayService timeOfDayService;
   
-  private Password passphrase;
   private PrivateKeyWrapper privateKey;
   private CertificateWrapper certificate;
   private List<CertificateWrapper> chain;
@@ -85,7 +84,7 @@ public class ConcreteCredentialImporter implements CredentialImporter {
    * {@inheritDoc}
    */
   @Override
-  public void validate(Errors errors) throws ImportException, 
+  public void validate(Password passphrase, Errors errors) throws ImportException, 
       PassphraseException {
     
     if (privateKey == null) {
@@ -114,6 +113,9 @@ public class ConcreteCredentialImporter implements CredentialImporter {
         }
       }
       catch (IncorrectPassphraseException ex) {
+        if (passphrase != null && !passphrase.isEmpty()) {
+          errors.addError("password", "passwordIncorrect");
+        }
         throw new PassphraseException();
       }
     }
@@ -162,31 +164,6 @@ public class ConcreteCredentialImporter implements CredentialImporter {
     catch (IOException ex) {
       throw new RuntimeException(ex);
     }
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public boolean isPassphraseRequired() {
-    return (privateKey != null && privateKey.isProtected())
-        || bag.isPassphraseRequired();
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public Password getPassphrase() {
-    return passphrase;
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public void setPassphrase(Password passphrase) {
-    this.passphrase = passphrase;
   }
 
   /**
