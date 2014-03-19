@@ -22,11 +22,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 
-import org.soulwing.credo.Credential;
-import org.soulwing.credo.CredentialBuilder;
-import org.soulwing.credo.CredentialBuilderFactory;
-import org.soulwing.credo.CredentialCertificate;
-import org.soulwing.credo.CredentialCertificateBuilder;
 import org.soulwing.credo.Password;
 import org.soulwing.credo.service.Errors;
 import org.soulwing.credo.service.ImportDetails;
@@ -47,13 +42,11 @@ import org.soulwing.credo.service.crypto.PrivateKeyWrapper;
 public class ConcreteCredentialImporter implements CredentialImporter {
 
   private final CredentialBag bag;
-  private final CredentialBuilderFactory credentialBuilderFactory;
   private final TimeOfDayService timeOfDayService;
   
   private PrivateKeyWrapper privateKey;
   private CertificateWrapper certificate;
   private List<CertificateWrapper> chain;
-  private ImportDetails details;
   
   /**
    * Constructs a new instance.
@@ -62,10 +55,8 @@ public class ConcreteCredentialImporter implements CredentialImporter {
    * @param timeOfDayService
    */
   public ConcreteCredentialImporter(CredentialBag bag,
-      CredentialBuilderFactory credentialBuilderFactory,
       TimeOfDayService timeOfDayService) {
     this.bag = bag;
-    this.credentialBuilderFactory = credentialBuilderFactory;
     this.timeOfDayService = timeOfDayService;
   }
 
@@ -84,8 +75,8 @@ public class ConcreteCredentialImporter implements CredentialImporter {
    * {@inheritDoc}
    */
   @Override
-  public void validate(Password passphrase, Errors errors) throws ImportException, 
-      PassphraseException {
+  public ImportDetails validateAndImport(Password passphrase, Errors errors) 
+      throws ImportException, PassphraseException {
     
     if (privateKey == null) {
       privateKey = bag.findPrivateKey();
@@ -128,54 +119,7 @@ public class ConcreteCredentialImporter implements CredentialImporter {
       }
     }
 
+    return new ConcreteImportDetails(privateKey, certificate, chain);
   }
 
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public Credential build() {
-    CredentialBuilder builder = 
-        credentialBuilderFactory.newCredentialBuilder();
-    builder.setIssuer(getDetails().getIssuer());
-    builder.setExpiration(certificate.getNotAfter());
-    // don't set the real key yet -- need to encrypt it first
-    builder.setPrivateKey(null);
-    builder.addCertificate(createCertificate(certificate));
-    for (CertificateWrapper authority : chain) {
-      builder.addCertificate(createCertificate(authority));
-    }
-    return builder.build();
-  }
-  
-  private CredentialCertificate createCertificate(
-      CertificateWrapper certificate) {
-    try {
-      CredentialCertificateBuilder builder =
-          credentialBuilderFactory.newCertificateBuilder();
-      builder.setSubject(certificate.getSubject());
-      builder.setIssuer(certificate.getIssuer());
-      builder.setSerialNumber(certificate.getSerialNumber());
-      builder.setNotBefore(certificate.getNotBefore());
-      builder.setNotAfter(certificate.getNotAfter());
-      builder.setContent(certificate.getContent());
-      return builder.build();
-    }
-    catch (IOException ex) {
-      throw new RuntimeException(ex);
-    }
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public ImportDetails getDetails() {
-    if (certificate == null) return null;
-    if (details == null) {
-      details = new ConcreteImportDetails(privateKey, certificate);
-    }
-    return details;
-  }
-  
 }

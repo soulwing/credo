@@ -19,12 +19,11 @@
 package org.soulwing.credo.service;
 
 import java.util.List;
-import java.util.Set;
 
 import javax.ejb.Local;
 
 import org.soulwing.credo.Credential;
-import org.soulwing.credo.Tag;
+import org.soulwing.credo.Password;
 
 /**
  * A service that imports credentials using the contents of uploaded files.
@@ -39,44 +38,33 @@ public interface ImportService {
    * @param files files whose contents will be imported
    * @param errors an errors object that will be updated during the
    *   import as necessary
-   * @return prepared credential content
+   * @param passphrase passphrase for the private key (which may be null or
+   *   empty)
+   * @return imported credential details
+   * @throws PassphraseException if a passphrase is required and was not
+   *    provided or is incorrect
    * @throws ImportException if a validation error occurs; warnings do
    *    not result in an exception
    */
-  ImportPreparation prepareImport(List<FileContentModel> files, 
-      Errors errors) throws ImportException;
-  
-  /**
-   * Creates the credential from the prepared imported contents. 
-   * @param preparation prepared contents
-   * @param errors an errors object that will be updated during 
-   *   credential validation and creation
-   * @return fully validated credential
-   * @throws ImportException if the credential had one or more validation 
-   *    errors/warnings
-   * @throws PassphraseException to indicate that a provided passphrase was
-   *    not correct
-   */
-  Credential createCredential(ImportPreparation preparation, Errors errors)
-      throws ImportException, PassphraseException;
+  ImportDetails prepareImport(List<FileContentModel> files, 
+      Errors errors, Password passphrase) throws PassphraseException, 
+      ImportException;
   
   /**
    * Protects the (private key of the) given credential. 
-   * @param credential the subject credential
-   * @param preparation prepared credential content
+   * @param details prepared credential content
    * @param protection protection parameters
    * @param errors an errors object that will be updated to report any
    *    recoverable errors that occur
    * @throws NoSuchGroupException if the specified protection group 
    *    does not exist
    * @throws PassphraseException if the provided passphrase is incorrect
-   * @throws AccessDeniedException if the specified user is
-   *    not a member of the specified protetion group 
+   * @throws GroupAccessException if the specified user is not a member of 
+   *    the specified protection group 
    */
-  void protectCredential(Credential credential, 
-      ImportPreparation preparation, ProtectionParameters protection,
-      Errors errors) throws NoSuchGroupException, PassphraseException,
-      AccessDeniedException;
+  Credential createCredential(ImportDetails details, 
+      ProtectionParameters protection, Errors errors) 
+      throws NoSuchGroupException, PassphraseException, GroupAccessException;
   
   /**
    * Save the given (transient) credential making it persistent.
@@ -88,29 +76,4 @@ public interface ImportService {
   void saveCredential(Credential credential, Errors errors) 
       throws ImportException;
 
-  /**
-   * Resolves an array of textual tag representations into a set of tag
-   * entities.
-   * @param tokens the array of tokens to resolve
-   * @return set of tags
-   */
-  Set<? extends Tag> resolveTags(String[] tokens);
-
-  /**
-   * Tests whether the logged-in user is a member of any groups in addition
-   * to the self group.
-   * @return {@code true} if the user is a member of no groups other than
-   *    the self group
-   */
-  boolean isMemberOfSelfGroupOnly();
-
-  /**
-   * Tests whether the existing group name exists.
-   * @param groupName the subject group name
-   * @return {@code true} if group name exists
-   * @throws GroupAccessException if the logged-in user is not a member of
-   *    the given group name
-   */
-  boolean isExistingGroup(String groupName) throws GroupAccessException;
-  
 }

@@ -24,8 +24,11 @@ import static org.hamcrest.Matchers.emptyArray;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.math.BigInteger;
 import java.util.Collections;
 import java.util.Date;
+
+import javax.security.auth.x500.X500Principal;
 
 import org.jmock.Expectations;
 import org.jmock.auto.Mock;
@@ -33,7 +36,6 @@ import org.jmock.integration.junit4.JUnitRuleMockery;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.soulwing.credo.CredentialBuilderFactory;
 import org.soulwing.credo.Password;
 import org.soulwing.credo.service.Errors;
 import org.soulwing.credo.service.ImportException;
@@ -63,9 +65,6 @@ public class ConcreteCredentialImporterTest {
   private CredentialBag bag;
  
   @Mock
-  private CredentialBuilderFactory credentialBuilderFactory;
-  
-  @Mock
   private TimeOfDayService timeOfDayService;
   
   @Mock
@@ -81,8 +80,7 @@ public class ConcreteCredentialImporterTest {
   
   @Before
   public void setUp() throws Exception {
-    importer = new ConcreteCredentialImporter(bag, credentialBuilderFactory,
-        timeOfDayService);
+    importer = new ConcreteCredentialImporter(bag, timeOfDayService);
   }
   
   @Test
@@ -127,7 +125,7 @@ public class ConcreteCredentialImporterTest {
           with(emptyArray()));
     } });
     
-    importer.validate(EMPTY_PASSPHRASE, errors);
+    importer.validateAndImport(EMPTY_PASSPHRASE, errors);
   }
   
   @Test(expected = ImportException.class)
@@ -143,7 +141,7 @@ public class ConcreteCredentialImporterTest {
           with(emptyArray()));
     } });
     
-    importer.validate(EMPTY_PASSPHRASE, errors);
+    importer.validateAndImport(EMPTY_PASSPHRASE, errors);
   }
   
   @Test(expected = PassphraseException.class)
@@ -160,7 +158,7 @@ public class ConcreteCredentialImporterTest {
       will(throwException(new IncorrectPassphraseException()));
     } });
     
-    importer.validate(EMPTY_PASSPHRASE, errors);
+    importer.validateAndImport(EMPTY_PASSPHRASE, errors);
   }
   
   @Test(expected = PassphraseException.class)
@@ -180,7 +178,7 @@ public class ConcreteCredentialImporterTest {
           with(emptyArray()));
     } });
     
-    importer.validate(PASSPHRASE, errors);
+    importer.validateAndImport(PASSPHRASE, errors);
   }
   
   @Test(expected = ImportException.class)
@@ -194,7 +192,7 @@ public class ConcreteCredentialImporterTest {
           with(emptyArray()));
     } });
 
-    importer.validate(PASSPHRASE, errors);
+    importer.validateAndImport(PASSPHRASE, errors);
   }
 
   @Test
@@ -211,7 +209,7 @@ public class ConcreteCredentialImporterTest {
           with(emptyArray()));
     } });
 
-    importer.validate(PASSPHRASE, errors);
+    importer.validateAndImport(PASSPHRASE, errors);
   }
   
 
@@ -227,7 +225,7 @@ public class ConcreteCredentialImporterTest {
           with(emptyArray()));
     } });
 
-    importer.validate(PASSPHRASE, errors);
+    importer.validateAndImport(PASSPHRASE, errors);
   }
 
   @Test
@@ -244,7 +242,7 @@ public class ConcreteCredentialImporterTest {
           with(emptyArray()));
     } });
   
-    importer.validate(PASSPHRASE, errors);
+    importer.validateAndImport(PASSPHRASE, errors);
   }
 
   private Expectations privateKeyExpectations() {
@@ -263,13 +261,23 @@ public class ConcreteCredentialImporterTest {
       allowing(privateKey).setProtectionParameter(PASSPHRASE);
       oneOf(bag).findSubjectCertificate(with(same(privateKey)));
       will(returnValue(certificate));
+      allowing(certificate).getSubject();
+      will(returnValue(new X500Principal("cn=Some Name")));
+      allowing(certificate).getIssuer();
+      will(returnValue(new X500Principal("cn=Some Name")));
+      allowing(certificate).getSerialNumber();
+      will(returnValue(BigInteger.ZERO));
+      allowing(certificate).getSerialNumber();
+      will(returnValue(BigInteger.ZERO));
+      allowing(certificate).getNotBefore();
+      will(returnValue(new Date()));
     } };
   }
 
   private Expectations expirationExpectations(final Date notAfterDate, 
       final Date currentDate) {
     return new Expectations() { { 
-      oneOf(certificate).getNotAfter();
+      allowing(certificate).getNotAfter();
       will(returnValue(notAfterDate));
       oneOf(timeOfDayService).getCurrent();
       will(returnValue(currentDate));

@@ -21,7 +21,6 @@ package org.soulwing.credo.service.importer;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
-import org.soulwing.credo.CredentialBuilderFactory;
 import org.soulwing.credo.service.TimeOfDayService;
 import org.soulwing.credo.service.crypto.CredentialBagFactory;
 
@@ -39,9 +38,6 @@ public class ConcreteCredentialImporterFactory
   protected CredentialBagFactory credentialBagFactory;
   
   @Inject
-  protected CredentialBuilderFactory credentialBuilderFactory;
-  
-  @Inject
   protected TimeOfDayService timeOfDayService;
   
   /**
@@ -51,7 +47,6 @@ public class ConcreteCredentialImporterFactory
   public CredentialImporter newImporter() {
     return new ConcreteCredentialImporter(
         credentialBagFactory.newCredentialBag(), 
-        credentialBuilderFactory, 
         timeOfDayService);
   }
 

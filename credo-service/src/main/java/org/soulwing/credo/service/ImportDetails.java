@@ -18,9 +18,10 @@
  */
 package org.soulwing.credo.service;
 
-import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 
+import org.soulwing.credo.service.crypto.CertificateWrapper;
 import org.soulwing.credo.service.crypto.PrivateKeyWrapper;
 
 /**
@@ -29,14 +30,20 @@ import org.soulwing.credo.service.crypto.PrivateKeyWrapper;
  *
  * @author Carl Harris
  */
-public interface ImportDetails extends Serializable {
+public interface ImportDetails extends CredentialEditor {
 
   /**
    * Gets the private key.
    * @return private key
    */
   PrivateKeyWrapper getPrivateKey();
-
+  
+  /**
+   * Gets the certificate chain.
+   * @return certificate chain
+   */
+  List<CertificateWrapper> getCertificates();
+  
   /**
    * Gets the {@code subject} property.
    * @return
@@ -44,10 +51,24 @@ public interface ImportDetails extends Serializable {
   String getSubject();
 
   /**
+   * Gets the common name component of the subject.
+   * @return common name component or the full subject name if the name
+   *    does not contain a common name component
+   */
+  String getSubjectCommonName();
+  
+  /**
    * Gets the {@code issuer} property.
    * @return
    */
   String getIssuer();
+
+  /**
+   * Gets the common name component of the issuer.
+   * @return common name component or the full issuer name if the name
+   *    does not contain a common name component
+   */
+  String getIssuerCommonName();
 
   /**
    * Gets the {@code serialNumber} property.

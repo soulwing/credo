@@ -18,12 +18,16 @@
  */
 package org.soulwing.credo.service.importer;
 
+import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import javax.naming.NamingException;
 import javax.naming.ldap.LdapName;
 import javax.naming.ldap.Rdn;
 
+import org.soulwing.credo.UserGroup;
 import org.soulwing.credo.service.ImportDetails;
 import org.soulwing.credo.service.crypto.CertificateWrapper;
 import org.soulwing.credo.service.crypto.PrivateKeyWrapper;
@@ -33,7 +37,7 @@ import org.soulwing.credo.service.crypto.PrivateKeyWrapper;
  *
  * @author Carl Harris
  */
-public class ConcreteImportDetails implements ImportDetails {
+public class ConcreteImportDetails implements ImportDetails, Serializable {
 
   private static final long serialVersionUID = -5190604068859062839L;
 
@@ -43,15 +47,67 @@ public class ConcreteImportDetails implements ImportDetails {
   private final Date notBefore;
   private final Date notAfter;
   private final PrivateKeyWrapper privateKey;
+  private final List<CertificateWrapper> certificates = new ArrayList<>();
   
-  protected ConcreteImportDetails(PrivateKeyWrapper privateKey,
-      CertificateWrapper certificate) {
-    this.subject = getCommonName(certificate.getSubject().getName());
-    this.issuer = getCommonName(certificate.getIssuer().getName());
+  private String name;
+  private String owner = UserGroup.SELF_GROUP_NAME;
+  private String note;
+  private String[] tags;
+
+  public ConcreteImportDetails(PrivateKeyWrapper privateKey,
+      CertificateWrapper certificate, 
+      List<CertificateWrapper> authorities) {
+    this.subject = certificate.getSubject().getName();
+    this.issuer = certificate.getIssuer().getName();
     this.serialNumber = certificate.getSerialNumber().toString();
     this.notBefore = certificate.getNotBefore();
     this.notAfter = certificate.getNotAfter();
     this.privateKey = privateKey;
+    this.certificates.add(certificate);
+    this.certificates.addAll(authorities);
+    this.name = getCommonName(certificate.getSubject().getName());
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public PrivateKeyWrapper getPrivateKey() {
+    return privateKey;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public List<CertificateWrapper> getCertificates() {
+    return certificates;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public String getSubject() {
+    return subject;
+  }
+
+  @Override
+  public String getSubjectCommonName() {
+    return getCommonName(subject);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public String getIssuer() {
+    return issuer;
+  }
+
+  @Override
+  public String getIssuerCommonName() {
+    return getCommonName(issuer);
   }
 
   private String getCommonName(String name) {
@@ -67,30 +123,6 @@ public class ConcreteImportDetails implements ImportDetails {
     catch (NamingException ex) {
       return name;
     }
-  }
-  
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public PrivateKeyWrapper getPrivateKey() {
-    return privateKey;
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public String getSubject() {
-    return subject;
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public String getIssuer() {
-    return issuer;
   }
 
   /**
@@ -115,6 +147,52 @@ public class ConcreteImportDetails implements ImportDetails {
   @Override
   public Date getNotAfter() {
     return notAfter;
+  }
+
+  @Override
+  public Date getExpiration() {
+    return getNotAfter();
+  }
+
+  @Override
+  public String getName() {
+    return name;
+  }
+
+  @Override
+  public void setName(String name) {
+    this.name = name;
+  }
+
+  @Override
+  public String getOwner() {
+    return owner;
+  }
+
+  @Override
+  public void setOwner(String owner) {
+    this.owner = owner;
+  }
+
+  @Override
+  public String getNote() {
+    return note;
+  }
+
+  @Override
+  public void setNote(String note) {
+    this.note = note;
+  }
+
+  @Override
+  public String[] getTags() {
+    if (tags == null) return new String[0];
+    return tags;
+  }
+
+  @Override
+  public void setTags(String[] tags) {
+    this.tags = tags;
   }
 
 }

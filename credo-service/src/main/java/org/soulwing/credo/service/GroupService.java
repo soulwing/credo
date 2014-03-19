@@ -90,4 +90,14 @@ public interface GroupService {
    */
   void removeGroup(Long id, Errors errors) 
       throws GroupEditException, NoSuchGroupException;
+  
+  /**
+   * Tests whether the existing group name exists for the logged-in user.
+   * @param groupName the subject group name
+   * @return {@code true} if group name exists
+   * @throws GroupAccessException if the logged-in user is not a member of
+   *    the given group name
+   */
+  boolean isExistingGroup(String groupName) throws GroupAccessException;
+  
 }

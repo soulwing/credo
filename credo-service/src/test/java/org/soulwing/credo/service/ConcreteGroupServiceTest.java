@@ -278,4 +278,50 @@ public class ConcreteGroupServiceTest {
     } };
   }
   
+  @Test
+  public void testGroupIsExistingGroup() throws Exception {
+    context.checking(new Expectations() { {
+      oneOf(userContextService).getLoginName();
+      will(returnValue(LOGIN_NAME1));
+      oneOf(groupRepository).findByGroupName(with(GROUP_NAME), 
+          with(LOGIN_NAME1));
+      will(returnValue(group));
+      oneOf(memberRepository).findByGroupAndLoginName(
+          with(GROUP_NAME), with(LOGIN_NAME1));
+      will(returnValue(member));
+    } });
+    
+    assertThat(service.isExistingGroup(GROUP_NAME), is(true));
+  }
+
+  @Test
+  public void testGroupIsNotExistingGroup() throws Exception {
+    context.checking(new Expectations() { {
+      oneOf(userContextService).getLoginName();
+      will(returnValue(LOGIN_NAME1));
+      oneOf(groupRepository).findByGroupName(with(GROUP_NAME), 
+          with(LOGIN_NAME1));
+      will(returnValue(null));
+    } });
+    
+    assertThat(service.isExistingGroup(GROUP_NAME), is(false));
+  }
+
+  @Test(expected = GroupAccessException.class)
+  public void testGroupIsExistingGroupAndUserIsNotMember() throws Exception {
+    context.checking(new Expectations() { {
+      oneOf(userContextService).getLoginName();
+      will(returnValue(LOGIN_NAME1));
+      oneOf(groupRepository).findByGroupName(with(GROUP_NAME), 
+          with(LOGIN_NAME1));
+      will(returnValue(group));
+      oneOf(memberRepository).findByGroupAndLoginName(
+          with(GROUP_NAME), with(LOGIN_NAME1));
+      will(returnValue(null));
+    } });
+    
+    service.isExistingGroup(GROUP_NAME);
+  }
+
+
 }

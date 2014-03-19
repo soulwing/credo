@@ -19,6 +19,7 @@
 package org.soulwing.credo.service;
 
 import java.io.IOException;
+import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
@@ -31,14 +32,18 @@ import javax.ejb.TransactionAttributeType;
 import javax.inject.Inject;
 
 import org.soulwing.credo.Credential;
+import org.soulwing.credo.CredentialBuilder;
+import org.soulwing.credo.CredentialBuilderFactory;
+import org.soulwing.credo.CredentialCertificate;
+import org.soulwing.credo.CredentialCertificateBuilder;
+import org.soulwing.credo.Password;
 import org.soulwing.credo.Tag;
 import org.soulwing.credo.UserGroup;
-import org.soulwing.credo.UserGroupMember;
 import org.soulwing.credo.repository.CredentialRepository;
 import org.soulwing.credo.repository.TagRepository;
 import org.soulwing.credo.repository.UserGroupMemberRepository;
 import org.soulwing.credo.repository.UserGroupRepository;
-import org.soulwing.credo.service.crypto.PrivateKeyWrapper;
+import org.soulwing.credo.service.crypto.CertificateWrapper;
 import org.soulwing.credo.service.importer.CredentialImporter;
 import org.soulwing.credo.service.importer.CredentialImporterFactory;
 import org.soulwing.credo.service.protect.CredentialProtectionService;
@@ -57,6 +62,9 @@ public class ConcreteImportService implements ImportService {
   
   @Inject
   protected CredentialRepository credentialRepository;
+  
+  @Inject
+  protected CredentialBuilderFactory credentialBuilderFactory;
   
   @Inject
   protected TagRepository tagRepository;
@@ -80,9 +88,19 @@ public class ConcreteImportService implements ImportService {
    * {@inheritDoc}
    */
   @Override
-  public ImportPreparation prepareImport(List<FileContentModel> files,
-      Errors errors) throws ImportException {
+  public ImportDetails prepareImport(List<FileContentModel> files,
+      Errors errors, Password passphrase) 
+      throws PassphraseException, ImportException {
     CredentialImporter importer = importerFactory.newImporter();
+    importFiles(importer, files, errors);
+    if (errors.hasErrors()) {
+      throw new ImportException();
+    }
+    return importer.validateAndImport(passphrase, errors);
+  }
+
+  private void importFiles(CredentialImporter importer,
+      List<FileContentModel> files, Errors errors) throws ImportException {
     if (files.isEmpty()) {
       errors.addError("importFileRequired");
       throw new ImportException();
@@ -102,42 +120,22 @@ public class ConcreteImportService implements ImportService {
             file.getName());
       }
     }
-    if (errors.hasErrors()) {
-      throw new ImportException();
-    }
-    
-    return importer;
   }
 
   /**
    * {@inheritDoc}
    */
   @Override
-  public Credential createCredential(ImportPreparation preparation,
-      Errors errors) throws ImportException, PassphraseException {
-    if (!(preparation instanceof CredentialImporter)) {
-      throw new IllegalArgumentException(
-          "preparation was not created by this service");
-    }
-
-    CredentialImporter importer = (CredentialImporter) preparation;
-    importer.validate(errors);
-    return importer.build();
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public void protectCredential(Credential credential,
-      ImportPreparation preparation, ProtectionParameters protection,
-      Errors errors) throws NoSuchGroupException, PassphraseException,
+  public Credential createCredential(ImportDetails details,
+      ProtectionParameters protection, Errors errors) throws NoSuchGroupException, PassphraseException,
       AccessDeniedException {
 
     try {
-      PrivateKeyWrapper privateKey = preparation.getDetails().getPrivateKey();
-      resolveOwner(credential, protection, errors);
-      protectionService.protect(credential, privateKey, protection);
+      Credential credential = createCredential(details);    
+      credential.setOwner(resolveOwner(protection, errors));
+      protectionService.protect(credential, details.getPrivateKey(), 
+          protection);
+      return credential;
     }
     catch (UserAccessException ex) {
       errors.addError("password", "passwordIncorrect");
@@ -155,9 +153,8 @@ public class ConcreteImportService implements ImportService {
     }
   }
   
-  private void resolveOwner(Credential credential, 
-      ProtectionParameters protection, Errors errors) 
-      throws NoSuchGroupException {
+  private UserGroup resolveOwner(ProtectionParameters protection, 
+      Errors errors) throws NoSuchGroupException {
     UserGroup group = null;
     try {
       group = findOwnerGroup(protection);
@@ -176,9 +173,7 @@ public class ConcreteImportService implements ImportService {
         throw new RuntimeException(pex);
       }      
     }
-    finally {
-      credential.setOwner(group);
-    }
+    return group;
   }
 
   private UserGroup findOwnerGroup(ProtectionParameters protection)
@@ -191,6 +186,39 @@ public class ConcreteImportService implements ImportService {
     return group;
   }
   
+  private Credential createCredential(ImportDetails details) {
+    CredentialBuilder builder = credentialBuilderFactory.newCredentialBuilder()
+        .setName(details.getName())
+        .setIssuer(details.getIssuerCommonName())
+        .setNote(details.getNote())
+        .setTags(resolveTags(details.getTags()))
+        .setExpiration(details.getNotAfter())
+        .setPrivateKey(details.getPrivateKey().getContent());
+    
+    for (CertificateWrapper certificate : details.getCertificates()) {
+      builder.addCertificate(createCertificate(certificate));
+    }
+    return builder.build();
+  }
+  
+  private CredentialCertificate createCertificate(
+      CertificateWrapper certificate) {
+    try {
+      CredentialCertificateBuilder builder =
+          credentialBuilderFactory.newCertificateBuilder();
+      builder.setSubject(certificate.getSubject());
+      builder.setIssuer(certificate.getIssuer());
+      builder.setSerialNumber(certificate.getSerialNumber());
+      builder.setNotBefore(certificate.getNotBefore());
+      builder.setNotAfter(certificate.getNotAfter());
+      builder.setContent(certificate.getContent());
+      return builder.build();
+    }
+    catch (IOException ex) {
+      throw new RuntimeException(ex);
+    }
+  }
+
   /**
    * {@inheritDoc}
    */
@@ -201,11 +229,7 @@ public class ConcreteImportService implements ImportService {
     credentialRepository.add(credential);
   }
 
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public Set<? extends Tag> resolveTags(String[] tokens) {
+  private Collection<Tag> resolveTags(String[] tokens) {
     Set<Tag> tags = new LinkedHashSet<>();
     for (String token : tokens) {
       Tag tag = tagRepository.findByTagText(token);
@@ -217,26 +241,5 @@ public class ConcreteImportService implements ImportService {
     return tags;
   }
 
-  @Override
-  public boolean isMemberOfSelfGroupOnly() {
-    return groupService.findAllGroups().isEmpty();
-  }
-
-  @Override
-  public boolean isExistingGroup(String groupName)
-      throws GroupAccessException {
-    String loginName = userContextService.getLoginName();
-    boolean exists = groupRepository
-        .findByGroupName(groupName, loginName) != null;
-    if (exists) {
-      UserGroupMember member = memberRepository.findByGroupAndLoginName(
-          groupName, loginName);
-      if (member == null) {
-        throw new GroupAccessException("not a member of group " + groupName);
-      }
-    }
-    return exists;
-  }
- 
 }
 

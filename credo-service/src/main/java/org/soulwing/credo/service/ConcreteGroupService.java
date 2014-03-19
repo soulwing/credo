@@ -162,4 +162,23 @@ public class ConcreteGroupService implements GroupService {
     groupRepository.remove(id);
   }
   
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public boolean isExistingGroup(String groupName)
+      throws GroupAccessException {
+    String loginName = userContextService.getLoginName();
+    boolean exists = groupRepository
+        .findByGroupName(groupName, loginName) != null;
+    if (exists) {
+      UserGroupMember member = memberRepository.findByGroupAndLoginName(
+          groupName, loginName);
+      if (member == null) {
+        throw new GroupAccessException("not a member of group " + groupName);
+      }
+    }
+    return exists;
+  }
+ 
 }

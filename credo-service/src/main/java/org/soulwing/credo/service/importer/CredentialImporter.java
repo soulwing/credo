@@ -24,8 +24,8 @@ import java.io.InputStream;
 import org.soulwing.credo.Credential;
 import org.soulwing.credo.Password;
 import org.soulwing.credo.service.Errors;
+import org.soulwing.credo.service.ImportDetails;
 import org.soulwing.credo.service.ImportException;
-import org.soulwing.credo.service.ImportPreparation;
 import org.soulwing.credo.service.NoContentException;
 import org.soulwing.credo.service.PassphraseException;
 
@@ -34,7 +34,7 @@ import org.soulwing.credo.service.PassphraseException;
  *
  * @author Carl Harris
  */
-public interface CredentialImporter extends ImportPreparation {
+public interface CredentialImporter {
 
   /**
    * Loads a file containing content for a credential.
@@ -47,21 +47,17 @@ public interface CredentialImporter extends ImportPreparation {
       throws NoContentException, IOException;
   
   /**
-   * Validates the credential content.
-   * @param passphrase passphrase for the private key 
+   * Imports the credential content from the loaded files.
+   * @param passphrase passphrase for the private key (which may be null or
+   *    empty)
    * @param errors errors object that will be updated with errors/warnings
-   *    during validation
+   *    as appropriate
+   * @return details object that describes the imported credential
    * @throws ImportException if a validation error occurs
-   * @throws PassphraseException if a provided password is incorrect
+   * @throws PassphraseException if a passphrase is required and was not
+   *    specified or was incorrect
    */
-  void validate(Password passphrase, Errors errors) 
+  ImportDetails validateAndImport(Password passphrase, Errors errors) 
       throws ImportException, PassphraseException;
-  
-  /**
-   * Creates a {@link Credential} containing the uploaded key and certificate 
-   * chain.
-   * @return transient credential object
-   */
-  Credential build();
   
 }

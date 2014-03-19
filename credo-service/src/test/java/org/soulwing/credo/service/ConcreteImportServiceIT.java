@@ -18,11 +18,9 @@
  */
 package org.soulwing.credo.service;
 
-import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.hasProperty;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.nullValue;
@@ -119,60 +117,26 @@ public class ConcreteImportServiceIT {
   }
   
   @Test
-  public void testResolveTags() throws Exception {
-    assertThat(importService.resolveTags(new String[] { "test" }),
-        contains(hasProperty("text", equalTo("test"))));
-  }
-
-  @Test
   public void testImportWithUnencryptedKey() throws Exception {    
     final String testCase = "unencrypted-key";
     Properties properties = properties(testCase);
     
-    ImportPreparation preparation = 
-        importService.prepareImport(testFiles(testCase), errors);
-    assertThat(preparation, is(not(nullValue())));
-    assertThat(preparation.isPassphraseRequired(), is(false));
+    ImportDetails details = 
+        importService.prepareImport(testFiles(testCase), errors, null);
     
-    Credential credential = importService.createCredential(preparation, errors);
-    assertThat(preparation.getDetails().getSubject(), is(equalTo(
-        properties.getProperty("subject"))));
-
-    assertThat(credential.getPrivateKey(), is(not(nullValue())));
-    assertThat(credential.getCertificates(), is(not(empty())));
-    assertThat(credential.getCertificates().get(0).getSubject(), 
-        containsString(properties.getProperty("subject")));
-    assertThat(credential.getCertificates().get(1).getSubject(), 
-        containsString(properties.getProperty("issuer1")));
-    assertThat(credential.getCertificates().get(2).getSubject(), 
-        containsString(properties.getProperty("issuer2")));
+    validateDetails(details, properties);
   }
 
   @Test
   public void testImportWithPemEncryptedKey() throws Exception {    
     final String testCase = "pem-encrypted-key";
     Properties properties = properties(testCase);
+    Password passphrase = new Password(
+        properties.getProperty("passphrase").toCharArray());
     
-    ImportPreparation preparation = 
-        importService.prepareImport(testFiles(testCase), errors);
-    assertThat(preparation, is(not(nullValue())));
-    assertThat(preparation.isPassphraseRequired(), is(true));
-    
-    preparation.setPassphrase(
-        new Password(properties.getProperty("passphrase").toCharArray()));
-    
-    Credential credential = importService.createCredential(preparation, errors);
-    assertThat(preparation.getDetails().getSubject(), is(equalTo(
-        properties.getProperty("subject"))));
-
-    assertThat(credential.getPrivateKey(), is(not(nullValue())));
-    assertThat(credential.getCertificates(), is(not(empty())));
-    assertThat(credential.getCertificates().get(0).getSubject(), 
-        containsString(properties.getProperty("subject")));
-    assertThat(credential.getCertificates().get(1).getSubject(), 
-        containsString(properties.getProperty("issuer1")));
-    assertThat(credential.getCertificates().get(2).getSubject(), 
-        containsString(properties.getProperty("issuer2")));
+    ImportDetails details = 
+        importService.prepareImport(testFiles(testCase), errors, passphrase);
+    validateDetails(details, properties);
   }
 
 
@@ -180,50 +144,47 @@ public class ConcreteImportServiceIT {
   public void testImportWithPKCS8Key() throws Exception {    
     final String testCase = "pkcs8-key";
     Properties properties = properties(testCase);
+    Password passphrase = new Password(
+        properties.getProperty("passphrase").toCharArray());
     
-    ImportPreparation preparation = 
-        importService.prepareImport(testFiles(testCase), errors);
-    assertThat(preparation, is(not(nullValue())));
-    assertThat(preparation.isPassphraseRequired(), is(true));
-    
-    preparation.setPassphrase(
-        new Password(properties.getProperty("passphrase").toCharArray()));
-    
-    Credential credential = importService.createCredential(preparation, errors);
-    assertThat(preparation.getDetails().getSubject(), is(equalTo(
-        properties.getProperty("subject"))));
-
-    assertThat(credential.getPrivateKey(), is(not(nullValue())));
-    assertThat(credential.getCertificates(), is(not(empty())));
-    assertThat(credential.getCertificates().get(0).getSubject(), 
-        containsString(properties.getProperty("subject")));
-    assertThat(credential.getCertificates().get(1).getSubject(), 
-        containsString(properties.getProperty("issuer1")));
-    assertThat(credential.getCertificates().get(2).getSubject(), 
-        containsString(properties.getProperty("issuer2")));
+    ImportDetails details = 
+        importService.prepareImport(testFiles(testCase), errors, passphrase);
+    validateDetails(details, properties);
   }
 
+  private void validateDetails(ImportDetails details, Properties properties) {
+    assertThat(details, is(not(nullValue())));
+    assertThat(details.getSubjectCommonName(), is(equalTo(
+        properties.getProperty("subject"))));
+
+    assertThat(details.getPrivateKey(), is(not(nullValue())));
+    assertThat(details.getCertificates(), is(not(empty())));
+    assertThat(details.getCertificates().get(0).getSubject().getName(), 
+        containsString(properties.getProperty("subject")));
+    assertThat(details.getCertificates().get(1).getSubject().getName(), 
+        containsString(properties.getProperty("issuer1")));
+    assertThat(details.getCertificates().get(2).getSubject().getName(), 
+        containsString(properties.getProperty("issuer2")));
+  }
+  
   @Test
   public void testImportProtectAndSave() throws Exception {
     final String testCase = "pkcs8-key";
     final Password password = new Password("somePassword".toCharArray());
     final ProtectionParameters protection = newProtectionParameters(password);
+    final Properties properties = properties(testCase);
+    final Password importPassphrase = new Password(
+        properties.getProperty("passphrase").toCharArray());
 
     createUserProfile(LOGIN_NAME, password);
 
-    Properties properties = properties(testCase);
+    ImportDetails details = 
+        importService.prepareImport(testFiles(testCase), errors, importPassphrase);
+    validateDetails(details, properties);
     
-    ImportPreparation preparation = 
-        importService.prepareImport(testFiles(testCase), errors);
-    assertThat(preparation, is(not(nullValue())));
-    assertThat(preparation.isPassphraseRequired(), is(true));
-    
-    preparation.setPassphrase(
-        new Password(properties.getProperty("passphrase").toCharArray()));
-    
-    Credential credential = importService.createCredential(preparation, errors);
-    credential.setName(preparation.getDetails().getSubject());
-    importService.protectCredential(credential, preparation, protection, errors);
+    Credential credential = importService.createCredential(details, 
+        protection, errors);
+    credential.setName(details.getSubjectCommonName());
     importService.saveCredential(credential, errors);
   }
 

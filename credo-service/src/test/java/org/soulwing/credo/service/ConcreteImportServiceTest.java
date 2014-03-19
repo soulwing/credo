@@ -18,21 +18,23 @@
  */
 package org.soulwing.credo.service;
 
-import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.arrayContaining;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.emptyArray;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.sameInstance;
 import static org.jmock.Expectations.returnValue;
 import static org.jmock.Expectations.throwException;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.math.BigInteger;
+import java.util.Collection;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
+
+import javax.security.auth.x500.X500Principal;
 
 import org.jmock.Expectations;
 import org.jmock.api.Action;
@@ -42,7 +44,11 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.soulwing.credo.Credential;
-import org.soulwing.credo.CredentialKey;
+import org.soulwing.credo.CredentialBuilder;
+import org.soulwing.credo.CredentialBuilderFactory;
+import org.soulwing.credo.CredentialCertificate;
+import org.soulwing.credo.CredentialCertificateBuilder;
+import org.soulwing.credo.Password;
 import org.soulwing.credo.Tag;
 import org.soulwing.credo.UserGroup;
 import org.soulwing.credo.UserGroupMember;
@@ -50,6 +56,7 @@ import org.soulwing.credo.repository.CredentialRepository;
 import org.soulwing.credo.repository.TagRepository;
 import org.soulwing.credo.repository.UserGroupMemberRepository;
 import org.soulwing.credo.repository.UserGroupRepository;
+import org.soulwing.credo.service.crypto.CertificateWrapper;
 import org.soulwing.credo.service.crypto.PrivateKeyWrapper;
 import org.soulwing.credo.service.importer.CredentialImporter;
 import org.soulwing.credo.service.importer.CredentialImporterFactory;
@@ -62,9 +69,39 @@ import org.soulwing.credo.service.protect.CredentialProtectionService;
  */
 public class ConcreteImportServiceTest {
 
+
+
+  private static final String CREDENTIAL_NAME = "credentialName";
+
+  private static final String CREDENTIAL_NOTE = "credentialNote";
+  
+  private static final String CREDENTIAL_TAG = "credentialTag";
+
+  private static final String[] CREDENTIAL_TAGS = new String[] { CREDENTIAL_TAG };
+  
+  private static final String ENCODED_PRIVATE_KEY = "encodedPrivateKey";
+
+  private static final BigInteger SERIAL_NUMBER = BigInteger.ZERO;
+
+  private static final X500Principal SUBJECT_X500_NAME = 
+      new X500Principal("cn=Some Subject");
+  
+  private static final X500Principal ISSUER_X500_NAME = 
+      new X500Principal("cn=Some Issuer");
+  
+  private static final String ENCODED_CERTIFICATE = "encodedCertificate";
+
+  private static final Date ISSUANCE = new Date();
+  
+  private static final Date EXPIRATION = new Date();
+
+  private static final String ISSUER = "issuer";
+
   private static final String GROUP_NAME = "someGroup";
 
   private static final String LOGIN_NAME = "someUser";
+
+  private static final Password PASSPHRASE = new Password(new char[0]);
 
   @Rule
   public final JUnitRuleMockery context = new JUnitRuleMockery();
@@ -76,13 +113,22 @@ public class ConcreteImportServiceTest {
   private CredentialImporter importer;
   
   @Mock
+  private CredentialBuilderFactory credentialBuilderFactory;
+  
+  @Mock
+  private CredentialBuilder credentialBuilder;
+  
+  @Mock
+  private CredentialCertificateBuilder certificateBuilder;
+  
+  @Mock
   private ImportDetails details;
   
   @Mock
   private Credential credential;
   
   @Mock
-  private CredentialKey credentialKey;
+  private CredentialCertificate credentialCertificate;
   
   @Mock
   private ProtectionParameters protection;
@@ -94,7 +140,10 @@ public class ConcreteImportServiceTest {
   private UserGroupMember member;
   
   @Mock
-  private PrivateKeyWrapper credentialPrivateKey;
+  private PrivateKeyWrapper privateKey;
+  
+  @Mock
+  private CertificateWrapper certificate;
   
   @Mock
   private Errors errors;
@@ -104,6 +153,9 @@ public class ConcreteImportServiceTest {
   
   @Mock
   private TagRepository tagRepository;
+  
+  @Mock
+  private Tag tag;
   
   @Mock
   private UserGroupRepository groupRepository;
@@ -126,6 +178,7 @@ public class ConcreteImportServiceTest {
   public void setUp() throws Exception {
     importService.importerFactory = importerFactory;
     importService.credentialRepository = credentialRepository;
+    importService.credentialBuilderFactory = credentialBuilderFactory;
     importService.tagRepository = tagRepository;
     importService.groupRepository = groupRepository;
     importService.memberRepository = memberRepository;
@@ -144,8 +197,8 @@ public class ConcreteImportServiceTest {
           with(emptyArray()));
     } });
     
-    List<FileContentModel> emptyList = Collections.emptyList();
-    importService.prepareImport(emptyList, errors);
+    List<FileContentModel> files = Collections.emptyList();
+    importService.prepareImport(files, errors, PASSPHRASE);
   }
   
   @Test(expected = ImportException.class)
@@ -169,8 +222,8 @@ public class ConcreteImportServiceTest {
       will(returnValue(true));
     } });
     
-    List<FileContentModel> emptyList = Collections.singletonList(file);
-    importService.prepareImport(emptyList, errors);
+    List<FileContentModel> files = Collections.singletonList(file);
+    importService.prepareImport(files, errors, PASSPHRASE);
   }
   
   @Test(expected = ImportException.class)
@@ -194,79 +247,146 @@ public class ConcreteImportServiceTest {
       will(returnValue(true));
     } });
     
-    List<FileContentModel> emptyList = Collections.singletonList(file);
-    importService.prepareImport(emptyList, errors);
-  }
-  
-  @Test(expected = ImportException.class)
-  public void testCreateCredentialWhenError() throws Exception {
-    context.checking(new Expectations() { { 
-      oneOf(importer).validate(with(same(errors)));
-      will(throwException(new ImportException()));
-    } });    
-    
-    importService.createCredential(importer, errors);
+    List<FileContentModel> files = Collections.singletonList(file);
+    importService.prepareImport(files, errors, PASSPHRASE);
   }
 
   @Test
-  public void testCreateCredentialWhenSuccessful() throws Exception {
-    context.checking(new Expectations() { { 
-      oneOf(importer).validate(with(same(errors)));
-      oneOf(importer).build();
-      will(returnValue(credential));
-    } });    
+  public void testPrepareImportSuccess() throws Exception {
+    final FileContentModel file = context.mock(FileContentModel.class);
+    final InputStream inputStream = new ByteArrayInputStream(new byte[0]);
+    context.checking(new Expectations() { {
+      oneOf(file).getInputStream();
+      will(returnValue(inputStream));
+      oneOf(importerFactory).newImporter();
+      will(returnValue(importer));
+      oneOf(importer).loadFile(with(same(inputStream)));
+      oneOf(errors).hasErrors();
+      will(returnValue(false));
+      oneOf(importer).validateAndImport(with(PASSPHRASE), with(same(errors)));
+    } });
     
-    assertThat(importService.createCredential(importer, errors), 
-        is(sameInstance(credential)));    
+    List<FileContentModel> files = Collections.singletonList(file);
+    importService.prepareImport(files, errors, PASSPHRASE);
   }
 
   @Test
   public void testProtectCredential() throws Exception {
     context.checking(requestDetailsExpectations());
+    context.checking(credentialBuilderExpectations());
     context.checking(findOwnerGroupExpectations(returnValue(group)));
     context.checking(storeOwnerExpectations());
     context.checking(protectionExpectations(returnValue(null)));
-    importService.protectCredential(credential, importer, protection, errors);
+    importService.createCredential(details, protection, errors);
   }
   
   @Test
   public void testProtectCredentialWhenGroupNotFound() throws Exception {
     context.checking(requestDetailsExpectations());
+    context.checking(credentialBuilderExpectations());
     context.checking(findOwnerGroupExpectations(returnValue(null)));
     context.checking(createOwnerGroupExpectations());
     context.checking(storeOwnerExpectations());
     context.checking(protectionExpectations(returnValue(null)));
-    importService.protectCredential(credential, importer, protection, errors);
+    importService.createCredential(details, protection, errors);
   }
   
   @Test(expected = PassphraseException.class)
   public void testProtectCredentialWhenPasswordIncorrect() throws Exception {
     context.checking(requestDetailsExpectations());
+    context.checking(credentialBuilderExpectations());
     context.checking(findOwnerGroupExpectations(returnValue(group)));
     context.checking(storeOwnerExpectations());
     context.checking(protectionExpectations(
         throwException(new UserAccessException(new Exception()))));
     context.checking(passwordErrorExpectations());
-    importService.protectCredential(credential, importer, protection, errors);
+    importService.createCredential(details, protection, errors);
   }
 
   @Test(expected = AccessDeniedException.class)
   public void testProtectCredentialWhenUserNotInGroup() throws Exception {
     context.checking(requestDetailsExpectations());
+    context.checking(credentialBuilderExpectations());
     context.checking(findOwnerGroupExpectations(returnValue(group)));
     context.checking(storeOwnerExpectations());
     context.checking(protectionExpectations(
         throwException(new GroupAccessException("some message"))));
     context.checking(accessDeniedErrorExpectations());
-    importService.protectCredential(credential, importer, protection, errors);
+    importService.createCredential(details, protection, errors);
   }
   
-  private Expectations requestDetailsExpectations() {
-    return new Expectations() { { 
-      allowing(importer).getDetails();
-      will(returnValue(details));
+  private Expectations requestDetailsExpectations() throws Exception {
+    return new Expectations() { {
       allowing(details).getPrivateKey();
-      will(returnValue(credentialPrivateKey));     
+      will(returnValue(privateKey));
+      allowing(details).getIssuerCommonName();
+      will(returnValue(ISSUER));
+      allowing(details).getNotAfter();
+      will(returnValue(EXPIRATION));
+      allowing(details).getCertificates();      
+      will(returnValue(Collections.singletonList(certificate)));
+      allowing(privateKey).getContent();
+      will(returnValue(ENCODED_PRIVATE_KEY));
+      allowing(certificate).getContent();
+      will(returnValue(ENCODED_CERTIFICATE));
+      allowing(certificate).getSubject();
+      will(returnValue(SUBJECT_X500_NAME));
+      allowing(certificate).getIssuer();
+      will(returnValue(ISSUER_X500_NAME));
+      allowing(certificate).getSerialNumber();
+      will(returnValue(SERIAL_NUMBER));
+      allowing(certificate).getNotAfter();
+      will(returnValue(EXPIRATION));
+      allowing(certificate).getNotBefore();
+      will(returnValue(ISSUANCE));
+      allowing(details).getName();
+      will(returnValue(CREDENTIAL_NAME));
+      allowing(details).getNote();
+      will(returnValue(CREDENTIAL_NOTE));
+      allowing(details).getTags();
+      will(returnValue(CREDENTIAL_TAGS));
+    } };
+  }
+
+  @SuppressWarnings("unchecked")
+  private Expectations credentialBuilderExpectations() {
+    return new Expectations() { { 
+      oneOf(credentialBuilderFactory).newCredentialBuilder();
+      will(returnValue(credentialBuilder));
+      oneOf(credentialBuilder).setName(with(CREDENTIAL_NAME));
+      will(returnValue(credentialBuilder));
+      oneOf(credentialBuilder).setNote(with(CREDENTIAL_NOTE));
+      will(returnValue(credentialBuilder));
+      oneOf(credentialBuilder).setTags((Collection<Tag>) with(contains(tag)));
+      will(returnValue(credentialBuilder));
+      oneOf(credentialBuilder).setExpiration(with(EXPIRATION));
+      will(returnValue(credentialBuilder));
+      oneOf(credentialBuilder).setIssuer(with(ISSUER));
+      will(returnValue(credentialBuilder));
+      oneOf(credentialBuilder).setPrivateKey(with(ENCODED_PRIVATE_KEY));
+      will(returnValue(credentialBuilder));
+      oneOf(credentialBuilder).build();
+      will(returnValue(credential));
+      oneOf(credentialBuilderFactory).newCertificateBuilder();
+      will(returnValue(certificateBuilder));
+      oneOf(certificateBuilder).setSubject(with(SUBJECT_X500_NAME));
+      will(returnValue(certificateBuilder));
+      oneOf(certificateBuilder).setIssuer(with(ISSUER_X500_NAME));
+      will(returnValue(certificateBuilder));
+      oneOf(certificateBuilder).setSerialNumber(with(SERIAL_NUMBER));
+      will(returnValue(certificateBuilder));
+      oneOf(certificateBuilder).setNotBefore(with(ISSUANCE));
+      will(returnValue(certificateBuilder));
+      oneOf(certificateBuilder).setNotAfter(with(EXPIRATION));
+      will(returnValue(certificateBuilder));
+      oneOf(certificateBuilder).setContent(with(ENCODED_CERTIFICATE));
+      will(returnValue(certificateBuilder));
+      oneOf(certificateBuilder).build();
+      will(returnValue(credentialCertificate));
+      oneOf(credentialBuilder).addCertificate(with(credentialCertificate));
+      will(returnValue(credentialBuilder));
+      oneOf(tagRepository).findByTagText(with(CREDENTIAL_TAG));
+      will(returnValue(tag));
     } };
   }
 
@@ -300,7 +420,7 @@ public class ConcreteImportServiceTest {
       throws Exception {
     return new Expectations() { { 
       oneOf(protectionService).protect(with(same(credential)), 
-          with(same(credentialPrivateKey)), with(same(protection)));
+          with(same(privateKey)), with(same(protection)));
       will(outcome);
     } };
   }
@@ -339,103 +459,6 @@ public class ConcreteImportServiceTest {
     importService.saveCredential(credential, errors);
   }
   
-  @Test
-  public void testResolveTagWhenTagFound() throws Exception {
-    final String token = "someTag";
-    final Tag tag = context.mock(Tag.class);
-    
-    context.checking(new Expectations() { { 
-      oneOf(tagRepository).findByTagText(token);
-      will(returnValue(tag));
-    } });
-    
-    assertThat(importService.resolveTags(new String[] { token }),
-        contains(tag));
-  }
-
-  @Test
-  public void testResolveTagWhenTagNotFound() throws Exception {
-    final String token = "someTag";
-    final Tag tag = context.mock(Tag.class);
-    
-    context.checking(new Expectations() { { 
-      oneOf(tagRepository).findByTagText(with(same(token)));
-      will(returnValue(null));
-      oneOf(tagRepository).newTag(with(same(token)));
-      will(returnValue(tag));
-    } });
-    
-    assertThat(importService.resolveTags(new String[] { token }),
-        contains(tag));
-  }
-
-  @Test
-  public void testUserIsNotMemberOfSelfGroupOnly() throws Exception {
-    context.checking(new Expectations() { { 
-      oneOf(groupService).findAllGroups();
-      will(returnValue(Collections.singleton(
-          context.mock(GroupDetail.class))));
-    } });
-    
-    assertThat(importService.isMemberOfSelfGroupOnly(), is(false));
-  }
-
-  @Test
-  public void testUserIsMemberOfSelfGroupOnly() throws Exception {
-    context.checking(new Expectations() { { 
-      oneOf(groupService).findAllGroups();
-      will(returnValue(Collections.emptySet()));
-    } });
-    
-    assertThat(importService.isMemberOfSelfGroupOnly(), is(true));
-  }
-
-  @Test
-  public void testGroupIsExistingGroup() throws Exception {
-    context.checking(new Expectations() { {
-      oneOf(userContextService).getLoginName();
-      will(returnValue(LOGIN_NAME));
-      oneOf(groupRepository).findByGroupName(with(GROUP_NAME), 
-          with(LOGIN_NAME));
-      will(returnValue(group));
-      oneOf(memberRepository).findByGroupAndLoginName(
-          with(GROUP_NAME), with(LOGIN_NAME));
-      will(returnValue(member));
-    } });
-    
-    assertThat(importService.isExistingGroup(GROUP_NAME), is(true));
-  }
-
-  @Test
-  public void testGroupIsNotExistingGroup() throws Exception {
-    context.checking(new Expectations() { {
-      oneOf(userContextService).getLoginName();
-      will(returnValue(LOGIN_NAME));
-      oneOf(groupRepository).findByGroupName(with(GROUP_NAME), 
-          with(LOGIN_NAME));
-      will(returnValue(null));
-    } });
-    
-    assertThat(importService.isExistingGroup(GROUP_NAME), is(false));
-  }
-
-  @Test(expected = GroupAccessException.class)
-  public void testGroupIsExistingGroupAndUserIsNotMember() throws Exception {
-    context.checking(new Expectations() { {
-      oneOf(userContextService).getLoginName();
-      will(returnValue(LOGIN_NAME));
-      oneOf(groupRepository).findByGroupName(with(GROUP_NAME), 
-          with(LOGIN_NAME));
-      will(returnValue(group));
-      oneOf(memberRepository).findByGroupAndLoginName(
-          with(GROUP_NAME), with(LOGIN_NAME));
-      will(returnValue(null));
-    } });
-    
-    importService.isExistingGroup(GROUP_NAME);
-  }
-
-
 }
 
 
