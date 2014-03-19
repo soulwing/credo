@@ -1,12 +1,13 @@
 $(document).ready(function() {
 	
-	var $owner = $("#details\\:owner");
-	var $ownerStatus = $("#details\\:ownerStatus");
+	var $owner = $("[id$=':owner']");
+	var $ownerStatus = $("[id$=':ownerStatus']");
 	var $inputGroup = $owner.parent().parent();
 	var $feedback = $owner.parent().children(".form-control-feedback");
 	var $helpWillCreate = $("#help-will-create");
 	var $helpInaccessible = $("#help-inaccessible");
-	var $ownerErrors = $("#details\\:ownerErrors");
+	var $ownerErrors = $("[id$=':ownerErrors']");
+	var $tags = $("[id$=':tags']");
 
 	var passwordTimeout = function() { };
 
@@ -37,7 +38,6 @@ $(document).ready(function() {
 		}
 	);
 	
-	var $tags = $("#details\\:tags");
 	var tagsSelector = $tags.selectize({
 	    delimiter: ',',
 	    persist: true,
@@ -67,7 +67,6 @@ $(document).ready(function() {
 	});
 	
 	var hideFeedback = function() {
-		var $ownerErrors = $("#details\\:ownerErrors");
 		$inputGroup.removeClass("has-error has-warning");
 		$feedback.removeClass("glyphicon glyphicon-warning-sign glyphicon-exclamation-sign");
 		$feedback.addClass("hidden");
@@ -77,7 +76,6 @@ $(document).ready(function() {
 	};
 
 	var updateFeedback = function() {
-		var $ownerErrors = $("#details\\:ownerErrors");
 		if ($ownerErrors.text().length > 0) {
 			$inputGroup.removeClass("has-warning has-success");
 			$inputGroup.addClass("has-error");
@@ -125,10 +123,10 @@ $(document).ready(function() {
 		var ajaxRequest = function() { 
 			jsf.ajax.request(source, event, {
 				execute: $owner.attr("id"),
-				render: $ownerStatus.attr("id") + " details:ownerErrors",
+				render: $ownerStatus.attr("id") + " " + $ownerErrors.attr("id"),
 				onevent: function(data) {
 					if (data.status == "success") {
-						$ownerErrors = $("#details\\:ownerErrors");
+						$ownerErrors = $("[id$=':ownerErrors']");
 						updateFeedback();
 					}			
 				}

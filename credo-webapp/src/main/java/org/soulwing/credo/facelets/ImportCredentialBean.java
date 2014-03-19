@@ -70,6 +70,8 @@ public class ImportCredentialBean implements Serializable {
   static final String CANCEL_OUTCOME_ID = "cancel";
 
   static final String PASSPHRASE_OUTCOME_ID = "passphrase";
+  
+  static final String PASSWORD_OUTCOME_ID = "password";
 
   private static final long serialVersionUID = -5565484780336702769L;
 
@@ -269,8 +271,16 @@ public class ImportCredentialBean implements Serializable {
   }
 
   /**
-   * Action that is fired when the form containing the credential details is
-   * submitted with the {@code protect} action.
+   * Action that is fired when the form containing the credential details
+   * is submitted.
+   * @return outcome ID
+   */
+  public String password() {
+    return ImportCredentialBean.PASSWORD_OUTCOME_ID;
+  }
+  
+  /**
+   * Action that is fired when the password form is submitted.
    * @return outcome ID
    */
   public String protect() {
@@ -291,8 +301,7 @@ public class ImportCredentialBean implements Serializable {
   }
 
   /**
-   * Action that is fired when the form containing credential details is
-   * submitted with the save action.
+   * Action that is fired when the confirmation form is submitted.
    * @return outcome ID
    */
   public String save() {
@@ -307,8 +316,7 @@ public class ImportCredentialBean implements Serializable {
   }
 
   /**
-   * Action that is fired when the form containing credential details is
-   * submitted with the cancel action.
+   * Action that is fired when any form in the interaction is canceled.
    * @return outcome ID
    */
   public String cancel() {
