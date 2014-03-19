@@ -38,7 +38,11 @@ public class CommaSeparatedArrayConverter implements Converter {
   public Object getAsObject(FacesContext context, UIComponent component, 
       String value) {
     if (value == null) return null;
-    return value.split("\\s*,\\s*");
+    String[] tokens = value.split("\\s*,\\s*");
+    if (tokens.length == 1 && tokens[0].trim().isEmpty()) {
+      return new String[0];
+    }
+    return tokens;
   }
 
   /**
@@ -51,9 +55,12 @@ public class CommaSeparatedArrayConverter implements Converter {
     final Object[] items =  (Object[]) value;
     final StringBuilder sb = new StringBuilder();
     for (int i = 0, max = items.length; i < max; i++) {
-      sb.append(items[i].toString());
-      if (i + 1 < max) {
-        sb.append(", ");
+      String text = items[i].toString();
+      if (!text.trim().isEmpty()) {
+        sb.append(text);
+        if (i + 1 < max) {
+          sb.append(", ");
+        }
       }
     }
     return sb.toString();
