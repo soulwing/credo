@@ -21,36 +21,24 @@ package org.soulwing.credo.facelets;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
-import java.util.Set;
 
 import javax.annotation.PostConstruct;
 import javax.enterprise.context.Conversation;
 import javax.enterprise.context.ConversationScoped;
-import javax.faces.component.EditableValueHolder;
-import javax.faces.component.UIComponent;
-import javax.faces.component.UIViewRoot;
 import javax.faces.context.FacesContext;
-import javax.faces.context.PartialViewContext;
-import javax.faces.event.ValueChangeEvent;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.servlet.http.Part;
 
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.Validate;
 import org.soulwing.credo.Credential;
 import org.soulwing.credo.Password;
-import org.soulwing.credo.Tag;
 import org.soulwing.credo.UserGroup;
-import org.soulwing.credo.service.AccessDeniedException;
 import org.soulwing.credo.service.Errors;
 import org.soulwing.credo.service.FileContentModel;
 import org.soulwing.credo.service.GroupAccessException;
+import org.soulwing.credo.service.ImportDetails;
 import org.soulwing.credo.service.ImportException;
-import org.soulwing.credo.service.ImportPreparation;
 import org.soulwing.credo.service.ImportService;
 import org.soulwing.credo.service.NoSuchGroupException;
 import org.soulwing.credo.service.PassphraseException;
@@ -89,7 +77,7 @@ public class ImportCredentialBean implements Serializable {
   private final PartContent file1 = new PartContent();
   private final PartContent file2 = new PartContent();
 
-  private final PasswordFormBean passwordFormBean = new PasswordFormBean();
+  private PasswordFormBean passwordFormBean = new PasswordFormBean();
 
   @Inject
   protected Conversation conversation;
@@ -105,10 +93,13 @@ public class ImportCredentialBean implements Serializable {
 
   @Inject
   protected FacesContext facesContext;
+  
+  @Inject
+  protected DelegatingCredentialEditor editor;
 
-  private ImportPreparation preparation;
+  private List<FileContentModel> files;
+  private Password passphrase;
   private Credential credential;
-  private OwnerStatus ownerStatus = OwnerStatus.EXISTS;
 
   @PostConstruct
   public void init() {
@@ -166,31 +157,6 @@ public class ImportCredentialBean implements Serializable {
   }
 
   /**
-   * Gets the {@code name} property.
-   * @return
-   */
-  public String getName() {
-    return credential.getName();
-  }
-
-  /**
-   * Sets the {@code name} property.
-   * @param name
-   */
-  public void setName(String name) {
-    credential.setName(name);
-  }
-
-  /**
-   * Tests whether the user is a member of the "self" group, only.
-   * @return {@code true} if the user has no group memberships other than the
-   *         "self" group
-   */
-  public boolean isMemberOfSelfGroupOnly() {
-    return importService.isMemberOfSelfGroupOnly();
-  }
-
-  /**
    * Gets the owner name for the credential.
    * @return owner name or {@code null} if none has been set
    */
@@ -207,76 +173,11 @@ public class ImportCredentialBean implements Serializable {
   }
 
   /**
-   * Gets the status of the group specified as the credential's owner.
-   * @return status
-   */
-  public OwnerStatus getOwnerStatus() {
-    return ownerStatus;
-  }
-
-  /**
-   * Sets the status of the group specified as the credential's owner.
-   * @param ownerStatus
-   */
-  public void setOwnerStatus(OwnerStatus ownerStatus) {
-  }
-
-  /**
-   * Gets the {@code note} property.
-   * @return
-   */
-  public String getNote() {
-    return credential.getNote();
-  }
-
-  /**
-   * Sets the {@code note} property.
-   * @param note
-   */
-  public void setNote(String note) {
-    credential.setNote(note);
-  }
-
-  /**
-   * Gets the {@code tags} property.
-   * @return
-   */
-  public String getTags() {
-    Set<? extends Tag> tags = credential.getTags();
-    if (tags == null || tags.isEmpty())
-      return "";
-    int i = 0;
-    StringBuilder sb = new StringBuilder();
-    for (Tag tag : tags) {
-      sb.append(tag.getText());
-      if (++i < tags.size()) {
-        sb.append(',');
-      }
-    }
-    return sb.toString();
-  }
-
-  /**
-   * Sets the {@code tags} property.
-   * @param tags
-   */
-  public void setTags(String tags) {
-    if (StringUtils.isBlank(tags)) {
-      Set<Tag> tagSet = Collections.emptySet();
-      credential.setTags(tagSet);
-      return;
-    }
-    String[] tokens = tags.split("\\s*,\\s*");
-    credential.setTags(importService.resolveTags(tokens));
-  }
-
-  /**
    * Gets the private key passphrase.
    * @return passphrase
    */
   public Password getPassphrase() {
-    Validate.notNull(preparation, "import not prepared");
-    return preparation.getPassphrase();
+    return passphrase;
   }
 
   /**
@@ -284,8 +185,7 @@ public class ImportCredentialBean implements Serializable {
    * @param passphrase the passphrase to set
    */
   public void setPassphrase(Password passphrase) {
-    Validate.notNull(preparation, "import not prepared");
-    preparation.setPassphrase(passphrase);
+    this.passphrase = passphrase;
   }
 
   /**
@@ -296,21 +196,31 @@ public class ImportCredentialBean implements Serializable {
   }
 
   /**
-   * Gets the import preparation produced by the import service.
-   * @return preparation
+   * Gets the credential editor.
+   * @return editor
    */
-  public ImportPreparation getPreparation() {
-    return preparation;
+  public DelegatingCredentialEditor getEditor() {
+    return editor;
   }
-
+  
   /**
-   * Sets the import preparation produced by the import service.
+   * Gets the details produced by the import service.
    * <p>
    * This method is exposed to support unit testing.
-   * @param preparation the preparation to set
+   * @return details
    */
-  void setPreparation(ImportPreparation preparation) {
-    this.preparation = preparation;
+  ImportDetails getDetails() {
+    return (ImportDetails) editor.getDelegate();
+  }
+  
+  /**
+   * Sets the details produced by the import service.
+   * <p>
+   * This method is exposed to support unit testing.
+   * @param details the details to set
+   */
+  void setDetails(ImportDetails details) {
+    editor.setDelegate(details);
   }
 
   /**
@@ -334,48 +244,6 @@ public class ImportCredentialBean implements Serializable {
   }
 
   /**
-   * Event handler that handles a change in the owner property.
-   * @param event
-   */
-  public void ownerChanged(ValueChangeEvent event) {
-    resetRenderedInputs();
-    try {
-      String value = event.getNewValue().toString();
-      if (value == null || value.isEmpty()) {
-        ownerStatus = OwnerStatus.NONE;
-      }
-      else {
-        ownerStatus = importService.isExistingGroup(value) ? 
-            OwnerStatus.EXISTS : OwnerStatus.WILL_CREATE;
-      }
-    }
-    catch (GroupAccessException ex) {
-      ownerStatus = OwnerStatus.INACCESSIBLE;
-    }
-  }
-
-  /**
-   * Resets rendered inputs on an Ajax request.  
-   * <p>
-   * This works around an issue when the form is submitted with one or more 
-   * validation errors, allowing the rendered inputs to be properly updated on 
-   * subsequent Ajax requests.
-   */
-  private void resetRenderedInputs() {
-    PartialViewContext partialViewContext = 
-        facesContext.getPartialViewContext();
-    Collection<String> renderIds = partialViewContext.getRenderIds();
-    UIViewRoot viewRoot = facesContext.getViewRoot();
-    for (String renderId : renderIds) {
-      UIComponent component = viewRoot.findComponent(renderId);
-      if (component instanceof EditableValueHolder) {
-        EditableValueHolder input = (EditableValueHolder) component;
-        input.resetValue();
-      }
-    }
-  }
-
-  /**
    * Action that is fired when the form containing the files to import has been
    * submitted.
    * @return outcome ID
@@ -385,45 +253,15 @@ public class ImportCredentialBean implements Serializable {
       conversation.begin();
     }
     try {
-      preparation = importService.prepareImport(fileList(), errors);
-      if (!preparation.isPassphraseRequired()) {
-        return validate();
-      }
+      editor.setDelegate(
+          importService.prepareImport(fileList(), errors, passphrase));
+      return DETAILS_OUTCOME_ID;
+    }
+    catch (PassphraseException ex) {
       return PASSPHRASE_OUTCOME_ID;
     }
     catch (ImportException ex) {
       return null;
-    }
-    catch (IOException ex) {
-      throw new RuntimeException(ex);
-    }
-  }
-
-  /**
-   * Action that is fired after files have been upload and (if necessary) the
-   * passphrase for the imported private key has been entered by the user.
-   * @return outcome ID
-   */
-  public String validate() {
-    if (preparation == null) {
-      throw new IllegalStateException("import not prepared");
-    }
-    try {
-      if (preparation.isPassphraseRequired()) {
-        ImportPreparation previous = preparation;
-        preparation = importService.prepareImport(fileList(), errors);
-        preparation.setPassphrase(previous.getPassphrase());
-      }
-      credential = importService.createCredential(preparation, errors);
-      credential.setName(preparation.getDetails().getSubject());
-      return DETAILS_OUTCOME_ID;
-    }
-    catch (PassphraseException ex) {
-      errors.addError("passphrase", "passphraseIncorrect");
-      return PASSPHRASE_OUTCOME_ID;
-    }
-    catch (ImportException ex) {
-      return FAILURE_OUTCOME_ID;
     }
     catch (IOException ex) {
       throw new RuntimeException(ex);
@@ -437,13 +275,12 @@ public class ImportCredentialBean implements Serializable {
    */
   public String protect() {
     try {
-      importService.protectCredential(credential, preparation,
-          passwordFormBean, errors);
+      credential = importService.createCredential(
+          (ImportDetails) editor.getDelegate(), passwordFormBean, errors);
       return CONFIRM_OUTCOME_ID;
     }
-    catch (AccessDeniedException ex) {
-      // FIXME -- should divert to an error view for this
-      throw new RuntimeException(ex);
+    catch (GroupAccessException ex) {
+      return DETAILS_OUTCOME_ID;
     }
     catch (NoSuchGroupException ex) {
       return DETAILS_OUTCOME_ID;
@@ -487,18 +324,20 @@ public class ImportCredentialBean implements Serializable {
    * @throws IOException
    */
   private List<FileContentModel> fileList() throws IOException {
-    List<FileContentModel> files = new ArrayList<FileContentModel>();
-    if (file0.isLoadable()) {
-      file0.load();
-      files.add(file0);
-    }
-    if (file1.isLoadable()) {
-      file1.load();
-      files.add(file1);
-    }
-    if (file2.isLoadable()) {
-      file2.load();
-      files.add(file2);
+    if (files == null) {
+      files = new ArrayList<FileContentModel>();
+      if (file0.isLoadable()) {
+        file0.load();
+        files.add(file0);
+      }
+      if (file1.isLoadable()) {
+        file1.load();
+        files.add(file1);
+      }
+      if (file2.isLoadable()) {
+        file2.load();
+        files.add(file2);
+      }
     }
     return files;
   }

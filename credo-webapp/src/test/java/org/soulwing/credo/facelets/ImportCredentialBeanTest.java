@@ -19,12 +19,8 @@
 package org.soulwing.credo.facelets;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.allOf;
-import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.empty;
-import static org.hamcrest.Matchers.emptyArray;
 import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.hasItemInArray;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.nullValue;
@@ -33,13 +29,10 @@ import static org.jmock.Expectations.returnValue;
 import static org.jmock.Expectations.throwException;
 
 import java.io.ByteArrayInputStream;
-import java.util.Collections;
-import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Set;
 
 import javax.enterprise.context.Conversation;
-import javax.faces.event.ValueChangeEvent;
+import javax.faces.context.FacesContext;
 import javax.servlet.http.Part;
 
 import org.jmock.Expectations;
@@ -52,20 +45,15 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.soulwing.credo.Credential;
 import org.soulwing.credo.Password;
-import org.soulwing.credo.Tag;
 import org.soulwing.credo.UserProfile;
-import org.soulwing.credo.facelets.ImportCredentialBean.OwnerStatus;
-import org.soulwing.credo.service.AccessDeniedException;
 import org.soulwing.credo.service.Errors;
 import org.soulwing.credo.service.FileContentModel;
 import org.soulwing.credo.service.GroupAccessException;
 import org.soulwing.credo.service.ImportDetails;
 import org.soulwing.credo.service.ImportException;
-import org.soulwing.credo.service.ImportPreparation;
 import org.soulwing.credo.service.ImportService;
 import org.soulwing.credo.service.NoSuchGroupException;
 import org.soulwing.credo.service.PassphraseException;
-import org.soulwing.credo.service.ProtectionParameters;
 import org.soulwing.credo.service.UserProfileService;
 
 /**
@@ -75,9 +63,7 @@ import org.soulwing.credo.service.UserProfileService;
  */
 public class ImportCredentialBeanTest {
 
-  private static final String SUBJECT_NAME = "subjectName";
-  
-  private static final String GROUP_NAME = "groupName";
+  private static final Password PASSPHRASE = new Password(new char[0]);
   
   @Rule
   public JUnitRuleMockery context = new JUnitRuleMockery() { {
@@ -100,17 +86,14 @@ public class ImportCredentialBeanTest {
   private UserProfile profile;
     
   @Mock
-  private ImportPreparation preparation;
-  
-  @Mock
   private ImportDetails details;
   
   @Mock
   private Credential credential;
   
   @Mock
-  private ValueChangeEvent event;
-  
+  private FacesContext facesContext;
+    
   private ImportCredentialBean bean = new ImportCredentialBean();
   
   @Before
@@ -119,6 +102,9 @@ public class ImportCredentialBeanTest {
     bean.errors = errors;
     bean.importService = importService;
     bean.profileService = profileService;
+    bean.facesContext = facesContext;
+    bean.editor = new DelegatingCredentialEditor();
+    bean.setPassphrase(PASSPHRASE);
   }
 
   @Test
@@ -143,7 +129,7 @@ public class ImportCredentialBeanTest {
     context.checking(new Expectations() { {
       oneOf(importService).prepareImport(
           (List<FileContentModel>) with(any(List.class)),
-          with(errors));
+          with(errors), with(PASSPHRASE));
       will(throwException(new ImportException()));
     } });
     
@@ -157,51 +143,47 @@ public class ImportCredentialBeanTest {
   public void testUploadSuccessWithFile0Selected() throws Exception {
     final Part file = context.mock(Part.class);
     context.checking(conversationExpectations());
-    context.checking(uploadSuccessExpectations(file, true));
+    context.checking(prepareImportExpectations(file, returnValue(details)));
     
     bean.setFile0(file);
-    assertThat(bean.upload(), equalTo(ImportCredentialBean.PASSPHRASE_OUTCOME_ID));
-    assertThat(bean.getPreparation(), sameInstance(preparation));
+    assertThat(bean.upload(), 
+        is(equalTo(ImportCredentialBean.DETAILS_OUTCOME_ID)));
+    assertThat(bean.getDetails(), is(sameInstance(details)));
   }
 
   @Test
   public void testUploadSuccessWithFile1Selected() throws Exception {
     final Part file = context.mock(Part.class);
     context.checking(conversationExpectations());
-    context.checking(uploadSuccessExpectations(file, true));
+    context.checking(prepareImportExpectations(file, 
+        returnValue(details)));
     
     bean.setFile1(file);
-    assertThat(bean.upload(), equalTo(ImportCredentialBean.PASSPHRASE_OUTCOME_ID));
-    assertThat(bean.getPreparation(), sameInstance(preparation));
+    assertThat(bean.upload(), 
+        is(equalTo(ImportCredentialBean.DETAILS_OUTCOME_ID)));
+    assertThat(bean.getDetails(), is(sameInstance(details)));
   }
     
   @Test
   public void testUploadSuccessWithFile2Selected() throws Exception {
     final Part file = context.mock(Part.class);
     context.checking(conversationExpectations());
-    context.checking(uploadSuccessExpectations(file, true));
-    
+    context.checking(prepareImportExpectations(file, returnValue(details)));
     bean.setFile2(file);
-    assertThat(bean.upload(), equalTo(ImportCredentialBean.PASSPHRASE_OUTCOME_ID));
-    assertThat(bean.getPreparation(), sameInstance(preparation));
+    assertThat(bean.upload(), 
+        is(equalTo(ImportCredentialBean.DETAILS_OUTCOME_ID)));
+    assertThat(bean.getDetails(), sameInstance(details));
   }
 
   @Test
-  public void testUploadWhenNoPassphraseRequired() throws Exception {
+  public void testUploadPassphraseRequired() throws Exception {
     final Part file = context.mock(Part.class);
     context.checking(conversationExpectations());
-    context.checking(uploadSuccessExpectations(file, false));
-    context.checking(new Expectations() { { 
-      allowing(preparation).isPassphraseRequired();
-      will(returnValue(false));
-      oneOf(importService).createCredential(with(preparation), 
-          with(errors));
-      // throw an exception here to avoid having to deal with credential creation
-      will(throwException(new ImportException()));
-    } });
-      
+    context.checking(prepareImportExpectations(file, 
+        throwException(new PassphraseException())));
     bean.setFile0(file);
-    assertThat(bean.upload(), equalTo(ImportCredentialBean.FAILURE_OUTCOME_ID));
+    assertThat(bean.upload(), 
+        is(equalTo(ImportCredentialBean.PASSPHRASE_OUTCOME_ID)));
   }
 
   @Test
@@ -214,7 +196,7 @@ public class ImportCredentialBeanTest {
       will(returnValue(new ByteArrayInputStream(new byte[0])));
       oneOf(importService).prepareImport(
           (List<FileContentModel>) with(not(empty())), 
-          with(errors));
+          with(errors), with(PASSPHRASE));
       will(throwException(new ImportException()));
     } });
     
@@ -223,18 +205,16 @@ public class ImportCredentialBeanTest {
   }
 
   @SuppressWarnings("unchecked")
-  private Expectations uploadSuccessExpectations(final Part file,
-      final boolean passphraseRequired) 
+  private Expectations prepareImportExpectations(final Part file,
+      final Action preparationOutcome) 
       throws Exception {
     return new Expectations() { {
       allowing(file).getInputStream();
       will(returnValue(new ByteArrayInputStream(new byte[0])));
       oneOf(importService).prepareImport(
           (List<FileContentModel>) with(not(empty())), 
-          with(errors));    
-      will(returnValue(preparation));
-      oneOf(preparation).isPassphraseRequired();
-      will(returnValue(passphraseRequired));
+          with(errors), with(PASSPHRASE));    
+      will(preparationOutcome);
     } };
   }
     
@@ -246,115 +226,6 @@ public class ImportCredentialBeanTest {
     } };
   }
   
-  @Test
-  public void testGetTagsWhenNull() throws Exception {
-    context.checking(new Expectations() { { 
-      oneOf(credential).getTags();
-      will(returnValue(null));
-    } });
-    
-    bean.setCredential(credential);
-    assertThat(bean.getTags().isEmpty(), equalTo(true));
-  }
-
-  @Test
-  public void testGetTagsWhenEmpty() throws Exception {
-    context.checking(new Expectations() { { 
-      oneOf(credential).getTags();
-      will(returnValue(Collections.emptySet()));
-    } });
-    
-    bean.setCredential(credential);
-    assertThat(bean.getTags().isEmpty(), equalTo(true));
-  }
-
-  @Test
-  public void testGetTagsWithOneTag() throws Exception {
-    final Tag tag = context.mock(Tag.class);
-    context.checking(new Expectations() { { 
-      oneOf(credential).getTags();
-      will(returnValue(Collections.singleton(tag)));
-      oneOf(tag).getText();
-      will(returnValue("tag"));
-    } });
-    
-    bean.setCredential(credential);
-    assertThat(bean.getTags(), equalTo("tag"));
-  }
-
-  @Test
-  public void testGetTagsWithTwoTag() throws Exception {
-    final Tag tag0 = context.mock(Tag.class, "tag0");
-    final Tag tag1 = context.mock(Tag.class, "tag1");
-    final Set<Tag> tags = new LinkedHashSet<Tag>();
-    tags.add(tag0);
-    tags.add(tag1);
-    
-    context.checking(new Expectations() { { 
-      oneOf(credential).getTags();
-      will(returnValue(tags));
-      oneOf(tag0).getText();
-      will(returnValue("tag0"));
-      oneOf(tag1).getText();
-      will(returnValue("tag1"));
-    } });
-    
-    bean.setCredential(credential);
-    assertThat(bean.getTags(), equalTo("tag0,tag1"));
-  }
-
-  @Test
-  @SuppressWarnings("unchecked")
-  public void testSetTagsWithNull() throws Exception {
-    context.checking(new Expectations() { { 
-      oneOf(credential).setTags((Set<Tag>) with(empty()));
-    } });
-    
-    bean.setCredential(credential);
-    bean.setTags(null);
-  }
-
-  @Test
-  @SuppressWarnings("unchecked")
-  public void testSetTagsWithBlank() throws Exception {
-    context.checking(new Expectations() { { 
-      oneOf(credential).setTags((Set<Tag>) with(empty()));
-    } });
-    
-    bean.setCredential(credential);
-    bean.setTags(" ");
-  }
-
-
-  @Test
-  public void testSetTagsWithOneTag() throws Exception {
-    final Set<Tag> tags = Collections.emptySet();
-    context.checking(new Expectations() { { 
-      oneOf(importService).resolveTags(with(
-          hasItemInArray(equalTo("tag"))));
-      will(returnValue(tags));
-      oneOf(credential).setTags(with(same(tags)));
-    } });
-    
-    bean.setCredential(credential);
-    bean.setTags("tag");
-  }
-
-  @Test
-  public void testSetTagsWithTwoTags() throws Exception {
-    final Set<Tag> tags = Collections.emptySet();
-    context.checking(new Expectations() { { 
-      oneOf(importService).resolveTags(with(allOf(
-          hasItemInArray(equalTo("tag0")), 
-          hasItemInArray(equalTo("tag1")))));
-      will(returnValue(tags));
-      oneOf(credential).setTags(with(same(tags)));
-    } });
-    
-    bean.setCredential(credential);
-    bean.setTags("tag0, tag1");
-  }
-
   @Test
   public void testSaveSuccess() throws Exception {
     context.checking(new Expectations() { { 
@@ -392,110 +263,9 @@ public class ImportCredentialBeanTest {
   }
   
   @Test
-  public void testValidateWhenSuccess() throws Exception {
-    context.checking(new Expectations() { { 
-      allowing(preparation).isPassphraseRequired();
-      will(returnValue(false));
-      oneOf(importService).createCredential(with(same(preparation)), 
-          with(same(errors)));
-      will(returnValue(credential));
-      oneOf(preparation).getDetails();
-      will(returnValue(details));
-      oneOf(details).getSubject();
-      will(returnValue(SUBJECT_NAME));
-      oneOf(credential).setName(with(same(SUBJECT_NAME)));
-    } });
-    
-    bean.setPreparation(preparation);
-    assertThat(bean.validate(), equalTo(ImportCredentialBean.DETAILS_OUTCOME_ID));
-    assertThat(bean.getCredential(), sameInstance(credential));
-  }
-
-  @Test
-  public void testValidateWhenError() throws Exception {
-    context.checking(new Expectations() { { 
-      allowing(preparation).isPassphraseRequired();
-      will(returnValue(false));
-      oneOf(importService).createCredential(with(same(preparation)), 
-          with(same(errors)));
-      will(throwException(new ImportException()));
-    } });
-    
-    bean.setPreparation(preparation);
-    assertThat(bean.validate(), equalTo(ImportCredentialBean.FAILURE_OUTCOME_ID));
-  }
-
-  @Test
-  @SuppressWarnings("unchecked")
-  public void testValidateAfterCollectingPassphrase() throws Exception {
-    final Part file = context.mock(Part.class);
-    final ImportPreparation preparation2 = context.mock(
-        ImportPreparation.class, "prepartion2");
-    final Password passphrase = new Password(new char[0]);
-    context.checking(new Expectations() { { 
-      allowing(file).getInputStream();
-      will(returnValue(new ByteArrayInputStream(new byte[0])));
-      allowing(preparation).isPassphraseRequired();
-      will(returnValue(true));
-      oneOf(importService).prepareImport(
-          (List<FileContentModel>) with(not(empty())), 
-          with(errors));
-      will(returnValue(preparation2));
-      oneOf(preparation).getPassphrase();
-      will(returnValue(passphrase));
-      oneOf(preparation2).setPassphrase(with(same(passphrase)));
-      oneOf(importService).createCredential(with(same(preparation2)), 
-          with(same(errors)));
-      will(returnValue(credential));
-      oneOf(preparation2).getDetails();
-      will(returnValue(details));
-      oneOf(details).getSubject();
-      will(returnValue(SUBJECT_NAME));
-      oneOf(credential).setName(with(same(SUBJECT_NAME)));
-    } });
-    
-    bean.setFile0(file);
-    bean.setPreparation(preparation);
-    assertThat(bean.validate(), equalTo(ImportCredentialBean.DETAILS_OUTCOME_ID));
-    assertThat(bean.getCredential(), sameInstance(credential));
-  }
-
-  @Test
-  @SuppressWarnings("unchecked")
-  public void testValidateWithIncorrectPassphrase() throws Exception {
-    final Part file = context.mock(Part.class);
-    final ImportPreparation preparation2 = context.mock(
-        ImportPreparation.class, "preparation2");
-    final Password passphrase = new Password(new char[0]);
-    context.checking(new Expectations() { { 
-      allowing(file).getInputStream();
-      will(returnValue(new ByteArrayInputStream(new byte[0])));
-      allowing(preparation).isPassphraseRequired();
-      will(returnValue(true));
-      oneOf(importService).prepareImport(
-          (List<FileContentModel>) with(not(empty())), 
-          with(errors));
-      will(returnValue(preparation2));
-      oneOf(preparation).getPassphrase();
-      will(returnValue(passphrase));
-      oneOf(preparation2).setPassphrase(with(same(passphrase)));
-      oneOf(importService).createCredential(with(same(preparation2)), 
-          with(same(errors)));
-      will(throwException(new PassphraseException()));
-      oneOf(errors).addError(with(containsString("passphrase")),
-          with(containsString("Incorrect")), with(emptyArray()));
-    } });
-    
-    bean.setFile0(file);
-    bean.setPreparation(preparation);
-    assertThat(bean.validate(), 
-        equalTo(ImportCredentialBean.PASSPHRASE_OUTCOME_ID));
-  }
-
-  @Test
   public void testProtectSuccess() throws Exception {
     context.checking(protectionExpectations(returnValue(null)));    
-    bean.setPreparation(preparation);
+    bean.setDetails(details);
     bean.setCredential(credential);
     assertThat(bean.protect(), 
         is(equalTo(ImportCredentialBean.CONFIRM_OUTCOME_ID)));    
@@ -505,7 +275,7 @@ public class ImportCredentialBeanTest {
   public void testProtectOwnerNotFound() throws Exception {
     context.checking(protectionExpectations(
         throwException(new NoSuchGroupException())));    
-    bean.setPreparation(preparation);
+    bean.setDetails(details);
     bean.setCredential(credential);
     assertThat(bean.protect(), 
         is(equalTo(ImportCredentialBean.DETAILS_OUTCOME_ID)));        
@@ -515,83 +285,29 @@ public class ImportCredentialBeanTest {
   public void testProtectPasswordIncorrect() throws Exception {
     context.checking(protectionExpectations(
         throwException(new PassphraseException())));
-    bean.setPreparation(preparation);
+    bean.setDetails(details);
     bean.setCredential(credential);
     assertThat(bean.protect(), is(nullValue()));        
   }
 
-  @Test(expected = RuntimeException.class)
+  @Test
   public void testProtectAccessDenied() throws Exception {
     context.checking(protectionExpectations(
-        throwException(new AccessDeniedException())));
-    bean.setPreparation(preparation);
+        throwException(new GroupAccessException("some message"))));
+    bean.setDetails(details);
     bean.setCredential(credential);
-    bean.protect();     
+    assertThat(bean.protect(), 
+        is(equalTo(ImportCredentialBean.DETAILS_OUTCOME_ID)));     
   }
 
   private Expectations protectionExpectations(final Action outcome) 
       throws Exception {
     return new Expectations() { { 
-      oneOf(importService).protectCredential(with(same(credential)), 
-          with(same(preparation)), 
-          with(any(ProtectionParameters.class)), 
+      oneOf(importService).createCredential(with(same(details)), 
+          with(same(bean.getPasswordFormBean())), 
           with(same(errors)));
       will(outcome);
     } };
   }
   
-  @Test
-  public void testOwnerChangedToBlank() throws Exception {
-    context.checking(new Expectations() { { 
-      oneOf(event).getNewValue();
-      will(returnValue(""));
-    } });
-    
-    bean.setOwner(GROUP_NAME);
-    bean.ownerChanged(event);
-    assertThat(bean.getOwnerStatus(), is(equalTo(OwnerStatus.NONE)));
-  }
-
-  @Test
-  public void testOwnerChangedWhenGroupExists() throws Exception {
-    context.checking(new Expectations() { { 
-      oneOf(event).getNewValue();
-      will(returnValue(GROUP_NAME));
-      oneOf(importService).isExistingGroup(with(GROUP_NAME));
-      will(returnValue(true));
-    } });
-    
-    bean.setOwner(GROUP_NAME);
-    bean.ownerChanged(event);
-    assertThat(bean.getOwnerStatus(), is(equalTo(OwnerStatus.EXISTS)));
-  }
-
-  @Test
-  public void testOwnerChangedWhenGroupDoesNotExist() throws Exception {
-    context.checking(new Expectations() { { 
-      oneOf(event).getNewValue();
-      will(returnValue(GROUP_NAME));
-      oneOf(importService).isExistingGroup(with(GROUP_NAME));
-      will(returnValue(false));
-    } });
-    
-    bean.setOwner(GROUP_NAME);
-    bean.ownerChanged(event);
-    assertThat(bean.getOwnerStatus(), is(equalTo(OwnerStatus.WILL_CREATE)));
-  }
-
-  @Test
-  public void testOwnerChangedWhenGroupAccessDenied() throws Exception {
-    context.checking(new Expectations() { { 
-      oneOf(event).getNewValue();
-      will(returnValue(GROUP_NAME));
-      oneOf(importService).isExistingGroup(with(GROUP_NAME));
-      will(throwException(new GroupAccessException("some message")));
-    } });
-    
-    bean.setOwner(GROUP_NAME);
-    bean.ownerChanged(event);
-    assertThat(bean.getOwnerStatus(), is(equalTo(OwnerStatus.INACCESSIBLE)));
-  }
-
 }
