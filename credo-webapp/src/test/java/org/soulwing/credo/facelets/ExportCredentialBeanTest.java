@@ -46,7 +46,6 @@ import org.junit.Test;
 import org.soulwing.credo.Credential;
 import org.soulwing.credo.Password;
 import org.soulwing.credo.UserGroup;
-import org.soulwing.credo.UserProfile;
 import org.soulwing.credo.service.AccessDeniedException;
 import org.soulwing.credo.service.Errors;
 import org.soulwing.credo.service.ExportException;
@@ -56,7 +55,6 @@ import org.soulwing.credo.service.ExportRequest;
 import org.soulwing.credo.service.ExportService;
 import org.soulwing.credo.service.NoSuchCredentialException;
 import org.soulwing.credo.service.PassphraseException;
-import org.soulwing.credo.service.UserProfileService;
 
 /**
  * Unit tests for {@link ExportCredentialBean}.
@@ -82,12 +80,6 @@ public class ExportCredentialBeanTest {
   
   @Mock
   private Conversation conversation;
-  
-  @Mock
-  private UserProfileService profileService;
-  
-  @Mock
-  private UserProfile profile;
   
   @Mock
   private ExportService exportService;
@@ -119,27 +111,11 @@ public class ExportCredentialBeanTest {
   public void setUp() throws Exception {
     bean.conversation = conversation;
     bean.exportService = exportService;
-    bean.profileService = profileService;
     bean.facesContext = facesContext;
     bean.errors = errors;
     bean.passwordEditor = new PasswordFormEditor();
   }
   
-  @Test
-  public void testInit() throws Exception {
-    final String expectedPassword = "password";
-    context.checking(new Expectations() { { 
-      oneOf(profileService).getLoggedInUserProfile();
-      will(returnValue(profile));
-      oneOf(profile).getPassword();
-      will(returnValue(expectedPassword));
-    } });
-    
-    bean.init();
-    assertThat(bean.getPasswordEditor().getExpected(),
-        is(equalTo(expectedPassword)));
-  }
-
   @Test
   public void testCreateExportRequest() throws Exception {
     final Long id = -1L;

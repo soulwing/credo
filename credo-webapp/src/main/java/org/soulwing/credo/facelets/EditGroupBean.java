@@ -20,7 +20,6 @@ package org.soulwing.credo.facelets;
 
 import java.io.Serializable;
 
-import javax.annotation.PostConstruct;
 import javax.enterprise.context.Conversation;
 import javax.enterprise.context.ConversationScoped;
 import javax.inject.Inject;
@@ -32,7 +31,6 @@ import org.soulwing.credo.service.GroupEditor;
 import org.soulwing.credo.service.GroupService;
 import org.soulwing.credo.service.NoSuchGroupException;
 import org.soulwing.credo.service.PassphraseException;
-import org.soulwing.credo.service.UserProfileService;
 
 /**
  * A bean that supports the Edit Group interaction.
@@ -55,9 +53,6 @@ public class EditGroupBean implements Serializable {
   protected Conversation conversation;
   
   @Inject
-  protected UserProfileService profileService;
-  
-  @Inject
   protected GroupService groupService;
   
   @Inject
@@ -70,16 +65,6 @@ public class EditGroupBean implements Serializable {
 
   private Long id;
  
-  /**
-   * Initializes the receiver.
-   */
-  @PostConstruct
-  public void init() {
-    passwordEditor.setExpected(
-        profileService.getLoggedInUserProfile().getPassword());
-  }
-  
-
   /**
    * Gets the {@code id} property.
    * @return

@@ -45,7 +45,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.soulwing.credo.Credential;
 import org.soulwing.credo.Password;
-import org.soulwing.credo.UserProfile;
 import org.soulwing.credo.service.Errors;
 import org.soulwing.credo.service.FileContentModel;
 import org.soulwing.credo.service.GroupAccessException;
@@ -54,7 +53,6 @@ import org.soulwing.credo.service.ImportException;
 import org.soulwing.credo.service.ImportService;
 import org.soulwing.credo.service.NoSuchGroupException;
 import org.soulwing.credo.service.PassphraseException;
-import org.soulwing.credo.service.UserProfileService;
 
 /**
  * Unit tests for {@link ImportCredentialBean}.
@@ -80,12 +78,6 @@ public class ImportCredentialBeanTest {
   private ImportService importService;
   
   @Mock
-  private UserProfileService profileService;
-  
-  @Mock
-  private UserProfile profile;
-    
-  @Mock
   private ImportDetails details;
   
   @Mock
@@ -101,26 +93,10 @@ public class ImportCredentialBeanTest {
     bean.conversation = conversation;
     bean.errors = errors;
     bean.importService = importService;
-    bean.profileService = profileService;
     bean.facesContext = facesContext;
     bean.passwordEditor = new PasswordFormEditor();
     bean.editor = new DelegatingCredentialEditor();
     bean.setPassphrase(PASSPHRASE);
-  }
-
-  @Test
-  public void testInit() throws Exception {
-    final String expectedPassword = "password";
-    context.checking(new Expectations() { { 
-      oneOf(profileService).getLoggedInUserProfile();
-      will(returnValue(profile));
-      oneOf(profile).getPassword();
-      will(returnValue(expectedPassword));
-    } });
-    
-    bean.init();
-    assertThat(bean.getPasswordEditor().getExpected(),
-        is(equalTo(expectedPassword)));
   }
 
   @Test

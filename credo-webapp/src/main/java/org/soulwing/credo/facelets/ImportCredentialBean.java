@@ -23,7 +23,6 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.annotation.PostConstruct;
 import javax.enterprise.context.Conversation;
 import javax.enterprise.context.ConversationScoped;
 import javax.faces.context.FacesContext;
@@ -41,7 +40,6 @@ import org.soulwing.credo.service.ImportException;
 import org.soulwing.credo.service.ImportService;
 import org.soulwing.credo.service.NoSuchGroupException;
 import org.soulwing.credo.service.PassphraseException;
-import org.soulwing.credo.service.UserProfileService;
 
 /**
  * A bean that supports the Import Credential interaction.
@@ -88,9 +86,6 @@ public class ImportCredentialBean implements Serializable {
   protected ImportService importService;
 
   @Inject
-  protected UserProfileService profileService;
-
-  @Inject
   protected FacesContext facesContext;
   
   @Inject
@@ -99,16 +94,9 @@ public class ImportCredentialBean implements Serializable {
   @Inject
   protected PasswordFormEditor passwordEditor;
 
-
   private List<FileContentModel> files;
   private Password passphrase;
   private Credential credential;
-
-  @PostConstruct
-  public void init() {
-    passwordEditor.setExpected(profileService.getLoggedInUserProfile()
-        .getPassword());
-  }
 
   /**
    * Gets the {@code file0} property.

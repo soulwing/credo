@@ -22,11 +22,14 @@ import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 import java.security.NoSuchAlgorithmException;
 
+import javax.annotation.PostConstruct;
 import javax.enterprise.context.Dependent;
 import javax.faces.event.ValueChangeEvent;
+import javax.inject.Inject;
 
 import org.soulwing.credo.Password;
 import org.soulwing.credo.service.ProtectionParameters;
+import org.soulwing.credo.service.UserProfileService;
 import org.soulwing.crypt4j.Crypt;
 
 /**
@@ -40,10 +43,21 @@ public class PasswordFormEditor
 
   private static final long serialVersionUID = 3933762758500375291L;
 
+  @Inject
+  protected UserProfileService profileService;
+
   private String groupName;
   private Password password;
   private String expected;
   private boolean correct;
+  
+  /**
+   * Initializes the receiver.
+   */
+  @PostConstruct
+  public void init() {
+    expected = profileService.getLoggedInUserProfile().getPassword();    
+  }
   
   /**
    * {@inheritDoc}
@@ -75,22 +89,6 @@ public class PasswordFormEditor
    */
   public void setPassword(Password password) {
     this.password = password;
-  }
-
-  /**
-   * Gets the expected password.
-   * @return encrypted password string
-   */
-  public String getExpected() {
-    return expected;
-  }
-
-  /**
-   * Sets the expected password.
-   * @param expected the encrypted password string to set
-   */
-  public void setExpected(String expected) {
-    this.expected = expected;
   }
 
   /**

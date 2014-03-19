@@ -24,7 +24,6 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.Set;
 
-import javax.annotation.PostConstruct;
 import javax.enterprise.context.Conversation;
 import javax.enterprise.context.ConversationScoped;
 import javax.faces.context.ExternalContext;
@@ -44,7 +43,6 @@ import org.soulwing.credo.service.ExportRequest;
 import org.soulwing.credo.service.ExportService;
 import org.soulwing.credo.service.NoSuchCredentialException;
 import org.soulwing.credo.service.PassphraseException;
-import org.soulwing.credo.service.UserProfileService;
 
 /**
  * A bean that supports the Export Credential interaction.
@@ -70,9 +68,6 @@ public class ExportCredentialBean implements Serializable {
   protected ExportService exportService;
   
   @Inject
-  protected UserProfileService profileService;
-  
-  @Inject
   protected FacesContext facesContext;
   
   @Inject
@@ -92,15 +87,6 @@ public class ExportCredentialBean implements Serializable {
   private ExportFormat selectedFormat;
   
   private ExportFormat.Variant selectedVariant;
-  
-  /**
-   * Initializes the receiver.
-   */
-  @PostConstruct
-  public void init() {
-    passwordEditor.setExpected(
-        profileService.getLoggedInUserProfile().getPassword());
-  }
   
   /**
    * Gets the {@code id} property.
