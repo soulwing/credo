@@ -33,7 +33,6 @@ import javax.servlet.http.Part;
 
 import org.soulwing.credo.Credential;
 import org.soulwing.credo.Password;
-import org.soulwing.credo.UserGroup;
 import org.soulwing.credo.service.Errors;
 import org.soulwing.credo.service.FileContentModel;
 import org.soulwing.credo.service.GroupAccessException;
@@ -79,8 +78,6 @@ public class ImportCredentialBean implements Serializable {
   private final PartContent file1 = new PartContent();
   private final PartContent file2 = new PartContent();
 
-  private PasswordFormBean passwordFormBean = new PasswordFormBean();
-
   @Inject
   protected Conversation conversation;
 
@@ -99,14 +96,17 @@ public class ImportCredentialBean implements Serializable {
   @Inject
   protected DelegatingCredentialEditor editor;
 
+  @Inject
+  protected PasswordFormEditor passwordEditor;
+
+
   private List<FileContentModel> files;
   private Password passphrase;
   private Credential credential;
 
   @PostConstruct
   public void init() {
-    passwordFormBean.setGroupName(UserGroup.SELF_GROUP_NAME);
-    passwordFormBean.setExpected(profileService.getLoggedInUserProfile()
+    passwordEditor.setExpected(profileService.getLoggedInUserProfile()
         .getPassword());
   }
 
@@ -159,22 +159,6 @@ public class ImportCredentialBean implements Serializable {
   }
 
   /**
-   * Gets the owner name for the credential.
-   * @return owner name or {@code null} if none has been set
-   */
-  public String getOwner() {
-    return passwordFormBean.getGroupName();
-  }
-
-  /**
-   * Sets the owner name for the credential.
-   * @param owner the owner name to set
-   */
-  public void setOwner(String owner) {
-    passwordFormBean.setGroupName(owner);
-  }
-
-  /**
    * Gets the private key passphrase.
    * @return passphrase
    */
@@ -193,8 +177,8 @@ public class ImportCredentialBean implements Serializable {
   /**
    * Gets the supporting bean for the password entry form.
    */
-  public PasswordFormBean getPasswordFormBean() {
-    return passwordFormBean;
+  public PasswordFormEditor getPasswordEditor() {
+    return passwordEditor;
   }
 
   /**
@@ -276,6 +260,7 @@ public class ImportCredentialBean implements Serializable {
    * @return outcome ID
    */
   public String password() {
+    passwordEditor.setGroupName(editor.getOwner());
     return ImportCredentialBean.PASSWORD_OUTCOME_ID;
   }
   
@@ -286,7 +271,7 @@ public class ImportCredentialBean implements Serializable {
   public String protect() {
     try {
       credential = importService.createCredential(
-          (ImportDetails) editor.getDelegate(), passwordFormBean, errors);
+          (ImportDetails) editor.getDelegate(), passwordEditor, errors);
       return CONFIRM_OUTCOME_ID;
     }
     catch (GroupAccessException ex) {

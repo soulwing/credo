@@ -51,8 +51,6 @@ public class EditGroupBean implements Serializable {
   
   static final String PASSWORD_OUTCOME_ID = "password";
   
-  private final PasswordFormBean passwordFormBean = new PasswordFormBean();
-
   @Inject
   protected Conversation conversation;
   
@@ -65,6 +63,9 @@ public class EditGroupBean implements Serializable {
   @Inject
   protected Errors errors;
  
+  @Inject
+  protected PasswordFormEditor passwordEditor = new PasswordFormEditor();
+
   private GroupEditor editor;
 
   private Long id;
@@ -74,7 +75,7 @@ public class EditGroupBean implements Serializable {
    */
   @PostConstruct
   public void init() {
-    passwordFormBean.setExpected(
+    passwordEditor.setExpected(
         profileService.getLoggedInUserProfile().getPassword());
   }
   
@@ -114,13 +115,17 @@ public class EditGroupBean implements Serializable {
   }
   
   /**
-   * Gets the password form bean
-   * @return form bean
+   * Gets the password editor.
+   * @return editor
    */
-  public PasswordFormBean getPasswordFormBean() {
-    return passwordFormBean;
+  public PasswordFormEditor getPasswordEditor() {
+    return passwordEditor;
   }
 
+  /**
+   * Action that is invoked when the edit form is initially displayed.
+   * @return outcome ID
+   */
   public String createEditor() {
     if (id == null) {
       errors.addError("id", "groupIdIsRequired");
@@ -128,7 +133,7 @@ public class EditGroupBean implements Serializable {
     }
     try {
       editor = groupService.editGroup(id);
-      passwordFormBean.setGroupName(editor.getName());
+      passwordEditor.setGroupName(editor.getName());
       beginConversation();
     }
     catch (NoSuchGroupException ex) {
@@ -152,7 +157,7 @@ public class EditGroupBean implements Serializable {
    */
   public String save() {
     try {
-      editor.setPassword(passwordFormBean.getPassword());
+      editor.setPassword(passwordEditor.getPassword());
       groupService.saveGroup(editor, errors);
       endConversation();
       return SUCCESS_OUTCOME_ID;

@@ -93,7 +93,7 @@ public class ImportCredentialBeanTest {
   
   @Mock
   private FacesContext facesContext;
-    
+  
   private ImportCredentialBean bean = new ImportCredentialBean();
   
   @Before
@@ -103,6 +103,7 @@ public class ImportCredentialBeanTest {
     bean.importService = importService;
     bean.profileService = profileService;
     bean.facesContext = facesContext;
+    bean.passwordEditor = new PasswordFormEditor();
     bean.editor = new DelegatingCredentialEditor();
     bean.setPassphrase(PASSPHRASE);
   }
@@ -118,7 +119,7 @@ public class ImportCredentialBeanTest {
     } });
     
     bean.init();
-    assertThat(bean.getPasswordFormBean().getExpected(),
+    assertThat(bean.getPasswordEditor().getExpected(),
         is(equalTo(expectedPassword)));
   }
 
@@ -304,7 +305,7 @@ public class ImportCredentialBeanTest {
       throws Exception {
     return new Expectations() { { 
       oneOf(importService).createCredential(with(same(details)), 
-          with(same(bean.getPasswordFormBean())), 
+          with(same(bean.getPasswordEditor())), 
           with(same(errors)));
       will(outcome);
     } };

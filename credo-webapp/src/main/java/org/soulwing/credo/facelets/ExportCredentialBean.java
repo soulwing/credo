@@ -63,8 +63,6 @@ public class ExportCredentialBean implements Serializable {
   
   static final String CONTENT_DISPOSITION_HEADER = "Content-Disposition";
  
-  private final PasswordFormBean passwordFormBean = new PasswordFormBean();
-
   @Inject
   protected Conversation conversation;
   
@@ -80,6 +78,9 @@ public class ExportCredentialBean implements Serializable {
   @Inject
   protected Errors errors;
   
+  @Inject
+  protected PasswordFormEditor passwordEditor;
+
   protected Long id;
     
   private ExportRequest request;
@@ -97,7 +98,7 @@ public class ExportCredentialBean implements Serializable {
    */
   @PostConstruct
   public void init() {
-    passwordFormBean.setExpected(
+    passwordEditor.setExpected(
         profileService.getLoggedInUserProfile().getPassword());
   }
   
@@ -345,11 +346,11 @@ public class ExportCredentialBean implements Serializable {
   }
   
   /**
-   * Gets the bean that supports the password entry form.
-   * @return
+   * Gets the editor that supports the password entry form.
+   * @return editor
    */
-  public PasswordFormBean getPasswordFormBean() {
-    return passwordFormBean;
+  public PasswordFormEditor getPasswordEditor() {
+    return passwordEditor;
   }
   
   /**
@@ -411,8 +412,8 @@ public class ExportCredentialBean implements Serializable {
     }
     try {
       request = exportService.newExportRequest(id);
-      passwordFormBean.setGroupName(request.getCredential().getOwner().getName());
-      request.setProtectionParameters(passwordFormBean);
+      passwordEditor.setGroupName(request.getCredential().getOwner().getName());
+      request.setProtectionParameters(passwordEditor);
       setFormat(exportService.getDefaultFormat().getId());
       formatSelected(null);
       if (conversation.isTransient()) {

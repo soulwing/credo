@@ -78,7 +78,8 @@ public class EditGroupBeanTest {
     bean.groupService = groupService;
     bean.errors = errors;
     bean.conversation = conversation;
-    bean.getPasswordFormBean().setPassword(PASSWORD);
+    bean.passwordEditor = new PasswordFormEditor();
+    bean.getPasswordEditor().setPassword(PASSWORD);
   }
   
   @Test

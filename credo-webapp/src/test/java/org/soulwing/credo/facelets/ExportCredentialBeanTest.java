@@ -122,6 +122,7 @@ public class ExportCredentialBeanTest {
     bean.profileService = profileService;
     bean.facesContext = facesContext;
     bean.errors = errors;
+    bean.passwordEditor = new PasswordFormEditor();
   }
   
   @Test
@@ -135,7 +136,7 @@ public class ExportCredentialBeanTest {
     } });
     
     bean.init();
-    assertThat(bean.getPasswordFormBean().getExpected(),
+    assertThat(bean.getPasswordEditor().getExpected(),
         is(equalTo(expectedPassword)));
   }
 
@@ -154,7 +155,7 @@ public class ExportCredentialBeanTest {
       will(returnValue(group));
       oneOf(group).getName();
       will(returnValue(groupName));
-      oneOf(request).setProtectionParameters(with(same(bean.getPasswordFormBean())));
+      oneOf(request).setProtectionParameters(with(same(bean.getPasswordEditor())));
       oneOf(exportService).getDefaultFormat();
       will(returnValue(format));
       oneOf(format).getId();

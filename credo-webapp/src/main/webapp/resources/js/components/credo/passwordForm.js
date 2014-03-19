@@ -4,7 +4,7 @@ $(document).ready(function() {
 	var $password = $("[id$=':password']");
 	$password.on("input", function(event) {
 		var source = this;
-		var $actual = $("[id$=':actual']");
+		var $correct = $("[id$=':correct']");
 		var applyFeedback = function(ok) {
 			var $source = $("[id$=':password']");
 	    	var $inputGroup = $source.parent().parent();
@@ -15,14 +15,13 @@ $(document).ready(function() {
 		};
 		var validate = function(data) {
 			if (data.status == "success") {
-				var $actual = $("[id$=':actual']");
-				var $expected = $("[id$=':expected']");
-				applyFeedback($expected.val() == $actual.val());
+				$correct = $("[id$=':correct']");
+				applyFeedback($correct.val() == "true");
 			}			
 		};		
 		var ajaxRequest = function() {
 			jsf.ajax.request(source, event, {
-				render: $actual.attr("id"),
+				render: $correct.attr("id"),
 				onevent: validate,
 				onerror: function() { applyFeedback(false); }
 			});			
