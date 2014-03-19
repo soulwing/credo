@@ -1,0 +1,94 @@
+<!DOCTYPE html [
+    <!ENTITY nbsp "&#160;"> 
+]>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+
+<h:body>
+	<ui:composition template="/templates/masterTemplate.xhtml">
+		<ui:define name="windowTitle">
+		  #{messages.applicationName}::#{messages.createRequestHeading}
+		</ui:define>
+		<ui:define name="content">
+		  <div class="col-md-8">
+	      <h1>#{messages.createRequestHeading}</h1>
+	      <p>
+	       <h:outputText escape="false" 
+	         value="#{messages.createRequestConfirmDetail}"/>
+	      </p>
+			  <h:form id="details" styleClass="form-horizontal" 
+			     enctype="multipart/form-data">
+			    <ui:include src="/templates/messages.xhtml"/>
+          <div class="form-group">
+            <h:outputLabel styleClass="col-md-4 control-label">#{messages.credentialNameLabel}</h:outputLabel>
+            <div class="col-md-8">
+              <p class="form-control-static" id="name" 
+                title="#{messages.credentialNameTip}">
+                #{createSigningRequestBean.editor.name}
+              </p>
+            </div>
+          </div>
+          <div class="form-group">
+            <h:outputLabel styleClass="col-md-4 control-label">#{messages.credentialOwnerLabel}</h:outputLabel>
+            <div class="col-md-8">
+              <p class="form-control-static" id="owner" 
+                title="#{messages.credentialOwnerTip}">
+                #{createSigningRequestBean.editor.owner}
+              </p>
+            </div>
+          </div>
+          <div class="form-group">
+            <h:outputLabel styleClass="col-md-4 control-label">
+              #{messages.credentialSubjectLabel}
+            </h:outputLabel>
+            <p class="form-control-static col-md-8" 
+              title="#{messages.credentialSubjectTip}">
+              #{createSigningRequestBean.editor.subject}
+            </p>
+          </div>
+          <h:panelGroup rendered="#{not empty createSigningRequestBean.editor.note}">
+	          <div class="form-group">
+	            <h:outputLabel styleClass="col-md-4 control-label" 
+	              for="note">#{messages.credentialNoteLabel}</h:outputLabel>
+	            <div class="col-md-8">
+	              <p class="form-control-static" id="note"
+	                 title="#{messages.credentialNoteTip}">
+	                 #{createSigningRequestBean.editor.note}
+	              </p>
+	            </div>
+	          </div>
+          </h:panelGroup>
+          <h:panelGroup rendered="#{not empty createSigningRequestBean.editor.tags}">
+	          <div class="form-group">
+	            <h:outputLabel styleClass="col-md-4 control-label" 
+	              for="tags">#{messages.credentialTagsLabel}</h:outputLabel>
+	            <div class="col-md-8">
+	              <p class="form-control-static" id="tags" 
+	                title="#{messages.credentialTagsTip}">
+	                <h:outputText value="#{createSigningRequestBean.editor.tags}"
+	                 converter="org.soulwing.credo.converters.CommaSeparatedArray"/>	                
+	              </p>
+	            </div>
+	          </div>
+          </h:panelGroup>
+	  		  <div class="form-group">
+	          <div class="col-md-8 col-md-push-4">      
+              <h:commandLink styleClass="btn btn-default" 
+                value="#{messages.cancelLabel}" 
+                action="#{createSigningRequestBean.cancel}" 
+                immediate="true"/>
+              &nbsp;
+	            <h:commandButton styleClass="btn btn-primary" 
+	              value="#{messages.saveLabel}" 
+	              action="#{createSigningRequestBean.save}" />
+	          </div>
+	        </div>	  		  
+	  		</h:form>
+      </div>
+		</ui:define>
+	</ui:composition>
+</h:body>
+
+</html>

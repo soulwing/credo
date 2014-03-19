@@ -1,0 +1,64 @@
+<!DOCTYPE html [
+    <!ENTITY nbsp "&#160;"> 
+]>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+
+<h:body>
+	<ui:composition template="/templates/masterTemplate.xhtml">
+		<ui:define name="windowTitle">
+		  #{messages.applicationName}::#{messages.createRequestHeading}
+		</ui:define>
+		<ui:define name="content">
+		  <div class="col-md-8">
+	      <h1>#{messages.createRequestHeading}</h1>
+	      <p>
+	       <h:outputText escape="false" 
+	         value="#{messages.createRequestSuccessDetail}"/>
+	      </p>
+        <div class="form-group">
+          <label class="col-md-4 control-label">
+            #{messages.credentialNameLabel}
+          </label>
+          <p class="form-control-static col-md-8" id="name" 
+            title="#{messages.credentialNameTip}">
+            #{createSigningRequestBean.editor.name}
+          </p>
+        </div>
+        <div class="form-group">
+          <label class="col-md-4 control-label">
+            #{messages.credentialSubjectLabel}
+          </label>
+          <p id="subject" class="form-control-static col-md-8" 
+            title="#{messages.credentialSubjectTip}">
+            #{createSigningRequestBean.editor.subject}
+          </p>
+        </div>
+        <div class="form-group">
+          <label class="col-md-4 control-label">
+            #{messages.credentialSubjectLabel}
+          </label>
+          <textarea readonly="readonly" rows="16" 
+            class="form-control-static col-md-6" 
+            title="#{messages.requestContentTip}">
+            #{createSigningRequestBean.requestContent}
+          </textarea>
+          <h:commandLink 
+            styleClass="btn btn-default btn-small col-md-2"
+            action="#{createSigningRequestBean.download}"
+            value="#{messages.downloadButtonLabel}"/>
+        </div>
+	      <p>
+	        <h:outputLink styleClass="btn btn-default btn-xs"
+	          value="#{request.contextPath}/requests">
+	            &#8592; #{messages.returnToRequest}
+	        </h:outputLink>
+	      </p>
+      </div>
+		</ui:define>
+	</ui:composition>
+</h:body>
+
+</html>
