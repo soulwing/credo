@@ -87,8 +87,13 @@ public class JpaUserGroupMemberRepository
     TypedQuery<UserGroupMember> query = entityManager.createNamedQuery(
         "findGroupMemberWithGroupAndProfileId", UserGroupMember.class);
     query.setParameter("groupName", groupName);
-    query.setParameter("profileId", profileId);    
-    return query.getSingleResult();
+    query.setParameter("profileId", profileId);
+    try {
+      return query.getSingleResult();
+    }
+    catch (NoResultException ex) {
+      return null;
+    }
   }
 
   /**
