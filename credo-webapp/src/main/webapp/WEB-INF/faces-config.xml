@@ -15,6 +15,11 @@
       <redirect/>
     </navigation-case>
     <navigation-case>
+      <from-outcome>requests</from-outcome>
+      <to-view-id>/requests/index.xhtml</to-view-id>
+      <redirect/>
+    </navigation-case>
+    <navigation-case>
       <from-outcome>groups</from-outcome>
       <to-view-id>/groups/index.xhtml</to-view-id>
       <redirect/>
