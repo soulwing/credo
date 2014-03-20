@@ -41,7 +41,7 @@ import org.soulwing.credo.service.GroupService;
  * @author Carl Harris
  */
 @Dependent
-public class DelegatingCredentialEditor 
+public class DelegatingCredentialEditor<T extends CredentialEditor> 
     implements Serializable, CredentialEditor {
 
   private static final long serialVersionUID = 123021515868469526L;
@@ -56,14 +56,14 @@ public class DelegatingCredentialEditor
   @Inject
   protected GroupService groupService;
   
-  private CredentialEditor delegate;
+  private T delegate;
   private OwnerStatus ownerStatus = OwnerStatus.EXISTS;
   
   /**
    * Gets the editor delegate.
    * @return delegate
    */
-  public CredentialEditor getDelegate() {
+  public T getDelegate() {
     return delegate;
   }
 
@@ -71,7 +71,7 @@ public class DelegatingCredentialEditor
    * Sets the editor delegate.
    * @param delegate the delegate to set.
    */
-  public void setDelegate(CredentialEditor delegate) {
+  public void setDelegate(T delegate) {
     this.delegate = delegate;
   }
 

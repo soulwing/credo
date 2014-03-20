@@ -95,7 +95,7 @@ public class ImportCredentialBeanTest {
     bean.importService = importService;
     bean.facesContext = facesContext;
     bean.passwordEditor = new PasswordFormEditor();
-    bean.editor = new DelegatingCredentialEditor();
+    bean.editor = new DelegatingCredentialEditor<ImportDetails>();
     bean.setPassphrase(PASSPHRASE);
   }
 

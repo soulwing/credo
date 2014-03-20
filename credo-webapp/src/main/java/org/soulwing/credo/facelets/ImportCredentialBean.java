@@ -89,7 +89,7 @@ public class ImportCredentialBean implements Serializable {
   protected FacesContext facesContext;
   
   @Inject
-  protected DelegatingCredentialEditor editor;
+  protected DelegatingCredentialEditor<ImportDetails> editor;
 
   @Inject
   protected PasswordFormEditor passwordEditor;

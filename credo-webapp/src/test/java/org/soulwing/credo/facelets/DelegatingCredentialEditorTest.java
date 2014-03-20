@@ -35,6 +35,7 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.soulwing.credo.facelets.DelegatingCredentialEditor.OwnerStatus;
+import org.soulwing.credo.service.CredentialEditor;
 import org.soulwing.credo.service.GroupAccessException;
 import org.soulwing.credo.service.GroupService;
 
@@ -67,7 +68,8 @@ public class DelegatingCredentialEditorTest {
   @Mock
   private ValueChangeEvent event;
   
-  private DelegatingCredentialEditor bean = new DelegatingCredentialEditor();
+  private DelegatingCredentialEditor<CredentialEditor> bean = 
+      new DelegatingCredentialEditor<CredentialEditor>();
   
   @Before
   public void setUp() throws Exception {
