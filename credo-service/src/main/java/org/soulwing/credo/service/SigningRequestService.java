@@ -18,6 +18,8 @@
  */
 package org.soulwing.credo.service;
 
+import java.io.IOException;
+
 import org.soulwing.credo.CredentialSigningRequest;
 
 
@@ -64,5 +66,16 @@ public interface SigningRequestService {
    * @param signingRequest the subject signing request
    */
   void saveSigningRequest(CredentialSigningRequest signingRequest);
+  
+  /**
+   * Transfers a signing request to a client via the given response object.
+   * @param signingRequest the subject signing request
+   * @param response response object that will be used to transfer the
+   *    signing request content
+   * @throws IOException if an error occurs in transferring the signing 
+   *    request content to the remote client
+   */
+  void downloadSigningRequest(CredentialSigningRequest signingRequest,
+      FileDownloadResponse response) throws IOException;
   
 }
