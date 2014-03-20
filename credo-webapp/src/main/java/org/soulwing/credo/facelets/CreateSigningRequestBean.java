@@ -27,11 +27,12 @@ import javax.faces.context.FacesContext;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import org.soulwing.credo.CredentialSigningRequest;
+import org.soulwing.credo.SigningRequest;
 import org.soulwing.credo.service.Errors;
 import org.soulwing.credo.service.GroupAccessException;
 import org.soulwing.credo.service.NoSuchCredentialException;
 import org.soulwing.credo.service.PassphraseException;
+import org.soulwing.credo.service.SigningRequestEditor;
 import org.soulwing.credo.service.SigningRequestException;
 import org.soulwing.credo.service.SigningRequestService;
 
@@ -68,7 +69,7 @@ public class CreateSigningRequestBean implements Serializable {
   protected SigningRequestService signingRequestService;
   
   @Inject
-  protected DelegatingCredentialEditor editor;
+  protected DelegatingCredentialEditor<SigningRequestEditor> editor;
   
   @Inject
   protected PasswordFormEditor passwordEditor;
@@ -80,7 +81,7 @@ public class CreateSigningRequestBean implements Serializable {
   protected FacesContext facesContext;
   
   private Long credentialId;
-  private CredentialSigningRequest signingRequest;
+  private SigningRequest signingRequest;
 
   /**
    * Gets the unique identifier for the credential that will be used as the
@@ -104,7 +105,7 @@ public class CreateSigningRequestBean implements Serializable {
    * Gets the editor for the signing request.
    * @return editor
    */
-  public DelegatingCredentialEditor getEditor() {
+  public DelegatingCredentialEditor<SigningRequestEditor> getEditor() {
     return editor;
   }
   
@@ -123,7 +124,7 @@ public class CreateSigningRequestBean implements Serializable {
    * @return signing request or {@code null} if the request has not been
    *    prepared
    */
-  CredentialSigningRequest getSigningRequest() {
+  SigningRequest getSigningRequest() {
     return signingRequest;
   }
 
@@ -133,7 +134,7 @@ public class CreateSigningRequestBean implements Serializable {
    * This method is exposed to support unit testing.
    * @param signingRequest the signing request to set
    */
-  void setSigningRequest(CredentialSigningRequest signingRequest) {
+  void setSigningRequest(SigningRequest signingRequest) {
     this.signingRequest = signingRequest;
   }
   
@@ -190,8 +191,8 @@ public class CreateSigningRequestBean implements Serializable {
    */
   public String prepare() {
     try {
-      signingRequest = signingRequestService.createSigningRequest(editor, 
-          passwordEditor, errors);
+      signingRequest = signingRequestService.createSigningRequest(
+          editor.getDelegate(), passwordEditor, errors);
       return CONFIRM_OUTCOME_ID;      
     }
     catch (PassphraseException ex) {

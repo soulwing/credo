@@ -20,7 +20,9 @@ package org.soulwing.credo.service;
 
 import java.io.IOException;
 
-import org.soulwing.credo.CredentialSigningRequest;
+import javax.ejb.Local;
+
+import org.soulwing.credo.SigningRequest;
 
 
 /**
@@ -28,6 +30,7 @@ import org.soulwing.credo.CredentialSigningRequest;
  *
  * @author Carl Harris
  */
+@Local
 public interface SigningRequestService {
 
   /**
@@ -39,7 +42,7 @@ public interface SigningRequestService {
    * @throws NoSuchCredentialException if there exists no credential with the
    *    specified identifier
    */
-  CredentialEditor createEditor(Long credentialId, Errors errors) 
+  SigningRequestEditor createEditor(Long credentialId, Errors errors) 
       throws NoSuchCredentialException;
   
   /**
@@ -56,7 +59,7 @@ public interface SigningRequestService {
    * @throws SigningRequestException if some other error occurs in creating 
    *    the signing request
    */
-  CredentialSigningRequest createSigningRequest(CredentialEditor editor, 
+  SigningRequest createSigningRequest(SigningRequestEditor editor, 
       ProtectionParameters protection, Errors errors)
       throws PassphraseException, GroupAccessException,
       SigningRequestException;
@@ -65,7 +68,7 @@ public interface SigningRequestService {
    * Saves the given (transient) signing request making it persistent.
    * @param signingRequest the subject signing request
    */
-  void saveSigningRequest(CredentialSigningRequest signingRequest);
+  void saveSigningRequest(SigningRequest signingRequest);
   
   /**
    * Transfers a signing request to a client via the given response object.
@@ -75,7 +78,7 @@ public interface SigningRequestService {
    * @throws IOException if an error occurs in transferring the signing 
    *    request content to the remote client
    */
-  void downloadSigningRequest(CredentialSigningRequest signingRequest,
+  void downloadSigningRequest(SigningRequest signingRequest,
       FileDownloadResponse response) throws IOException;
   
 }

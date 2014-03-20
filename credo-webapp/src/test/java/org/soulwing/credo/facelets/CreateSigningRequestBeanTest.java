@@ -37,12 +37,12 @@ import org.jmock.lib.legacy.ClassImposteriser;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.soulwing.credo.CredentialSigningRequest;
-import org.soulwing.credo.service.CredentialEditor;
+import org.soulwing.credo.SigningRequest;
 import org.soulwing.credo.service.Errors;
 import org.soulwing.credo.service.GroupAccessException;
 import org.soulwing.credo.service.NoSuchCredentialException;
 import org.soulwing.credo.service.PassphraseException;
+import org.soulwing.credo.service.SigningRequestEditor;
 import org.soulwing.credo.service.SigningRequestException;
 import org.soulwing.credo.service.SigningRequestService;
 
@@ -66,7 +66,7 @@ public class CreateSigningRequestBeanTest {
   private SigningRequestService signingRequestService;
   
   @Mock
-  private CredentialSigningRequest signingRequest;
+  private SigningRequest signingRequest;
   
   @Mock
   private Errors errors;
@@ -75,7 +75,7 @@ public class CreateSigningRequestBeanTest {
   private FacesContext facesContext;
   
   @Mock
-  private CredentialEditor editor;
+  private SigningRequestEditor editor;
   
   @Mock
   private Conversation conversation;
@@ -86,7 +86,7 @@ public class CreateSigningRequestBeanTest {
   public void setUp() throws Exception {
     bean.conversation = conversation;
     bean.signingRequestService = signingRequestService;
-    bean.editor = new DelegatingCredentialEditor();
+    bean.editor = new DelegatingCredentialEditor<SigningRequestEditor>();
     bean.passwordEditor = new PasswordFormEditor();
     bean.errors = errors;
     bean.facesContext = facesContext;
@@ -146,6 +146,7 @@ public class CreateSigningRequestBeanTest {
   public void testPrepareWhenPassphraseException() throws Exception {
     context.checking(createSigningRequestExpectations(
         throwException(new PassphraseException())));
+    bean.getEditor().setDelegate(editor);
     assertThat(bean.prepare(), 
         is(equalTo(CreateSigningRequestBean.PASSWORD_OUTCOME_ID)));
   }
@@ -154,6 +155,7 @@ public class CreateSigningRequestBeanTest {
   public void testPrepareWhenGroupAccessException() throws Exception {
     context.checking(createSigningRequestExpectations(
         throwException(new GroupAccessException("some message"))));
+    bean.getEditor().setDelegate(editor);
     assertThat(bean.prepare(), 
         is(equalTo(CreateSigningRequestBean.DETAILS_OUTCOME_ID)));
   }
@@ -163,6 +165,7 @@ public class CreateSigningRequestBeanTest {
     context.checking(endConversationExpectations());
     context.checking(createSigningRequestExpectations(
         throwException(new SigningRequestException())));
+    bean.getEditor().setDelegate(editor);
     assertThat(bean.prepare(), 
         is(equalTo(CreateSigningRequestBean.FAILURE_OUTCOME_ID)));
   }
@@ -171,6 +174,7 @@ public class CreateSigningRequestBeanTest {
   public void testPrepareSuccess() throws Exception {
     context.checking(createSigningRequestExpectations(
         returnValue(signingRequest)));
+    bean.getEditor().setDelegate(editor);
     assertThat(bean.prepare(),
         is(equalTo(CreateSigningRequestBean.CONFIRM_OUTCOME_ID)));
     assertThat(bean.getSigningRequest(), is(sameInstance(signingRequest)));
@@ -180,7 +184,7 @@ public class CreateSigningRequestBeanTest {
       final Action outcome) throws Exception {
     return new Expectations() { { 
       oneOf(signingRequestService).createSigningRequest(
-          with(same(bean.getEditor())), 
+          with(same(editor)), 
           with(same(bean.getPasswordEditor())), 
           with(same(errors)));
       will(outcome);
