@@ -18,13 +18,21 @@
  */
 package org.soulwing.credo.facelets;
 
+import java.io.IOException;
 import java.io.Serializable;
 
 import javax.enterprise.context.Conversation;
 import javax.enterprise.context.ConversationScoped;
+import javax.faces.context.FacesContext;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import org.soulwing.credo.CredentialSigningRequest;
+import org.soulwing.credo.service.Errors;
+import org.soulwing.credo.service.GroupAccessException;
+import org.soulwing.credo.service.NoSuchCredentialException;
+import org.soulwing.credo.service.PassphraseException;
+import org.soulwing.credo.service.SigningRequestException;
 import org.soulwing.credo.service.SigningRequestService;
 
 /**
@@ -38,6 +46,21 @@ public class CreateSigningRequestBean implements Serializable {
 
   private static final long serialVersionUID = -9132630420041335985L;
 
+  static final String FAILURE_OUTCOME_ID = "failure";
+  
+  static final String DETAILS_OUTCOME_ID = "details";
+  
+  static final String CONFIRM_OUTCOME_ID = "confirm";
+  
+  static final String PASSWORD_OUTCOME_ID = "password";
+  
+  static final String SUCCESS_OUTCOME_ID = "success";
+  
+  static final String CANCEL_OUTCOME_ID = "cancel";
+  
+  /** conversation timeout (milliseconds) */
+  static final long CONVERSATION_TIMEOUT = 1800000;
+
   @Inject
   protected Conversation conversation;
   
@@ -50,7 +73,14 @@ public class CreateSigningRequestBean implements Serializable {
   @Inject
   protected PasswordFormEditor passwordEditor;
   
+  @Inject
+  protected Errors errors;
+  
+  @Inject
+  protected FacesContext facesContext;
+  
   private Long credentialId;
+  private CredentialSigningRequest signingRequest;
 
   /**
    * Gets the unique identifier for the credential that will be used as the
@@ -87,6 +117,27 @@ public class CreateSigningRequestBean implements Serializable {
   }
   
   /**
+   * Gets the prepared signing request.
+   * <p>
+   * This method is exposed to support unit testing.
+   * @return signing request or {@code null} if the request has not been
+   *    prepared
+   */
+  CredentialSigningRequest getSigningRequest() {
+    return signingRequest;
+  }
+
+  /**
+   * Sets the prepared signing request.
+   * <p>
+   * This method is exposed to support unit testing.
+   * @param signingRequest the signing request to set
+   */
+  void setSigningRequest(CredentialSigningRequest signingRequest) {
+    this.signingRequest = signingRequest;
+  }
+  
+  /**
    * An action that is fired when the details view is displayed.
    * <p>
    * If the {@code credentialId} property is set, this method locates the
@@ -95,8 +146,26 @@ public class CreateSigningRequestBean implements Serializable {
    * @return outcome ID
    */
   public String findCredential() {
-    // TODO
-    return null;
+    try {
+      if (credentialId == null) {
+        // not implemented yet
+        throw new UnsupportedOperationException(
+            "cannot signing request for new credential");
+      }  
+      try {
+        editor.setDelegate(
+            signingRequestService.createEditor(credentialId, errors));
+        return DETAILS_OUTCOME_ID;
+      }
+      catch (NoSuchCredentialException ex) {
+        return FAILURE_OUTCOME_ID;
+      }
+    }
+    finally {
+      if (editor.getDelegate() != null) {
+        beginConversation();
+      }
+    }
   }
   
   /**
@@ -108,7 +177,8 @@ public class CreateSigningRequestBean implements Serializable {
    * @return outcome ID
    */
   public String password() {
-    return null;
+    passwordEditor.setGroupName(editor.getOwner());
+    return PASSWORD_OUTCOME_ID;
   }
   
   /**
@@ -119,8 +189,21 @@ public class CreateSigningRequestBean implements Serializable {
    * @return outcome ID
    */
   public String prepare() {
-    // TODO
-    return null;
+    try {
+      signingRequest = signingRequestService.createSigningRequest(editor, 
+          passwordEditor, errors);
+      return CONFIRM_OUTCOME_ID;      
+    }
+    catch (PassphraseException ex) {
+      return PASSWORD_OUTCOME_ID;
+    }
+    catch (GroupAccessException ex) {
+      return DETAILS_OUTCOME_ID;
+    }
+    catch (SigningRequestException ex) {
+      endConversation();
+      return FAILURE_OUTCOME_ID;
+    }
   }
   
   /**
@@ -130,8 +213,8 @@ public class CreateSigningRequestBean implements Serializable {
    * @return outcome ID
    */
   public String save() {
-    // TODO
-    return null;
+    signingRequestService.saveSigningRequest(signingRequest);
+    return CreateSigningRequestBean.SUCCESS_OUTCOME_ID;
   }
 
   /**
@@ -142,8 +225,17 @@ public class CreateSigningRequestBean implements Serializable {
    * content.
    * @return always {@code null}
    */
-  public String download() {
-    return null;
+  public String download() {    
+    try {
+      signingRequestService.downloadSigningRequest(signingRequest, 
+          new FacesFileDownloadResponse(facesContext));
+      facesContext.responseComplete();
+      return null;
+    }
+    catch (IOException ex) {
+      // FIXME
+      throw new RuntimeException(ex);
+    }
   }
   
   /**
@@ -151,19 +243,19 @@ public class CreateSigningRequestBean implements Serializable {
    * @return outcome ID
    */
   public String cancel() {
-    // TODO
-    return null;
+    endConversation();
+    return CANCEL_OUTCOME_ID;
   }
   
   private void beginConversation() {
     if (!conversation.isTransient()) return;
     conversation.begin();
+    conversation.setTimeout(CONVERSATION_TIMEOUT);
   }
   
   private void endConversation() {
     if (conversation.isTransient()) return;
     conversation.end();
   }
-  
 
 }
