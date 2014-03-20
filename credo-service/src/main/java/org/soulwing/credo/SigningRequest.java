@@ -23,6 +23,6 @@ package org.soulwing.credo;
  *
  * @author Carl Harris
  */
-public interface CredentialSigningRequest {
+public interface SigningRequest {
 
 }
