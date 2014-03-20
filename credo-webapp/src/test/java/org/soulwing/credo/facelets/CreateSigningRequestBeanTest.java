@@ -41,6 +41,7 @@ import org.soulwing.credo.SigningRequest;
 import org.soulwing.credo.service.Errors;
 import org.soulwing.credo.service.GroupAccessException;
 import org.soulwing.credo.service.NoSuchCredentialException;
+import org.soulwing.credo.service.NoSuchGroupException;
 import org.soulwing.credo.service.PassphraseException;
 import org.soulwing.credo.service.SigningRequestEditor;
 import org.soulwing.credo.service.SigningRequestException;
@@ -140,6 +141,15 @@ public class CreateSigningRequestBeanTest {
         is(equalTo(CreateSigningRequestBean.PASSWORD_OUTCOME_ID)));
     assertThat(bean.getPasswordEditor().getGroupName(),
         is(equalTo(GROUP_NAME)));
+  }
+
+  @Test
+  public void testPrepareWhenNoSuchGroupException() throws Exception {
+    context.checking(createSigningRequestExpectations(
+        throwException(new NoSuchGroupException())));
+    bean.getEditor().setDelegate(editor);
+    assertThat(bean.prepare(), 
+        is(equalTo(CreateSigningRequestBean.DETAILS_OUTCOME_ID)));
   }
 
   @Test

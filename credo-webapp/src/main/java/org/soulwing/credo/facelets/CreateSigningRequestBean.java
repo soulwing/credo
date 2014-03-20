@@ -31,6 +31,7 @@ import org.soulwing.credo.SigningRequest;
 import org.soulwing.credo.service.Errors;
 import org.soulwing.credo.service.GroupAccessException;
 import org.soulwing.credo.service.NoSuchCredentialException;
+import org.soulwing.credo.service.NoSuchGroupException;
 import org.soulwing.credo.service.PassphraseException;
 import org.soulwing.credo.service.SigningRequestEditor;
 import org.soulwing.credo.service.SigningRequestException;
@@ -198,7 +199,7 @@ public class CreateSigningRequestBean implements Serializable {
     catch (PassphraseException ex) {
       return PASSWORD_OUTCOME_ID;
     }
-    catch (GroupAccessException ex) {
+    catch (GroupAccessException|NoSuchGroupException ex) {
       return DETAILS_OUTCOME_ID;
     }
     catch (SigningRequestException ex) {

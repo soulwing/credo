@@ -52,6 +52,8 @@ public interface SigningRequestService {
    *    key for the signing request
    * @param errors an errors object that will be updated if an error occurs
    * @return signing request
+   * @throws NoSuchGroupException if the group specified in the protection
+   *    parameters does not exist
    * @throws PassphraseException if the password specified in the protection
    *    parameters is null, empty, or incorrect
    * @throws GroupAccessException if the logged in user is not a member of the
@@ -61,7 +63,7 @@ public interface SigningRequestService {
    */
   SigningRequest createSigningRequest(SigningRequestEditor editor, 
       ProtectionParameters protection, Errors errors)
-      throws PassphraseException, GroupAccessException,
+      throws NoSuchGroupException, PassphraseException, GroupAccessException,
       SigningRequestException;
 
   /**
