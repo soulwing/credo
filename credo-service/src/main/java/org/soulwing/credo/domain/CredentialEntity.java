@@ -83,6 +83,7 @@ public class CredentialEntity extends AbstractEntity implements Credential {
   private CredentialKeyEntity privateKey;
   
   @OneToMany(fetch = FetchType.LAZY, cascade = { CascadeType.PERSIST })
+  @JoinTable(name = "credential_certificates")
   @OrderColumn(name = "list_offset")
   private List<CredentialCertificateEntity> certificates = 
       new ArrayList<>();

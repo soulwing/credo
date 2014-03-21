@@ -18,8 +18,8 @@
  */
 package org.soulwing.credo;
 
-import java.util.Collection;
 import java.util.Date;
+import java.util.Set;
 
 /**
  * A builder for a {@link Credential}.
@@ -61,7 +61,7 @@ public interface CredentialBuilder {
    * @param tags the tags to set
    * @return the receiver
    */
-  CredentialBuilder setTags(Collection<Tag> tags);
+  CredentialBuilder setTags(Set<? extends Tag> tags);
   
   /**
    * Sets the private key content for the credential.

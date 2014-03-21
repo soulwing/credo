@@ -30,6 +30,7 @@ import javax.faces.context.FacesContext;
 import javax.faces.context.PartialViewContext;
 import javax.faces.event.ValueChangeEvent;
 import javax.inject.Inject;
+import javax.security.auth.x500.X500Principal;
 
 import org.soulwing.credo.service.CredentialEditor;
 import org.soulwing.credo.service.GroupAccessException;
@@ -73,6 +74,11 @@ public class DelegatingCredentialEditor<T extends CredentialEditor>
    */
   public void setDelegate(T delegate) {
     this.delegate = delegate;
+  }
+
+  @Override
+  public X500Principal getSubject() {
+    return delegate.getSubject();
   }
 
   /**

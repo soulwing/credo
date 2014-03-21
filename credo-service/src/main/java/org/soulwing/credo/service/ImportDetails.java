@@ -21,6 +21,8 @@ package org.soulwing.credo.service;
 import java.util.Date;
 import java.util.List;
 
+import javax.security.auth.x500.X500Principal;
+
 import org.soulwing.credo.service.crypto.CertificateWrapper;
 import org.soulwing.credo.service.crypto.PrivateKeyWrapper;
 
@@ -48,7 +50,7 @@ public interface ImportDetails extends CredentialEditor {
    * Gets the {@code subject} property.
    * @return
    */
-  String getSubject();
+  X500Principal getSubject();
 
   /**
    * Gets the common name component of the subject.

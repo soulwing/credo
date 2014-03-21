@@ -29,10 +29,10 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigInteger;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 import javax.security.auth.x500.X500Principal;
 
@@ -347,7 +347,6 @@ public class ConcreteImportServiceTest {
     } };
   }
 
-  @SuppressWarnings("unchecked")
   private Expectations credentialBuilderExpectations() {
     return new Expectations() { { 
       oneOf(credentialBuilderFactory).newCredentialBuilder();
@@ -356,7 +355,8 @@ public class ConcreteImportServiceTest {
       will(returnValue(credentialBuilder));
       oneOf(credentialBuilder).setNote(with(CREDENTIAL_NOTE));
       will(returnValue(credentialBuilder));
-      oneOf(credentialBuilder).setTags((Collection<Tag>) with(contains(tag)));
+      oneOf(credentialBuilder).setTags(
+          (Set<? extends Tag>) with(contains(tag)));
       will(returnValue(credentialBuilder));
       oneOf(credentialBuilder).setExpiration(with(EXPIRATION));
       will(returnValue(credentialBuilder));

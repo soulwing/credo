@@ -26,6 +26,7 @@ import java.util.List;
 import javax.naming.NamingException;
 import javax.naming.ldap.LdapName;
 import javax.naming.ldap.Rdn;
+import javax.security.auth.x500.X500Principal;
 
 import org.soulwing.credo.UserGroup;
 import org.soulwing.credo.service.ImportDetails;
@@ -89,8 +90,8 @@ public class ConcreteImportDetails implements ImportDetails, Serializable {
    * {@inheritDoc}
    */
   @Override
-  public String getSubject() {
-    return subject;
+  public X500Principal getSubject() {
+    return new X500Principal(subject);
   }
 
   @Override

@@ -19,6 +19,7 @@
 package org.soulwing.credo.service;
 
 import java.util.Collection;
+import java.util.Set;
 
 import javax.ejb.Local;
 
@@ -44,6 +45,6 @@ public interface TagService {
    * @param tags tag strings
    * @return tag set
    */
-  Collection<Tag> resolve(String[] tags);
+  Set<? extends Tag> resolve(String[] tags);
   
 }

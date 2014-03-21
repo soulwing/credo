@@ -57,7 +57,7 @@ public class ConcreteTagService implements TagService {
    * {@inheritDoc}
    */
   @Override
-  public Collection<Tag> resolve(String[] tags) {
+  public Set<? extends Tag> resolve(String[] tags) {
     Set<Tag> tagSet = new LinkedHashSet<>();
     for (String text : tags) {
       Tag tag = tagRepository.findByTagText(text);

@@ -20,6 +20,8 @@ package org.soulwing.credo.service;
 
 import java.util.Date;
 
+import javax.security.auth.x500.X500Principal;
+
 
 /**
  * An editor for a credential.
@@ -31,6 +33,13 @@ import java.util.Date;
  */
 public interface CredentialEditor {
 
+  /**
+   * Gets the X.500 principal name for the subject of the credential's
+   * certificate.
+   * @return subject principal name 
+   */
+  X500Principal getSubject();
+  
   /**
    * Gets the common name for the subject of the credential's certificate.
    * @return subject name

@@ -18,7 +18,6 @@
  */
 package org.soulwing.credo.domain;
 
-import java.util.Collection;
 import java.util.Date;
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -50,7 +49,7 @@ public class CredentialEntityBuilder implements CredentialBuilder {
   }
 
   @Override
-  public CredentialBuilder setTags(Collection<Tag> tags) {
+  public CredentialBuilder setTags(Set<? extends Tag> tags) {
     Set<Tag> tagSet = new LinkedHashSet<>();
     tagSet.addAll(tags);
     credential.setTags(tagSet);
