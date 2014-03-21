@@ -18,6 +18,7 @@
  */
 package org.soulwing.credo;
 
+import java.util.Date;
 import java.util.Set;
 
 /**
@@ -96,5 +97,11 @@ public interface CredentialRequest {
    * @return certification request
    */
   CredentialCertificationRequest getCertificationRequest();
+  
+  /**
+   * Gets the date/time at which this request was created.
+   * @return creation date
+   */
+  Date getDateCreated();
   
 }

@@ -18,6 +18,7 @@
  */
 package org.soulwing.credo.domain;
 
+import java.util.Date;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
@@ -32,6 +33,8 @@ import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 
 import org.soulwing.credo.CredentialCertificationRequest;
 import org.soulwing.credo.CredentialKey;
@@ -77,8 +80,17 @@ public class CredentialRequestEntity extends AbstractEntity
   @OneToOne(optional = false, fetch = FetchType.LAZY,
       cascade = { CascadeType.PERSIST })
   @JoinColumn(name = "certification_request_id")
-  private CredentialCertificationRequest certificationRequest;
+  private CredentialCertificationRequestEntity certificationRequest;
 
+  @Temporal(TemporalType.TIMESTAMP)
+  @Column(name = "date_created", nullable = false)
+  private Date dateCreated;
+  
+  @Temporal(TemporalType.TIMESTAMP)
+  @Column(name = "date_modified", nullable = false)
+  private Date dateModified;
+  
+  
   /**
    * {@inheritDoc}
    */
@@ -186,11 +198,52 @@ public class CredentialRequestEntity extends AbstractEntity
   }
 
   /**
+   * Sets the request's private key.
+   * @param privateKey private key.
+   */
+  public void setPrivateKey(CredentialKeyEntity privateKey) {    
+    this.privateKey = privateKey;
+  }
+  
+  /**
    * {@inheritDoc}
    */
   @Override
   public CredentialCertificationRequest getCertificationRequest() {
     return certificationRequest;
   }
+
+  /**
+   * Sets the request's certification request content.
+   * @param certificationRequest the certification request to set
+   */
+  public void setCertificationRequest(
+      CredentialCertificationRequestEntity certificationRequest) {
+    this.certificationRequest = certificationRequest;
+  }
   
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public Date getDateCreated() {
+    return dateCreated;
+  }
+
+  /**
+   * Sets the date/time at which this request was created.
+   * @param dateCreated the date to set
+   */
+  public void setDateCreated(Date dateCreated) {
+    this.dateCreated = dateCreated;
+  }
+
+  /**
+   * Sets the date/time at which this request was last modified.
+   * @param dateModified the date to set
+   */
+  public void setDateModified(Date dateModified) {
+    this.dateModified = dateModified;
+  }
+
 }
