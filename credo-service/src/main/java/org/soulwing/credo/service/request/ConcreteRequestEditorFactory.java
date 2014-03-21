@@ -25,16 +25,16 @@ import javax.inject.Inject;
 import org.apache.commons.lang.Validate;
 import org.soulwing.credo.Credential;
 import org.soulwing.credo.CredentialCertificate;
-import org.soulwing.credo.service.SigningRequestEditor;
+import org.soulwing.credo.service.CredentialRequestEditor;
 
 /**
- * A concrete {@link SigningRequestEditorFactory} implementation.
+ * A concrete {@link CredentialRequestEditorFactory} implementation.
  *
  * @author Carl Harris
  */
 @ApplicationScoped
 public class ConcreteRequestEditorFactory
-    implements SigningRequestEditorFactory {
+    implements CredentialRequestEditorFactory {
 
   @Inject
   protected Instance<ConfigurableRequestEditor> editorInstance;
@@ -43,7 +43,7 @@ public class ConcreteRequestEditorFactory
    * {@inheritDoc}
    */
   @Override
-  public SigningRequestEditor newEditor(Credential credential) {
+  public CredentialRequestEditor newEditor(Credential credential) {
     Validate.isTrue(!credential.getCertificates().isEmpty());
     CredentialCertificate certificate = credential.getCertificates().get(0);
     ConfigurableRequestEditor editor = editorInstance.get();

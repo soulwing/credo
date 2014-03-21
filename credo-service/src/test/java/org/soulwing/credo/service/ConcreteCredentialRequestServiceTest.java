@@ -37,18 +37,19 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.soulwing.credo.Credential;
-import org.soulwing.credo.SigningRequest;
+import org.soulwing.credo.CredentialCertificationRequest;
+import org.soulwing.credo.CredentialRequest;
 import org.soulwing.credo.repository.CredentialRepository;
-import org.soulwing.credo.repository.SigningRequestRepository;
-import org.soulwing.credo.service.request.SigningRequestEditorFactory;
-import org.soulwing.credo.service.request.SigningRequestGenerator;
+import org.soulwing.credo.repository.CredentialRequestRepository;
+import org.soulwing.credo.service.request.CredentialRequestEditorFactory;
+import org.soulwing.credo.service.request.CredentialRequestGenerator;
 
 /**
- * Unit tests for {@link ConcreteSigningRequestService}.
+ * Unit tests for {@link ConcreteCredentialRequestService}.
  *
  * @author Carl Harris
  */
-public class ConcreteSigningRequestServiceTest {
+public class ConcreteCredentialRequestServiceTest {
 
   private static final String REQUEST_NAME = "requestName";
 
@@ -63,22 +64,25 @@ public class ConcreteSigningRequestServiceTest {
   private CredentialRepository credentialRepository;
   
   @Mock
-  private SigningRequestEditorFactory editorFactory;
+  private CredentialRequestEditorFactory editorFactory;
   
   @Mock
-  private SigningRequestGenerator generator;
+  private CredentialRequestGenerator generator;
   
   @Mock
-  private SigningRequestRepository requestRepository;
+  private CredentialRequestRepository requestRepository;
   
   @Mock
   private Credential credential;
   
   @Mock
-  private SigningRequestEditor editor;
+  private CredentialRequestEditor editor;
   
   @Mock
-  private SigningRequest request;
+  private CredentialRequest request;
+  
+  @Mock
+  private CredentialCertificationRequest certificationRequest;
   
   @Mock
   private FileDownloadResponse response;
@@ -89,8 +93,8 @@ public class ConcreteSigningRequestServiceTest {
   @Mock
   private Errors errors;
   
-  private ConcreteSigningRequestService service =
-      new ConcreteSigningRequestService();
+  private ConcreteCredentialRequestService service =
+      new ConcreteCredentialRequestService();
   
   @Before
   public void setUp() throws Exception {
@@ -132,27 +136,27 @@ public class ConcreteSigningRequestServiceTest {
       throws Exception {
     context.checking(generateExpectations(
         throwException(new UserAccessException(new Exception()))));
-    service.createSigningRequest(editor, protection, errors);
+    service.createRequest(editor, protection, errors);
   }
   
   @Test(expected = GroupAccessException.class)
   public void testCreateSigningRequestWhenGroupAccessDenied() throws Exception {
     context.checking(generateExpectations(
         throwException(new GroupAccessException("some message"))));
-    service.createSigningRequest(editor, protection, errors);
+    service.createRequest(editor, protection, errors);
   }
 
-  @Test(expected = SigningRequestException.class)
+  @Test(expected = CredentialRequestException.class)
   public void testCreateSigningRequestFailure() throws Exception {
     context.checking(generateExpectations(
-        throwException(new SigningRequestException())));
-    service.createSigningRequest(editor, protection, errors);
+        throwException(new CredentialRequestException())));
+    service.createRequest(editor, protection, errors);
   }
 
   @Test
   public void testCreateSigningRequestSuccess() throws Exception {
     context.checking(generateExpectations(returnValue(request)));
-    assertThat(service.createSigningRequest(editor, protection, errors),
+    assertThat(service.createRequest(editor, protection, errors),
         is(sameInstance(request)));
   }
   
@@ -171,27 +175,29 @@ public class ConcreteSigningRequestServiceTest {
       oneOf(requestRepository).add(with(same(request)));
     } });
     
-    service.saveSigningRequest(request);
+    service.saveRequest(request);
   }
   
   @Test
   public void testDownloadSigningRequest() throws Exception {
     final StringWriter writer = new StringWriter();
     context.checking(new Expectations() { { 
-      oneOf(request).getContent();
+      oneOf(request).getCertificationRequest();
+      will(returnValue(certificationRequest));
+      oneOf(certificationRequest).getContent();
       will(returnValue(CSR_CONTENT));
       oneOf(request).getName();
       will(returnValue(REQUEST_NAME));
       oneOf(response).setFileName(with(containsString(REQUEST_NAME)));
       oneOf(response).setContentType(
-          with(ConcreteSigningRequestService.CONTENT_TYPE));
+          with(ConcreteCredentialRequestService.CONTENT_TYPE));
       oneOf(response).setCharacterEncoding(
-          with(ConcreteSigningRequestService.CHARACTER_ENCODING));
+          with(ConcreteCredentialRequestService.CHARACTER_ENCODING));
       oneOf(response).getWriter();
       will(returnValue(writer));
     } });
     
-    service.downloadSigningRequest(request, response);
+    service.downloadRequest(request, response);
     assertThat(writer.toString(), is(equalTo(CSR_CONTENT)));
   }
 

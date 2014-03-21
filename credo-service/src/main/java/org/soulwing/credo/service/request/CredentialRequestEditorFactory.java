@@ -1,5 +1,5 @@
 /*
- * File created on Mar 19, 2014 
+ * File created on Mar 20, 2014 
  *
  * Copyright (c) 2014 Virginia Polytechnic Institute and State University
  *
@@ -16,32 +16,26 @@
  * limitations under the License.
  *
  */
-package org.soulwing.credo;
+package org.soulwing.credo.service.request;
+
+import org.soulwing.credo.Credential;
+import org.soulwing.credo.service.CredentialEditor;
+import org.soulwing.credo.service.CredentialRequestEditor;
 
 /**
- * An abstract representation of an PKCS#10 certificate signing request.
+ * A factory that produces {@link CredentialEditor} objects for 
+ *  requests.
  *
  * @author Carl Harris
  */
-public interface SigningRequest {
+public interface CredentialRequestEditorFactory {
 
   /**
-   * Gets the friendly name associated with this signing request.
-   * @return friendly name
+   * Creates an editor for a  request based on contents of the given 
+   * credential.
+   * @param credential basis for the request that will be edited
+   * @return editor
    */
-  String getName();
-  
-  /**
-   * Gets the private key for this signing request.
-   * @return private key
-   */
-  CredentialKey getPrivateKey();
-  
-  /**
-   * Gets the PEM encoded content for this signing request.
-   * @return PEM-encoded DER representation of a PKCS#10 Certificate
-   *    Signing Request (CDR) 
-   */
-  String getContent();
+  CredentialRequestEditor newEditor(Credential credential);
   
 }

@@ -18,22 +18,22 @@
  */
 package org.soulwing.credo.service.request;
 
-import org.soulwing.credo.SigningRequest;
+import org.soulwing.credo.CredentialRequest;
 import org.soulwing.credo.service.Errors;
 import org.soulwing.credo.service.GroupAccessException;
 import org.soulwing.credo.service.NoSuchGroupException;
 import org.soulwing.credo.service.ProtectionParameters;
-import org.soulwing.credo.service.SigningRequestEditor;
-import org.soulwing.credo.service.SigningRequestException;
+import org.soulwing.credo.service.CredentialRequestEditor;
+import org.soulwing.credo.service.CredentialRequestException;
 import org.soulwing.credo.service.UserAccessException;
 
 /**
- * A generator that produces a {@link SigningRequest} from the contents of
+ * A generator that produces a {@link CredentialRequest} from the contents of
  * an editor.
  *
  * @author Carl Harris
  */
-public interface SigningRequestGenerator {
+public interface CredentialRequestGenerator {
 
   /**
    * Generates a signing request.
@@ -46,12 +46,12 @@ public interface SigningRequestGenerator {
    * @throws NoSuchGroupException
    * @throws GroupAccessException
    * @throws UserAccessException
-   * @throws SigningRequestException if an error occurs in generating the
+   * @throws CredentialRequestException if an error occurs in generating the
    *    signing request
    */
-  SigningRequest generate(SigningRequestEditor editor, 
+  CredentialRequest generate(CredentialRequestEditor editor, 
       ProtectionParameters protection, Errors errors) 
       throws NoSuchGroupException, GroupAccessException, UserAccessException,
-      SigningRequestException;
+      CredentialRequestException;
 
 }

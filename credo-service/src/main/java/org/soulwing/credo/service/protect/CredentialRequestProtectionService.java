@@ -18,7 +18,7 @@
  */
 package org.soulwing.credo.service.protect;
 
-import org.soulwing.credo.SigningRequest;
+import org.soulwing.credo.CredentialRequest;
 import org.soulwing.credo.service.GroupAccessException;
 import org.soulwing.credo.service.NoSuchGroupException;
 import org.soulwing.credo.service.ProtectionParameters;
@@ -27,16 +27,16 @@ import org.soulwing.credo.service.crypto.PrivateKeyWrapper;
 
 /**
  * A service that provides encryption services for the private key associated
- * with a {@link SigningRequest}.
+ * with a {@link CredentialRequest}.
  *
  * @author Carl Harris
  */
-public interface SigningRequestProtectionService {
+public interface CredentialRequestProtectionService {
 
   /**
-   * Applies cryptographic protection to a signing request's private key. 
-   * @param request the subject signing request
-   * @param privateKey private key associated with the signing request
+   * Applies cryptographic protection to a request's private key. 
+   * @param request the subject request
+   * @param privateKey private key associated with the request
    * @param protection protection parameters
    * @throws GroupAccessException if the logged-in user is not a member 
    *    of the group specified in the protection parameters
@@ -45,7 +45,7 @@ public interface SigningRequestProtectionService {
    * @throws NoSuchGroupException if the group specified in the protection
    *    parameters does not exist
    */
-  void protect(SigningRequest request, PrivateKeyWrapper privateKey,
+  void protect(CredentialRequest request, PrivateKeyWrapper privateKey,
       ProtectionParameters protection) throws GroupAccessException, 
       UserAccessException, NoSuchGroupException;
   

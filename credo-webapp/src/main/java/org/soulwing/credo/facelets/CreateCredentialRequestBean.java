@@ -27,24 +27,24 @@ import javax.faces.context.FacesContext;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import org.soulwing.credo.SigningRequest;
+import org.soulwing.credo.CredentialRequest;
+import org.soulwing.credo.service.CredentialRequestEditor;
+import org.soulwing.credo.service.CredentialRequestException;
+import org.soulwing.credo.service.CredentialRequestService;
 import org.soulwing.credo.service.Errors;
 import org.soulwing.credo.service.GroupAccessException;
 import org.soulwing.credo.service.NoSuchCredentialException;
 import org.soulwing.credo.service.NoSuchGroupException;
 import org.soulwing.credo.service.PassphraseException;
-import org.soulwing.credo.service.SigningRequestEditor;
-import org.soulwing.credo.service.SigningRequestException;
-import org.soulwing.credo.service.SigningRequestService;
 
 /**
- * A bean that supports the Create Signing Request interaction.
+ * A bean that supports the Create Credential Request interaction.
  *
  * @author Carl Harris
  */
 @Named
 @ConversationScoped
-public class CreateSigningRequestBean implements Serializable {
+public class CreateCredentialRequestBean implements Serializable {
 
   private static final long serialVersionUID = -9132630420041335985L;
 
@@ -67,10 +67,10 @@ public class CreateSigningRequestBean implements Serializable {
   protected Conversation conversation;
   
   @Inject
-  protected SigningRequestService signingRequestService;
+  protected CredentialRequestService signingRequestService;
   
   @Inject
-  protected DelegatingCredentialEditor<SigningRequestEditor> editor;
+  protected DelegatingCredentialEditor<CredentialRequestEditor> editor;
   
   @Inject
   protected PasswordFormEditor passwordEditor;
@@ -82,7 +82,7 @@ public class CreateSigningRequestBean implements Serializable {
   protected FacesContext facesContext;
   
   private Long credentialId;
-  private SigningRequest signingRequest;
+  private CredentialRequest signingRequest;
 
   /**
    * Gets the unique identifier for the credential that will be used as the
@@ -106,7 +106,7 @@ public class CreateSigningRequestBean implements Serializable {
    * Gets the editor for the signing request.
    * @return editor
    */
-  public DelegatingCredentialEditor<SigningRequestEditor> getEditor() {
+  public DelegatingCredentialEditor<CredentialRequestEditor> getEditor() {
     return editor;
   }
   
@@ -125,7 +125,7 @@ public class CreateSigningRequestBean implements Serializable {
    * @return signing request or {@code null} if the request has not been
    *    prepared
    */
-  SigningRequest getSigningRequest() {
+  CredentialRequest getSigningRequest() {
     return signingRequest;
   }
 
@@ -135,7 +135,7 @@ public class CreateSigningRequestBean implements Serializable {
    * This method is exposed to support unit testing.
    * @param signingRequest the signing request to set
    */
-  void setSigningRequest(SigningRequest signingRequest) {
+  void setSigningRequest(CredentialRequest signingRequest) {
     this.signingRequest = signingRequest;
   }
   
@@ -192,7 +192,7 @@ public class CreateSigningRequestBean implements Serializable {
    */
   public String prepare() {
     try {
-      signingRequest = signingRequestService.createSigningRequest(
+      signingRequest = signingRequestService.createRequest(
           editor.getDelegate(), passwordEditor, errors);
       return CONFIRM_OUTCOME_ID;      
     }
@@ -202,7 +202,7 @@ public class CreateSigningRequestBean implements Serializable {
     catch (GroupAccessException|NoSuchGroupException ex) {
       return DETAILS_OUTCOME_ID;
     }
-    catch (SigningRequestException ex) {
+    catch (CredentialRequestException ex) {
       endConversation();
       return FAILURE_OUTCOME_ID;
     }
@@ -215,8 +215,8 @@ public class CreateSigningRequestBean implements Serializable {
    * @return outcome ID
    */
   public String save() {
-    signingRequestService.saveSigningRequest(signingRequest);
-    return CreateSigningRequestBean.SUCCESS_OUTCOME_ID;
+    signingRequestService.saveRequest(signingRequest);
+    return CreateCredentialRequestBean.SUCCESS_OUTCOME_ID;
   }
 
   /**
@@ -229,7 +229,7 @@ public class CreateSigningRequestBean implements Serializable {
    */
   public String download() {    
     try {
-      signingRequestService.downloadSigningRequest(signingRequest, 
+      signingRequestService.downloadRequest(signingRequest, 
           new FacesFileDownloadResponse(facesContext));
       facesContext.responseComplete();
       return null;

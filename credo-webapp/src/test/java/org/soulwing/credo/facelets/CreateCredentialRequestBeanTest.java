@@ -37,22 +37,22 @@ import org.jmock.lib.legacy.ClassImposteriser;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.soulwing.credo.SigningRequest;
+import org.soulwing.credo.CredentialRequest;
 import org.soulwing.credo.service.Errors;
 import org.soulwing.credo.service.GroupAccessException;
 import org.soulwing.credo.service.NoSuchCredentialException;
 import org.soulwing.credo.service.NoSuchGroupException;
 import org.soulwing.credo.service.PassphraseException;
-import org.soulwing.credo.service.SigningRequestEditor;
-import org.soulwing.credo.service.SigningRequestException;
-import org.soulwing.credo.service.SigningRequestService;
+import org.soulwing.credo.service.CredentialRequestEditor;
+import org.soulwing.credo.service.CredentialRequestException;
+import org.soulwing.credo.service.CredentialRequestService;
 
 /**
- * Unit tests for {@link CreateSigningRequestBean}.
+ * Unit tests for {@link CreateCredentialRequestBean}.
  *
  * @author Carl Harris
  */
-public class CreateSigningRequestBeanTest {
+public class CreateCredentialRequestBeanTest {
 
   private static final String GROUP_NAME = "groupName";
 
@@ -64,10 +64,10 @@ public class CreateSigningRequestBeanTest {
   } };
   
   @Mock
-  private SigningRequestService signingRequestService;
+  private CredentialRequestService signingRequestService;
   
   @Mock
-  private SigningRequest signingRequest;
+  private CredentialRequest signingRequest;
   
   @Mock
   private Errors errors;
@@ -76,18 +76,18 @@ public class CreateSigningRequestBeanTest {
   private FacesContext facesContext;
   
   @Mock
-  private SigningRequestEditor editor;
+  private CredentialRequestEditor editor;
   
   @Mock
   private Conversation conversation;
   
-  private CreateSigningRequestBean bean = new CreateSigningRequestBean();
+  private CreateCredentialRequestBean bean = new CreateCredentialRequestBean();
   
   @Before
   public void setUp() throws Exception {
     bean.conversation = conversation;
     bean.signingRequestService = signingRequestService;
-    bean.editor = new DelegatingCredentialEditor<SigningRequestEditor>();
+    bean.editor = new DelegatingCredentialEditor<CredentialRequestEditor>();
     bean.passwordEditor = new PasswordFormEditor();
     bean.errors = errors;
     bean.facesContext = facesContext;
@@ -105,7 +105,7 @@ public class CreateSigningRequestBeanTest {
         throwException(new NoSuchCredentialException())));
     bean.setCredentialId(CREDENTIAL_ID);
     assertThat(bean.findCredential(), 
-        is(equalTo(CreateSigningRequestBean.FAILURE_OUTCOME_ID)));
+        is(equalTo(CreateCredentialRequestBean.FAILURE_OUTCOME_ID)));
   }
 
   @Test
@@ -116,7 +116,7 @@ public class CreateSigningRequestBeanTest {
     
     bean.setCredentialId(CREDENTIAL_ID);
     assertThat(bean.findCredential(),
-        is(equalTo(CreateSigningRequestBean.DETAILS_OUTCOME_ID)));
+        is(equalTo(CreateCredentialRequestBean.DETAILS_OUTCOME_ID)));
     assertThat(bean.getEditor().getDelegate(), is(sameInstance(editor)));
   }
 
@@ -138,7 +138,7 @@ public class CreateSigningRequestBeanTest {
     
     bean.getEditor().setDelegate(editor);
     assertThat(bean.password(), 
-        is(equalTo(CreateSigningRequestBean.PASSWORD_OUTCOME_ID)));
+        is(equalTo(CreateCredentialRequestBean.PASSWORD_OUTCOME_ID)));
     assertThat(bean.getPasswordEditor().getGroupName(),
         is(equalTo(GROUP_NAME)));
   }
@@ -149,7 +149,7 @@ public class CreateSigningRequestBeanTest {
         throwException(new NoSuchGroupException())));
     bean.getEditor().setDelegate(editor);
     assertThat(bean.prepare(), 
-        is(equalTo(CreateSigningRequestBean.DETAILS_OUTCOME_ID)));
+        is(equalTo(CreateCredentialRequestBean.DETAILS_OUTCOME_ID)));
   }
 
   @Test
@@ -158,7 +158,7 @@ public class CreateSigningRequestBeanTest {
         throwException(new PassphraseException())));
     bean.getEditor().setDelegate(editor);
     assertThat(bean.prepare(), 
-        is(equalTo(CreateSigningRequestBean.PASSWORD_OUTCOME_ID)));
+        is(equalTo(CreateCredentialRequestBean.PASSWORD_OUTCOME_ID)));
   }
 
   @Test
@@ -167,17 +167,17 @@ public class CreateSigningRequestBeanTest {
         throwException(new GroupAccessException("some message"))));
     bean.getEditor().setDelegate(editor);
     assertThat(bean.prepare(), 
-        is(equalTo(CreateSigningRequestBean.DETAILS_OUTCOME_ID)));
+        is(equalTo(CreateCredentialRequestBean.DETAILS_OUTCOME_ID)));
   }
 
   @Test
   public void testPrepareWhenSigningRequestException() throws Exception {
     context.checking(endConversationExpectations());
     context.checking(createSigningRequestExpectations(
-        throwException(new SigningRequestException())));
+        throwException(new CredentialRequestException())));
     bean.getEditor().setDelegate(editor);
     assertThat(bean.prepare(), 
-        is(equalTo(CreateSigningRequestBean.FAILURE_OUTCOME_ID)));
+        is(equalTo(CreateCredentialRequestBean.FAILURE_OUTCOME_ID)));
   }
 
   @Test 
@@ -186,14 +186,14 @@ public class CreateSigningRequestBeanTest {
         returnValue(signingRequest)));
     bean.getEditor().setDelegate(editor);
     assertThat(bean.prepare(),
-        is(equalTo(CreateSigningRequestBean.CONFIRM_OUTCOME_ID)));
+        is(equalTo(CreateCredentialRequestBean.CONFIRM_OUTCOME_ID)));
     assertThat(bean.getSigningRequest(), is(sameInstance(signingRequest)));
   }
   
   private Expectations createSigningRequestExpectations(
       final Action outcome) throws Exception {
     return new Expectations() { { 
-      oneOf(signingRequestService).createSigningRequest(
+      oneOf(signingRequestService).createRequest(
           with(same(editor)), 
           with(same(bean.getPasswordEditor())), 
           with(same(errors)));
@@ -204,26 +204,26 @@ public class CreateSigningRequestBeanTest {
   @Test  
   public void testSaveAction() throws Exception {
     context.checking(new Expectations() { { 
-      oneOf(signingRequestService).saveSigningRequest(
+      oneOf(signingRequestService).saveRequest(
           with(same(signingRequest)));
     } });
     
     bean.setSigningRequest(signingRequest);
     assertThat(bean.save(), 
-        is(equalTo(CreateSigningRequestBean.SUCCESS_OUTCOME_ID)));
+        is(equalTo(CreateCredentialRequestBean.SUCCESS_OUTCOME_ID)));
   }
   
   @Test
   public void testCancelAction() throws Exception {
     context.checking(endConversationExpectations());
     assertThat(bean.cancel(), 
-        is(equalTo(CreateSigningRequestBean.CANCEL_OUTCOME_ID)));
+        is(equalTo(CreateCredentialRequestBean.CANCEL_OUTCOME_ID)));
   }
 
   @Test
   public void testDownloadAction() throws Exception {
     context.checking(new Expectations() { { 
-      oneOf(signingRequestService).downloadSigningRequest(
+      oneOf(signingRequestService).downloadRequest(
           with(same(signingRequest)), 
           with(any(FacesFileDownloadResponse.class)));
       oneOf(facesContext).responseComplete();
@@ -239,7 +239,7 @@ public class CreateSigningRequestBeanTest {
       will(returnValue(true));
       oneOf(conversation).begin();
       oneOf(conversation).setTimeout(
-          with(CreateSigningRequestBean.CONVERSATION_TIMEOUT));
+          with(CreateCredentialRequestBean.CONVERSATION_TIMEOUT));
     } };
   }
 

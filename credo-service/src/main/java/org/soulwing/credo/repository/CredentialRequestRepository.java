@@ -16,24 +16,21 @@
  * limitations under the License.
  *
  */
-package org.soulwing.credo.service.request;
+package org.soulwing.credo.repository;
 
-import java.util.Set;
-
-import org.soulwing.credo.Tag;
-import org.soulwing.credo.service.CredentialRequestEditor;
+import org.soulwing.credo.CredentialRequest;
 
 /**
- * A configurable {@link CredentialRequestEditor}.
+ * A repository of {@link CredentialRequest} objects.
  *
  * @author Carl Harris
  */
-public interface ConfigurableRequestEditor extends CredentialRequestEditor {
+public interface CredentialRequestRepository {
 
   /**
-   * Sets the tags for the request.
-   * @param tags set of tags
+   * Adds a (transient) request to the repository, making it persistent.
+   * @param request the request to add
    */
-  void setTags(Set<? extends Tag> tags);
+  void add(CredentialRequest request);
   
 }

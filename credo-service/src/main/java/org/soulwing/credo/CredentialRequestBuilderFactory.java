@@ -1,5 +1,5 @@
 /*
- * File created on Mar 19, 2014 
+ * File created on Mar 20, 2014 
  *
  * Copyright (c) 2014 Virginia Polytechnic Institute and State University
  *
@@ -16,16 +16,19 @@
  * limitations under the License.
  *
  */
-package org.soulwing.credo.service;
+package org.soulwing.credo;
 
 /**
- * An exception that is thrown when an error occurs in producing a signing
- * request.
+ * A factory that produces {@link CredentialRequestBuilder} objects.
  *
  * @author Carl Harris
  */
-public class SigningRequestException extends Exception {
+public interface CredentialRequestBuilderFactory {
 
-  private static final long serialVersionUID = 3701837532285551494L;
-
+  /**
+   * Creates a new builder.
+   * @return new builder
+   */
+  CredentialRequestBuilder newBuilder();
+  
 }

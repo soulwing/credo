@@ -22,19 +22,19 @@ import java.io.IOException;
 
 import javax.ejb.Local;
 
-import org.soulwing.credo.SigningRequest;
+import org.soulwing.credo.CredentialRequest;
 
 
 /**
- * A service that supports the creation and manipulation of signing requests.
+ * A service that supports the creation and manipulation of credential requests.
  *
  * @author Carl Harris
  */
 @Local
-public interface SigningRequestService {
+public interface CredentialRequestService {
 
   /**
-   * Creates an editor for a signing request that is based on an existing
+   * Creates an editor for a request that is based on an existing
    * credential.
    * @param credentialId unique identifier of the subject credential
    * @param errors an errors object that will be updated if an error occurs
@@ -42,45 +42,45 @@ public interface SigningRequestService {
    * @throws NoSuchCredentialException if there exists no credential with the
    *    specified identifier
    */
-  SigningRequestEditor createEditor(Long credentialId, Errors errors) 
+  CredentialRequestEditor createEditor(Long credentialId, Errors errors) 
       throws NoSuchCredentialException;
   
   /**
-   * Create a signing request using the contents of the specified editor.
+   * Create a request using the contents of the specified editor.
    * @param editor editor which specifies the properties of the request
    * @param protection parameters which will be used to protect the private
-   *    key for the signing request
+   *    key for the request
    * @param errors an errors object that will be updated if an error occurs
-   * @return signing request
+   * @return request
    * @throws NoSuchGroupException if the group specified in the protection
    *    parameters does not exist
    * @throws PassphraseException if the password specified in the protection
    *    parameters is null, empty, or incorrect
    * @throws GroupAccessException if the logged in user is not a member of the
    *    group specified in the protection parameters 
-   * @throws SigningRequestException if some other error occurs in creating 
-   *    the signing request
+   * @throws CredentialRequestException if some other error occurs in creating 
+   *    the request
    */
-  SigningRequest createSigningRequest(SigningRequestEditor editor, 
+  CredentialRequest createRequest(CredentialRequestEditor editor, 
       ProtectionParameters protection, Errors errors)
       throws NoSuchGroupException, PassphraseException, GroupAccessException,
-      SigningRequestException;
+      CredentialRequestException;
 
   /**
-   * Saves the given (transient) signing request making it persistent.
-   * @param signingRequest the subject signing request
+   * Saves the given (transient) request making it persistent.
+   * @param request the subject request
    */
-  void saveSigningRequest(SigningRequest signingRequest);
+  void saveRequest(CredentialRequest request);
   
   /**
-   * Transfers a signing request to a client via the given response object.
-   * @param signingRequest the subject signing request
+   * Transfers a request to a client via the given response object.
+   * @param request the subject request
    * @param response response object that will be used to transfer the
-   *    signing request content
-   * @throws IOException if an error occurs in transferring the signing 
+   *    request content
+   * @throws IOException if an error occurs in transferring the 
    *    request content to the remote client
    */
-  void downloadSigningRequest(SigningRequest signingRequest,
+  void downloadRequest(CredentialRequest request,
       FileDownloadResponse response) throws IOException;
   
 }

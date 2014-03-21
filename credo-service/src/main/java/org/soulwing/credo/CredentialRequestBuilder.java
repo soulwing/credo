@@ -21,25 +21,25 @@ package org.soulwing.credo;
 import javax.security.auth.x500.X500Principal;
 
 /**
- * A builder for a {@link SigningRequest}.
+ * A builder for a {@link CredentialRequest}.
  *
  * @author Carl Harris
  */
-public interface SigningRequestBuilder {
+public interface CredentialRequestBuilder {
 
   /**
    * Sets the request's subject name.
    * @param subject the subject name to set
    * @return the receiver
    */
-  SigningRequestBuilder setSubject(X500Principal subject);
+  CredentialRequestBuilder setSubject(X500Principal subject);
   
   /**
    * Sets the request's private key
    * @param privateKey the private key to set
    * @return the receiver
    */
-  SigningRequestBuilder setPrivateKey(String privateKey);
+  CredentialRequestBuilder setPrivateKey(String privateKey);
   
   /**
    * Sets the request's PKCS#10 certification request content.
@@ -47,7 +47,7 @@ public interface SigningRequestBuilder {
    *    PKCS#10 certification request
    * @return the receiver
    */
-  SigningRequestBuilder setCertificationRequest(String certificationRequest);
+  CredentialRequestBuilder setCertificationRequest(String certificationRequest);
   
   /**
    * Builds the signing request according to the receiver's configuration.
@@ -55,6 +55,6 @@ public interface SigningRequestBuilder {
    * @throws IllegalStateException if the state of the receiver is 
    *    invalid/inconsistent 
    */
-  SigningRequest build();
+  CredentialRequest build();
   
 }

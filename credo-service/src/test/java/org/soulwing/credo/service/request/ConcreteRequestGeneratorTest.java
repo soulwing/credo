@@ -33,13 +33,13 @@ import org.jmock.integration.junit4.JUnitRuleMockery;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.soulwing.credo.SigningRequest;
-import org.soulwing.credo.SigningRequestBuilder;
-import org.soulwing.credo.SigningRequestBuilderFactory;
+import org.soulwing.credo.CredentialRequest;
+import org.soulwing.credo.CredentialRequestBuilder;
+import org.soulwing.credo.CredentialRequestBuilderFactory;
 import org.soulwing.credo.service.Errors;
 import org.soulwing.credo.service.ProtectionParameters;
-import org.soulwing.credo.service.SigningRequestEditor;
-import org.soulwing.credo.service.SigningRequestException;
+import org.soulwing.credo.service.CredentialRequestEditor;
+import org.soulwing.credo.service.CredentialRequestException;
 import org.soulwing.credo.service.crypto.CertificationRequestBuilder;
 import org.soulwing.credo.service.crypto.CertificationRequestException;
 import org.soulwing.credo.service.crypto.CertificationRequestWrapper;
@@ -47,7 +47,7 @@ import org.soulwing.credo.service.crypto.KeyGeneratorService;
 import org.soulwing.credo.service.crypto.KeyPairWrapper;
 import org.soulwing.credo.service.crypto.PrivateKeyWrapper;
 import org.soulwing.credo.service.crypto.PublicKeyWrapper;
-import org.soulwing.credo.service.protect.SigningRequestProtectionService;
+import org.soulwing.credo.service.protect.CredentialRequestProtectionService;
 
 /**
  * Unit tests for {@link ConcreteRequestGenerator}.
@@ -70,19 +70,19 @@ public class ConcreteRequestGeneratorTest {
   private CertificationRequestBuilder csrBuilder;
   
   @Mock
-  private SigningRequestBuilderFactory requestBuilderFactory;
+  private CredentialRequestBuilderFactory requestBuilderFactory;
   
   @Mock
-  private SigningRequestProtectionService protectionService;
+  private CredentialRequestProtectionService protectionService;
   
   @Mock
-  private SigningRequestEditor editor;
+  private CredentialRequestEditor editor;
   
   @Mock
-  private SigningRequestBuilder requestBuilder;
+  private CredentialRequestBuilder requestBuilder;
   
   @Mock
-  private SigningRequest request;
+  private CredentialRequest request;
 
   @Mock
   private ProtectionParameters protection;
@@ -123,7 +123,7 @@ public class ConcreteRequestGeneratorTest {
         is(sameInstance(request)));
   }
 
-  @Test(expected = SigningRequestException.class)
+  @Test(expected = CredentialRequestException.class)
   public void testGenerateWhenCertificationRequestException() throws Exception {
     context.checking(keyPairExpectations());
     context.checking(csrBuilderExpectations(

@@ -1,5 +1,5 @@
 /*
- * File created on Mar 20, 2014 
+ * File created on Mar 21, 2014 
  *
  * Copyright (c) 2014 Virginia Polytechnic Institute and State University
  *
@@ -19,16 +19,16 @@
 package org.soulwing.credo;
 
 /**
- * A factory that produces {@link SigningRequestBuilder} objects.
+ * A PKCS#10 certification request for a {@link CredentialRequest}.
  *
  * @author Carl Harris
  */
-public interface SigningRequestBuilderFactory {
+public interface CredentialCertificationRequest {
 
   /**
-   * Creates a new builder.
-   * @return new builder
+   * Gets the PEM-encoded content of the certification request.
+   * @return content
    */
-  SigningRequestBuilder newBuilder();
-  
+  String getContent();
+
 }

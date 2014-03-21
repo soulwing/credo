@@ -29,20 +29,20 @@ import javax.ejb.TransactionAttributeType;
 import javax.inject.Inject;
 
 import org.soulwing.credo.Credential;
-import org.soulwing.credo.SigningRequest;
+import org.soulwing.credo.CredentialRequest;
 import org.soulwing.credo.repository.CredentialRepository;
-import org.soulwing.credo.repository.SigningRequestRepository;
-import org.soulwing.credo.service.request.SigningRequestEditorFactory;
-import org.soulwing.credo.service.request.SigningRequestGenerator;
+import org.soulwing.credo.repository.CredentialRequestRepository;
+import org.soulwing.credo.service.request.CredentialRequestEditorFactory;
+import org.soulwing.credo.service.request.CredentialRequestGenerator;
 
 /**
- * A concrete {@link SigningRequestService} as a singleton session bean.
+ * A concrete {@link CredentialRequestService} as a singleton session bean.
  *
  * @author Carl Harris
  */
 @Singleton
 @ConcurrencyManagement(ConcurrencyManagementType.BEAN)
-public class ConcreteSigningRequestService implements SigningRequestService {
+public class ConcreteCredentialRequestService implements CredentialRequestService {
 
   static final String CONTENT_TYPE = "application/pkcs10";
   
@@ -54,18 +54,18 @@ public class ConcreteSigningRequestService implements SigningRequestService {
   protected CredentialRepository credentialRepository;
 
   @Inject
-  protected SigningRequestEditorFactory editorFactory;
+  protected CredentialRequestEditorFactory editorFactory;
   
   @Inject
-  protected SigningRequestGenerator generator;
+  protected CredentialRequestGenerator generator;
   
   @Inject
-  protected SigningRequestRepository requestRespository;
+  protected CredentialRequestRepository requestRespository;
 
 
   @Override
   @TransactionAttribute(TransactionAttributeType.REQUIRED)
-  public SigningRequestEditor createEditor(Long credentialId, Errors errors)
+  public CredentialRequestEditor createEditor(Long credentialId, Errors errors)
       throws NoSuchCredentialException {
     
     Credential credential = credentialRepository.findById(credentialId);
@@ -78,10 +78,10 @@ public class ConcreteSigningRequestService implements SigningRequestService {
   }
 
   @Override
-  public SigningRequest createSigningRequest(
-      SigningRequestEditor editor, ProtectionParameters protection, 
+  public CredentialRequest createRequest(
+      CredentialRequestEditor editor, ProtectionParameters protection, 
       Errors errors) throws NoSuchGroupException, PassphraseException, 
-      GroupAccessException, SigningRequestException {
+      GroupAccessException, CredentialRequestException {
     try {
       return generator.generate(editor, protection, errors);
     }
@@ -92,18 +92,18 @@ public class ConcreteSigningRequestService implements SigningRequestService {
 
   @Override
   @TransactionAttribute(TransactionAttributeType.REQUIRED)
-  public void saveSigningRequest(SigningRequest signingRequest) {
-    requestRespository.add(signingRequest);
+  public void saveRequest(CredentialRequest request) {
+    requestRespository.add(request);
   }
 
   @Override
-  public void downloadSigningRequest(SigningRequest request,
+  public void downloadRequest(CredentialRequest request,
       FileDownloadResponse response) throws IOException {
     response.setFileName(normalizedFileName(request.getName(), SUFFIX));
     response.setContentType(CONTENT_TYPE);
     response.setCharacterEncoding(CHARACTER_ENCODING);
     Writer writer = response.getWriter();
-    writer.write(request.getContent());
+    writer.write(request.getCertificationRequest().getContent());
     writer.flush();
   }
 

@@ -1,5 +1,5 @@
 /*
- * File created on Mar 20, 2014 
+ * File created on Mar 19, 2014 
  *
  * Copyright (c) 2014 Virginia Polytechnic Institute and State University
  *
@@ -18,32 +18,14 @@
  */
 package org.soulwing.credo.service;
 
-import javax.security.auth.x500.X500Principal;
-
-
 /**
- * An editor for the properties of a signing request.
+ * An exception that is thrown when an error occurs in producing a credential
+ * request.
  *
  * @author Carl Harris
  */
-public interface SigningRequestEditor extends CredentialEditor {
+public class CredentialRequestException extends Exception {
 
-  /**
-   * Gets the subject principal for the signing request.
-   * @return subject principal
-   */
-  X500Principal getSubject();
-  
-  /**
-   * Gets the subject name for the signing request.
-   * @return subject name
-   */
-  String getSubjectName();
-  
-  /**
-   * Sets the subject name for the signing request.
-   * @param subjectName the subject name to set
-   */
-  void setSubjectName(String subjectName);
-  
+  private static final long serialVersionUID = 3701837532285551494L;
+
 }

@@ -23,30 +23,30 @@ import java.io.IOException;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
-import org.soulwing.credo.SigningRequest;
-import org.soulwing.credo.SigningRequestBuilderFactory;
+import org.soulwing.credo.CredentialRequest;
+import org.soulwing.credo.CredentialRequestBuilderFactory;
 import org.soulwing.credo.service.Errors;
 import org.soulwing.credo.service.GroupAccessException;
 import org.soulwing.credo.service.NoSuchGroupException;
 import org.soulwing.credo.service.ProtectionParameters;
-import org.soulwing.credo.service.SigningRequestEditor;
-import org.soulwing.credo.service.SigningRequestException;
+import org.soulwing.credo.service.CredentialRequestEditor;
+import org.soulwing.credo.service.CredentialRequestException;
 import org.soulwing.credo.service.UserAccessException;
 import org.soulwing.credo.service.crypto.CertificationRequestBuilder;
 import org.soulwing.credo.service.crypto.CertificationRequestException;
 import org.soulwing.credo.service.crypto.CertificationRequestWrapper;
 import org.soulwing.credo.service.crypto.KeyGeneratorService;
 import org.soulwing.credo.service.crypto.KeyPairWrapper;
-import org.soulwing.credo.service.protect.SigningRequestProtectionService;
+import org.soulwing.credo.service.protect.CredentialRequestProtectionService;
 
 /**
- * A concrete {@link SigningRequestGenerator} implementation.
+ * A concrete {@link CredentialRequestGenerator} implementation.
  * 
  * @author Carl Harris
  */
 @ApplicationScoped
 public class ConcreteRequestGenerator
-    implements SigningRequestGenerator {
+    implements CredentialRequestGenerator {
 
   @Inject
   protected KeyGeneratorService keyGeneratorService;
@@ -55,16 +55,16 @@ public class ConcreteRequestGenerator
   protected CertificationRequestBuilder csrBuilder;
 
   @Inject
-  protected SigningRequestBuilderFactory requestBuilderFactory;
+  protected CredentialRequestBuilderFactory requestBuilderFactory;
 
   @Inject
-  protected SigningRequestProtectionService protectionService;
+  protected CredentialRequestProtectionService protectionService;
 
   @Override
-  public SigningRequest generate(SigningRequestEditor editor,
+  public CredentialRequest generate(CredentialRequestEditor editor,
       ProtectionParameters protection, Errors errors)
       throws NoSuchGroupException, GroupAccessException, UserAccessException,
-      SigningRequestException {
+      CredentialRequestException {
     
     KeyPairWrapper keyPair = keyGeneratorService.generateKeyPair();
     
@@ -74,7 +74,7 @@ public class ConcreteRequestGenerator
           csrBuilder.setPublicKey(keyPair.getPublic())
               .setSubject(editor.getSubject()).build();
       
-      SigningRequest request = requestBuilderFactory.newBuilder()
+      CredentialRequest request = requestBuilderFactory.newBuilder()
           .setSubject(csr.getSubject())
           .setCertificationRequest(csr.getContent())
           .build();
@@ -83,7 +83,7 @@ public class ConcreteRequestGenerator
       return request;
     }
     catch (CertificationRequestException ex) {
-      throw new SigningRequestException();
+      throw new CredentialRequestException();
     }
     catch (IOException ex) {
       throw new RuntimeException(ex);

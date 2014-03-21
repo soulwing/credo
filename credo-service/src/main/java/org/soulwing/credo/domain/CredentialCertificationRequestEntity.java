@@ -1,5 +1,5 @@
 /*
- * File created on Mar 20, 2014 
+ * File created on Feb 18, 2014 
  *
  * Copyright (c) 2014 Virginia Polytechnic Institute and State University
  *
@@ -16,26 +16,24 @@
  * limitations under the License.
  *
  */
-package org.soulwing.credo.service.request;
+package org.soulwing.credo.domain;
 
-import org.soulwing.credo.Credential;
-import org.soulwing.credo.service.CredentialEditor;
-import org.soulwing.credo.service.SigningRequestEditor;
+import javax.persistence.Entity;
+import javax.persistence.Table;
+
+import org.soulwing.credo.CredentialCertificationRequest;
 
 /**
- * A factory that produces {@link CredentialEditor} objects for 
- * signing requests.
+ * A {@link CredentialCertificationRequest} implemented as a JPA entity.
  *
  * @author Carl Harris
  */
-public interface SigningRequestEditorFactory {
+@Entity
+@Table(name = "credential_certification_request")
+public class CredentialCertificationRequestEntity 
+    extends CredentialComponentEntity 
+    implements CredentialCertificationRequest {
 
-  /**
-   * Creates an editor for a signing request based on contents of the
-   * given credential
-   * @param credential basis for the signing request that will be edited
-   * @return editor
-   */
-  SigningRequestEditor newEditor(Credential credential);
-  
+  private static final long serialVersionUID = 1989015823707931759L;
+
 }
