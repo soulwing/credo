@@ -43,10 +43,12 @@ public interface CertificationRequestBuilder {
   
   /**
    * Builds the certification request.
+   * @param privateKey private key that will be used to sign the request
    * @return certification request
    * @throws CertificationRequestException as a wrapper for an exception that 
    *    while generating the certification request
    */
-  CertificationRequestWrapper build() throws CertificationRequestException;
+  CertificationRequestWrapper build(PrivateKeyWrapper privateKey) 
+      throws CertificationRequestException;
   
 }

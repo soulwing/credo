@@ -72,7 +72,7 @@ public class ConcreteRequestGenerator
       CertificationRequestWrapper csr = csrBuilderFactory.newBuilder()
           .setPublicKey(keyPair.getPublic())
           .setSubject(editor.getSubject())
-          .build();
+          .build(keyPair.getPrivate());
       
       CredentialRequest request = requestBuilderFactory.newBuilder()
           .setSubject(csr.getSubject())

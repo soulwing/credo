@@ -158,7 +158,7 @@ public class ConcreteRequestGeneratorTest {
       will(returnValue(csrBuilder));
       oneOf(csrBuilder).setPublicKey(with(same(publicKey)));
       will(returnValue(csrBuilder));
-      oneOf(csrBuilder).build();
+      oneOf(csrBuilder).build(with(same(privateKey)));
       will(outcome);
     } };
   }
