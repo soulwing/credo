@@ -28,6 +28,7 @@ import static org.jmock.Expectations.returnValue;
 import static org.jmock.Expectations.throwException;
 
 import java.io.StringWriter;
+import java.util.Set;
 
 import org.jmock.Expectations;
 import org.jmock.api.Action;
@@ -39,6 +40,7 @@ import org.junit.Test;
 import org.soulwing.credo.Credential;
 import org.soulwing.credo.CredentialCertificationRequest;
 import org.soulwing.credo.CredentialRequest;
+import org.soulwing.credo.Tag;
 import org.soulwing.credo.repository.CredentialRepository;
 import org.soulwing.credo.repository.CredentialRequestRepository;
 import org.soulwing.credo.service.request.CredentialRequestEditorFactory;
@@ -57,6 +59,10 @@ public class ConcreteCredentialRequestServiceTest {
 
   private static final long CREDENTIAL_ID = -1L;
 
+  private static final String NOTE = "note";
+   
+  private static final String[] TAGS = new String[0];
+  
   @Rule
   public final JUnitRuleMockery context = new JUnitRuleMockery();
   
@@ -71,6 +77,9 @@ public class ConcreteCredentialRequestServiceTest {
   
   @Mock
   private CredentialRequestRepository requestRepository;
+  
+  @Mock
+  private TagService tagService;
   
   @Mock
   private Credential credential;
@@ -93,6 +102,9 @@ public class ConcreteCredentialRequestServiceTest {
   @Mock
   private Errors errors;
   
+  @Mock
+  private Set<? extends Tag> tags;
+  
   private ConcreteCredentialRequestService service =
       new ConcreteCredentialRequestService();
   
@@ -102,6 +114,7 @@ public class ConcreteCredentialRequestServiceTest {
     service.editorFactory = editorFactory;
     service.generator = generator;
     service.requestRespository = requestRepository;
+    service.tagService = tagService;
   }
   
   @Test
@@ -156,6 +169,7 @@ public class ConcreteCredentialRequestServiceTest {
   @Test
   public void testCreateSigningRequestSuccess() throws Exception {
     context.checking(generateExpectations(returnValue(request)));
+    context.checking(requestExpectations());
     assertThat(service.createRequest(editor, protection, errors),
         is(sameInstance(request)));
   }
@@ -166,6 +180,22 @@ public class ConcreteCredentialRequestServiceTest {
       oneOf(generator).generate(with(same(editor)), with(same(protection)), 
           with(same(errors)));
       will(outcome);
+    } };
+  }
+  
+  private Expectations requestExpectations() {
+    return new Expectations() { {
+      oneOf(editor).getName();
+      will(returnValue(REQUEST_NAME));
+      oneOf(request).setName(with(REQUEST_NAME));
+      oneOf(editor).getNote();
+      will(returnValue(NOTE));
+      oneOf(request).setNote(with(NOTE));
+      oneOf(editor).getTags();
+      will(returnValue(TAGS));
+      oneOf(request).setTags(tags);
+      oneOf(tagService).resolve(TAGS);
+      will(returnValue(tags));
     } };
   }
   

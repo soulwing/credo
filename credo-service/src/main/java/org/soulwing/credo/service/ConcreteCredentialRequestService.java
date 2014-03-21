@@ -62,6 +62,9 @@ public class ConcreteCredentialRequestService implements CredentialRequestServic
   @Inject
   protected CredentialRequestRepository requestRespository;
 
+  @Inject
+  protected TagService tagService;
+  
 
   @Override
   @TransactionAttribute(TransactionAttributeType.REQUIRED)
@@ -83,7 +86,12 @@ public class ConcreteCredentialRequestService implements CredentialRequestServic
       Errors errors) throws NoSuchGroupException, PassphraseException, 
       GroupAccessException, CredentialRequestException {
     try {
-      return generator.generate(editor, protection, errors);
+      CredentialRequest request = generator.generate(editor, protection, 
+          errors);
+      request.setName(editor.getName());
+      request.setNote(editor.getNote());
+      request.setTags(tagService.resolve(editor.getTags()));
+      return request;
     }
     catch (UserAccessException ex) {
       throw new PassphraseException();
