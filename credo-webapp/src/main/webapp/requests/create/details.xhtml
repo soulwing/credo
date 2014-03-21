@@ -11,8 +11,8 @@
   <ui:composition template="/templates/masterTemplate.xhtml">
     <f:metadata>
       <f:viewParam id="credentialId" name="credentialId" 
-        value="#{createSigningRequestBean.credentialId}"/>
-      <f:viewAction action="#{createSigningRequestBean.findCredential}" />
+        value="#{createCredentialRequestBean.credentialId}"/>
+      <f:viewAction action="#{createCredentialRequestBean.findCredential}" />
     </f:metadata>  
     <ui:define name="windowTitle">
       #{messages.applicationName}::#{messages.createRequestHeading}
@@ -23,9 +23,9 @@
         detail="#{messages.createRequestDetailsDetail}"
         submitLabel="#{messages.continueLabel} &#8594;"
         cancelLabel="#{messages.cancelLabel}"
-        submitAction="#{createSigningRequestBean.password}"
-        cancelAction="#{createSigningRequestBean.cancel}" 
-        editor="#{createSigningRequestBean.editor}" />
+        submitAction="#{createCredentialRequestBean.password}"
+        cancelAction="#{createCredentialRequestBean.cancel}" 
+        editor="#{createCredentialRequestBean.editor}" />
     </ui:define>
     <ui:define name="scripts">
       <h:outputScript library="js" name="typeahead.bundle.js"/>

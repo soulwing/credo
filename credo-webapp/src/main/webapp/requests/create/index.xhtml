@@ -10,8 +10,8 @@
   <ui:composition template="/templates/masterTemplate.xhtml">
     <f:metadata>
       <f:viewParam id="credentialId" name="credentialId" 
-        value="#{createSigningRequestBean.credentialId}"/>
-      <f:viewAction action="#{createSigningRequestBean.findCredential}" />
+        value="#{createCredentialRequestBean.credentialId}"/>
+      <f:viewAction action="#{createCredentialRequestBean.findCredential}" />
     </f:metadata>  
     <ui:define name="windowTitle">
       #{messages.applicationName}::#{messages.createRequestHeading}

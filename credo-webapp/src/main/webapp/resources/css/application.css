@@ -138,3 +138,8 @@ td.column-width30 {
 td.table-tools a {
 	margin-right: 5px;
 }
+
+.pem-text {
+	font-family: monospace;
+	font-size: 12px;
+}
