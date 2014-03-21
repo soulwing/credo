@@ -115,8 +115,9 @@ public class FacesFileDownloadResponseTest {
 
   @Test
   public void testGetWriter() throws Exception {
+    context.checking(fetchExternalContextExpectations());
     context.checking(new Expectations() { { 
-      oneOf(facesContext).getResponseWriter();
+      oneOf(externalContext).getResponseOutputWriter();
       will(returnValue(writer));
     } });
     
@@ -125,8 +126,9 @@ public class FacesFileDownloadResponseTest {
 
   @Test
   public void testGetOutputStream() throws Exception {
+    context.checking(fetchExternalContextExpectations());
     context.checking(new Expectations() { { 
-      oneOf(facesContext).getResponseStream();
+      oneOf(externalContext).getResponseOutputStream();
       will(returnValue(outputStream));
     } });
     

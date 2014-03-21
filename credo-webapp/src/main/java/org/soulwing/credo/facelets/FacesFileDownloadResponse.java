@@ -78,7 +78,7 @@ public class FacesFileDownloadResponse implements FileDownloadResponse {
    */
   @Override
   public Writer getWriter() throws IOException {
-    return facesContext.getResponseWriter();
+    return facesContext.getExternalContext().getResponseOutputWriter();
   }
 
   /**
@@ -86,7 +86,7 @@ public class FacesFileDownloadResponse implements FileDownloadResponse {
    */
   @Override
   public OutputStream getOutputStream() throws IOException {
-    return facesContext.getResponseStream();
+    return facesContext.getExternalContext().getResponseOutputStream();
   }
 
 }
