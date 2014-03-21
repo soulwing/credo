@@ -25,14 +25,14 @@ import javax.inject.Inject;
 
 import org.soulwing.credo.CredentialRequest;
 import org.soulwing.credo.CredentialRequestBuilderFactory;
+import org.soulwing.credo.service.CredentialRequestEditor;
+import org.soulwing.credo.service.CredentialRequestException;
 import org.soulwing.credo.service.Errors;
 import org.soulwing.credo.service.GroupAccessException;
 import org.soulwing.credo.service.NoSuchGroupException;
 import org.soulwing.credo.service.ProtectionParameters;
-import org.soulwing.credo.service.CredentialRequestEditor;
-import org.soulwing.credo.service.CredentialRequestException;
 import org.soulwing.credo.service.UserAccessException;
-import org.soulwing.credo.service.crypto.CertificationRequestBuilder;
+import org.soulwing.credo.service.crypto.CertificationRequestBuilderFactory;
 import org.soulwing.credo.service.crypto.CertificationRequestException;
 import org.soulwing.credo.service.crypto.CertificationRequestWrapper;
 import org.soulwing.credo.service.crypto.KeyGeneratorService;
@@ -52,7 +52,7 @@ public class ConcreteRequestGenerator
   protected KeyGeneratorService keyGeneratorService;
 
   @Inject
-  protected CertificationRequestBuilder csrBuilder;
+  protected CertificationRequestBuilderFactory csrBuilderFactory;
 
   @Inject
   protected CredentialRequestBuilderFactory requestBuilderFactory;
@@ -67,12 +67,12 @@ public class ConcreteRequestGenerator
       CredentialRequestException {
     
     KeyPairWrapper keyPair = keyGeneratorService.generateKeyPair();
-    
     try {
       
-      CertificationRequestWrapper csr =
-          csrBuilder.setPublicKey(keyPair.getPublic())
-              .setSubject(editor.getSubject()).build();
+      CertificationRequestWrapper csr = csrBuilderFactory.newBuilder()
+          .setPublicKey(keyPair.getPublic())
+          .setSubject(editor.getSubject())
+          .build();
       
       CredentialRequest request = requestBuilderFactory.newBuilder()
           .setSubject(csr.getSubject())

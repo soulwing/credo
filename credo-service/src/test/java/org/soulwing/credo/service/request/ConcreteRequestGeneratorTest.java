@@ -36,11 +36,12 @@ import org.junit.Test;
 import org.soulwing.credo.CredentialRequest;
 import org.soulwing.credo.CredentialRequestBuilder;
 import org.soulwing.credo.CredentialRequestBuilderFactory;
-import org.soulwing.credo.service.Errors;
-import org.soulwing.credo.service.ProtectionParameters;
 import org.soulwing.credo.service.CredentialRequestEditor;
 import org.soulwing.credo.service.CredentialRequestException;
+import org.soulwing.credo.service.Errors;
+import org.soulwing.credo.service.ProtectionParameters;
 import org.soulwing.credo.service.crypto.CertificationRequestBuilder;
+import org.soulwing.credo.service.crypto.CertificationRequestBuilderFactory;
 import org.soulwing.credo.service.crypto.CertificationRequestException;
 import org.soulwing.credo.service.crypto.CertificationRequestWrapper;
 import org.soulwing.credo.service.crypto.KeyGeneratorService;
@@ -67,7 +68,7 @@ public class ConcreteRequestGeneratorTest {
   private KeyGeneratorService keyGeneratorService;
   
   @Mock
-  private CertificationRequestBuilder csrBuilder;
+  private CertificationRequestBuilderFactory csrBuilderFactory;
   
   @Mock
   private CredentialRequestBuilderFactory requestBuilderFactory;
@@ -77,6 +78,9 @@ public class ConcreteRequestGeneratorTest {
   
   @Mock
   private CredentialRequestEditor editor;
+  
+  @Mock
+  private CertificationRequestBuilder csrBuilder;
   
   @Mock
   private CredentialRequestBuilder requestBuilder;
@@ -108,7 +112,7 @@ public class ConcreteRequestGeneratorTest {
   @Before
   public void setUp() throws Exception {
     generator.keyGeneratorService = keyGeneratorService;
-    generator.csrBuilder = csrBuilder;
+    generator.csrBuilderFactory = csrBuilderFactory;
     generator.requestBuilderFactory = requestBuilderFactory;
     generator.protectionService = protectionService;
   }
@@ -148,6 +152,8 @@ public class ConcreteRequestGeneratorTest {
     return new Expectations() { { 
       oneOf(editor).getSubject();
       will(returnValue(SUBJECT));
+      oneOf(csrBuilderFactory).newBuilder();
+      will(returnValue(csrBuilder));
       oneOf(csrBuilder).setSubject(with(SUBJECT));
       will(returnValue(csrBuilder));
       oneOf(csrBuilder).setPublicKey(with(same(publicKey)));
