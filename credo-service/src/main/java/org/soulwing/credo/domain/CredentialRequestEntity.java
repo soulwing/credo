@@ -48,7 +48,7 @@ import org.soulwing.credo.UserGroup;
  * @author Carl Harris
  */
 @Entity
-@Table(name = "signing_request")
+@Table(name = "credential_request")
 public class CredentialRequestEntity extends AbstractEntity 
     implements CredentialRequest {
 
@@ -67,7 +67,7 @@ public class CredentialRequestEntity extends AbstractEntity
   private String note;
   
   @ManyToMany(fetch = FetchType.LAZY)
-  @JoinTable(name = "signing_request_tag", inverseJoinColumns = { 
+  @JoinTable(name = "credential_request_tag", inverseJoinColumns = { 
       @JoinColumn(name = "tag_id")
   })
   private Set<TagEntity> tags = new LinkedHashSet<TagEntity>();
@@ -75,12 +75,13 @@ public class CredentialRequestEntity extends AbstractEntity
   @OneToOne(optional = false, fetch = FetchType.LAZY, 
       cascade = { CascadeType.PERSIST })
   @JoinColumn(name = "private_key_id")
-  private CredentialKeyEntity privateKey;
+  private CredentialKeyEntity privateKey = new CredentialKeyEntity();
 
   @OneToOne(optional = false, fetch = FetchType.LAZY,
       cascade = { CascadeType.PERSIST })
   @JoinColumn(name = "certification_request_id")
-  private CredentialCertificationRequestEntity certificationRequest;
+  private CredentialCertificationRequestEntity certificationRequest =
+      new CredentialCertificationRequestEntity();
 
   @Temporal(TemporalType.TIMESTAMP)
   @Column(name = "date_created", nullable = false)
