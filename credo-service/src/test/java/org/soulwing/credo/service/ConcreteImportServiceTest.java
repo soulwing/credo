@@ -53,7 +53,6 @@ import org.soulwing.credo.Tag;
 import org.soulwing.credo.UserGroup;
 import org.soulwing.credo.UserGroupMember;
 import org.soulwing.credo.repository.CredentialRepository;
-import org.soulwing.credo.repository.TagRepository;
 import org.soulwing.credo.repository.UserGroupMemberRepository;
 import org.soulwing.credo.repository.UserGroupRepository;
 import org.soulwing.credo.service.crypto.CertificateWrapper;
@@ -152,9 +151,6 @@ public class ConcreteImportServiceTest {
   private CredentialRepository credentialRepository;
   
   @Mock
-  private TagRepository tagRepository;
-  
-  @Mock
   private Tag tag;
   
   @Mock
@@ -162,6 +158,9 @@ public class ConcreteImportServiceTest {
   
   @Mock
   private UserGroupMemberRepository memberRepository;
+  
+  @Mock
+  private TagService tagService;
   
   @Mock
   private GroupService groupService;
@@ -179,7 +178,7 @@ public class ConcreteImportServiceTest {
     importService.importerFactory = importerFactory;
     importService.credentialRepository = credentialRepository;
     importService.credentialBuilderFactory = credentialBuilderFactory;
-    importService.tagRepository = tagRepository;
+    importService.tagService = tagService;
     importService.groupRepository = groupRepository;
     importService.memberRepository = memberRepository;
     importService.groupService = groupService;
@@ -385,8 +384,8 @@ public class ConcreteImportServiceTest {
       will(returnValue(credentialCertificate));
       oneOf(credentialBuilder).addCertificate(with(credentialCertificate));
       will(returnValue(credentialBuilder));
-      oneOf(tagRepository).findByTagText(with(CREDENTIAL_TAG));
-      will(returnValue(tag));
+      oneOf(tagService).resolve(with(CREDENTIAL_TAGS));
+      will(returnValue(Collections.singleton(tag)));
     } };
   }
 

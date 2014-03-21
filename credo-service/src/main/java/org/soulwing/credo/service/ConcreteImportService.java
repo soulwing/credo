@@ -19,10 +19,7 @@
 package org.soulwing.credo.service;
 
 import java.io.IOException;
-import java.util.Collection;
-import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Set;
 
 import javax.ejb.ConcurrencyManagement;
 import javax.ejb.ConcurrencyManagementType;
@@ -37,10 +34,8 @@ import org.soulwing.credo.CredentialBuilderFactory;
 import org.soulwing.credo.CredentialCertificate;
 import org.soulwing.credo.CredentialCertificateBuilder;
 import org.soulwing.credo.Password;
-import org.soulwing.credo.Tag;
 import org.soulwing.credo.UserGroup;
 import org.soulwing.credo.repository.CredentialRepository;
-import org.soulwing.credo.repository.TagRepository;
 import org.soulwing.credo.repository.UserGroupMemberRepository;
 import org.soulwing.credo.repository.UserGroupRepository;
 import org.soulwing.credo.service.crypto.CertificateWrapper;
@@ -67,13 +62,13 @@ public class ConcreteImportService implements ImportService {
   protected CredentialBuilderFactory credentialBuilderFactory;
   
   @Inject
-  protected TagRepository tagRepository;
-  
-  @Inject
   protected UserGroupRepository groupRepository;
   
   @Inject
   protected UserGroupMemberRepository memberRepository;
+  
+  @Inject
+  protected TagService tagService;
   
   @Inject
   protected GroupService groupService;
@@ -191,7 +186,7 @@ public class ConcreteImportService implements ImportService {
         .setName(details.getName())
         .setIssuer(details.getIssuerCommonName())
         .setNote(details.getNote())
-        .setTags(resolveTags(details.getTags()))
+        .setTags(tagService.resolve(details.getTags()))
         .setExpiration(details.getNotAfter())
         .setPrivateKey(details.getPrivateKey().getContent());
     
@@ -227,18 +222,6 @@ public class ConcreteImportService implements ImportService {
   public void saveCredential(Credential credential, Errors errors)
       throws ImportException {
     credentialRepository.add(credential);
-  }
-
-  private Collection<Tag> resolveTags(String[] tokens) {
-    Set<Tag> tags = new LinkedHashSet<>();
-    for (String token : tokens) {
-      Tag tag = tagRepository.findByTagText(token);
-      if (tag == null) {
-        tag = tagRepository.newTag(token);
-      }
-      tags.add(tag);
-    }
-    return tags;
   }
 
 }

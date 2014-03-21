@@ -39,6 +39,8 @@ import org.soulwing.credo.repository.TagRepository;
  */
 public class ConcreteTagServiceTest {
 
+  private static final String TAG_TEXT = "tagText";
+  
   @Rule
   public final JUnitRuleMockery context = new JUnitRuleMockery();
   
@@ -64,4 +66,28 @@ public class ConcreteTagServiceTest {
     
     assertThat(service.findAllTags(), contains(tag));
   }
+  
+  @Test
+  public void testResolveWithExistingTag() throws Exception {
+    context.checking(new Expectations() { { 
+      oneOf(tagRepository).findByTagText(TAG_TEXT);
+      will(returnValue(tag));
+    } });
+    
+    assertThat(service.resolve(new String[] { TAG_TEXT }), contains(tag));
+  }
+  
+  @Test
+  public void testResolveWithNewTag() throws Exception {
+    context.checking(new Expectations() { { 
+      oneOf(tagRepository).findByTagText(TAG_TEXT);
+      will(returnValue(null));
+      oneOf(tagRepository).newTag(TAG_TEXT);
+      will(returnValue(tag));
+    } });
+    
+    assertThat(service.resolve(new String[] { TAG_TEXT }), contains(tag));
+  }
+  
+
 }

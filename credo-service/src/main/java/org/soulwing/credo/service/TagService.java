@@ -38,4 +38,12 @@ public interface TagService {
    */
   Collection<Tag> findAllTags();
 
+  /**
+   * Resolves the tag strings in the given array into a set of {@link Tag}
+   * objects.
+   * @param tags tag strings
+   * @return tag set
+   */
+  Collection<Tag> resolve(String[] tags);
+  
 }

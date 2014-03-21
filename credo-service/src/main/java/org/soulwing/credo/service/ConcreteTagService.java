@@ -19,6 +19,8 @@
 package org.soulwing.credo.service;
 
 import java.util.Collection;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 import javax.ejb.ConcurrencyManagement;
 import javax.ejb.ConcurrencyManagementType;
@@ -50,5 +52,22 @@ public class ConcreteTagService implements TagService {
   public Collection<Tag> findAllTags() {
     return tagRepository.findAll();
   }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public Collection<Tag> resolve(String[] tags) {
+    Set<Tag> tagSet = new LinkedHashSet<>();
+    for (String text : tags) {
+      Tag tag = tagRepository.findByTagText(text);
+      if (tag == null) {
+        tag = tagRepository.newTag(text);
+      }
+      tagSet.add(tag);
+    }
+    return tagSet;
+  }
+
 
 }
