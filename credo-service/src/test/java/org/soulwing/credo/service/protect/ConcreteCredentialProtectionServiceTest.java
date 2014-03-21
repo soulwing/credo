@@ -212,6 +212,7 @@ public class ConcreteCredentialProtectionServiceTest {
       will(returnValue(credentialPrivateKey));
       oneOf(credentialPrivateKey).getContent();
       will(returnValue(encodedPrivateKey));
+      oneOf(credential).setOwner(with(same(group)));
       oneOf(credential).getPrivateKey();
       will(returnValue(credentialKey));
       oneOf(credentialKey).setContent(with(same(encodedPrivateKey)));

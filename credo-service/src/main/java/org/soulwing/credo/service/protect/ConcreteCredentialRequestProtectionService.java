@@ -22,6 +22,7 @@ import javax.crypto.SecretKey;
 import javax.enterprise.context.ApplicationScoped;
 
 import org.soulwing.credo.CredentialRequest;
+import org.soulwing.credo.UserGroup;
 import org.soulwing.credo.service.GroupAccessException;
 import org.soulwing.credo.service.NoSuchGroupException;
 import org.soulwing.credo.service.ProtectionParameters;
@@ -46,7 +47,9 @@ public class ConcreteCredentialRequestProtectionService
       PrivateKeyWrapper privateKey, ProtectionParameters protection)
       throws GroupAccessException, UserAccessException, NoSuchGroupException {
 
-    SecretKey secretKey = getGroupSecretKey(protection);    
+    UserGroup group = findGroup(protection.getGroupName());
+    SecretKey secretKey = getGroupSecretKey(group, protection.getPassword());
+    request.setOwner(group);
     request.getPrivateKey().setContent(
         wrapPrivateKey(privateKey, secretKey).getContent());
   }

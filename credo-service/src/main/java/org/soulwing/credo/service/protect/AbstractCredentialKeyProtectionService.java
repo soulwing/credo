@@ -21,11 +21,11 @@ package org.soulwing.credo.service.protect;
 import javax.crypto.SecretKey;
 import javax.inject.Inject;
 
+import org.soulwing.credo.Password;
 import org.soulwing.credo.UserGroup;
 import org.soulwing.credo.repository.UserGroupRepository;
 import org.soulwing.credo.service.GroupAccessException;
 import org.soulwing.credo.service.NoSuchGroupException;
-import org.soulwing.credo.service.ProtectionParameters;
 import org.soulwing.credo.service.UserAccessException;
 import org.soulwing.credo.service.UserContextService;
 import org.soulwing.credo.service.crypto.Encoded;
@@ -36,44 +36,42 @@ import org.soulwing.credo.service.crypto.PrivateKeyWrapper;
 
 /**
  * An abstract base for private key protection services.
- *
+ * 
  * @author Carl Harris
  */
 public abstract class AbstractCredentialKeyProtectionService {
 
   @Inject
   protected UserGroupRepository groupRepository;
-  
+
   @Inject
   protected UserContextService userContextService;
-  
+
   @Inject
   protected GroupProtectionService groupProtectionService;
-  
+
   @Inject
   protected PrivateKeyEncryptionService privateKeyEncryptionService;
-  
+
   @Inject
   @Encoded(Type.AES)
   protected PrivateKeyDecoder aesDecoder;
 
   /**
    * Obtains the secret key associated with a group.
-   * @param protection protection parameters which identify the group and
-   *    provide the password obtained from the logged-in user
+   * @param group the subject group
+   * @param password password obtained from the logged-in user
    * @return secret key
    * @throws NoSuchGroupException if the specified group does not exist
-   * @throws GroupAccessException if the user is not a member of the 
-   *    specified group
-   * @throws UserAccessException if the user's private key cannot be
-   *    accessed using the specified password
+   * @throws GroupAccessException if the user is not a member of the specified
+   *         group
+   * @throws UserAccessException if the user's private key cannot be accessed
+   *         using the specified password
    */
-  protected SecretKey getGroupSecretKey(ProtectionParameters protection)
+  protected SecretKey getGroupSecretKey(UserGroup group, Password password)
       throws NoSuchGroupException, GroupAccessException, UserAccessException {
-        UserGroup group = findGroup(protection.getGroupName());
-        return groupProtectionService.unprotect(group, 
-            protection.getPassword()).derive();
-      }
+    return groupProtectionService.unprotect(group, password).derive();
+  }
 
   /**
    * Finds a group by name.
@@ -82,7 +80,7 @@ public abstract class AbstractCredentialKeyProtectionService {
    * @throws NoSuchGroupException if the group does not exist
    */
   protected UserGroup findGroup(String groupName) throws NoSuchGroupException {
-    UserGroup group = groupRepository.findByGroupName(groupName, 
+    UserGroup group = groupRepository.findByGroupName(groupName,
         userContextService.getLoginName());
     if (group == null) {
       throw new NoSuchGroupException();
@@ -96,7 +94,7 @@ public abstract class AbstractCredentialKeyProtectionService {
    * @param secretKey the secret key to use to encrypt {@code privateKey}
    * @return wrapped private key
    */
-  protected PrivateKeyWrapper wrapPrivateKey(PrivateKeyWrapper privateKey, 
+  protected PrivateKeyWrapper wrapPrivateKey(PrivateKeyWrapper privateKey,
       SecretKey secretKey) {
     return privateKeyEncryptionService.encrypt(privateKey, secretKey);
   }
@@ -107,15 +105,14 @@ public abstract class AbstractCredentialKeyProtectionService {
    * @param secretKey the secret key to use to decrypt {@code privateKey}
    * @return private key
    */
-  protected PrivateKeyWrapper unwrapPrivateKey(String encodedPrivateKey, 
+  protected PrivateKeyWrapper unwrapPrivateKey(String encodedPrivateKey,
       SecretKey secretKey) {
-  
-    PrivateKeyWrapper encryptedCredentialKey = aesDecoder.decode(
-        encodedPrivateKey);
-    
-    encryptedCredentialKey.setProtectionParameter(
-        secretKey);
-    
+
+    PrivateKeyWrapper encryptedCredentialKey =
+        aesDecoder.decode(encodedPrivateKey);
+
+    encryptedCredentialKey.setProtectionParameter(secretKey);
+
     return encryptedCredentialKey.deriveWrapper();
   }
 

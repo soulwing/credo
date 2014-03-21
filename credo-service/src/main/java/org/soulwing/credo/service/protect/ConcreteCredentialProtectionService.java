@@ -47,7 +47,9 @@ public class ConcreteCredentialProtectionService
       ProtectionParameters protection) throws UserAccessException,
       GroupAccessException, NoSuchGroupException {
     
-    SecretKey secretKey = getGroupSecretKey(protection);    
+    UserGroup group = findGroup(protection.getGroupName());
+    SecretKey secretKey = getGroupSecretKey(group, protection.getPassword());
+    credential.setOwner(group);
     credential.getPrivateKey().setContent(
         wrapPrivateKey(privateKey, secretKey).getContent());
   }
@@ -67,7 +69,7 @@ public class ConcreteCredentialProtectionService
             + " is not the owner of " + credential.getName());
       }
   
-      SecretKey secretKey = getGroupSecretKey(protection);
+      SecretKey secretKey = getGroupSecretKey(group, protection.getPassword());
   
       return unwrapPrivateKey(credential.getPrivateKey().getContent(), 
           secretKey);
