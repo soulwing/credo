@@ -37,7 +37,16 @@ public class X500PrincipalUtil {
    *   {@code name} if the name does not have a common name component
    */
   public static String getCommonName(X500Principal principal) {
-    String name = principal.getName();
+    return getCommonName(principal.getName());
+  }
+
+  /**
+   * Gets the common name (CN) component of an X.500 principal name.
+   * @param name a distinguished principal name
+   * @return the common name (CN) component or a string representation of 
+   *   {@code name} if the name does not have a common name component
+   */
+  public static String getCommonName(String name) {
     try {
       LdapName ldapName = new LdapName(name);
       for (Rdn rdn : ldapName.getRdns()) {

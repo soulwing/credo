@@ -16,34 +16,37 @@
  * limitations under the License.
  *
  */
-package org.soulwing.credo.service;
+package org.soulwing.credo.service.crypto;
 
 import javax.security.auth.x500.X500Principal;
 
-
 /**
- * An editor for the properties of a signing request.
+ * A builder for a PKCS#10 certificate signing request.
  *
  * @author Carl Harris
  */
-public interface SigningRequestEditor extends CredentialEditor {
+public interface CertificationRequestBuilder {
 
   /**
-   * Gets the subject principal for the signing request.
-   * @return subject principal
+   * Sets the subject name for the certification request.
+   * @param subject subject name
+   * @return the receiver
    */
-  X500Principal getSubject();
+  CertificationRequestBuilder setSubject(X500Principal subject);
   
   /**
-   * Gets the subject name for the signing request.
-   * @return subject name
+   * Sets the subject's public key.
+   * @param publicKey public key associated with the subject
+   * @return the receiver
    */
-  String getSubjectName();
+  CertificationRequestBuilder setPublicKey(PublicKeyWrapper publicKey);
   
   /**
-   * Sets the subject name for the signing request.
-   * @param subjectName the subject name to set
+   * Builds the certification request.
+   * @return certification request
+   * @throws CertificationRequestException as a wrapper for an exception that 
+   *    while generating the certification request
    */
-  void setSubjectName(String subjectName);
+  CertificationRequestWrapper build() throws CertificationRequestException;
   
 }

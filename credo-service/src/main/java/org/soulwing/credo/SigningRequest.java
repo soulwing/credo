@@ -25,4 +25,23 @@ package org.soulwing.credo;
  */
 public interface SigningRequest {
 
+  /**
+   * Gets the friendly name associated with this signing request.
+   * @return friendly name
+   */
+  String getName();
+  
+  /**
+   * Gets the private key for this signing request.
+   * @return private key
+   */
+  CredentialKey getPrivateKey();
+  
+  /**
+   * Gets the PEM encoded content for this signing request.
+   * @return PEM-encoded DER representation of a PKCS#10 Certificate
+   *    Signing Request (CDR) 
+   */
+  String getContent();
+  
 }

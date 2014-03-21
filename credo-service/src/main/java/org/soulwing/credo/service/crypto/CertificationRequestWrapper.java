@@ -1,5 +1,5 @@
 /*
- * File created on Mar 20, 2014 
+ * File created on Feb 19, 2014 
  *
  * Copyright (c) 2014 Virginia Polytechnic Institute and State University
  *
@@ -16,34 +16,31 @@
  * limitations under the License.
  *
  */
-package org.soulwing.credo.service;
+package org.soulwing.credo.service.crypto;
+
+import java.io.IOException;
 
 import javax.security.auth.x500.X500Principal;
 
-
 /**
- * An editor for the properties of a signing request.
+ * A wrapper for a PKCS#10 certification request.
  *
  * @author Carl Harris
  */
-public interface SigningRequestEditor extends CredentialEditor {
+public interface CertificationRequestWrapper {
 
   /**
-   * Gets the subject principal for the signing request.
-   * @return subject principal
+   * Gets the subject name of this certificate.
+   * @return subject name
    */
   X500Principal getSubject();
   
   /**
-   * Gets the subject name for the signing request.
-   * @return subject name
+   * Gets the content of this certification request in a suitable string 
+   * encoding (typically PEM).
+   * @return certification request content
+   * @throws IOException
    */
-  String getSubjectName();
-  
-  /**
-   * Sets the subject name for the signing request.
-   * @param subjectName the subject name to set
-   */
-  void setSubjectName(String subjectName);
+  String getContent() throws IOException;
   
 }

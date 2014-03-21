@@ -16,34 +16,26 @@
  * limitations under the License.
  *
  */
-package org.soulwing.credo.service;
+package org.soulwing.credo.service.request;
 
-import javax.security.auth.x500.X500Principal;
-
+import org.soulwing.credo.Credential;
+import org.soulwing.credo.service.CredentialEditor;
+import org.soulwing.credo.service.SigningRequestEditor;
 
 /**
- * An editor for the properties of a signing request.
+ * A factory that produces {@link CredentialEditor} objects for 
+ * signing requests.
  *
  * @author Carl Harris
  */
-public interface SigningRequestEditor extends CredentialEditor {
+public interface SigningRequestEditorFactory {
 
   /**
-   * Gets the subject principal for the signing request.
-   * @return subject principal
+   * Creates an editor for a signing request based on contents of the
+   * given credential
+   * @param credential basis for the signing request that will be edited
+   * @return editor
    */
-  X500Principal getSubject();
-  
-  /**
-   * Gets the subject name for the signing request.
-   * @return subject name
-   */
-  String getSubjectName();
-  
-  /**
-   * Sets the subject name for the signing request.
-   * @param subjectName the subject name to set
-   */
-  void setSubjectName(String subjectName);
+  SigningRequestEditor newEditor(Credential credential);
   
 }
