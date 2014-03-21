@@ -121,7 +121,6 @@ public class CreateCredentialRequestBean implements Serializable {
   /**
    * Gets the prepared signing request.
    * <p>
-   * This method is exposed to support unit testing.
    * @return signing request or {@code null} if the request has not been
    *    prepared
    */
@@ -140,6 +139,15 @@ public class CreateCredentialRequestBean implements Serializable {
   }
   
   /**
+   * Gets the prepared certification request.
+   * @return
+   */
+  public String getCertificationRequest() {
+    if (signingRequest == null) return null;
+    return signingRequest.getCertificationRequest().getContent();
+  }
+  
+  /**
    * An action that is fired when the details view is displayed.
    * <p>
    * If the {@code credentialId} property is set, this method locates the
@@ -152,7 +160,7 @@ public class CreateCredentialRequestBean implements Serializable {
       if (credentialId == null) {
         // not implemented yet
         throw new UnsupportedOperationException(
-            "cannot signing request for new credential");
+            "cannot create request for new credential");
       }  
       try {
         editor.setDelegate(
