@@ -29,6 +29,7 @@ import javax.naming.ldap.Rdn;
 
 import org.soulwing.credo.UserGroup;
 import org.soulwing.credo.service.ImportDetails;
+import org.soulwing.credo.service.X500PrincipalUtil;
 import org.soulwing.credo.service.crypto.CertificateWrapper;
 import org.soulwing.credo.service.crypto.PrivateKeyWrapper;
 
@@ -65,7 +66,7 @@ public class ConcreteImportDetails implements ImportDetails, Serializable {
     this.privateKey = privateKey;
     this.certificates.add(certificate);
     this.certificates.addAll(authorities);
-    this.name = getCommonName(certificate.getSubject().getName());
+    this.name = X500PrincipalUtil.getCommonName(certificate.getSubject());
   }
 
   /**
@@ -110,7 +111,7 @@ public class ConcreteImportDetails implements ImportDetails, Serializable {
     return getCommonName(issuer);
   }
 
-  private String getCommonName(String name) {
+  private static String getCommonName(String name) {
     try {
       LdapName ldapName = new LdapName(name);
       for (Rdn rdn : ldapName.getRdns()) {
