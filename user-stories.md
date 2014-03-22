@@ -1,11 +1,9 @@
-Remove Signing Request
-----------------------
+Download Signing Request
+------------------------
 
-A user can remove a signing request for which she is an owner.
+A user can download the certification request file for an existing signing
+request for which she is an owner.
 
-* The user should be prompted to confirm before the request is removed.
-* The user receives a warning if no credential has been created from the
-  request.
 
 Edit Credential
 ---------------

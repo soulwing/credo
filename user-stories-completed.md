@@ -308,6 +308,16 @@ A user can view a table of signing requests for which she is an owner.
 * Each row in the table should include controls to edit or remove the 
   request, and to import the signed certificate chain.
  
+
+Remove Signing Request
+----------------------
+
+A user can remove a signing request for which she is an owner.
+
+* The user should be prompted to confirm before the request is removed.
+* The user receives a warning if no credential has been created from the
+  request.
+
  
 
 
