@@ -25,6 +25,7 @@ import java.util.Set;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
 import javax.persistence.TypedQuery;
 
@@ -79,11 +80,15 @@ public class JpaCredentialRequestRepository
    * {@inheritDoc}
    */
   @Override
-  public void remove(Long id) {
+  public void remove(Long id, boolean removePrivateKey) {
     CredentialRequestEntity request = entityManager.find(
         CredentialRequestEntity.class, id);
     if (request != null) {
       entityManager.remove(request);
+      entityManager.remove(request.getCertificationRequest());
+      if (removePrivateKey) {
+        entityManager.remove(request.getPrivateKey());
+      }
     }
   }
 
@@ -92,7 +97,15 @@ public class JpaCredentialRequestRepository
    */
   @Override
   public CredentialRequest findById(Long id) {
-    return entityManager.find(CredentialRequestEntity.class, id);
+    TypedQuery<CredentialRequest> query = entityManager.createNamedQuery(
+        "findRequestById", CredentialRequest.class);
+    query.setParameter("id", id);
+    try {
+      return query.getSingleResult();
+    }
+    catch (NoResultException ex) {
+      return null;
+    }
   }
 
   /**

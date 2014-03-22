@@ -43,6 +43,8 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.soulwing.credo.Credential;
 import org.soulwing.credo.CredentialRequest;
+import org.soulwing.credo.domain.CredentialEntity;
+import org.soulwing.credo.domain.CredentialKeyEntity;
 import org.soulwing.credo.domain.CredentialRequestEntity;
 import org.soulwing.credo.domain.TagEntity;
 import org.soulwing.credo.domain.UserGroupEntity;
@@ -156,9 +158,41 @@ public class JpaCredentialRequestRepositoryIT {
     CredentialRequest actual = repository.findById(request.getId());   
     assertThat(actual, is(not(nullValue())));
 
-    repository.remove(request.getId());
+    repository.remove(request.getId(), true);
     assertThat(repository.findById(request.getId()), is(nullValue()));
   }
+
+  @Test
+  public void testRemoveLeavingPrivateKey() throws Exception {
+    UserGroupEntity group = EntityUtil.newGroup("someGroup");
+    CredentialKeyEntity privateKey = EntityUtil.newPrivateKey();
+    CredentialRequestEntity request = EntityUtil.newRequest(group, 
+        privateKey, EntityUtil.newCertificationRequest());
+
+    CredentialEntity credential = EntityUtil.newCredential(group, privateKey);
+    credential.setRequest(request);
+    entityManager.persist(group);
+    repository.add(request);
+    entityManager.persist(credential);
+    
+    entityManager.flush();
+    entityManager.clear();
+    
+    CredentialRequest actual = repository.findById(request.getId());   
+    assertThat(actual, is(not(nullValue())));
+
+    credential.setRequest(null);
+    credential = entityManager.merge(credential);
+    
+    repository.remove(request.getId(), false);
+    assertThat(repository.findById(request.getId()), is(nullValue()));
+    
+    CredentialEntity actualCredential = entityManager.find(
+        CredentialEntity.class, credential.getId());
+    assertThat(actualCredential, is(not(nullValue())));
+    assertThat(actualCredential.getPrivateKey(), is(not(nullValue())));
+  }
+
 
   @Test
   public void testFindById() throws Exception {

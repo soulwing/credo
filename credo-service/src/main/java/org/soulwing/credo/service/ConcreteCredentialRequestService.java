@@ -196,7 +196,7 @@ public class ConcreteCredentialRequestService implements CredentialRequestServic
       credential.setRequest(null);
       credentialRepository.update(credential);
     }
-    requestRepository.remove(id);
+    requestRepository.remove(id, credential == null);
   }
   
   
