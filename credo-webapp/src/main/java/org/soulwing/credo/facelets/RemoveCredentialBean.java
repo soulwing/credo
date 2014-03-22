@@ -98,6 +98,7 @@ public class RemoveCredentialBean implements Serializable {
       return null;
     }
     catch (NoSuchCredentialException ex) {
+      errors.addError("id", "credentialNotFound", id);
       return FAILURE_OUTCOME_ID;
     }
   }

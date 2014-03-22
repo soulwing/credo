@@ -19,6 +19,7 @@
 package org.soulwing.credo.facelets;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.arrayContaining;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.emptyArray;
 import static org.hamcrest.Matchers.equalTo;
@@ -88,6 +89,7 @@ public class RemoveCredentialBeanTest {
   public void testFindGroupWhenNoSuchCredential() throws Exception {
     context.checking(findCredentialExpectations(
         throwException(new NoSuchCredentialException())));
+    context.checking(errorExpectations("id", "NotFound", CREDENTIAL_ID));
     bean.setId(CREDENTIAL_ID);
     assertThat(bean.findCredential(), 
         is(equalTo(RemoveCredentialBean.FAILURE_OUTCOME_ID)));
@@ -138,6 +140,14 @@ public class RemoveCredentialBeanTest {
     return new Expectations() { { 
       oneOf(errors).addError(with(id), with(containsString(message)),
           with(emptyArray()));
+    } };
+  }
+
+  private Expectations errorExpectations(final String id, 
+      final String message, final Object obj) {
+    return new Expectations() { { 
+      oneOf(errors).addError(with(id), with(containsString(message)),
+          with(arrayContaining(obj)));
     } };
   }
 
