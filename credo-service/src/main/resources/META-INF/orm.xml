@@ -166,6 +166,14 @@
     </query>
   </named-query>
 
+  <named-query name="findCredentialByRequestId">
+    <query>
+      select distinct c from CredentialEntity c
+      inner join c.request r
+      where r.id = :requestId
+    </query>
+  </named-query>
+  
   <named-query name="findAllRequestsByLoginName">
     <query>
       select distinct r from CredentialRequestEntity r

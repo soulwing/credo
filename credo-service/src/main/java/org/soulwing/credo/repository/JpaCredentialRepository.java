@@ -80,6 +80,14 @@ public class JpaCredentialRepository implements CredentialRepository {
    * {@inheritDoc}
    */
   @Override
+  public Credential update(Credential credential) {
+    return entityManager.merge(credential);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
   public void remove(Long id) {
     Credential credential = findById(id);
     for (CredentialCertificate certificate : credential.getCertificates()) {
@@ -125,6 +133,22 @@ public class JpaCredentialRepository implements CredentialRepository {
         "findAllCredentialsByOwnerId", Credential.class);
     query.setParameter("ownerId", ownerId);
     return query.getResultList();
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public Credential findByRequestId(Long requestId) {
+    TypedQuery<Credential> query = entityManager.createNamedQuery(
+        "findCredentialByRequestId", Credential.class);
+    query.setParameter("requestId", requestId);
+    try {
+      return query.getSingleResult();      
+    }
+    catch (NoResultException ex) {
+      return null;
+    }
   }
 
 }

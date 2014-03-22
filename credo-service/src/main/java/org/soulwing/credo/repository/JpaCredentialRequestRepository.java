@@ -79,6 +79,26 @@ public class JpaCredentialRequestRepository
    * {@inheritDoc}
    */
   @Override
+  public void remove(Long id) {
+    CredentialRequestEntity request = entityManager.find(
+        CredentialRequestEntity.class, id);
+    if (request != null) {
+      entityManager.remove(request);
+    }
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public CredentialRequest findById(Long id) {
+    return entityManager.find(CredentialRequestEntity.class, id);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
   public List<CredentialRequest> findAllByLoginName(String loginName) {
     TypedQuery<CredentialRequest> query = entityManager.createNamedQuery(
         "findAllRequestsByLoginName", CredentialRequest.class);

@@ -40,8 +40,9 @@ public interface CredentialRepository {
    * persistent credential
    * <p>
    * @param credential the credential to update
+   * @return the updated (merged) credential
    */
-  void update(Credential credential);
+  Credential update(Credential credential);
   
   /**
    * Removes a credential from the repository.

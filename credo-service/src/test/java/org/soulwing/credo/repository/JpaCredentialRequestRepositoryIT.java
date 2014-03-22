@@ -141,7 +141,42 @@ public class JpaCredentialRequestRepositoryIT {
         is(equalTo(credential.getId())));
   }
 
+  @Test
+  public void testRemove() throws Exception {
+    UserGroupEntity group = EntityUtil.newGroup("someGroup");
+    CredentialRequestEntity request = EntityUtil.newRequest(group, 
+        EntityUtil.newPrivateKey(),
+        EntityUtil.newCertificationRequest());
 
+    entityManager.persist(group);
+    repository.add(request);
+    entityManager.flush();
+    entityManager.clear();
+    
+    CredentialRequest actual = repository.findById(request.getId());   
+    assertThat(actual, is(not(nullValue())));
+
+    repository.remove(request.getId());
+    assertThat(repository.findById(request.getId()), is(nullValue()));
+  }
+
+  @Test
+  public void testFindById() throws Exception {
+    UserGroupEntity group = EntityUtil.newGroup("someGroup");
+    CredentialRequestEntity request = EntityUtil.newRequest(group, 
+        EntityUtil.newPrivateKey(),
+        EntityUtil.newCertificationRequest());
+
+    entityManager.persist(group);
+    repository.add(request);
+    entityManager.flush();
+    entityManager.clear();
+    
+    CredentialRequest actual = repository.findById(request.getId());
+    assertThat(actual, is(not(nullValue())));
+    assertThat(actual.getId(), is(equalTo(request.getId())));
+  }
+  
   @Test
   public void testFindAllByLoginName() throws Exception {
     final String loginName = "someUser";

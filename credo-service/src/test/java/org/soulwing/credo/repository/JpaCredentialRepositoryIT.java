@@ -192,7 +192,35 @@ public class JpaCredentialRepositoryIT {
     assertThat(actual.getRequest().getId(), is(equalTo(request.getId())));
   }
 
+  @Test
+  public void testUpdate() throws Exception {
+    UserGroupEntity group = EntityUtil.newGroup("someGroup");
+    CredentialKeyEntity privateKey = EntityUtil.newPrivateKey();
+    CredentialRequestEntity request = EntityUtil.newRequest(group, privateKey, 
+        EntityUtil.newCertificationRequest());
+    CredentialEntity credential = EntityUtil.newCredential(group, privateKey);
+    credential.setRequest(request);
+    entityManager.persist(group);
+    entityManager.persist(request);
+    repository.add(credential);
+    entityManager.flush();
+    entityManager.clear();
 
+    CredentialEntity actual = entityManager.find(CredentialEntity.class,
+        credential.getId());
+    assertThat(actual, is(not(nullValue())));
+    assertThat(actual.getRequest(), is(not(nullValue())));
+
+    credential.setRequest(null);
+    repository.update(credential);
+    entityManager.flush();
+    entityManager.clear();
+    
+    actual = entityManager.find(CredentialEntity.class, credential.getId());
+    assertThat(actual, is(not(nullValue())));
+    assertThat(actual.getRequest(), is(nullValue()));
+  }
+  
   @Test
   public void testRemove() throws Exception {
     UserGroupEntity group = EntityUtil.newGroup("someGroup");
@@ -274,6 +302,25 @@ public class JpaCredentialRepositoryIT {
     assertThat(credentials.size(), is(equalTo(1)));    
     
     Credential actual = credentials.get(0);
+    assertThat(actual, is(not(nullValue())));
+    assertThat(actual.getName(), is(equalTo(credential.getName())));
+  }
+
+  @Test
+  public void testFindByRequestId() throws Exception {
+    UserGroupEntity group = EntityUtil.newGroup("someGroup");
+    CredentialKeyEntity privateKey = EntityUtil.newPrivateKey();
+    CredentialRequestEntity request = EntityUtil.newRequest(group, privateKey, 
+        EntityUtil.newCertificationRequest());
+    CredentialEntity credential = EntityUtil.newCredential(group, privateKey);
+    credential.setRequest(request);
+    entityManager.persist(group);
+    entityManager.persist(request);
+    repository.add(credential);
+    entityManager.flush();
+    entityManager.clear();
+    
+    Credential actual = repository.findByRequestId(request.getId());
     assertThat(actual, is(not(nullValue())));
     assertThat(actual.getName(), is(equalTo(credential.getName())));
   }
