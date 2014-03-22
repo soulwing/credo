@@ -86,7 +86,7 @@ public class RemoveCredentialBeanTest {
   }
 
   @Test
-  public void testFindGroupWhenNoSuchCredential() throws Exception {
+  public void testFindCredentialWhenNoSuchCredential() throws Exception {
     context.checking(findCredentialExpectations(
         throwException(new NoSuchCredentialException())));
     context.checking(errorExpectations("id", "NotFound", CREDENTIAL_ID));
@@ -96,7 +96,7 @@ public class RemoveCredentialBeanTest {
   }
 
   @Test
-  public void testFindGroupWhenNoId() throws Exception {
+  public void testFindCredentialWhenNoId() throws Exception {
     context.checking(errorExpectations("id", "Required"));
     bean.setId(null);
     assertThat(bean.findCredential(), 
