@@ -240,7 +240,7 @@ public class CredentialRequestEntity extends AbstractEntity
    */
   @Override
   public void setCredential(Credential credential) {
-    if (!(credential instanceof CredentialEntity)) {
+    if (credential != null && !(credential instanceof CredentialEntity)) {
       throw new IllegalArgumentException("unsupported credential type: "
           + credential.getClass().getName());
     }
