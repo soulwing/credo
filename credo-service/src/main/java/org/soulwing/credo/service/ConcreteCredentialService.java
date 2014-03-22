@@ -72,7 +72,10 @@ public class ConcreteCredentialService implements CredentialService {
    */
   @Override
   public void removeCredential(Long id) {
-    credentialRepository.remove(id);
+    Credential credential = credentialRepository.findById(id);
+    if (credential != null) {
+      credentialRepository.remove(credential);
+    }
   }
 
 }

@@ -105,7 +105,9 @@ public class ConcreteCredentialServiceTest {
   @Test
   public void testRemoveCredential() throws Exception {
     context.checking(new Expectations() { {
-      oneOf(credentialRepository).remove(with(CREDENTIAL_ID));
+      oneOf(credentialRepository).findById(with(CREDENTIAL_ID));
+      will(returnValue(credential));
+      oneOf(credentialRepository).remove(with(credential));
     } });
     
     service.removeCredential(CREDENTIAL_ID);

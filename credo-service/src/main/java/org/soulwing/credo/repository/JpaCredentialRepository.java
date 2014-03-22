@@ -92,8 +92,8 @@ public class JpaCredentialRepository implements CredentialRepository {
    * {@inheritDoc}
    */
   @Override
-  public void remove(Long id) {
-    Credential credential = findById(id);
+  @Restricted(Restriction.OWNER)
+  public void remove(Credential credential) {
     for (CredentialCertificate certificate : credential.getCertificates()) {
       entityManager.remove(certificate);
     }
@@ -105,7 +105,6 @@ public class JpaCredentialRepository implements CredentialRepository {
    * {@inheritDoc}
    */
   @Override
-  @Restricted(Restriction.OWNER)
   public Credential findById(Long id) {
     TypedQuery<Credential> query = entityManager.createNamedQuery(
         "findCredentialById", Credential.class);
@@ -144,7 +143,6 @@ public class JpaCredentialRepository implements CredentialRepository {
    * {@inheritDoc}
    */
   @Override
-  @Restricted(Restriction.OWNER)
   public Credential findByRequestId(Long requestId) {
     TypedQuery<Credential> query = entityManager.createNamedQuery(
         "findCredentialByRequestId", Credential.class);

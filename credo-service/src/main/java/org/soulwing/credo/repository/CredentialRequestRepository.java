@@ -37,11 +37,11 @@ public interface CredentialRequestRepository {
   
   /**
    * Removes a persistent request from the repository.
-   * @param id unique identifier of the request to remove
+   * @param request the request to remove
    * @param removePrivateKey flag indicating whether the request's 
    *    private key should also be removed
    */
-  void remove(Long id, boolean removePrivateKey);
+  void remove(CredentialRequest request, boolean removePrivateKey);
   
   /**
    * Finds a request using its unique identifier.

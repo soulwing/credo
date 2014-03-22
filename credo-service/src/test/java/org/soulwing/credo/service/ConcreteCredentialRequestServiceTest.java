@@ -403,7 +403,9 @@ public class ConcreteCredentialRequestServiceTest {
       will(returnValue(credential));
       oneOf(credential).setRequest(with(nullValue(CredentialRequest.class)));
       oneOf(credentialRepository).update(with(same(credential)));
-      oneOf(requestRepository).remove(with(REQUEST_ID), with(false));
+      oneOf(requestRepository).findById(with(REQUEST_ID));
+      will(returnValue(request));
+      oneOf(requestRepository).remove(with(same(request)), with(false));
     } });
     
     service.removeRequest(REQUEST_ID);
@@ -414,7 +416,9 @@ public class ConcreteCredentialRequestServiceTest {
     context.checking(new Expectations() { { 
       oneOf(credentialRepository).findByRequestId(with(REQUEST_ID));
       will(returnValue(null));
-      oneOf(requestRepository).remove(with(REQUEST_ID), with(true));
+      oneOf(requestRepository).findById(with(REQUEST_ID));
+      will(returnValue(request));
+      oneOf(requestRepository).remove(with(same(request)), with(true));
     } });
     
     service.removeRequest(REQUEST_ID);

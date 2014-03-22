@@ -83,9 +83,8 @@ public class JpaCredentialRequestRepository
    * {@inheritDoc}
    */
   @Override
-  public void remove(Long id, boolean removePrivateKey) {
-    CredentialRequestEntity request = entityManager.find(
-        CredentialRequestEntity.class, id);
+  @Restricted(Restriction.OWNER)
+  public void remove(CredentialRequest request, boolean removePrivateKey) {
     if (request != null) {
       entityManager.remove(request);
       entityManager.remove(request.getCertificationRequest());
@@ -99,7 +98,6 @@ public class JpaCredentialRequestRepository
    * {@inheritDoc}
    */
   @Override
-  @Restricted(Restriction.OWNER)
   public CredentialRequest findById(Long id) {
     TypedQuery<CredentialRequest> query = entityManager.createNamedQuery(
         "findRequestById", CredentialRequest.class);

@@ -238,7 +238,7 @@ public class JpaCredentialRepositoryIT {
     entityManager.flush();
     entityManager.clear();
   
-    repository.remove(credential.getId());
+    repository.remove(credential);
     entityManager.flush();
     entityManager.clear();
     
