@@ -32,6 +32,8 @@ import javax.persistence.TypedQuery;
 import org.soulwing.credo.CredentialRequest;
 import org.soulwing.credo.Tag;
 import org.soulwing.credo.domain.CredentialRequestEntity;
+import org.soulwing.credo.security.Restricted;
+import org.soulwing.credo.security.Restricted.Restriction;
 
 /**
  * A {@link CredentialRepository} implemented using JPA.
@@ -49,6 +51,7 @@ public class JpaCredentialRequestRepository
    * {@inheritDoc}
    */
   @Override
+  @Restricted(Restriction.OWNER)
   public void add(CredentialRequest request) {
     if (!(request instanceof CredentialRequestEntity)) {
       throw new IllegalArgumentException("unsupported request type: "
@@ -96,6 +99,7 @@ public class JpaCredentialRequestRepository
    * {@inheritDoc}
    */
   @Override
+  @Restricted(Restriction.OWNER)
   public CredentialRequest findById(Long id) {
     TypedQuery<CredentialRequest> query = entityManager.createNamedQuery(
         "findRequestById", CredentialRequest.class);

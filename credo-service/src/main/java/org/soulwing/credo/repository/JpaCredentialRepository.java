@@ -33,6 +33,8 @@ import org.soulwing.credo.Credential;
 import org.soulwing.credo.CredentialCertificate;
 import org.soulwing.credo.Tag;
 import org.soulwing.credo.domain.CredentialEntity;
+import org.soulwing.credo.security.Restricted;
+import org.soulwing.credo.security.Restricted.Restriction;
 
 /**
  * A {@link CredentialRepository} implemented using JPA.
@@ -49,6 +51,7 @@ public class JpaCredentialRepository implements CredentialRepository {
    * {@inheritDoc}
    */
   @Override
+  @Restricted(Restriction.OWNER)
   public void add(Credential credential) {
     if (!(credential instanceof CredentialEntity)) {
       throw new IllegalArgumentException("unsupported credential type: "
@@ -80,6 +83,7 @@ public class JpaCredentialRepository implements CredentialRepository {
    * {@inheritDoc}
    */
   @Override
+  @Restricted(Restriction.OWNER)
   public Credential update(Credential credential) {
     return entityManager.merge(credential);
   }
@@ -101,6 +105,7 @@ public class JpaCredentialRepository implements CredentialRepository {
    * {@inheritDoc}
    */
   @Override
+  @Restricted(Restriction.OWNER)
   public Credential findById(Long id) {
     TypedQuery<Credential> query = entityManager.createNamedQuery(
         "findCredentialById", Credential.class);
@@ -139,6 +144,7 @@ public class JpaCredentialRepository implements CredentialRepository {
    * {@inheritDoc}
    */
   @Override
+  @Restricted(Restriction.OWNER)
   public Credential findByRequestId(Long requestId) {
     TypedQuery<Credential> query = entityManager.createNamedQuery(
         "findCredentialByRequestId", Credential.class);
