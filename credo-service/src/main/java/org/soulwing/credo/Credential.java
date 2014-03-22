@@ -18,7 +18,6 @@
  */
 package org.soulwing.credo;
 
-import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
@@ -35,7 +34,7 @@ public interface Credential {
    * Gets the persistent identifier for this credential.
    * @return identifier or {@code null} if this credential is transient
    */
-  Serializable getId();
+  Long getId();
   
   /**
    * Gets the simple name assigned to this credential.

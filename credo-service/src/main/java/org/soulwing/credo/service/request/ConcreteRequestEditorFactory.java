@@ -47,6 +47,7 @@ public class ConcreteRequestEditorFactory
     Validate.isTrue(!credential.getCertificates().isEmpty());
     CredentialCertificate certificate = credential.getCertificates().get(0);
     ConfigurableRequestEditor editor = editorInstance.get();
+    editor.setCredentialId(credential.getId());
     editor.setSubjectName(certificate.getSubject());
     editor.setName(credential.getName());
     editor.setOwner(credential.getOwner().getName());

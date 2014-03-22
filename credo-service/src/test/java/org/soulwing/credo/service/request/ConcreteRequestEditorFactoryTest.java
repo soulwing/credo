@@ -48,6 +48,8 @@ import org.soulwing.credo.service.CredentialRequestEditor;
  */
 public class ConcreteRequestEditorFactoryTest {
 
+  private static final long CREDENTIAL_ID = -1L;
+
   private static final String SUBJECT = "subject";
 
   private static final String OWNER = "owner";
@@ -98,6 +100,7 @@ public class ConcreteRequestEditorFactoryTest {
     return new Expectations() { {
       oneOf(editorInstance).get();
       will(returnValue(editor));
+      oneOf(editor).setCredentialId(with(CREDENTIAL_ID));
       oneOf(editor).setName(with(NAME));
       oneOf(editor).setSubjectName(with(SUBJECT));
       oneOf(editor).setOwner(with(OWNER));
@@ -107,7 +110,9 @@ public class ConcreteRequestEditorFactoryTest {
   }
   
   private Expectations credentialExpectations() throws Exception {
-    return new Expectations() { { 
+    return new Expectations() { {
+      allowing(credential).getId();
+      will(returnValue(CREDENTIAL_ID));
       allowing(credential).getName();
       will(returnValue(NAME));
       allowing(credential).getOwner();
