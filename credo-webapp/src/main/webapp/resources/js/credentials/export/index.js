@@ -7,6 +7,7 @@ $(document).ready(function() {
 		var wrapper = function(event) {
 			target.trigger(event);
 		};
+		$("#exportPassphrase").val("not-empty");
 		wrapper.call(target, event);
 	});
 	
