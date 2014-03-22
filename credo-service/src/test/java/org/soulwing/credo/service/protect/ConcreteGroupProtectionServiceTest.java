@@ -237,7 +237,7 @@ public class ConcreteGroupProtectionServiceTest {
       will(returnValue(GROUP_NAME));
       oneOf(userContextService).getLoginName();
       will(returnValue(LOGIN_NAME));
-      oneOf(memberRepository).findByGroupAndLoginName(
+      oneOf(memberRepository).findByGroupNameAndLoginName(
           with(same(GROUP_NAME)), with(same(LOGIN_NAME)));
       will(outcome);
     } };

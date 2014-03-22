@@ -172,7 +172,7 @@ public class ConcreteGroupService implements GroupService {
     boolean exists = groupRepository
         .findByGroupName(groupName, loginName) != null;
     if (exists) {
-      UserGroupMember member = memberRepository.findByGroupAndLoginName(
+      UserGroupMember member = memberRepository.findByGroupNameAndLoginName(
           groupName, loginName);
       if (member == null) {
         throw new GroupAccessException("not a member of group " + groupName);

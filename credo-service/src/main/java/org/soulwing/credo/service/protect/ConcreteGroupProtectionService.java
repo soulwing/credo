@@ -112,7 +112,7 @@ public class ConcreteGroupProtectionService
   private UserGroupMember findGroupMember(String groupName, 
       String loginName) throws GroupAccessException {
     UserGroupMember groupMember = memberRepository
-        .findByGroupAndLoginName(groupName, loginName);
+        .findByGroupNameAndLoginName(groupName, loginName);
     if (groupMember == null) {
       throw new GroupAccessException(
           loginName + " is not a member of group " + groupName);

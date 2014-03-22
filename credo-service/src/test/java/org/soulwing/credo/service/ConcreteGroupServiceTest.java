@@ -286,7 +286,7 @@ public class ConcreteGroupServiceTest {
       oneOf(groupRepository).findByGroupName(with(GROUP_NAME), 
           with(LOGIN_NAME1));
       will(returnValue(group));
-      oneOf(memberRepository).findByGroupAndLoginName(
+      oneOf(memberRepository).findByGroupNameAndLoginName(
           with(GROUP_NAME), with(LOGIN_NAME1));
       will(returnValue(member));
     } });
@@ -315,7 +315,7 @@ public class ConcreteGroupServiceTest {
       oneOf(groupRepository).findByGroupName(with(GROUP_NAME), 
           with(LOGIN_NAME1));
       will(returnValue(group));
-      oneOf(memberRepository).findByGroupAndLoginName(
+      oneOf(memberRepository).findByGroupNameAndLoginName(
           with(GROUP_NAME), with(LOGIN_NAME1));
       will(returnValue(null));
     } });
