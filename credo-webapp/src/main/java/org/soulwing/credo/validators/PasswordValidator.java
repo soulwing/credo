@@ -66,15 +66,16 @@ public class PasswordValidator implements Validator, Serializable {
     
     Password passwordAgain = (Password) value;
     Password password = (Password) passwordComponent.getLocalValue();
-    if (password == null && passwordAgain == null) {
-      return;
+    if (password == null || password.isEmpty()) {
+      throw new ValidatorException(new FacesMessage(FacesMessage.SEVERITY_ERROR,
+          Bundle.get(context.getViewRoot().getLocale()).getString(
+              "passwordRequired"), null));              
     }
-    if (password != null && password.equals(passwordAgain)) {
-      return;
+    if (!password.equals(passwordAgain)) {
+      throw new ValidatorException(new FacesMessage(FacesMessage.SEVERITY_ERROR,
+          Bundle.get(context.getViewRoot().getLocale()).getString(
+              "passwordValidationFailed"), null));              
     }
-    throw new ValidatorException(new FacesMessage(FacesMessage.SEVERITY_ERROR,
-        Bundle.get(context.getViewRoot().getLocale()).getString(
-            "passwordValidationFailed"), null));              
   }
 
 }

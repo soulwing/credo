@@ -44,11 +44,11 @@
             <h:outputLabel styleClass="col-md-4 control-label" 
               for="password">#{messages.passwordLabel}</h:outputLabel>
             <div class="col-md-4" id="pw-container">
-	            <h:inputSecret styleClass="form-control"
-	              redisplay="true" required="true" 
-                requiredMessage="#{messages.passwordRequired}"               	              
-                id="password" title="#{messages.passwordTip}" 
-                value="#{createUserProfileBean.password}">
+	            <h:inputSecret id="password" styleClass="form-control" 
+	              redisplay="true"
+                title="#{messages.passwordTip}" 
+                value="#{createUserProfileBean.password}"
+                converter="org.soulwing.credo.converters.EmptyPassword">
               </h:inputSecret>
               <span class="form-control-feedback glyphicon glyphicon-warning-sign"
                   title="The selected password is weak."></span>
@@ -60,11 +60,11 @@
             <h:outputLabel styleClass="col-md-4 control-label" 
               for="passwordAgain">#{messages.passwordAgainLabel}</h:outputLabel>
             <div class="col-md-4" id="pw-again-container">
-              <h:inputSecret styleClass="col-md-4 form-control"
-                redisplay="true" required="true" 
-                requiredMessage="#{messages.passwordAgainRequired}"               
-                id="passwordAgain" title="#{messages.passwordAgainTip}" 
-                value="#{createUserProfileBean.passwordAgain}">
+              <h:inputSecret id="passwordAgain" styleClass="form-control"
+                redisplay="true"              
+                title="#{messages.passwordAgainTip}" 
+                value="#{createUserProfileBean.passwordAgain}"
+                converter="org.soulwing.credo.converters.EmptyPassword">
                 <f:validator validatorId="org.soulwing.credo.validators.Password"/>
               </h:inputSecret>
               <span class="form-control-feedback"></span>
