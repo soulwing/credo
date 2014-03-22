@@ -28,7 +28,7 @@ import java.util.Set;
  *
  * @author Carl Harris
  */
-public interface Credential {
+public interface Credential extends Owned {
 
   /**
    * Gets the persistent identifier for this credential.

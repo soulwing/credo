@@ -30,7 +30,7 @@ import java.util.Set;
  *
  * @author Carl Harris
  */
-public interface CredentialRequest {
+public interface CredentialRequest extends Owned {
 
   /**
    * Gets the persistent unique identifier for this request.
