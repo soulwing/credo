@@ -100,7 +100,7 @@ public class JpaUserGroupMemberRepository
    * {@inheritDoc}
    */
   @Override
-  public UserGroupMember findByGroupAndLoginName(String groupName,
+  public UserGroupMember findByGroupNameAndLoginName(String groupName,
       String loginName) {
 
     if (UserGroup.SELF_GROUP_NAME.equals(groupName)) {
@@ -108,7 +108,7 @@ public class JpaUserGroupMemberRepository
     }
 
     String queryName =
-        groupName != null ? "findGroupMemberWithGroupAndLoginName"
+        groupName != null ? "findGroupMemberWithGroupNameAndLoginName"
             : "findGroupMemberSelf";
     TypedQuery<UserGroupMember> query =
         entityManager.createNamedQuery(queryName, UserGroupMember.class);
@@ -125,6 +125,28 @@ public class JpaUserGroupMemberRepository
       return null;
     }
   }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public UserGroupMember findByGroupAndLoginName(UserGroup group,
+      String loginName) {
+
+    TypedQuery<UserGroupMember> query = entityManager.createNamedQuery(
+        "findGroupMemberWithGroupAndLoginName", UserGroupMember.class);
+
+    query.setParameter("group", group);
+    query.setParameter("loginName", loginName);
+
+    try {
+      return query.getSingleResult();
+    }
+    catch (NoResultException ex) {
+      return null;
+    }
+  }
+
 
   /**
    * {@inheritDoc}

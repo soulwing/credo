@@ -64,7 +64,7 @@
     </query>
   </named-query>
   
-  <named-query name="findGroupMemberWithGroupAndLoginName">
+  <named-query name="findGroupMemberWithGroupNameAndLoginName">
     <query>
       select distinct gm from UserGroupMemberEntity gm
       inner join gm.group g
@@ -83,6 +83,17 @@
       and g.name is null
     </query>
   </named-query>
+
+  <named-query name="findGroupMemberWithGroupAndLoginName">
+    <query>
+      select distinct gm from UserGroupMemberEntity gm
+      inner join gm.group g
+      inner join gm.user u
+      where u.loginName = :loginName
+      and g = :group
+    </query>
+  </named-query>
+  
   
   <named-query name="findGroupsAndMembersByLoginName">
     <query>

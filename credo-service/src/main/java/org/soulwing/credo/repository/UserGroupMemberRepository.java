@@ -63,7 +63,9 @@ public interface UserGroupMemberRepository {
    * @param loginName the subject user's login name
    * @return matching group member or {@code null} if no such member exists
    */
-  UserGroupMember findByGroupAndLoginName(String groupName, String loginName);
+  UserGroupMember findByGroupNameAndLoginName(String groupName, String loginName);
+  
+  UserGroupMember findByGroupAndLoginName(UserGroup group, String loginName);
   
   /**
    * Finds the set of all members of a given group.
