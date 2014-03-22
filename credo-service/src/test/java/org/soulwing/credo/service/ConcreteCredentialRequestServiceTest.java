@@ -31,6 +31,7 @@ import static org.jmock.Expectations.returnValue;
 import static org.jmock.Expectations.throwException;
 
 import java.io.StringWriter;
+import java.io.Writer;
 import java.util.Collections;
 import java.util.Set;
 
@@ -348,7 +349,37 @@ public class ConcreteCredentialRequestServiceTest {
   @Test
   public void testDownloadRequest() throws Exception {
     final StringWriter writer = new StringWriter();
+    context.checking(downloadExpectations(writer));
+    service.downloadRequest(request, response);
+    assertThat(writer.toString(), is(equalTo(CSR_CONTENT)));
+  }
+
+  @Test
+  public void testDownloadRequestById() throws Exception {
+    final StringWriter writer = new StringWriter();
+    context.checking(downloadExpectations(writer));
     context.checking(new Expectations() { { 
+      oneOf(requestRepository).findById(with(REQUEST_ID));
+      will(returnValue(request));
+    } });    
+    
+    service.downloadRequest(REQUEST_ID, response);
+    assertThat(writer.toString(), is(equalTo(CSR_CONTENT)));
+  }
+
+  @Test(expected = NoSuchCredentialException.class)
+  public void testDownloadRequestByIdWhenNotFound() throws Exception {
+    context.checking(new Expectations() { { 
+      oneOf(requestRepository).findById(with(REQUEST_ID));
+      will(returnValue(null));
+    } });    
+    
+    service.downloadRequest(REQUEST_ID, response);
+  }
+
+  private Expectations downloadExpectations(final Writer writer) 
+      throws Exception {
+    return new Expectations() { { 
       oneOf(request).getCertificationRequest();
       will(returnValue(certificationRequest));
       oneOf(certificationRequest).getContent();
@@ -362,10 +393,7 @@ public class ConcreteCredentialRequestServiceTest {
           with(ConcreteCredentialRequestService.CHARACTER_ENCODING));
       oneOf(response).getWriter();
       will(returnValue(writer));
-    } });
-    
-    service.downloadRequest(request, response);
-    assertThat(writer.toString(), is(equalTo(CSR_CONTENT)));
+    } };
   }
 
   @Test

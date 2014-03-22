@@ -101,6 +101,18 @@ public interface CredentialRequestService {
       FileDownloadResponse response) throws IOException;
   
   /**
+   * Transfers a request to a client via the given response object.
+   * @param requestId unique identifier of the request to download
+   * @param response response object that will be used to transfer the
+   *    request content
+   * @throws IOException if an error occurs in transferring the 
+   *    request content to the remote client
+   */
+  void downloadRequest(Long requestId,
+      FileDownloadResponse response) 
+      throws NoSuchCredentialException, IOException;
+  
+  /**
    * Removes a request.
    * @param id unique identifier of the request to remove
    */

@@ -177,6 +177,19 @@ public class ConcreteCredentialRequestService implements CredentialRequestServic
   }
 
   /**
+   * {@inheritDoc}
+   */
+  @Override
+  public void downloadRequest(Long requestId, FileDownloadResponse response)
+      throws NoSuchCredentialException, IOException {
+    CredentialRequest request = requestRepository.findById(requestId);
+    if (request == null) {
+      throw new NoSuchCredentialException();
+    }
+    downloadRequest(request, response);
+  }
+
+  /**
    * Creates a normalized file name from a base name and a suffix.
    * @param base base name
    * @param suffix suffix
