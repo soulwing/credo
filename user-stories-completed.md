@@ -285,6 +285,30 @@ credential.
 * The user should be prompted to confirm before the credential is removed.
 
 
+Signing Request for Existing Credential
+---------------------------------------
+
+A user can create a signing request to renew an existing credential.
+
+* The subject name for the request is the same as the subject name on the
+  credential.
+* The friendly name, owner, and description, and tags should be copied from 
+  the existing credential, and the user should have the opportunity to edit 
+  them before saving the request.
+
+
+View Signing Requests
+---------------------
+
+A user can view a table of signing requests for which she is an owner.
+
+* It should be a table view with the friendly name, issuer name, date 
+  created, and a flag that indicates whether the request has been completed
+  (i.e. whether it has been used to create a credential).
+* Each row in the table should include controls to edit or remove the 
+  request, and to import the signed certificate chain.
+ 
+ 
 
 
 

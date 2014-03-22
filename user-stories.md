@@ -1,13 +1,19 @@
-Signing Request for Existing Credential
----------------------------------------
+Edit Credential
+---------------
 
-A user can create a signing request to renew an existing credential.
+A user can edit an existing credential for which she is an owner.
 
-* The subject name for the request is the same as the subject name on the
-  credential.
-* The friendly name, owner, and description, and tags should be copied from 
-  the existing credential, and the user should have the opportunity to edit 
-  them before saving the request.
+* The name, note, and tags can be edited.
+* The owner group can be changed to another group of which she is a member.
+
+
+Edit Signing Request
+--------------------
+
+A user can edit an existing signing request for which she is an owner.
+
+* The name, note, and tags can be edited.
+* The owner group can be changed to another group of which she is a member.
 
 
 Signing Request for New Credential
@@ -23,18 +29,6 @@ A user can create a signing request for a new credential.
 * A description and zero or more tags may be specified
 
 
-View Signing Requests
----------------------
-
-A user can view a table of signing requests for which she is an owner.
-
-* It should be a table view with the friendly name, issuer name, date 
-  created, and a flag that indicates whether the request has been completed
-  (i.e. whether it has been used to create a credential).
-* Each row in the table should include controls to edit or remove the 
-  request, and to import the signed certificate chain.
- 
- 
 Extensions for Signing Request
 ------------------------------
 
