@@ -8,4 +8,7 @@ $(document).ready(function() {
 		});
 		return false;
 	});
+	
+	$("#returnToRequests").trigger("focus");
+	
 });
