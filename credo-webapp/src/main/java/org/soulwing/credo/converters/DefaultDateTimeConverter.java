@@ -31,7 +31,7 @@ public class DefaultDateTimeConverter extends DateTimeConverter {
    * Constructs a new instance.
    */
   public DefaultDateTimeConverter() {
-    setPattern("yyyy/MM/dd HH:mm zzz");
+    setPattern("yyyy-MM-dd HH:mm zzz");
   }
 
 }
