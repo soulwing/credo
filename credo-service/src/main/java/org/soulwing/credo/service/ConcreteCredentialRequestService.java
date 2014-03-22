@@ -20,6 +20,7 @@ package org.soulwing.credo.service;
 
 import java.io.IOException;
 import java.io.Writer;
+import java.util.List;
 
 import javax.ejb.ConcurrencyManagement;
 import javax.ejb.ConcurrencyManagementType;
@@ -63,9 +64,24 @@ public class ConcreteCredentialRequestService implements CredentialRequestServic
   protected CredentialRequestRepository requestRespository;
 
   @Inject
-  protected TagService tagService;
+  protected UserContextService userContextService;
   
+  @Inject
+  protected TagService tagService;
 
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  @TransactionAttribute(TransactionAttributeType.REQUIRED)
+  public List<CredentialRequest> findAllRequests() {
+    return requestRespository.findAllByLoginName(
+        userContextService.getLoginName());
+  }
+
+  /**
+   * {@inheritDoc}
+   */
   @Override
   @TransactionAttribute(TransactionAttributeType.REQUIRED)
   public CredentialRequestEditor createEditor(Long credentialId, Errors errors)
@@ -80,6 +96,9 @@ public class ConcreteCredentialRequestService implements CredentialRequestServic
     return editorFactory.newEditor(credential);
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public CredentialRequest createRequest(
       CredentialRequestEditor editor, ProtectionParameters protection, 
@@ -108,12 +127,18 @@ public class ConcreteCredentialRequestService implements CredentialRequestServic
     }
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   @TransactionAttribute(TransactionAttributeType.REQUIRED)
   public void saveRequest(CredentialRequest request) {
     requestRespository.add(request);
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public void downloadRequest(CredentialRequest request,
       FileDownloadResponse response) throws IOException {

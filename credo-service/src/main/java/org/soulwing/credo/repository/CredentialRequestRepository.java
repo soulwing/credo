@@ -18,6 +18,8 @@
  */
 package org.soulwing.credo.repository;
 
+import java.util.List;
+
 import org.soulwing.credo.CredentialRequest;
 
 /**
@@ -33,4 +35,13 @@ public interface CredentialRequestRepository {
    */
   void add(CredentialRequest request);
   
+  /**
+   * Finds all credential requests in the repository that are accessible to 
+   * the given user.
+   * @param loginName login name of the subject user 
+   * @return list of requests
+   */
+  List<CredentialRequest> findAllByLoginName(String loginName);
+  
+
 }

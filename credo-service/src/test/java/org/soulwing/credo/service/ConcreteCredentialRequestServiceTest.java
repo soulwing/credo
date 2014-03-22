@@ -20,6 +20,7 @@ package org.soulwing.credo.service;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.arrayContaining;
+import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.emptyArray;
 import static org.hamcrest.Matchers.equalTo;
@@ -29,6 +30,7 @@ import static org.jmock.Expectations.returnValue;
 import static org.jmock.Expectations.throwException;
 
 import java.io.StringWriter;
+import java.util.Collections;
 import java.util.Set;
 
 import org.jmock.Expectations;
@@ -53,6 +55,8 @@ import org.soulwing.credo.service.request.CredentialRequestGenerator;
  * @author Carl Harris
  */
 public class ConcreteCredentialRequestServiceTest {
+
+  private static final String LOGIN_NAME = "loginName";
 
   private static final String GROUP_NAME = "groupName";
 
@@ -83,6 +87,9 @@ public class ConcreteCredentialRequestServiceTest {
   
   @Mock
   private TagService tagService;
+  
+  @Mock
+  private UserContextService userContextService;
   
   @Mock
   private Credential credential;
@@ -118,6 +125,19 @@ public class ConcreteCredentialRequestServiceTest {
     service.generator = generator;
     service.requestRespository = requestRepository;
     service.tagService = tagService;
+    service.userContextService = userContextService;
+  }
+  
+  @Test
+  public void testFindAllRequests() throws Exception {
+    context.checking(new Expectations() { { 
+      oneOf(userContextService).getLoginName();
+      will(returnValue(LOGIN_NAME));
+      oneOf(requestRepository).findAllByLoginName(with(LOGIN_NAME));
+      will(returnValue(Collections.singletonList(request)));
+    } });
+    
+    assertThat(service.findAllRequests(), contains(request));
   }
   
   @Test
