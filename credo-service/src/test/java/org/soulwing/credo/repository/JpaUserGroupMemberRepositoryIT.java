@@ -372,4 +372,29 @@ public class JpaUserGroupMemberRepositoryIT {
     assertThat(members.hasNext(), is(false));
   }
 
+  @Test
+  public void testFindByLoginNameWhenOnlyOneMember() throws Exception {
+    UserProfileEntity user = EntityUtil.newUser("someUser");
+    UserGroupEntity group = EntityUtil.newGroup("someGroup");
+    
+    UserGroupMemberEntity groupMember = EntityUtil.newGroupMember(user, group);
+    
+    entityManager.persist(user);
+    entityManager.persist(group);
+    entityManager.persist(groupMember);
+    entityManager.flush();
+    entityManager.clear();
+    
+    Iterator<UserGroupMember> members = 
+        repository.findByLoginName(user.getLoginName()).iterator();
+
+    assertThat(members.hasNext(), is(true));
+    UserGroupMember member = members.next();
+    assertThat(member.getUser(), 
+        hasProperty("loginName", equalTo(user.getLoginName())));
+
+    assertThat(members.hasNext(), is(false));
+  }
+
+
 }
