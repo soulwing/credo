@@ -116,6 +116,9 @@ public class JpaCredentialRepository implements CredentialRepository {
     return query.getResultList();
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
   public List<Credential> findAllByOwnerId(Long ownerId) {
     TypedQuery<Credential> query = entityManager.createNamedQuery(
