@@ -19,15 +19,10 @@
 package org.soulwing.credo.facelets;
 
 import java.io.Serializable;
-import java.util.Collection;
 import java.util.Date;
 
 import javax.enterprise.context.Dependent;
-import javax.faces.component.EditableValueHolder;
-import javax.faces.component.UIComponent;
-import javax.faces.component.UIViewRoot;
 import javax.faces.context.FacesContext;
-import javax.faces.context.PartialViewContext;
 import javax.faces.event.ValueChangeEvent;
 import javax.inject.Inject;
 import javax.security.auth.x500.X500Principal;
@@ -186,7 +181,7 @@ public class DelegatingCredentialEditor<T extends CredentialEditor>
    * @param event
    */
   public void ownerChanged(ValueChangeEvent event) {
-    resetRenderedInputs();
+    FacesAjaxUtil.resetRenderedInputs(facesContext);
     try {
       String value = event.getNewValue().toString();
       if (value == null || value.isEmpty()) {
@@ -199,27 +194,6 @@ public class DelegatingCredentialEditor<T extends CredentialEditor>
     }
     catch (GroupAccessException ex) {
       ownerStatus = OwnerStatus.INACCESSIBLE;
-    }
-  }
-
-  /**
-   * Resets rendered inputs on an Ajax request.  
-   * <p>
-   * This works around an issue when the form is submitted with one or more 
-   * validation errors, allowing the rendered inputs to be properly updated on 
-   * subsequent Ajax requests.
-   */
-  private void resetRenderedInputs() {
-    PartialViewContext partialViewContext = 
-        facesContext.getPartialViewContext();
-    Collection<String> renderIds = partialViewContext.getRenderIds();
-    UIViewRoot viewRoot = facesContext.getViewRoot();
-    for (String renderId : renderIds) {
-      UIComponent component = viewRoot.findComponent(renderId);
-      if (component instanceof EditableValueHolder) {
-        EditableValueHolder input = (EditableValueHolder) component;
-        input.resetValue();
-      }
     }
   }
 

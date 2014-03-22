@@ -317,6 +317,7 @@ public class ExportCredentialBean implements Serializable {
    * @param event source event
    */
   public void generateExportPassphrase(AjaxBehaviorEvent event) {
+    FacesAjaxUtil.resetRenderedInputs(facesContext);
     generateExportPassphrase();
   }
 
