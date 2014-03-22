@@ -83,7 +83,9 @@ public class OwnerAccessControlInterceptor {
       UserGroupMember member = memberRepository.findByGroupAndLoginName(
           owner, loginName);
       if (member == null) {
-        logger.error("user %s is not a member of group %s for owned object %s");
+        logger.error(String.format(
+            "user %s is not a member of group %s for owned object %s",
+            loginName, groupName, owned));
         throw new OwnerAccessControlException(groupName, loginName);
       }
     }
