@@ -61,8 +61,22 @@
   <navigation-rule>
     <from-view-id>/requests/*</from-view-id>
     <navigation-case>
+      <from-outcome>success</from-outcome>
+      <to-view-id>/requests/index.xhtml</to-view-id>
+      <redirect />
+    </navigation-case>
+    <navigation-case>
       <from-outcome>cancel</from-outcome>
       <to-view-id>/requests/index.xhtml</to-view-id>
+      <redirect />
+    </navigation-case>
+  </navigation-rule>
+
+  <navigation-rule>
+    <from-view-id>/requests/create/*</from-view-id>
+    <navigation-case>
+      <from-outcome>success</from-outcome>
+      <to-view-id>/requests/create/success.xhtml</to-view-id>
       <redirect />
     </navigation-case>
   </navigation-rule>
