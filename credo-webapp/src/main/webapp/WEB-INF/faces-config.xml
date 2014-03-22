@@ -57,7 +57,16 @@
       <redirect />
     </navigation-case>
   </navigation-rule>
-  
+
+  <navigation-rule>
+    <from-view-id>/requests/*</from-view-id>
+    <navigation-case>
+      <from-outcome>cancel</from-outcome>
+      <to-view-id>/requests/index.xhtml</to-view-id>
+      <redirect />
+    </navigation-case>
+  </navigation-rule>
+    
   <navigation-rule>
     <from-view-id>/credentials/import/*</from-view-id>
     <navigation-case>
