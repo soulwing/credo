@@ -61,7 +61,7 @@ public class ConcreteCredentialRequestService implements CredentialRequestServic
   protected CredentialRequestGenerator generator;
   
   @Inject
-  protected CredentialRequestRepository requestRespository;
+  protected CredentialRequestRepository requestRepository;
 
   @Inject
   protected UserContextService userContextService;
@@ -74,8 +74,29 @@ public class ConcreteCredentialRequestService implements CredentialRequestServic
    */
   @Override
   @TransactionAttribute(TransactionAttributeType.REQUIRED)
+  public CredentialRequestDetail findRequestById(Long id)
+      throws NoSuchCredentialException {
+    
+    CredentialRequest request = requestRepository.findById(id);
+    if (request == null) {
+      throw new NoSuchCredentialException();
+    }
+    
+    Credential credential = credentialRepository.findByRequestId(id);
+    
+    CredentialRequestWrapper detail = new CredentialRequestWrapper(request);
+    detail.setCredentialCreated(credential != null);
+    
+    return detail;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  @TransactionAttribute(TransactionAttributeType.REQUIRED)
   public List<CredentialRequest> findAllRequests() {
-    return requestRespository.findAllByLoginName(
+    return requestRepository.findAllByLoginName(
         userContextService.getLoginName());
   }
 
@@ -138,7 +159,7 @@ public class ConcreteCredentialRequestService implements CredentialRequestServic
   @Override
   @TransactionAttribute(TransactionAttributeType.REQUIRED)
   public void saveRequest(CredentialRequest request) {
-    requestRespository.add(request);
+    requestRepository.add(request);
   }
 
   /**
@@ -164,5 +185,19 @@ public class ConcreteCredentialRequestService implements CredentialRequestServic
   private String normalizedFileName(String base, String suffix) {
     return base.trim().replaceAll("\\.|\\s+", "_") + suffix;
   }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public void removeRequest(Long id) {
+    Credential credential = credentialRepository.findByRequestId(id);
+    if (credential != null) {
+      credential.setRequest(null);
+      credentialRepository.update(credential);
+    }
+    requestRepository.remove(id);
+  }
+  
   
 }

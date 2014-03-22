@@ -25,6 +25,7 @@ import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.emptyArray;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.Matchers.sameInstance;
 import static org.jmock.Expectations.returnValue;
 import static org.jmock.Expectations.throwException;
@@ -56,6 +57,8 @@ import org.soulwing.credo.service.request.CredentialRequestGenerator;
  */
 public class ConcreteCredentialRequestServiceTest {
 
+  private static final long REQUEST_ID = -1L;
+
   private static final String LOGIN_NAME = "loginName";
 
   private static final String GROUP_NAME = "groupName";
@@ -64,7 +67,7 @@ public class ConcreteCredentialRequestServiceTest {
 
   private static final String CSR_CONTENT = "csrContent";
 
-  private static final long CREDENTIAL_ID = -1L;
+  private static final long CREDENTIAL_ID = REQUEST_ID;
 
   private static final String NOTE = "note";
    
@@ -123,9 +126,51 @@ public class ConcreteCredentialRequestServiceTest {
     service.credentialRepository = credentialRepository;
     service.editorFactory = editorFactory;
     service.generator = generator;
-    service.requestRespository = requestRepository;
+    service.requestRepository = requestRepository;
     service.tagService = tagService;
     service.userContextService = userContextService;
+  }
+  
+  @Test
+  public void testFindRequestById() throws Exception {
+    context.checking(new Expectations() { { 
+      oneOf(requestRepository).findById(with(REQUEST_ID));
+      will(returnValue(request));
+      oneOf(credentialRepository).findByRequestId(with(REQUEST_ID));
+      will(returnValue(credential));
+      allowing(request).getName();
+      will(returnValue(REQUEST_NAME));
+    } });
+    
+    CredentialRequestDetail detail = service.findRequestById(REQUEST_ID);
+    assertThat(detail.getName(), is(equalTo(REQUEST_NAME)));
+    assertThat(detail.isCredentialCreated(), is(equalTo(true)));
+  }
+
+  @Test
+  public void testFindRequestByIdWhenCredentialNotCreated() throws Exception {
+    context.checking(new Expectations() { { 
+      oneOf(requestRepository).findById(with(REQUEST_ID));
+      will(returnValue(request));
+      oneOf(credentialRepository).findByRequestId(with(REQUEST_ID));
+      will(returnValue(null));
+      allowing(request).getName();
+      will(returnValue(REQUEST_NAME));
+    } });
+    
+    CredentialRequestDetail detail = service.findRequestById(REQUEST_ID);
+    assertThat(detail.getName(), is(equalTo(REQUEST_NAME)));
+    assertThat(detail.isCredentialCreated(), is(equalTo(false)));
+  }
+  
+  @Test(expected = NoSuchCredentialException.class)
+  public void testFindRequestByIdWhenRequestNotFound() throws Exception {
+    context.checking(new Expectations() { { 
+      oneOf(requestRepository).findById(with(REQUEST_ID));
+      will(returnValue(null));
+    } });
+    
+    service.findRequestById(REQUEST_ID);
   }
   
   @Test
@@ -168,7 +213,7 @@ public class ConcreteCredentialRequestServiceTest {
   }
 
   @Test(expected = PassphraseException.class)
-  public void testCreateSigningRequestWhenPassphraseIncorrect() 
+  public void testCreateRequestWhenPassphraseIncorrect() 
       throws Exception {
     context.checking(generateExpectations(
         throwException(new UserAccessException(new Exception()))));
@@ -182,7 +227,7 @@ public class ConcreteCredentialRequestServiceTest {
   }
   
   @Test(expected = GroupAccessException.class)
-  public void testCreateSigningRequestWhenGroupAccessDenied() throws Exception {
+  public void testCreateRequestWhenGroupAccessDenied() throws Exception {
     context.checking(generateExpectations(
         throwException(new GroupAccessException("some message"))));
     context.checking(new Expectations() { { 
@@ -197,7 +242,7 @@ public class ConcreteCredentialRequestServiceTest {
   }
 
   @Test(expected = NoSuchGroupException.class)
-  public void testCreateSigningRequestWhenNoSuchGroup() throws Exception {
+  public void testCreateRequestWhenNoSuchGroup() throws Exception {
     context.checking(generateExpectations(
         throwException(new NoSuchGroupException())));
     context.checking(new Expectations() { {
@@ -213,14 +258,14 @@ public class ConcreteCredentialRequestServiceTest {
 
 
   @Test(expected = CredentialRequestException.class)
-  public void testCreateSigningRequestFailure() throws Exception {
+  public void testCreateRequestFailure() throws Exception {
     context.checking(generateExpectations(
         throwException(new CredentialRequestException())));
     service.createRequest(editor, protection, errors);
   }
 
   @Test
-  public void testCreateSigningRequestForNewCredential() 
+  public void testCreateRequestForNewCredential() 
       throws Exception {
     context.checking(generateExpectations(returnValue(request)));
     context.checking(newCredentialExpectations());
@@ -230,7 +275,7 @@ public class ConcreteCredentialRequestServiceTest {
   }
 
   @Test
-  public void testCreateSigningRequestForExistingCredentialWhenFound() 
+  public void testCreateRequestForExistingCredentialWhenFound() 
       throws Exception {
     context.checking(generateExpectations(returnValue(request)));
     context.checking(existingCredentialExpectations(credential));
@@ -240,7 +285,7 @@ public class ConcreteCredentialRequestServiceTest {
   }
 
   @Test
-  public void testCreateSigningRequestForExistingCredentialWhenNotFound() 
+  public void testCreateRequestForExistingCredentialWhenNotFound() 
       throws Exception {
     context.checking(generateExpectations(returnValue(request)));
     context.checking(existingCredentialExpectations(null));
@@ -292,7 +337,7 @@ public class ConcreteCredentialRequestServiceTest {
   }
   
   @Test
-  public void testSaveSigningRequest() throws Exception {
+  public void testSaveRequest() throws Exception {
     context.checking(new Expectations() { { 
       oneOf(requestRepository).add(with(same(request)));
     } });
@@ -301,7 +346,7 @@ public class ConcreteCredentialRequestServiceTest {
   }
   
   @Test
-  public void testDownloadSigningRequest() throws Exception {
+  public void testDownloadRequest() throws Exception {
     final StringWriter writer = new StringWriter();
     context.checking(new Expectations() { { 
       oneOf(request).getCertificationRequest();
@@ -323,4 +368,17 @@ public class ConcreteCredentialRequestServiceTest {
     assertThat(writer.toString(), is(equalTo(CSR_CONTENT)));
   }
 
+  @Test
+  public void testRemoveRequest() throws Exception {
+    context.checking(new Expectations() { { 
+      oneOf(credentialRepository).findByRequestId(with(REQUEST_ID));
+      will(returnValue(credential));
+      oneOf(credential).setRequest(with(nullValue(CredentialRequest.class)));
+      oneOf(credentialRepository).update(with(same(credential)));
+      oneOf(requestRepository).remove(with(REQUEST_ID));
+    } });
+    
+    service.removeRequest(REQUEST_ID);
+  }
+  
 }

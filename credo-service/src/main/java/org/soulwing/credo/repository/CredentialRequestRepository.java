@@ -36,6 +36,19 @@ public interface CredentialRequestRepository {
   void add(CredentialRequest request);
   
   /**
+   * Removes a persistent request from the repository.
+   * @param id unique identifier of the request to remove
+   */
+  void remove(Long id);
+  
+  /**
+   * Finds a request using its unique identifier.
+   * @param id unique ID of the request to match
+   * @return request or {@code null} if no such request exists
+   */
+  CredentialRequest findById(Long id);
+  
+  /**
    * Finds all credential requests in the repository that are accessible to 
    * the given user.
    * @param loginName login name of the subject user 

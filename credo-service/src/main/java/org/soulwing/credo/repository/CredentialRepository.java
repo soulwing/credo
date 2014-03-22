@@ -36,6 +36,14 @@ public interface CredentialRepository {
   void add(Credential credential);
 
   /**
+   * Updates (merges) the state of the given credential with the corresponding
+   * persistent credential
+   * <p>
+   * @param credential the credential to update
+   */
+  void update(Credential credential);
+  
+  /**
    * Removes a credential from the repository.
    * @param id the unique identifier of the credential to remove
    */
@@ -58,10 +66,17 @@ public interface CredentialRepository {
   List<Credential> findAllByLoginName(String loginName);
   
   /**
-   * Finds a credentials in the repository with a given owner.
+   * Finds a credential in the repository with a given owner.
    * @param ownerId unique identifier of the owner.
    * @return list of credentials
    */
   List<Credential> findAllByOwnerId(Long ownerId);
+  
+  /**
+   * Finds a request in the repository that was created for the given request.
+   * @param requestId unique identifier of the request
+   * @return credential or {@code null} if no such credential exists
+   */
+  Credential findByRequestId(Long requestId);
   
 }
