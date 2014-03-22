@@ -19,6 +19,7 @@
 package org.soulwing.credo.service;
 
 import java.io.IOException;
+import java.util.List;
 
 import javax.ejb.Local;
 
@@ -33,6 +34,12 @@ import org.soulwing.credo.CredentialRequest;
 @Local
 public interface CredentialRequestService {
 
+  /**
+   * Finds all credential requests for which the logged-in user is an owner.
+   * @return list of requests
+   */
+  List<CredentialRequest> findAllRequests();
+  
   /**
    * Creates an editor for a request that is based on an existing
    * credential.
