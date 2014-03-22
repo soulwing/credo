@@ -36,6 +36,7 @@ import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
+import org.soulwing.credo.Credential;
 import org.soulwing.credo.CredentialCertificationRequest;
 import org.soulwing.credo.CredentialKey;
 import org.soulwing.credo.CredentialRequest;
@@ -83,6 +84,9 @@ public class CredentialRequestEntity extends AbstractEntity
   private CredentialCertificationRequestEntity certificationRequest =
       new CredentialCertificationRequestEntity();
 
+  @ManyToOne(optional = true, fetch = FetchType.LAZY)
+  private CredentialEntity credential;
+  
   @Temporal(TemporalType.TIMESTAMP)
   @Column(name = "date_created", nullable = false)
   private Date dateCreated;
@@ -223,6 +227,26 @@ public class CredentialRequestEntity extends AbstractEntity
     this.certificationRequest = certificationRequest;
   }
   
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public Credential getCredential() {
+    return credential;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public void setCredential(Credential credential) {
+    if (!(credential instanceof CredentialEntity)) {
+      throw new IllegalArgumentException("unsupported credential type: "
+          + credential.getClass().getName());
+    }
+    this.credential = (CredentialEntity) credential;
+  }
+
   /**
    * {@inheritDoc}
    */

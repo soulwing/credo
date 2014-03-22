@@ -104,4 +104,25 @@ public interface CredentialRequest {
    */
   Date getDateCreated();
   
+  /**
+   * Gets the credential that is the basis for this request, if any.
+   * <p>
+   * When a request is created to renew an existing credential, this property
+   * refers to the credential that is to be renewed.
+   * 
+   * @return credential or {@code null} if this request was not created to
+   *    renew an existing credential
+   */
+  Credential getCredential();
+  
+  /**
+   * Sets an existing credential that is the basis for this request.
+   * <p>
+   * When a request is created to renew an existing credential, this property
+   * refers to the credential that is to be renewed.
+   * 
+   * @param credential the credential to set
+   */
+  void setCredential(Credential credential);
+
 }

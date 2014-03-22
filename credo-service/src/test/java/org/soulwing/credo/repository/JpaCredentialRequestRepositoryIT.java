@@ -41,6 +41,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.soulwing.credo.Credential;
 import org.soulwing.credo.CredentialRequest;
 import org.soulwing.credo.domain.CredentialRequestEntity;
 import org.soulwing.credo.domain.TagEntity;
@@ -116,6 +117,30 @@ public class JpaCredentialRequestRepositoryIT {
     assertThat(actual.getTags().contains(TAG1), is(true)); 
     assertThat(actual.getTags().contains(TAG2), is(true)); 
   }
+
+  @Test
+  public void testAddWithCredential() throws Exception {
+    UserGroupEntity group = EntityUtil.newGroup("someGroup");
+    Credential credential = EntityUtil.newCredential(group,  
+        EntityUtil.newPrivateKey());
+    CredentialRequestEntity request = EntityUtil.newRequest(group, 
+        EntityUtil.newPrivateKey(),
+        EntityUtil.newCertificationRequest());
+
+    request.setCredential(credential);
+    entityManager.persist(group);
+    entityManager.persist(credential);
+    repository.add(request);
+    entityManager.flush();
+    entityManager.clear();
+    
+    CredentialRequestEntity actual = entityManager.find(
+        CredentialRequestEntity.class, request.getId());
+    assertThat(actual, is(not(nullValue())));
+    assertThat(actual.getCredential().getId(), 
+        is(equalTo(credential.getId())));
+  }
+
 
   @Test
   public void testFindAllByLoginName() throws Exception {
