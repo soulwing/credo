@@ -1,0 +1,33 @@
+<!DOCTYPE html [
+    <!ENTITY nbsp "&#160;"> 
+]>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+	xmlns:credo="http://xmlns.jcp.org/jsf/composite/credo">
+
+<h:body>
+	<ui:composition template="/templates/masterTemplate.xhtml">
+    <f:metadata>
+      <f:viewParam id="id" name="id" value="#{removeCredentialRequestBean.id}"/>
+      <f:viewAction action="#{removeCredentialRequestBean.findRequest}" />
+    </f:metadata>
+		<ui:define name="windowTitle">
+		  #{messages.applicationName}::#{messages.removeRequestHeading}
+		</ui:define>
+		<ui:define name="content">
+      <credo:confirmationForm
+          heading="#{messages.removeRequestHeading}"
+          detail="#{messages.removeRequestDetail}"
+          prompt="#{messages.removeRequestPrompt}"
+          cancelLabel="#{messages.noLabel}"
+          submitLabel="#{messages.yesLabel}"
+          item="#{removeCredentialRequestBean.request.name}"
+          cancelAction="#{removeCredentialRequestBean.cancel}"
+          submitAction="#{removeCredentialRequestBean.remove}"/>
+		</ui:define>
+	</ui:composition>
+</h:body>
+
+</html>

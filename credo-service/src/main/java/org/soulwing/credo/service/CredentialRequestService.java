@@ -35,6 +35,16 @@ import org.soulwing.credo.CredentialRequest;
 public interface CredentialRequestService {
 
   /**
+   * Finds a request using its unique identifier.
+   * @param id unique identifier of the subject request
+   * @return request
+   * @throws NoSuchCredentialException if no request exists with the given
+   *    identifier
+   */
+  CredentialRequestDetail findRequestById(Long id) 
+      throws NoSuchCredentialException;
+  
+  /**
    * Finds all credential requests for which the logged-in user is an owner.
    * @return list of requests
    */
@@ -89,5 +99,11 @@ public interface CredentialRequestService {
    */
   void downloadRequest(CredentialRequest request,
       FileDownloadResponse response) throws IOException;
+  
+  /**
+   * Removes a request.
+   * @param id unique identifier of the request to remove
+   */
+  void removeRequest(Long id);
   
 }
