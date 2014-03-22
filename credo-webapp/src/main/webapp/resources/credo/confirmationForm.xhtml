@@ -22,7 +22,7 @@
 	</cc:interface>
 
 	<cc:implementation>
-		<div class="col-md-8">
+		<div class="col-md-12">
 			<h1>#{cc.attrs.heading}</h1>
 			<p>
 				<h:outputFormat escape="false" value="#{cc.attrs.detail}">
@@ -33,7 +33,7 @@
 				<ui:include src="/templates/messages.xhtml" />
 				<div class="form-group">
 				  <h:outputFormat 
-				    styleClass="form-control-static col-md-8" 
+				    styleClass="form-control-static col-md-12" 
 				    escape="false" value="#{cc.attrs.prompt}">
 				    <f:param value="#{cc.attrs.item}"/>
 				  </h:outputFormat>
