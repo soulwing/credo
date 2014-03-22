@@ -22,28 +22,28 @@
             <span>#{messages.createRequestButtonLabel}</span>
           </button>
         </div>
-        <h:dataTable id="requests" var="request" 
+        <h:dataTable id="requests" var="req" 
           value="#{credentialRequestTableBean.requests}"
           columnClasses="column-nowrap,column-nowrap,column-nowrap,,column-nowrap table-tools">
           
           <h:column>
             <f:facet name="header">#{messages.requestTableNameHeader}</f:facet>
-            #{request.name}
+            #{req.name}
           </h:column>
 
           <h:column>
             <f:facet name="header">#{messages.requestTableOwnerHeader}</f:facet>
-            #{request.owner.name}
+            #{req.owner.name}
           </h:column>
           
           <h:column>
             <f:facet name="header">#{messages.requestTableDateCreatedHeader}</f:facet>          
-            <h:outputText value="#{request.dateCreated}"/>
+            <h:outputText value="#{req.dateCreated}"/>
           </h:column>
           
           <h:column headerClass="sorter-false">
             <f:facet name="header">#{messages.requestTableTagsHeader}</f:facet>
-            <h:outputText value="#{request.tags}">
+            <h:outputText value="#{req.tags}">
               <f:converter converterId="org.soulwing.credo.converters.CommaSeparated"/>
             </h:outputText>
           </h:column>
@@ -51,11 +51,11 @@
           <h:column headerClass="sorter-false filter-false">
             <f:facet name="header">#{messages.requestTableActionsHeader}</f:facet>
             <h:outputLink styleClass="btn btn-default btn-xs" value="download">
-              <f:param name="id" value="#{request.id}"/>
+              <f:param name="id" value="#{req.id}"/>
               #{messages.downloadButtonLabel}
             </h:outputLink>
             <h:outputLink styleClass="btn btn-default btn-xs" value="remove">
-              <f:param name="id" value="#{request.id}"/>
+              <f:param name="id" value="#{req.id}"/>
               #{messages.removeButtonLabel}
             </h:outputLink>
           </h:column>
