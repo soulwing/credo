@@ -21,6 +21,7 @@ package org.soulwing.credo.service;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.arrayContaining;
 import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.emptyArray;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.sameInstance;
@@ -52,6 +53,8 @@ import org.soulwing.credo.service.request.CredentialRequestGenerator;
  * @author Carl Harris
  */
 public class ConcreteCredentialRequestServiceTest {
+
+  private static final String GROUP_NAME = "groupName";
 
   private static final String REQUEST_NAME = "requestName";
 
@@ -143,12 +146,18 @@ public class ConcreteCredentialRequestServiceTest {
     
     service.createEditor(CREDENTIAL_ID, errors);
   }
-  
+
   @Test(expected = PassphraseException.class)
   public void testCreateSigningRequestWhenPassphraseIncorrect() 
       throws Exception {
     context.checking(generateExpectations(
         throwException(new UserAccessException(new Exception()))));
+    context.checking(new Expectations() { { 
+      oneOf(errors).addError(
+          with("password"), 
+          with("passwordIncorrect"), 
+          with(emptyArray()));
+    } } );
     service.createRequest(editor, protection, errors);
   }
   
@@ -156,8 +165,32 @@ public class ConcreteCredentialRequestServiceTest {
   public void testCreateSigningRequestWhenGroupAccessDenied() throws Exception {
     context.checking(generateExpectations(
         throwException(new GroupAccessException("some message"))));
+    context.checking(new Expectations() { { 
+      allowing(protection).getGroupName();
+      will(returnValue(GROUP_NAME));
+      oneOf(errors).addError(
+          with("owner"), 
+          with("groupAccessDenied"), 
+          (Object[]) with(arrayContaining(GROUP_NAME)));
+    } } );
     service.createRequest(editor, protection, errors);
   }
+
+  @Test(expected = NoSuchGroupException.class)
+  public void testCreateSigningRequestWhenNoSuchGroup() throws Exception {
+    context.checking(generateExpectations(
+        throwException(new NoSuchGroupException())));
+    context.checking(new Expectations() { {
+      allowing(protection).getGroupName();
+      will(returnValue(GROUP_NAME));
+      oneOf(errors).addError(
+          with("owner"), 
+          with("credentialOwnerNotFound"), 
+          (Object[]) with(arrayContaining(GROUP_NAME)));
+    } } );
+    service.createRequest(editor, protection, errors);
+  }
+
 
   @Test(expected = CredentialRequestException.class)
   public void testCreateSigningRequestFailure() throws Exception {
@@ -177,8 +210,7 @@ public class ConcreteCredentialRequestServiceTest {
   private Expectations generateExpectations(final Action outcome) 
       throws Exception {
     return new Expectations() { { 
-      oneOf(generator).generate(with(same(editor)), with(same(protection)), 
-          with(same(errors)));
+      oneOf(generator).generate(with(same(editor)), with(same(protection)));
       will(outcome);
     } };
   }

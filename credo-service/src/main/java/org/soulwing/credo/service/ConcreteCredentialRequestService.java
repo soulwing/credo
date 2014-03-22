@@ -86,15 +86,25 @@ public class ConcreteCredentialRequestService implements CredentialRequestServic
       Errors errors) throws NoSuchGroupException, PassphraseException, 
       GroupAccessException, CredentialRequestException {
     try {
-      CredentialRequest request = generator.generate(editor, protection, 
-          errors);
+      CredentialRequest request = generator.generate(editor, protection);
       request.setName(editor.getName());
       request.setNote(editor.getNote());
       request.setTags(tagService.resolve(editor.getTags()));
       return request;
     }
     catch (UserAccessException ex) {
+      errors.addError("password", "passwordIncorrect");
       throw new PassphraseException();
+    }
+    catch (GroupAccessException ex) {
+      errors.addError("owner", "groupAccessDenied", 
+          protection.getGroupName());
+      throw ex;
+    }
+    catch (NoSuchGroupException ex) {
+      errors.addError("owner", "credentialOwnerNotFound", 
+          protection.getGroupName());
+      throw ex;
     }
   }
 

@@ -38,7 +38,6 @@ import org.soulwing.credo.CredentialRequestBuilder;
 import org.soulwing.credo.CredentialRequestBuilderFactory;
 import org.soulwing.credo.service.CredentialRequestEditor;
 import org.soulwing.credo.service.CredentialRequestException;
-import org.soulwing.credo.service.Errors;
 import org.soulwing.credo.service.ProtectionParameters;
 import org.soulwing.credo.service.crypto.CertificationRequestBuilder;
 import org.soulwing.credo.service.crypto.CertificationRequestBuilderFactory;
@@ -92,9 +91,6 @@ public class ConcreteRequestGeneratorTest {
   private ProtectionParameters protection;
 
   @Mock
-  private Errors errors;
-  
-  @Mock
   private KeyPairWrapper keyPair;
   
   @Mock
@@ -123,7 +119,7 @@ public class ConcreteRequestGeneratorTest {
     context.checking(csrBuilderExpectations(returnValue(csr)));
     context.checking(signingRequestExpectations());
     context.checking(protectionServiceExpectations(returnValue(null)));    
-    assertThat(generator.generate(editor, protection, errors),
+    assertThat(generator.generate(editor, protection),
         is(sameInstance(request)));
   }
 
@@ -133,7 +129,7 @@ public class ConcreteRequestGeneratorTest {
     context.checking(csrBuilderExpectations(
         throwException(new CertificationRequestException("some message"))));
 
-    generator.generate(editor, protection, errors);
+    generator.generate(editor, protection);
   }
   
   private Expectations keyPairExpectations() throws Exception {

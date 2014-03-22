@@ -27,7 +27,6 @@ import org.soulwing.credo.CredentialRequest;
 import org.soulwing.credo.CredentialRequestBuilderFactory;
 import org.soulwing.credo.service.CredentialRequestEditor;
 import org.soulwing.credo.service.CredentialRequestException;
-import org.soulwing.credo.service.Errors;
 import org.soulwing.credo.service.GroupAccessException;
 import org.soulwing.credo.service.NoSuchGroupException;
 import org.soulwing.credo.service.ProtectionParameters;
@@ -62,7 +61,7 @@ public class ConcreteRequestGenerator
 
   @Override
   public CredentialRequest generate(CredentialRequestEditor editor,
-      ProtectionParameters protection, Errors errors)
+      ProtectionParameters protection)
       throws NoSuchGroupException, GroupAccessException, UserAccessException,
       CredentialRequestException {
     
