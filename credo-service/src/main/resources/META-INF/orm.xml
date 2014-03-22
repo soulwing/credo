@@ -166,4 +166,20 @@
     </query>
   </named-query>
 
+  <named-query name="findAllRequestsByLoginName">
+    <query>
+      select distinct r from CredentialRequestEntity r
+      inner join fetch r.owner
+      left outer join fetch r.tags t
+      where exists (
+        select distinct g from UserGroupMemberEntity gm
+        inner join gm.group g
+        inner join gm.user u
+        where u.loginName = :loginName
+        and gm.group = r.owner
+      )      
+      order by r.name
+    </query>
+  </named-query>
+
 </entity-mappings>

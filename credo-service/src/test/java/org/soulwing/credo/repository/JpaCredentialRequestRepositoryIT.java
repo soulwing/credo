@@ -21,6 +21,10 @@ package org.soulwing.credo.repository;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.nullValue;
+
+import java.util.List;
 
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
@@ -41,6 +45,8 @@ import org.soulwing.credo.CredentialRequest;
 import org.soulwing.credo.domain.CredentialRequestEntity;
 import org.soulwing.credo.domain.TagEntity;
 import org.soulwing.credo.domain.UserGroupEntity;
+import org.soulwing.credo.domain.UserGroupMemberEntity;
+import org.soulwing.credo.domain.UserProfileEntity;
 
 /**
  * Integration tests for {@link JpaCredentialRequestRepository}.
@@ -109,6 +115,34 @@ public class JpaCredentialRequestRepositoryIT {
         is(equalTo(request.getCertificationRequest().getContent())));
     assertThat(actual.getTags().contains(TAG1), is(true)); 
     assertThat(actual.getTags().contains(TAG2), is(true)); 
+  }
+
+  @Test
+  public void testFindAllByLoginName() throws Exception {
+    final String loginName = "someUser";
+    final String groupName = "someGroup";
+    UserProfileEntity user = EntityUtil.newUser(loginName);
+    UserGroupEntity group = EntityUtil.newGroup(groupName);
+    UserGroupEntity otherGroup = EntityUtil.newGroup("someOtherGroup");
+    UserGroupMemberEntity groupMember = EntityUtil.newGroupMember(user, group);
+    CredentialRequestEntity request = EntityUtil.newRequest(group, 
+        EntityUtil.newPrivateKey(), EntityUtil.newCertificationRequest());
+    CredentialRequestEntity otherRequest = EntityUtil.newRequest(otherGroup, 
+        EntityUtil.newPrivateKey(), EntityUtil.newCertificationRequest());
+    otherRequest.setName(otherRequest.getName() + "other");
+    entityManager.persist(user);
+    entityManager.persist(group);
+    entityManager.persist(otherGroup);
+    entityManager.persist(groupMember);
+    entityManager.persist(request);
+    entityManager.persist(otherRequest);
+    entityManager.flush();
+    entityManager.clear();
+    List<CredentialRequest> requests = repository.findAllByLoginName(loginName);
+    assertThat(requests, is(not(nullValue())));
+    assertThat(requests.size(), is(equalTo(1)));
+    CredentialRequest actual = requests.get(0);
+    assertThat(actual.getName(), is(equalTo(actual.getName())));
   }
 
 }
