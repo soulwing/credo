@@ -1,23 +1,7 @@
-Download Signing Request
-------------------------
-
-A user can download the certification request file for an existing signing
-request for which she is an owner.
-
-
 Edit Credential
 ---------------
 
 A user can edit an existing credential for which she is an owner.
-
-* The name, note, and tags can be edited.
-* The owner group can be changed to another group of which she is a member.
-
-
-Edit Signing Request
---------------------
-
-A user can edit an existing signing request for which she is an owner.
 
 * The name, note, and tags can be edited.
 * The owner group can be changed to another group of which she is a member.
@@ -75,17 +59,6 @@ she is an owner.
 * If the user chooses not to remove the signing request, it should be flagged
   as "complete" upon successful creation of the credential.
 
-
-Remove Credential Signing Request
----------------------------------
-
-A user can remove a signing request for which she is an owner.
-
-* The user should be prompted to confirm that she wishes to remove the
-  signing request.
-* If the signing request is not completed, there should be an additional 
-  warning that the private key for the request cannot be recovered.
-  
 
 Credential Expiration Report
 ----------------------------

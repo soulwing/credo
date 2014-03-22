@@ -319,6 +319,13 @@ A user can remove a signing request for which she is an owner.
   request.
 
  
+Download Signing Request
+------------------------
+
+A user can download the certification request file for an existing signing
+request for which she is an owner.
+
+
 
 
 
