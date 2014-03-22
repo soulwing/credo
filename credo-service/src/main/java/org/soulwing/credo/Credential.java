@@ -109,6 +109,19 @@ public interface Credential {
   List<? extends CredentialCertificate> getCertificates();
   
   /**
+   * Gets the request that was used as the basis for this credential.
+   * @return request or {@code null} if this credential was not created
+   *    from a request (e.g. it was imported)
+   */
+  CredentialRequest getRequest();
+  
+  /**
+   * Sets the request that was used as the basis for this credential.
+   * @param request the request to set
+   */
+  void setRequest(CredentialRequest request);
+  
+  /**
    * Gets the date at which this credential was created.
    * @return creation date
    */

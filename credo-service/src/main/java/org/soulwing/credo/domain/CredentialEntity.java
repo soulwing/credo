@@ -41,6 +41,7 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
 import org.soulwing.credo.Credential;
+import org.soulwing.credo.CredentialRequest;
 import org.soulwing.credo.Tag;
 import org.soulwing.credo.UserGroup;
 
@@ -87,6 +88,9 @@ public class CredentialEntity extends AbstractEntity implements Credential {
   @OrderColumn(name = "list_offset")
   private List<CredentialCertificateEntity> certificates = 
       new ArrayList<>();
+  
+  @OneToOne(optional = true, fetch = FetchType.LAZY)
+  private CredentialRequestEntity request;
   
   @Temporal(TemporalType.TIMESTAMP)
   @Column(name = "date_created", nullable = false)
@@ -250,6 +254,26 @@ public class CredentialEntity extends AbstractEntity implements Credential {
       throw new NullPointerException("cannot add null reference to list");
     }
     this.certificates.add(certificate);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public CredentialRequest getRequest() {
+    return request;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public void setRequest(CredentialRequest request) {
+    if (request != null && !(request instanceof CredentialRequestEntity)) {
+      throw new IllegalArgumentException("unsupported request type: "
+          + request.getClass().getName());
+    }
+    this.request = (CredentialRequestEntity) request;
   }
 
   /**

@@ -46,6 +46,7 @@ import org.soulwing.credo.Credential;
 import org.soulwing.credo.domain.CredentialCertificateEntity;
 import org.soulwing.credo.domain.CredentialEntity;
 import org.soulwing.credo.domain.CredentialKeyEntity;
+import org.soulwing.credo.domain.CredentialRequestEntity;
 import org.soulwing.credo.domain.TagEntity;
 import org.soulwing.credo.domain.UserGroupEntity;
 import org.soulwing.credo.domain.UserGroupMemberEntity;
@@ -170,6 +171,27 @@ public class JpaCredentialRepositoryIT {
     assertThat(certificateEntity.getEncoded(), 
         is(equalTo(certificate.getEncoded())));
   }
+
+  @Test
+  public void testAddWithRequest() throws Exception {
+    UserGroupEntity group = EntityUtil.newGroup("someGroup");
+    CredentialKeyEntity privateKey = EntityUtil.newPrivateKey();
+    CredentialRequestEntity request = EntityUtil.newRequest(group, 
+        privateKey, EntityUtil.newCertificationRequest());
+    CredentialEntity credential = EntityUtil.newCredential(group, 
+        privateKey);
+    credential.setRequest(request);
+    entityManager.persist(group);
+    entityManager.persist(request);
+    repository.add(credential);
+    entityManager.flush();
+    entityManager.clear();
+    CredentialEntity actual = entityManager.find(CredentialEntity.class, 
+        credential.getId());
+    assertThat(actual, is(not(nullValue())));
+    assertThat(actual.getRequest().getId(), is(equalTo(request.getId())));
+  }
+
 
   @Test
   public void testRemove() throws Exception {

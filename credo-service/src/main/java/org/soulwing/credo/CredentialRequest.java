@@ -33,6 +33,12 @@ import java.util.Set;
 public interface CredentialRequest {
 
   /**
+   * Gets the persistent unique identifier for this request.
+   * @return unique identifier or {@code null} if this request is transient
+   */
+  Long getId();
+  
+  /**
    * Gets the friendly name associated with this request.
    * @return friendly name
    */
