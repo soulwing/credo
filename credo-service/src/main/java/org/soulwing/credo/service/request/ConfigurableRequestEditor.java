@@ -31,6 +31,16 @@ import org.soulwing.credo.service.CredentialRequestEditor;
 public interface ConfigurableRequestEditor extends CredentialRequestEditor {
 
   /**
+   * Sets the unique identifier of a credential to associate with the request.
+   * <p>
+   * This property is used when creating a request to renew an existing 
+   * credential.
+   * 
+   * @param credentialId the credential identifier to set
+   */
+  void setCredentialId(Long credentialId);
+  
+  /**
    * Sets the tags for the request.
    * @param tags set of tags
    */

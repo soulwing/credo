@@ -18,7 +18,6 @@
  */
 package org.soulwing.credo.service;
 
-import javax.security.auth.x500.X500Principal;
 
 
 /**
@@ -29,10 +28,13 @@ import javax.security.auth.x500.X500Principal;
 public interface CredentialRequestEditor extends CredentialEditor {
 
   /**
-   * Gets the subject principal for the signing request.
-   * @return subject principal
+   * Gets the unique identifier of the the credential this is the basis
+   * for the request.
+   * <p>
+   * @return credential ID or {@code null} if this request is not associated 
+   *    with an existing credential
    */
-  X500Principal getSubject();
+  Long getCredentialId();
   
   /**
    * Gets the subject name for the signing request.

@@ -37,12 +37,29 @@ import org.soulwing.credo.service.X500PrincipalUtil;
 public class ConcreteConfigurableRequestEditor
     implements ConfigurableRequestEditor {
 
+  private Long credentialId;
   private String name;
   private String subjectName;
   private String owner;
   private String note;
   private String[] tags;
   
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public Long getCredentialId() {
+    return credentialId;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public void setCredentialId(Long credentialId) {
+    this.credentialId = credentialId;    
+  }
+
   /**
    * {@inheritDoc}
    */

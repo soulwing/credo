@@ -220,8 +220,30 @@ public class ConcreteCredentialRequestServiceTest {
   }
 
   @Test
-  public void testCreateSigningRequestSuccess() throws Exception {
+  public void testCreateSigningRequestForNewCredential() 
+      throws Exception {
     context.checking(generateExpectations(returnValue(request)));
+    context.checking(newCredentialExpectations());
+    context.checking(requestExpectations());
+    assertThat(service.createRequest(editor, protection, errors),
+        is(sameInstance(request)));
+  }
+
+  @Test
+  public void testCreateSigningRequestForExistingCredentialWhenFound() 
+      throws Exception {
+    context.checking(generateExpectations(returnValue(request)));
+    context.checking(existingCredentialExpectations(credential));
+    context.checking(requestExpectations());
+    assertThat(service.createRequest(editor, protection, errors),
+        is(sameInstance(request)));
+  }
+
+  @Test
+  public void testCreateSigningRequestForExistingCredentialWhenNotFound() 
+      throws Exception {
+    context.checking(generateExpectations(returnValue(request)));
+    context.checking(existingCredentialExpectations(null));
     context.checking(requestExpectations());
     assertThat(service.createRequest(editor, protection, errors),
         is(sameInstance(request)));
@@ -248,6 +270,24 @@ public class ConcreteCredentialRequestServiceTest {
       oneOf(request).setTags(tags);
       oneOf(tagService).resolve(TAGS);
       will(returnValue(tags));
+    } };
+  }
+
+  private Expectations newCredentialExpectations() {
+    return new Expectations() { { 
+      oneOf(editor).getCredentialId();
+      will(returnValue(null));
+    } };
+  }
+  
+  private Expectations existingCredentialExpectations(
+      final Credential retValue) {
+    return new Expectations() { { 
+      allowing(editor).getCredentialId();
+      will(returnValue(CREDENTIAL_ID));
+      oneOf(credentialRepository).findById(with(CREDENTIAL_ID));
+      will(returnValue(retValue));
+      oneOf(request).setCredential(with(retValue));
     } };
   }
   

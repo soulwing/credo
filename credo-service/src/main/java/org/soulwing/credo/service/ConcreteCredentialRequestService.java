@@ -106,6 +106,11 @@ public class ConcreteCredentialRequestService implements CredentialRequestServic
       GroupAccessException, CredentialRequestException {
     try {
       CredentialRequest request = generator.generate(editor, protection);
+      if (editor.getCredentialId() != null) {
+        Credential credential = credentialRepository.findById(
+            editor.getCredentialId());
+        request.setCredential(credential);
+      }
       request.setName(editor.getName());
       request.setNote(editor.getNote());
       request.setTags(tagService.resolve(editor.getTags()));
