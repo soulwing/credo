@@ -158,6 +158,7 @@ public class JpaCredentialRequestRepositoryIT {
     CredentialRequest actual = repository.findById(request.getId());   
     assertThat(actual, is(not(nullValue())));
 
+    request = entityManager.merge(request);
     repository.remove(request, true);
     assertThat(repository.findById(request.getId()), is(nullValue()));
   }
@@ -184,6 +185,7 @@ public class JpaCredentialRequestRepositoryIT {
     credential.setRequest(null);
     credential = entityManager.merge(credential);
     
+    request = entityManager.merge(request);
     repository.remove(request, false);
     assertThat(repository.findById(request.getId()), is(nullValue()));
     

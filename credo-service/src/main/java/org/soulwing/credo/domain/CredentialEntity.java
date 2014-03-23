@@ -79,11 +79,12 @@ public class CredentialEntity extends AbstractEntity implements Credential {
   private Date expiration;
   
   @OneToOne(optional = false, fetch = FetchType.LAZY, 
-      cascade = { CascadeType.PERSIST })
+      cascade = { CascadeType.PERSIST, CascadeType.MERGE })
   @JoinColumn(name = "private_key_id")
   private CredentialKeyEntity privateKey;
   
-  @OneToMany(fetch = FetchType.LAZY, cascade = { CascadeType.PERSIST })
+  @OneToMany(fetch = FetchType.LAZY, 
+      cascade = { CascadeType.PERSIST, CascadeType.MERGE })
   @JoinTable(name = "credential_certificates")
   @OrderColumn(name = "list_offset")
   private List<CredentialCertificateEntity> certificates = 

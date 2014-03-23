@@ -74,12 +74,12 @@ public class CredentialRequestEntity extends AbstractEntity
   private Set<TagEntity> tags = new LinkedHashSet<TagEntity>();
 
   @OneToOne(optional = false, fetch = FetchType.LAZY, 
-      cascade = { CascadeType.PERSIST })
+      cascade = { CascadeType.PERSIST, CascadeType.MERGE })
   @JoinColumn(name = "private_key_id")
   private CredentialKeyEntity privateKey = new CredentialKeyEntity();
 
   @OneToOne(optional = false, fetch = FetchType.LAZY,
-      cascade = { CascadeType.PERSIST })
+      cascade = { CascadeType.PERSIST, CascadeType.MERGE })
   @JoinColumn(name = "certification_request_id")
   private CredentialCertificationRequestEntity certificationRequest =
       new CredentialCertificationRequestEntity();

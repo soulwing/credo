@@ -238,7 +238,7 @@ public class JpaCredentialRepositoryIT {
     entityManager.flush();
     entityManager.clear();
   
-    repository.remove(credential);
+    repository.remove(entityManager.merge(credential));
     entityManager.flush();
     entityManager.clear();
     
