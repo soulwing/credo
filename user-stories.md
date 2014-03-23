@@ -1,3 +1,18 @@
+Create Credential from Signing Request
+--------------------------------------
+
+A user can create a credential from an existing signing request for which
+she is an owner.
+
+* The subject certificate and authority chain must be uploaded and validated.
+* The friendly name, owner, description, and tags should be copied from the
+  request, and the user should be given the opportunity to edit them.
+* The user should be given the option to delete the signing request upon 
+  successful creation of the credential.
+* If the user chooses not to remove the signing request, it should be flagged
+  as "complete" upon successful creation of the credential.
+
+
 Edit Credential
 ---------------
 
@@ -43,21 +58,6 @@ include in the request
 * When creating a signing request to renew an existing credential the
   default values for all supported extensions should come from the existing
   certificate
-
-
-Create Credential from Signing Request
---------------------------------------
-
-A user can create a credential from an existing signing request for which
-she is an owner.
-
-* The subject certificate and authority chain must be uploaded and validated.
-* The friendly name, owner, description, and tags should be copied from the
-  request, and the user should be given the opportunity to edit them.
-* The user should be given the option to delete the signing request upon 
-  successful creation of the credential.
-* If the user chooses not to remove the signing request, it should be flagged
-  as "complete" upon successful creation of the credential.
 
 
 Credential Expiration Report
