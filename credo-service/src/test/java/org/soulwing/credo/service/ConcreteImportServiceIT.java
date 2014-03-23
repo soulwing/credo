@@ -50,7 +50,9 @@ import org.soulwing.credo.Credential;
 import org.soulwing.credo.Password;
 import org.soulwing.credo.UserGroup;
 import org.soulwing.credo.domain.CredentialEntity;
+import org.soulwing.credo.logging.LoggerCategory;
 import org.soulwing.credo.repository.CredentialRepository;
+import org.soulwing.credo.security.OwnerAccessControlException;
 import org.soulwing.credo.service.archive.ArchiveBuilder;
 import org.soulwing.credo.service.crypto.PrivateKeyWrapper;
 import org.soulwing.credo.service.crypto.bc.BcPrivateKeyWrapper;
@@ -61,6 +63,7 @@ import org.soulwing.credo.service.importer.CredentialImporter;
 import org.soulwing.credo.service.pem.PemObjectBuilder;
 import org.soulwing.credo.service.pem.bc.BcPemObjectBuilder;
 import org.soulwing.credo.service.protect.CredentialProtectionService;
+import org.soulwing.credo.service.request.CredentialRequestEditorFactory;
 
 /**
  * Integration tests for {@link ConcreteImportService}.
@@ -80,6 +83,8 @@ public class ConcreteImportServiceIT {
         .addPackage(Credential.class.getPackage())
         .addPackage(CredentialEntity.class.getPackage())
         .addPackage(CredentialRepository.class.getPackage())
+        .addPackage(LoggerCategory.class.getPackage())
+        .addPackage(OwnerAccessControlException.class.getPackage())
         .addPackage(CredentialService.class.getPackage())
         .addPackage(ArchiveBuilder.class.getPackage())
         .addPackage(CredentialExporter.class.getPackage())
@@ -91,6 +96,7 @@ public class ConcreteImportServiceIT {
         .addPackage(BcPemObjectBuilder.class.getPackage())
         .addPackage(GroupEditorFactory.class.getPackage())
         .addPackage(CredentialProtectionService.class.getPackage())
+        .addPackage(CredentialRequestEditorFactory.class.getPackage())
         .addClass(MockUserContextService.class)
         .addAsResource("testcases")
         .addAsResource("persistence-test.xml", "META-INF/persistence.xml")

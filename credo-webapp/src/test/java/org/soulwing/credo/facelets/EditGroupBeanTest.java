@@ -131,6 +131,16 @@ public class EditGroupBeanTest {
     bean.save();
   }
 
+  @Test(expected = RuntimeException.class)
+  public void testSaveWhenGroupAccessException() throws Exception {
+    context.checking(saveGroupExpectations(
+        throwException(new NoSuchGroupException())));
+    context.checking(endConversationExpectations());
+    bean.setEditor(editor);
+    bean.save();
+  }
+
+
   @Test
   public void testSaveWhenPassphraseException() throws Exception {
     context.checking(saveGroupExpectations(

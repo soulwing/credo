@@ -24,6 +24,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.soulwing.credo.service.Errors;
+import org.soulwing.credo.service.GroupAccessException;
 import org.soulwing.credo.service.GroupEditException;
 import org.soulwing.credo.service.GroupEditor;
 import org.soulwing.credo.service.GroupService;
@@ -96,6 +97,9 @@ public class CreateGroupBean {
       throw new RuntimeException(ex);
     }
     catch (GroupEditException ex) {
+      return null;
+    }
+    catch (GroupAccessException ex) {
       return null;
     }
     catch (NoSuchGroupException ex) {

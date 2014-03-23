@@ -302,7 +302,7 @@ public class ConcreteImportServiceTest {
     importService.createCredential(details, protection, errors);
   }
 
-  @Test(expected = AccessDeniedException.class)
+  @Test(expected = GroupAccessException.class)
   public void testProtectCredentialWhenUserNotInGroup() throws Exception {
     context.checking(requestDetailsExpectations());
     context.checking(credentialBuilderExpectations());

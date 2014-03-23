@@ -122,8 +122,8 @@ public class ConcreteImportService implements ImportService {
    */
   @Override
   public Credential createCredential(ImportDetails details,
-      ProtectionParameters protection, Errors errors) throws NoSuchGroupException, PassphraseException,
-      AccessDeniedException {
+      ProtectionParameters protection, Errors errors) 
+      throws NoSuchGroupException, GroupAccessException, PassphraseException {
 
     try {
       Credential credential = createCredential(details);    
@@ -139,7 +139,7 @@ public class ConcreteImportService implements ImportService {
     catch (GroupAccessException ex) {
       errors.addError("owner", "groupAccessDenied", 
           protection.getGroupName());
-      throw new AccessDeniedException();
+      throw ex;
     }
     catch (NoSuchGroupException ex) {
       errors.addError("owner", "credentialOwnerNotFound", 
@@ -149,7 +149,7 @@ public class ConcreteImportService implements ImportService {
   }
   
   private UserGroup resolveOwner(ProtectionParameters protection, 
-      Errors errors) throws NoSuchGroupException {
+      Errors errors) throws NoSuchGroupException, GroupAccessException {
     UserGroup group = null;
     try {
       group = findOwnerGroup(protection);

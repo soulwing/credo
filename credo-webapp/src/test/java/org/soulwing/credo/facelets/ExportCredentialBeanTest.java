@@ -46,13 +46,13 @@ import org.junit.Test;
 import org.soulwing.credo.Credential;
 import org.soulwing.credo.Password;
 import org.soulwing.credo.UserGroup;
-import org.soulwing.credo.service.AccessDeniedException;
 import org.soulwing.credo.service.Errors;
 import org.soulwing.credo.service.ExportException;
 import org.soulwing.credo.service.ExportFormat;
 import org.soulwing.credo.service.ExportPreparation;
 import org.soulwing.credo.service.ExportRequest;
 import org.soulwing.credo.service.ExportService;
+import org.soulwing.credo.service.GroupAccessException;
 import org.soulwing.credo.service.NoSuchCredentialException;
 import org.soulwing.credo.service.PassphraseException;
 
@@ -62,6 +62,8 @@ import org.soulwing.credo.service.PassphraseException;
  * @author Carl Harris
  */
 public class ExportCredentialBeanTest {
+
+  private static final String GROUP_NAME = "someGroup";
 
   private static final String SUFFIX = ".suffix";
 
@@ -121,7 +123,7 @@ public class ExportCredentialBeanTest {
     final Long id = -1L;
     final Credential credential = context.mock(Credential.class);
     final UserGroup group = context.mock(UserGroup.class);
-    final String groupName = "someGroup";
+    final String groupName = GROUP_NAME;
     context.checking(new Expectations() { { 
       oneOf(exportService).newExportRequest(with(id));
       will(returnValue(request));
@@ -189,17 +191,19 @@ public class ExportCredentialBeanTest {
     assertThat(bean.prepareDownload(), is(nullValue()));
   }
 
-  @Test(expected = RuntimeException.class)
+  @Test
   public void testPrepareDownloadAccessDenied() throws Exception {
     context.checking(new Expectations() { {
       oneOf(exportService).prepareExport(with(same(request)));
-      will(throwException(new AccessDeniedException()));
+      will(throwException(new GroupAccessException(GROUP_NAME)));
+      oneOf(errors).addError(with(equalTo("groupAccessDenied")), 
+          (Object[]) with(arrayContaining(GROUP_NAME)));
     } });
     
     bean.setExportRequest(request);
-    bean.prepareDownload();
+    assertThat(bean.prepareDownload(), 
+        is(equalTo(ExportCredentialBean.FAILURE_OUTCOME_ID)));
   }
-
 
   @Test
   public void testPrepareDownloadError() throws Exception {

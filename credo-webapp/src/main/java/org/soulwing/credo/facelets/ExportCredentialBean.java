@@ -41,6 +41,7 @@ import org.soulwing.credo.service.ExportFormat;
 import org.soulwing.credo.service.ExportPreparation;
 import org.soulwing.credo.service.ExportRequest;
 import org.soulwing.credo.service.ExportService;
+import org.soulwing.credo.service.GroupAccessException;
 import org.soulwing.credo.service.NoSuchCredentialException;
 import org.soulwing.credo.service.PassphraseException;
 
@@ -426,6 +427,10 @@ public class ExportCredentialBean implements Serializable {
     catch (PassphraseException ex) {
       errors.addError("passphrase", "passphraseIncorrect");
       return null;
+    }
+    catch (GroupAccessException ex) {
+      errors.addError("groupAccessDenied", new Object[] { ex.getGroupName() });
+      return FAILURE_OUTCOME_ID;
     }
     catch (ExportException ex) {
       return FAILURE_OUTCOME_ID;

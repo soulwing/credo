@@ -30,6 +30,7 @@ import javax.inject.Inject;
 
 import org.soulwing.credo.Credential;
 import org.soulwing.credo.Password;
+import org.soulwing.credo.security.OwnerAccessControlException;
 import org.soulwing.credo.service.ExportFormat.Variant;
 import org.soulwing.credo.service.crypto.PasswordGenerator;
 import org.soulwing.credo.service.crypto.PrivateKeyWrapper;
@@ -113,7 +114,7 @@ public class ConcreteExportService implements ExportService {
   @Override
   @TransactionAttribute(TransactionAttributeType.REQUIRED)
   public ExportPreparation prepareExport(ExportRequest request)
-      throws ExportException, AccessDeniedException, PassphraseException {
+      throws ExportException, GroupAccessException, PassphraseException {
 
     try {
       Credential credential = request.getCredential();
@@ -125,8 +126,8 @@ public class ConcreteExportService implements ExportService {
       CredentialExporter exporter = exporterRegistry.findExporter(request);
       return exporter.exportCredential(request, privateKey);
     }
-    catch (GroupAccessException ex) {
-      throw new AccessDeniedException();
+    catch (OwnerAccessControlException ex) {
+      throw new GroupAccessException(ex.getGroupName());
     }
     catch (UserAccessException ex) {
       throw new PassphraseException();

@@ -72,12 +72,12 @@ public interface GroupService {
    *    editor was created
    * @throws PassphraseException if a password is required and was not
    *    provided or was incorrect
-   * @throws AccessDeniedException if the logged in user is not a member
+   * @throws GroupAccessException if the logged in user is not a member
    *    of the edited group
    */
   void saveGroup(GroupEditor editor, Errors errors) 
-      throws GroupEditException, NoSuchGroupException, PassphraseException,
-          AccessDeniedException;
+      throws GroupEditException, NoSuchGroupException, GroupAccessException,
+      PassphraseException;
   
   /**
    * Removes the group with the given unique identifier.

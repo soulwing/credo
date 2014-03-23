@@ -26,6 +26,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.soulwing.credo.service.Errors;
+import org.soulwing.credo.service.GroupAccessException;
 import org.soulwing.credo.service.GroupEditException;
 import org.soulwing.credo.service.GroupEditor;
 import org.soulwing.credo.service.GroupService;
@@ -153,7 +154,9 @@ public class EditGroupBean implements Serializable {
     catch (GroupEditException ex) {
       return null;
     }
-    catch (NoSuchGroupException ex) {
+    catch (NoSuchGroupException|GroupAccessException ex) {
+      // TODO -- need to think about how we could ever get here that
+      // isn't a programming error
       endConversation();
       throw new RuntimeException(ex);
     }
