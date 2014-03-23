@@ -164,7 +164,7 @@ public class CreateCredentialRequestBeanTest {
   @Test
   public void testPrepareWhenGroupAccessException() throws Exception {
     context.checking(createSigningRequestExpectations(
-        throwException(new GroupAccessException("some message"))));
+        throwException(new GroupAccessException("groupName"))));
     bean.getEditor().setDelegate(editor);
     assertThat(bean.prepare(), 
         is(equalTo(CreateCredentialRequestBean.DETAILS_OUTCOME_ID)));

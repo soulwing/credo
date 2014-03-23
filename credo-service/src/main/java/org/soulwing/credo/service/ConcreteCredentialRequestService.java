@@ -33,6 +33,7 @@ import org.soulwing.credo.Credential;
 import org.soulwing.credo.CredentialRequest;
 import org.soulwing.credo.repository.CredentialRepository;
 import org.soulwing.credo.repository.CredentialRequestRepository;
+import org.soulwing.credo.security.OwnerAccessControlException;
 import org.soulwing.credo.service.request.CredentialRequestEditorFactory;
 import org.soulwing.credo.service.request.CredentialRequestGenerator;
 
@@ -203,15 +204,20 @@ public class ConcreteCredentialRequestService implements CredentialRequestServic
    * {@inheritDoc}
    */
   @Override
-  public void removeRequest(Long id) {
-    Credential credential = credentialRepository.findByRequestId(id);
-    if (credential != null) {
-      credential.setRequest(null);
-      credentialRepository.update(credential);
+  public void removeRequest(Long id) throws GroupAccessException {
+    try {
+      Credential credential = credentialRepository.findByRequestId(id);
+      if (credential != null) {
+        credential.setRequest(null);
+        credentialRepository.update(credential);
+      }
+      CredentialRequest request = requestRepository.findById(id);
+      if (request != null) {
+        requestRepository.remove(request, credential == null);
+      }
     }
-    CredentialRequest request = requestRepository.findById(id);
-    if (request != null) {
-      requestRepository.remove(request, credential == null);
+    catch (OwnerAccessControlException ex) {
+      throw new GroupAccessException(ex.getGroupName());
     }
   }
   

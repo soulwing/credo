@@ -29,6 +29,7 @@ import javax.inject.Inject;
 
 import org.soulwing.credo.Credential;
 import org.soulwing.credo.repository.CredentialRepository;
+import org.soulwing.credo.security.OwnerAccessControlException;
 
 /**
  * A concrete {@link CredentialService} implementation.
@@ -71,11 +72,16 @@ public class ConcreteCredentialService implements CredentialService {
    * {@inheritDoc}
    */
   @Override
-  public void removeCredential(Long id) {
-    Credential credential = credentialRepository.findById(id);
-    if (credential != null) {
-      credentialRepository.remove(credential);
+  public void removeCredential(Long id) throws GroupAccessException {
+    try {
+      Credential credential = credentialRepository.findById(id);
+      if (credential != null) {
+        credentialRepository.remove(credential);
+      }
+    }
+    catch (OwnerAccessControlException ex) {
+      throw new GroupAccessException(ex.getGroupName());
     }
   }
-
+  
 }

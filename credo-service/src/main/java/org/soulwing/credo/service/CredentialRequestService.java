@@ -115,7 +115,9 @@ public interface CredentialRequestService {
   /**
    * Removes a request.
    * @param id unique identifier of the request to remove
+   * @throws GroupAccessException if the logged-in user is not a member of
+   *    the group that owns the given request
    */
-  void removeRequest(Long id);
+  void removeRequest(Long id) throws GroupAccessException;
   
 }

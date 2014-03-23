@@ -57,7 +57,9 @@ public interface CredentialService {
    * @param id unique identifier of the credential to remove
    * @param errors errors object that will be updated in the case of an
    *    error
+   * @throws GroupAccessException if the logged in user is not a member of
+   *    the group that owns the given credential
    */
-  void removeCredential(Long id);
+  void removeCredential(Long id) throws GroupAccessException;
 
 }

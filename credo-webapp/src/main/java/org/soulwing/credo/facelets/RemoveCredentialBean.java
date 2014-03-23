@@ -28,6 +28,7 @@ import javax.inject.Named;
 import org.soulwing.credo.Credential;
 import org.soulwing.credo.service.CredentialService;
 import org.soulwing.credo.service.Errors;
+import org.soulwing.credo.service.GroupAccessException;
 import org.soulwing.credo.service.NoSuchCredentialException;
 
 /**
@@ -119,9 +120,18 @@ public class RemoveCredentialBean implements Serializable {
    * @return outcome ID
    */
   public String remove() {
-    credentialService.removeCredential(id);
-    endConversation();
-    return SUCCESS_OUTCOME_ID;
+    try {
+      credentialService.removeCredential(id);
+      return SUCCESS_OUTCOME_ID;
+    }
+    catch (GroupAccessException ex) {
+      errors.addError("groupAccessDenied", 
+          new Object[] { ex.getGroupName() });
+      return FAILURE_OUTCOME_ID;
+    }
+    finally {
+      endConversation();
+    }
   }
   
   private void beginConversation() {
