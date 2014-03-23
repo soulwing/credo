@@ -158,7 +158,7 @@ public class ConcreteExportServiceTest {
   @Test(expected = AccessDeniedException.class)
   public void testPrepareExportWhenNotUserGroupMember() throws Exception {
     context.checking(unprotectCredentialExpectations(
-        throwException(new GroupAccessException("some message"))));
+        throwException(new GroupAccessException("someGroup"))));
     exportService.prepareExport(request);
   }
 

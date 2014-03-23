@@ -124,7 +124,7 @@ public class DelegatingCredentialEditorTest {
       oneOf(event).getNewValue();
       will(returnValue(GROUP_NAME));
       oneOf(groupService).isExistingGroup(with(GROUP_NAME));
-      will(throwException(new GroupAccessException("some message")));
+      will(throwException(new GroupAccessException(GROUP_NAME)));
     } });
     
     bean.ownerChanged(event);

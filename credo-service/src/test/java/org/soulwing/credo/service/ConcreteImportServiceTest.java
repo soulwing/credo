@@ -309,7 +309,7 @@ public class ConcreteImportServiceTest {
     context.checking(findOwnerGroupExpectations(returnValue(group)));
     context.checking(storeOwnerExpectations());
     context.checking(protectionExpectations(
-        throwException(new GroupAccessException("some message"))));
+        throwException(new GroupAccessException(GROUP_NAME))));
     context.checking(accessDeniedErrorExpectations());
     importService.createCredential(details, protection, errors);
   }

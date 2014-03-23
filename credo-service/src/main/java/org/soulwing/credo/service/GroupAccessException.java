@@ -28,12 +28,23 @@ public class GroupAccessException extends Exception {
 
   private static final long serialVersionUID = -6443606842556968462L;
 
+  private final String groupName;
+  
   /**
    * Constructs a new instance.
-   * @param message
+   * @param groupName
    */
-  public GroupAccessException(String message) {
-    super(message);
+  public GroupAccessException(String groupName) {
+    super("group " + groupName + " access denied");
+    this.groupName = groupName;
+  }
+
+  /**
+   * Gets the {@code groupName} property.
+   * @return
+   */
+  public String getGroupName() {
+    return groupName;
   }
   
 }

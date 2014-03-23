@@ -175,7 +175,7 @@ public class ConcreteGroupService implements GroupService {
       UserGroupMember member = memberRepository.findByGroupNameAndLoginName(
           groupName, loginName);
       if (member == null) {
-        throw new GroupAccessException("not a member of group " + groupName);
+        throw new GroupAccessException(groupName);
       }
     }
     return exists;

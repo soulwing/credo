@@ -230,7 +230,7 @@ public class ConcreteCredentialRequestServiceTest {
   @Test(expected = GroupAccessException.class)
   public void testCreateRequestWhenGroupAccessDenied() throws Exception {
     context.checking(generateExpectations(
-        throwException(new GroupAccessException("some message"))));
+        throwException(new GroupAccessException(GROUP_NAME))));
     context.checking(new Expectations() { { 
       allowing(protection).getGroupName();
       will(returnValue(GROUP_NAME));

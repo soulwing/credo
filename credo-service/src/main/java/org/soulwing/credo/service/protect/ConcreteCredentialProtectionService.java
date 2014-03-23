@@ -65,8 +65,7 @@ public class ConcreteCredentialProtectionService
     try {
       UserGroup group = findGroup(protection.getGroupName());
       if (!group.equals(credential.getOwner())) {
-        throw new GroupAccessException(protection.getGroupName() 
-            + " is not the owner of " + credential.getName());
+        throw new GroupAccessException(protection.getGroupName());
       }
   
       SecretKey secretKey = getGroupSecretKey(group, protection.getPassword());

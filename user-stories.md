@@ -7,6 +7,15 @@ A user can edit an existing credential for which she is an owner.
 * The owner group can be changed to another group of which she is a member.
 
 
+Edit Credential Signing Request
+-------------------------------
+
+A user can edit an existing signing request for which she is an owner.
+
+* The friendly name, description, and tags, and owner can be changed.
+* None of the attributes of the X.509 signing request object can be changed.
+
+
 Signing Request for New Credential
 ----------------------------------
 
@@ -34,15 +43,6 @@ include in the request
 * When creating a signing request to renew an existing credential the
   default values for all supported extensions should come from the existing
   certificate
-
-
-Edit Credential Signing Request
--------------------------------
-
-A user can edit an existing signing request for which she is an owner.
-
-* The friendly name, description, and tags, and owner can be changed.
-* None of the attributes of the X.509 signing request object can be changed.
 
 
 Create Credential from Signing Request

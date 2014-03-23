@@ -114,8 +114,7 @@ public class ConcreteGroupProtectionService
     UserGroupMember groupMember = memberRepository
         .findByGroupNameAndLoginName(groupName, loginName);
     if (groupMember == null) {
-      throw new GroupAccessException(
-          loginName + " is not a member of group " + groupName);
+      throw new GroupAccessException(groupName);
     }
     return groupMember;
   }

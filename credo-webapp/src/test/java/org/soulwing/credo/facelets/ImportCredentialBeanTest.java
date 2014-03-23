@@ -270,7 +270,7 @@ public class ImportCredentialBeanTest {
   @Test
   public void testProtectAccessDenied() throws Exception {
     context.checking(protectionExpectations(
-        throwException(new GroupAccessException("some message"))));
+        throwException(new GroupAccessException("someGroup"))));
     bean.setDetails(details);
     bean.setCredential(credential);
     assertThat(bean.protect(), 
