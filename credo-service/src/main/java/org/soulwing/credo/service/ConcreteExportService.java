@@ -113,7 +113,7 @@ public class ConcreteExportService implements ExportService {
    */
   @Override
   @TransactionAttribute(TransactionAttributeType.REQUIRED)
-  public ExportPreparation prepareExport(ExportRequest request)
+  public ExportPreparation prepareExport(ExportRequest request, Errors errors)
       throws ExportException, GroupAccessException, PassphraseException {
 
     try {
@@ -126,10 +126,15 @@ public class ConcreteExportService implements ExportService {
       CredentialExporter exporter = exporterRegistry.findExporter(request);
       return exporter.exportCredential(request, privateKey);
     }
-    catch (OwnerAccessControlException ex) {
-      throw new GroupAccessException(ex.getGroupName());
+    catch (OwnerAccessControlException|GroupAccessException ex) {
+      String groupName = (ex instanceof OwnerAccessControlException) ?
+          ((OwnerAccessControlException) ex).getGroupName()
+          : ((GroupAccessException) ex).getGroupName();          
+      errors.addError("groupAccessDenied", new Object[] { groupName });
+      throw new GroupAccessException(groupName);
     }
-    catch (UserAccessException ex) {
+    catch (PassphraseException|UserAccessException ex) {
+      errors.addError("passphrase", "passphraseIncorrect");
       throw new PassphraseException();
     }
     catch (IOException ex) {

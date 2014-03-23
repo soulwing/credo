@@ -421,15 +421,13 @@ public class ExportCredentialBean implements Serializable {
   public String prepareDownload() {
     Validate.notNull(request, "request not created");
     try {
-      preparation = exportService.prepareExport(request);
+      preparation = exportService.prepareExport(request, errors);
       return PREPARED_OUTCOME_ID;
     }
     catch (PassphraseException ex) {
-      errors.addError("passphrase", "passphraseIncorrect");
       return null;
     }
     catch (GroupAccessException ex) {
-      errors.addError("groupAccessDenied", new Object[] { ex.getGroupName() });
       return FAILURE_OUTCOME_ID;
     }
     catch (ExportException ex) {

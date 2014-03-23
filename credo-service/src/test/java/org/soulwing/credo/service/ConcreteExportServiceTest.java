@@ -19,6 +19,9 @@
 package org.soulwing.credo.service;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.arrayContaining;
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.emptyArray;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasProperty;
 import static org.hamcrest.Matchers.is;
@@ -53,6 +56,8 @@ import org.soulwing.credo.service.protect.CredentialProtectionService;
  */
 public class ConcreteExportServiceTest {
 
+  private static final String GROUP_NAME = "someGroup";
+
   @Rule
   public final JUnitRuleMockery context = new JUnitRuleMockery();
   
@@ -85,6 +90,9 @@ public class ConcreteExportServiceTest {
   
   @Mock
   private PasswordGenerator passwordGenerator;
+  
+  @Mock
+  private Errors errors;
   
   private ConcreteExportService exportService = new ConcreteExportService();
   
@@ -130,7 +138,7 @@ public class ConcreteExportServiceTest {
           with(same(credentialPrivateKey)));
       will(returnValue(preparation));
     } });
-    assertThat(exportService.prepareExport(request), 
+    assertThat(exportService.prepareExport(request, errors), 
         sameInstance(preparation));
   }
 
@@ -145,21 +153,30 @@ public class ConcreteExportServiceTest {
       will(throwException(new IOException()));
     } });
     
-    exportService.prepareExport(request); 
+    exportService.prepareExport(request, errors); 
   }
   
   @Test(expected = PassphraseException.class)
   public void testPrepareExportWhenIncorrectPassword() throws Exception {
     context.checking(unprotectCredentialExpectations(
         throwException(new UserAccessException(new Exception()))));
-    exportService.prepareExport(request);
+    context.checking(new Expectations() { { 
+      oneOf(errors).addError(with(equalTo("passphrase")), 
+          with(containsString("Incorrect")),
+          with(emptyArray()));
+    } });
+    exportService.prepareExport(request, errors);
   }
 
   @Test(expected = GroupAccessException.class)
   public void testPrepareExportWhenNotUserGroupMember() throws Exception {
     context.checking(unprotectCredentialExpectations(
-        throwException(new GroupAccessException("someGroup"))));
-    exportService.prepareExport(request);
+        throwException(new GroupAccessException(GROUP_NAME))));
+    context.checking(new Expectations() { { 
+      oneOf(errors).addError(with(equalTo("groupAccessDenied")), 
+          (Object[]) with(arrayContaining(GROUP_NAME)));
+    } });
+    exportService.prepareExport(request, errors);
   }
 
   @Test
@@ -192,9 +209,9 @@ public class ConcreteExportServiceTest {
       oneOf(credential).getOwner();
       will(returnValue(group));
       oneOf(group).getName();
-      will(returnValue("someGroup"));
+      will(returnValue(GROUP_NAME));
       oneOf(protectionService).unprotect(with(credential), 
-          (ProtectionParameters) with(hasProperty("groupName", equalTo("someGroup"))));
+          (ProtectionParameters) with(hasProperty("groupName", equalTo(GROUP_NAME))));
       will(outcome);
     } };
   }

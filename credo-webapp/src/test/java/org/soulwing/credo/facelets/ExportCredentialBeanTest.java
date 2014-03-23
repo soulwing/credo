@@ -21,7 +21,6 @@ package org.soulwing.credo.facelets;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.arrayContaining;
 import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.emptyArray;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
@@ -123,7 +122,6 @@ public class ExportCredentialBeanTest {
     final Long id = -1L;
     final Credential credential = context.mock(Credential.class);
     final UserGroup group = context.mock(UserGroup.class);
-    final String groupName = GROUP_NAME;
     context.checking(new Expectations() { { 
       oneOf(exportService).newExportRequest(with(id));
       will(returnValue(request));
@@ -132,7 +130,7 @@ public class ExportCredentialBeanTest {
       oneOf(credential).getOwner();
       will(returnValue(group));
       oneOf(group).getName();
-      will(returnValue(groupName));
+      will(returnValue(GROUP_NAME));
       oneOf(request).setProtectionParameters(with(same(bean.getPasswordEditor())));
       oneOf(exportService).getDefaultFormat();
       will(returnValue(format));
@@ -167,7 +165,8 @@ public class ExportCredentialBeanTest {
   @Test
   public void testPrepareDownload() throws Exception {
     context.checking(new Expectations() { {
-      oneOf(exportService).prepareExport(with(same(request)));
+      oneOf(exportService).prepareExport(with(same(request)), 
+          with(same(errors)));
       will(returnValue(preparation));
     } });
     
@@ -180,24 +179,20 @@ public class ExportCredentialBeanTest {
   @Test
   public void testPrepareDownloadIncorrectPassphrase() throws Exception {
     context.checking(new Expectations() { {
-      oneOf(exportService).prepareExport(with(same(request)));
+      oneOf(exportService).prepareExport(with(same(request)), 
+          with(same(errors)));
       will(throwException(new PassphraseException()));
-      oneOf(errors).addError(with(equalTo("passphrase")), 
-          with(containsString("Incorrect")),
-          with(emptyArray()));
     } });
-    
-    bean.setExportRequest(request);
+        bean.setExportRequest(request);
     assertThat(bean.prepareDownload(), is(nullValue()));
   }
 
   @Test
   public void testPrepareDownloadAccessDenied() throws Exception {
     context.checking(new Expectations() { {
-      oneOf(exportService).prepareExport(with(same(request)));
+      oneOf(exportService).prepareExport(with(same(request)), 
+          with(same(errors)));
       will(throwException(new GroupAccessException(GROUP_NAME)));
-      oneOf(errors).addError(with(equalTo("groupAccessDenied")), 
-          (Object[]) with(arrayContaining(GROUP_NAME)));
     } });
     
     bean.setExportRequest(request);
@@ -208,7 +203,8 @@ public class ExportCredentialBeanTest {
   @Test
   public void testPrepareDownloadError() throws Exception {
     context.checking(new Expectations() { {
-      oneOf(exportService).prepareExport(with(same(request)));
+      oneOf(exportService).prepareExport(with(same(request)), 
+          with(same(errors)));
       will(throwException(new ExportException()));
     } });
     

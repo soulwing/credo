@@ -80,6 +80,7 @@ public interface ExportService {
   /**
    * Performs the work required to export a credential.
    * @param request the export request to act upon
+   * @param errors errors object that will be updated if an error occurs
    * @return export preparation
    * @throws ExportException if an error occurs in performing the request
    * @throws PassphraseException if the credential requires a passphrase 
@@ -87,7 +88,7 @@ public interface ExportService {
    * @throws GroupAccessException is the user identified in the request's
    *    protection parameters is not a member of the credential's owner group
    */
-  ExportPreparation prepareExport(ExportRequest request)
+  ExportPreparation prepareExport(ExportRequest request, Errors errors)
       throws ExportException, PassphraseException, GroupAccessException;
   
 }
