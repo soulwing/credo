@@ -36,12 +36,18 @@ Signing Request for New Credential
 
 A user can create a signing request for a new credential.
 
-* A subject common name must be specified; additional X.509 name components
-  may be specified
+* A subject common name must be specified.
 * A friendly name must be specified; the default value is the subject common
   name
 * An owner must be specified
 * A description and zero or more tags may be specified
+
+
+Subject Name for New Credential Request
+---------------------------------------
+
+A user can specify X.509 name components for the subject name when creating
+a signing request for a new credential.
 
 
 Extensions for Signing Request
