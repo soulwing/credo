@@ -191,6 +191,7 @@
       inner join fetch r.privateKey
       inner join fetch r.certificationRequest
       inner join fetch r.owner
+      inner join fetch r.tags
       where r.id = :id
     </query>
   </named-query>
