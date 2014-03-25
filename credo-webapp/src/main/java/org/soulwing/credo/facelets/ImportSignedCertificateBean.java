@@ -20,45 +20,42 @@ package org.soulwing.credo.facelets;
 
 import java.io.IOException;
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
 
 import javax.enterprise.context.Conversation;
 import javax.enterprise.context.ConversationScoped;
 import javax.faces.context.FacesContext;
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.servlet.http.Part;
 
 import org.soulwing.credo.Credential;
-import org.soulwing.credo.Password;
+import org.soulwing.credo.CredentialRequest;
 import org.soulwing.credo.service.Errors;
-import org.soulwing.credo.service.FileContentModel;
 import org.soulwing.credo.service.GroupAccessException;
 import org.soulwing.credo.service.ImportDetails;
 import org.soulwing.credo.service.ImportException;
 import org.soulwing.credo.service.ImportService;
+import org.soulwing.credo.service.NoSuchCredentialException;
 import org.soulwing.credo.service.NoSuchGroupException;
 import org.soulwing.credo.service.PassphraseException;
 
 /**
- * A bean that supports the Import Credential interaction.
+ * A bean that supports the Import Signed Certificate interaction.
  * 
  * @author Carl Harris
  */
 @Named
 @ConversationScoped
-public class ImportCredentialBean implements Serializable {
+public class ImportSignedCertificateBean implements Serializable {
 
   public enum OwnerStatus {
     NONE, EXISTS, WILL_CREATE, INACCESSIBLE
   }
 
+  static final String RESTART_OUTCOME_ID = "index";
+  
   static final String DETAILS_OUTCOME_ID = "details";
 
   static final String CONFIRM_OUTCOME_ID = "confirm";
-
-  static final String WARNINGS_OUTCOME_ID = "warnings";
 
   static final String FAILURE_OUTCOME_ID = "failure";
 
@@ -66,15 +63,11 @@ public class ImportCredentialBean implements Serializable {
 
   static final String CANCEL_OUTCOME_ID = "cancel";
 
-  static final String PASSPHRASE_OUTCOME_ID = "passphrase";
-  
-  static final String PASSWORD_OUTCOME_ID = "password";
+  static final String PASSWORD1_OUTCOME_ID = "password1";
+
+  static final String PASSWORD2_OUTCOME_ID = "password2";
 
   private static final long serialVersionUID = -5565484780336702769L;
-
-  private final PartContent file0 = new PartContent();
-  private final PartContent file1 = new PartContent();
-  private final PartContent file2 = new PartContent();
 
   @Inject
   protected Conversation conversation;
@@ -87,6 +80,9 @@ public class ImportCredentialBean implements Serializable {
 
   @Inject
   protected FacesContext facesContext;
+
+  @Inject
+  protected FileUploadEditor fileUploadEditor;
   
   @Inject
   protected DelegatingCredentialEditor<ImportDetails> editor;
@@ -94,76 +90,40 @@ public class ImportCredentialBean implements Serializable {
   @Inject
   protected PasswordFormEditor passwordEditor;
 
-  private List<FileContentModel> files;
-  private Password passphrase;
+  private Long requestId;
+  private CredentialRequest request;
   private Credential credential;
 
+  
   /**
-   * Gets the {@code file0} property.
-   * @return
+   * Gets the unique identifier of the credential request that will be used
+   * as the basis for this import.
+   * @return request ID
    */
-  public Part getFile0() {
-    return file0.getPart();
+  public Long getRequestId() {
+    return requestId;
   }
 
   /**
-   * Sets the {@code file0} property.
-   * @param file0
+   * Sets the unique identifier of the credential request that will be used
+   * as the basis for this import.
+   * @param requestId the request ID to set
    */
-  public void setFile0(Part part) {
-    file0.setPart(part);
+  public void setRequestId(Long requestId) {
+    this.requestId = requestId;
   }
 
   /**
-   * Gets the {@code file1} property.
-   * @return
+   * Gets the supporting editor bean for the file upload form.
+   * @return editor
    */
-  public Part getFile1() {
-    return file1.getPart();
+  public FileUploadEditor getFileUploadEditor() {
+    return fileUploadEditor;
   }
-
-  /**
-   * Sets the {@code file1} property.
-   * @param file1
-   */
-  public void setFile1(Part part) {
-    file1.setPart(part);
-  }
-
-  /**
-   * Gets the {@code file2} property.
-   * @return
-   */
-  public Part getFile2() {
-    return file2.getPart();
-  }
-
-  /**
-   * Sets the {@code file2} property.
-   * @param file2
-   */
-  public void setFile2(Part part) {
-    file2.setPart(part);
-  }
-
-  /**
-   * Gets the private key passphrase.
-   * @return passphrase
-   */
-  public Password getPassphrase() {
-    return passphrase;
-  }
-
-  /**
-   * Sets the private key passphrase.
-   * @param passphrase the passphrase to set
-   */
-  public void setPassphrase(Password passphrase) {
-    this.passphrase = passphrase;
-  }
-
+  
   /**
    * Gets the supporting bean for the password entry form.
+   * @return editors
    */
   public PasswordFormEditor getPasswordEditor() {
     return passwordEditor;
@@ -177,6 +137,25 @@ public class ImportCredentialBean implements Serializable {
     return editor;
   }
   
+  /**
+   * Gets the credential request.
+   * <p>
+   * This method is exposed to support unit testing.
+   * @return credential request
+   */
+  CredentialRequest getRequest() {
+    return request;
+  }
+
+  /**
+   * Sets the credential request.
+   * <p>
+   * @param request the credential request
+   */
+  void setRequest(CredentialRequest request) {
+    this.request = request;
+  }
+
   /**
    * Gets the details produced by the import service.
    * <p>
@@ -218,40 +197,61 @@ public class ImportCredentialBean implements Serializable {
   }
 
   /**
+   * Finds the credential request on which this import will be based.
+   * @return outcome ID
+   */
+  public String findRequest() {
+    if (requestId == null) {
+      errors.addError("requestId", "requestIdIsRequired");
+      return FAILURE_OUTCOME_ID;
+    }
+    try {
+      request = importService.findRequestById(requestId);
+      beginConversation();
+      return null;
+    }
+    catch (NoSuchCredentialException ex) {
+      errors.addError("requestId", "requestNotFound", requestId);
+      return FAILURE_OUTCOME_ID;
+    }
+  }
+  
+  public String password1() {
+    passwordEditor.setGroupName(request.getOwner().getName());
+    return ImportSignedCertificateBean.PASSWORD1_OUTCOME_ID;
+  }
+
+  /**
    * Action that is fired when the form containing the files to import has been
    * submitted.
    * @return outcome ID
    */
-  public String upload() {
-    if (conversation.isTransient()) {
-      conversation.begin();
-    }
+  public String prepare() {
     try {
-      editor.setDelegate(
-          importService.prepareImport(fileList(), passphrase, errors));
+      ImportDetails details = importService.prepareImport(request, 
+          fileUploadEditor.fileList(), passwordEditor, errors);
+      editor.setDelegate(details);
       return DETAILS_OUTCOME_ID;
     }
-    catch (PassphraseException ex) {
-      return PASSPHRASE_OUTCOME_ID;
-    }
     catch (ImportException ex) {
+      return RESTART_OUTCOME_ID;
+    }
+    catch (PassphraseException ex) {
       return null;
+    }
+    catch (GroupAccessException ex) {
+      return FAILURE_OUTCOME_ID;
     }
     catch (IOException ex) {
       throw new RuntimeException(ex);
     }
   }
 
-  /**
-   * Action that is fired when the form containing the credential details
-   * is submitted.
-   * @return outcome ID
-   */
-  public String password() {
+  public String password2() {
     passwordEditor.setGroupName(editor.getOwner());
-    return ImportCredentialBean.PASSWORD_OUTCOME_ID;
+    return ImportSignedCertificateBean.PASSWORD2_OUTCOME_ID;
   }
-  
+
   /**
    * Action that is fired when the password form is submitted.
    * @return outcome ID
@@ -280,7 +280,7 @@ public class ImportCredentialBean implements Serializable {
   public String save() {
     try {
       importService.saveCredential(credential, errors);
-      conversation.end();
+      endConversation();
       return SUCCESS_OUTCOME_ID;
     }
     catch (ImportException ex) {
@@ -293,34 +293,20 @@ public class ImportCredentialBean implements Serializable {
    * @return outcome ID
    */
   public String cancel() {
-    if (!conversation.isTransient()) {
-      conversation.end();
-    }
+    endConversation();
     return CANCEL_OUTCOME_ID;
   }
 
-  /**
-   * Produces a list containing the files that were uploaded by the user.
-   * @return list of file content models
-   * @throws IOException
-   */
-  private List<FileContentModel> fileList() throws IOException {
-    if (files == null) {
-      files = new ArrayList<FileContentModel>();
-      if (file0.isLoadable()) {
-        file0.load();
-        files.add(file0);
-      }
-      if (file1.isLoadable()) {
-        file1.load();
-        files.add(file1);
-      }
-      if (file2.isLoadable()) {
-        file2.load();
-        files.add(file2);
-      }
+  private void beginConversation() {
+    if (conversation.isTransient()) {
+      conversation.begin();
     }
-    return files;
+  }
+
+  private void endConversation() {
+    if (!conversation.isTransient()) {
+      conversation.end();
+    }
   }
 
 }

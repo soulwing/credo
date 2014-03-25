@@ -128,7 +128,7 @@ public class ConcreteImportServiceIT {
     Properties properties = properties(testCase);
     
     ImportDetails details = 
-        importService.prepareImport(testFiles(testCase), errors, null);
+        importService.prepareImport(testFiles(testCase), null, errors);
     
     validateDetails(details, properties);
   }
@@ -141,7 +141,7 @@ public class ConcreteImportServiceIT {
         properties.getProperty("passphrase").toCharArray());
     
     ImportDetails details = 
-        importService.prepareImport(testFiles(testCase), errors, passphrase);
+        importService.prepareImport(testFiles(testCase), passphrase, errors);
     validateDetails(details, properties);
   }
 
@@ -154,7 +154,7 @@ public class ConcreteImportServiceIT {
         properties.getProperty("passphrase").toCharArray());
     
     ImportDetails details = 
-        importService.prepareImport(testFiles(testCase), errors, passphrase);
+        importService.prepareImport(testFiles(testCase), passphrase, errors);
     validateDetails(details, properties);
   }
 
@@ -185,7 +185,7 @@ public class ConcreteImportServiceIT {
     createUserProfile(LOGIN_NAME, password);
 
     ImportDetails details = 
-        importService.prepareImport(testFiles(testCase), errors, importPassphrase);
+        importService.prepareImport(testFiles(testCase), importPassphrase, errors);
     validateDetails(details, properties);
     
     Credential credential = importService.createCredential(details, 

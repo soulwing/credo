@@ -23,6 +23,7 @@ import javax.inject.Inject;
 
 import org.soulwing.credo.service.TimeOfDayService;
 import org.soulwing.credo.service.crypto.CredentialBagFactory;
+import org.soulwing.credo.service.crypto.PrivateKeyWrapper;
 
 /**
  * A {@link CredentialImporterFactory} that produces 
@@ -47,6 +48,16 @@ public class ConcreteCredentialImporterFactory
   public CredentialImporter newImporter() {
     return new ConcreteCredentialImporter(
         credentialBagFactory.newCredentialBag(), 
+        timeOfDayService);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public CredentialImporter newImporter(PrivateKeyWrapper privateKey) {
+    return new ConcreteCredentialImporter(
+        privateKey, credentialBagFactory.newCredentialBag(), 
         timeOfDayService);
   }
 

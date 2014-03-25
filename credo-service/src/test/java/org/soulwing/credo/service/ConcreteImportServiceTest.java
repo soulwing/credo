@@ -22,8 +22,11 @@ import static org.hamcrest.Matchers.arrayContaining;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.emptyArray;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.sameInstance;
 import static org.jmock.Expectations.returnValue;
 import static org.jmock.Expectations.throwException;
+import static org.junit.Assert.assertThat;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -48,11 +51,13 @@ import org.soulwing.credo.CredentialBuilder;
 import org.soulwing.credo.CredentialBuilderFactory;
 import org.soulwing.credo.CredentialCertificate;
 import org.soulwing.credo.CredentialCertificateBuilder;
+import org.soulwing.credo.CredentialRequest;
 import org.soulwing.credo.Password;
 import org.soulwing.credo.Tag;
 import org.soulwing.credo.UserGroup;
 import org.soulwing.credo.UserGroupMember;
 import org.soulwing.credo.repository.CredentialRepository;
+import org.soulwing.credo.repository.CredentialRequestRepository;
 import org.soulwing.credo.repository.UserGroupMemberRepository;
 import org.soulwing.credo.repository.UserGroupRepository;
 import org.soulwing.credo.service.crypto.CertificateWrapper;
@@ -60,6 +65,7 @@ import org.soulwing.credo.service.crypto.PrivateKeyWrapper;
 import org.soulwing.credo.service.importer.CredentialImporter;
 import org.soulwing.credo.service.importer.CredentialImporterFactory;
 import org.soulwing.credo.service.protect.CredentialProtectionService;
+import org.soulwing.credo.service.protect.CredentialRequestProtectionService;
 
 /**
  * Unit tests for {@link ConcreteImportService}.
@@ -68,7 +74,7 @@ import org.soulwing.credo.service.protect.CredentialProtectionService;
  */
 public class ConcreteImportServiceTest {
 
-
+  private static final long REQUEST_ID = -1L;
 
   private static final String CREDENTIAL_NAME = "credentialName";
 
@@ -102,6 +108,8 @@ public class ConcreteImportServiceTest {
 
   private static final Password PASSPHRASE = new Password(new char[0]);
 
+  private static final Password EMPTY_PASSPHRASE = new Password(new char[0]);
+
   @Rule
   public final JUnitRuleMockery context = new JUnitRuleMockery();
   
@@ -127,6 +135,9 @@ public class ConcreteImportServiceTest {
   private Credential credential;
   
   @Mock
+  private CredentialRequest request;
+  
+  @Mock
   private CredentialCertificate credentialCertificate;
   
   @Mock
@@ -149,7 +160,10 @@ public class ConcreteImportServiceTest {
   
   @Mock
   private CredentialRepository credentialRepository;
-  
+
+  @Mock
+  private CredentialRequestRepository requestRepository;
+
   @Mock
   private Tag tag;
   
@@ -169,21 +183,48 @@ public class ConcreteImportServiceTest {
   private UserContextService userContextService;
   
   @Mock
-  private CredentialProtectionService protectionService;
+  private CredentialProtectionService credentialProtectionService;
+
+  @Mock
+  private CredentialRequestProtectionService requestProtectionService;
   
+
   public ConcreteImportService importService = new ConcreteImportService();
   
   @Before
   public void setUp() throws Exception {
     importService.importerFactory = importerFactory;
     importService.credentialRepository = credentialRepository;
+    importService.requestRepository = requestRepository;
     importService.credentialBuilderFactory = credentialBuilderFactory;
     importService.tagService = tagService;
     importService.groupRepository = groupRepository;
     importService.memberRepository = memberRepository;
     importService.groupService = groupService;
     importService.userContextService = userContextService;
-    importService.protectionService = protectionService;
+    importService.requestProtectionService = requestProtectionService;
+    importService.credentialProtectionService = credentialProtectionService;
+  }
+  
+  @Test
+  public void testFindRequestSuccess() throws Exception {
+    context.checking(new Expectations() { { 
+      oneOf(requestRepository).findById(with(REQUEST_ID));
+      will(returnValue(request));
+    } });
+    
+    assertThat(importService.findRequestById(REQUEST_ID), 
+        is(sameInstance(request)));
+  }
+
+  @Test(expected = NoSuchCredentialException.class)
+  public void testFindRequestWhenNotFound() throws Exception {
+    context.checking(new Expectations() { { 
+      oneOf(requestRepository).findById(with(REQUEST_ID));
+      will(returnValue(null));
+    } });
+    
+    importService.findRequestById(REQUEST_ID);
   }
   
   @Test(expected = ImportException.class)
@@ -197,7 +238,7 @@ public class ConcreteImportServiceTest {
     } });
     
     List<FileContentModel> files = Collections.emptyList();
-    importService.prepareImport(files, errors, PASSPHRASE);
+    importService.prepareImport(files, PASSPHRASE, errors);
   }
   
   @Test(expected = ImportException.class)
@@ -222,7 +263,7 @@ public class ConcreteImportServiceTest {
     } });
     
     List<FileContentModel> files = Collections.singletonList(file);
-    importService.prepareImport(files, errors, PASSPHRASE);
+    importService.prepareImport(files, PASSPHRASE, errors);
   }
   
   @Test(expected = ImportException.class)
@@ -247,27 +288,84 @@ public class ConcreteImportServiceTest {
     } });
     
     List<FileContentModel> files = Collections.singletonList(file);
-    importService.prepareImport(files, errors, PASSPHRASE);
+    importService.prepareImport(files, PASSPHRASE, errors);
   }
 
   @Test
   public void testPrepareImportSuccess() throws Exception {
-    final FileContentModel file = context.mock(FileContentModel.class);
-    final InputStream inputStream = new ByteArrayInputStream(new byte[0]);
-    context.checking(new Expectations() { {
-      oneOf(file).getInputStream();
-      will(returnValue(inputStream));
+    FileContentModel file = context.mock(FileContentModel.class);
+    List<FileContentModel> files = Collections.singletonList(file);
+    context.checking(prepareImportExpectations(file, PASSPHRASE));    
+    context.checking(new Expectations() { { 
       oneOf(importerFactory).newImporter();
       will(returnValue(importer));
+    } });
+    importService.prepareImport(files, PASSPHRASE, errors);
+  }
+
+  @Test
+  public void testPrepareImportUsingRequest() throws Exception {
+    FileContentModel file = context.mock(FileContentModel.class);
+    List<FileContentModel> files = Collections.singletonList(file);
+    context.checking(prepareImportExpectations(file, PASSPHRASE));    
+    context.checking(new Expectations() { { 
+      oneOf(requestProtectionService).unprotect(with(same(request)), 
+          with(same(protection)));
+      will(returnValue(privateKey));
+      oneOf(importerFactory).newImporter(
+          with(same(privateKey)));
+      will(returnValue(importer));
+    } });
+    
+    importService.prepareImport(request, files, protection, errors);
+  }
+
+  private Expectations prepareImportExpectations(final FileContentModel file,
+      final Password passphrase) throws Exception {
+    final InputStream inputStream = new ByteArrayInputStream(new byte[0]);
+    return new Expectations() { {
+      oneOf(file).getInputStream();
+      will(returnValue(inputStream));
       oneOf(importer).loadFile(with(same(inputStream)));
       oneOf(errors).hasErrors();
       will(returnValue(false));
-      oneOf(importer).validateAndImport(with(PASSPHRASE), with(same(errors)));
+      oneOf(importer).validateAndImport(with(passphrase), with(same(errors)));
+    } };    
+  }
+
+  @Test(expected = GroupAccessException.class)
+  public void testPrepareImportUsingRequestWhenNotGroupMember() throws Exception {
+    context.checking(new Expectations() { {
+      oneOf(requestProtectionService).unprotect(
+          with(request), with(protection));
+      will(throwException(new GroupAccessException(GROUP_NAME)));
+      oneOf(protection).getGroupName();
+      will(returnValue(GROUP_NAME));
+      oneOf(errors).addError(with("groupAccessDenied"),
+          (Object[]) with(arrayContaining(GROUP_NAME)));
     } });
     
+    FileContentModel file = context.mock(FileContentModel.class);
     List<FileContentModel> files = Collections.singletonList(file);
-    importService.prepareImport(files, errors, PASSPHRASE);
+    importService.prepareImport(request, files, protection, errors);
   }
+
+  @Test(expected = PassphraseException.class)
+  public void testPrepareImportUsingRequestWhenWrongPassword() 
+      throws Exception {
+    context.checking(new Expectations() { {
+      oneOf(requestProtectionService).unprotect(
+          with(request), with(protection));
+      will(throwException(new UserAccessException(new Exception())));
+      oneOf(errors).addError(with("passwordIncorrect"),
+          with(emptyArray()));
+    } });
+    
+    FileContentModel file = context.mock(FileContentModel.class);
+    List<FileContentModel> files = Collections.singletonList(file);
+    importService.prepareImport(request, files, protection, errors);
+  }
+  
 
   @Test
   public void testProtectCredential() throws Exception {
@@ -418,7 +516,7 @@ public class ConcreteImportServiceTest {
   private Expectations protectionExpectations(final Action outcome) 
       throws Exception {
     return new Expectations() { { 
-      oneOf(protectionService).protect(with(same(credential)), 
+      oneOf(credentialProtectionService).protect(with(same(credential)), 
           with(same(privateKey)), with(same(protection)));
       will(outcome);
     } };

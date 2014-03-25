@@ -41,7 +41,7 @@ public interface CredentialRequestProtectionService {
    * @throws GroupAccessException if the logged-in user is not a member 
    *    of the group specified in the protection parameters
    * @throws UserAccessException if the user's profile cannot be accessed
-   *    with the passwords specified in the protection parameters
+   *    with the password specified in the protection parameters
    * @throws NoSuchGroupException if the group specified in the protection
    *    parameters does not exist
    */
@@ -49,4 +49,20 @@ public interface CredentialRequestProtectionService {
       ProtectionParameters protection) throws GroupAccessException, 
       UserAccessException, NoSuchGroupException;
   
+  /**
+   * Removes the cryptographic protection from a credential request's private 
+   * key.
+   * @param request the subject request
+   * @param protection protection parameters
+   * @return unprotected private key associated with {@code request}
+   * @throws GroupAccessException if the logged-in user is not a member
+   *    of the group specified in the protection parameters
+   * @throws UserAccessException if the user's profile cannot be accessed with
+   *    the password specified in the protection parameters   *    
+   */
+  PrivateKeyWrapper unprotect(CredentialRequest request, 
+      ProtectionParameters protection) throws UserAccessException,
+      GroupAccessException;
+  
+
 }

@@ -23,6 +23,7 @@ import java.util.List;
 import javax.ejb.Local;
 
 import org.soulwing.credo.Credential;
+import org.soulwing.credo.CredentialRequest;
 import org.soulwing.credo.Password;
 
 /**
@@ -32,14 +33,24 @@ import org.soulwing.credo.Password;
  */
 @Local
 public interface ImportService {
-
+  
+  /**
+   * Finds a request using its unique identifier.
+   * @param id unique identifier of the subject request
+   * @return request
+   * @throws NoSuchCredentialException if no request exists with the given
+   *    identifier
+   */
+  CredentialRequest findRequestById(Long id) 
+      throws NoSuchCredentialException;
+  
   /**
    * Prepares the contents of a collection of files for import as a credential.
    * @param files files whose contents will be imported
-   * @param errors an errors object that will be updated during the
-   *   import as necessary
    * @param passphrase passphrase for the private key (which may be null or
    *   empty)
+   * @param errors an errors object that will be updated during the
+   *   import as necessary
    * @return imported credential details
    * @throws PassphraseException if a passphrase is required and was not
    *    provided or is incorrect
@@ -47,9 +58,31 @@ public interface ImportService {
    *    not result in an exception
    */
   ImportDetails prepareImport(List<FileContentModel> files, 
-      Errors errors, Password passphrase) throws PassphraseException, 
+      Password passphrase, Errors errors) throws PassphraseException, 
       ImportException;
-  
+
+  /**
+   * Prepares the contents of a credential request and a collection of files 
+   * for import as a credential.
+   * @param request subject credential request
+   * @param files files whose contents will be imported
+   * @param errors an errors object that will be updated during the
+   *   import as necessary
+   * @param protection protection parameters for the private key contained
+   *    in {@code request}
+   * @return imported credential details
+   * @throws PassphraseException if a passphrase is required and was not
+   *    provided or is incorrect
+   * @throws GroupAccessException if the logged-in user is not a member of
+   *    the group that owns {@code request}
+   * @throws ImportException if a validation error occurs; warnings do
+   *    not result in an exception
+   */
+  ImportDetails prepareImport(CredentialRequest request, 
+      List<FileContentModel> files, ProtectionParameters protection, 
+      Errors errors) throws PassphraseException, GroupAccessException,
+      ImportException;
+
   /**
    * Protects the (private key of the) given credential. 
    * @param details prepared credential content

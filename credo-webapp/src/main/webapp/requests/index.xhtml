@@ -54,6 +54,10 @@
               <f:param name="id" value="#{req.id}"/>
               #{messages.downloadButtonLabel}
             </h:outputLink>
+            <h:outputLink styleClass="btn btn-default btn-xs" value="import">
+              <f:param name="requestId" value="#{req.id}"/>
+              #{messages.importButtonLabel}
+            </h:outputLink>
             <h:outputLink styleClass="btn btn-default btn-xs" value="remove">
               <f:param name="id" value="#{req.id}"/>
               #{messages.removeButtonLabel}

@@ -18,6 +18,8 @@
  */
 package org.soulwing.credo.service.importer;
 
+import org.soulwing.credo.service.crypto.PrivateKeyWrapper;
+
 /**
  * A factory that produces {@link CredentialImporter} objects.
  *
@@ -30,5 +32,12 @@ public interface CredentialImporterFactory {
    * @return importer object.
    */
   CredentialImporter newImporter();
+  
+  /**
+   * Creates a new importer.
+   * @param privateKey (unwrapped) private key for the import
+   * @return
+   */
+  CredentialImporter newImporter(PrivateKeyWrapper privateKey);
   
 }

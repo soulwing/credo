@@ -33,15 +33,19 @@ import org.soulwing.credo.CredentialBuilder;
 import org.soulwing.credo.CredentialBuilderFactory;
 import org.soulwing.credo.CredentialCertificate;
 import org.soulwing.credo.CredentialCertificateBuilder;
+import org.soulwing.credo.CredentialRequest;
 import org.soulwing.credo.Password;
 import org.soulwing.credo.UserGroup;
 import org.soulwing.credo.repository.CredentialRepository;
+import org.soulwing.credo.repository.CredentialRequestRepository;
 import org.soulwing.credo.repository.UserGroupMemberRepository;
 import org.soulwing.credo.repository.UserGroupRepository;
 import org.soulwing.credo.service.crypto.CertificateWrapper;
+import org.soulwing.credo.service.crypto.PrivateKeyWrapper;
 import org.soulwing.credo.service.importer.CredentialImporter;
 import org.soulwing.credo.service.importer.CredentialImporterFactory;
 import org.soulwing.credo.service.protect.CredentialProtectionService;
+import org.soulwing.credo.service.protect.CredentialRequestProtectionService;
 
 /**
  * A concrete implementation of {@link ImportService}.
@@ -52,11 +56,16 @@ import org.soulwing.credo.service.protect.CredentialProtectionService;
 @ConcurrencyManagement(ConcurrencyManagementType.BEAN)
 public class ConcreteImportService implements ImportService {
 
+  private static final Password EMPTY_PASSPHRASE = new Password(new char[0]);
+
   @Inject
   protected CredentialImporterFactory importerFactory;
   
   @Inject
   protected CredentialRepository credentialRepository;
+  
+  @Inject
+  protected CredentialRequestRepository requestRepository;
   
   @Inject
   protected CredentialBuilderFactory credentialBuilderFactory;
@@ -77,16 +86,64 @@ public class ConcreteImportService implements ImportService {
   protected UserContextService userContextService;
   
   @Inject
-  protected CredentialProtectionService protectionService;
+  protected CredentialRequestProtectionService requestProtectionService;
+
+  @Inject
+  protected CredentialProtectionService credentialProtectionService;
   
   /**
    * {@inheritDoc}
    */
   @Override
+  @TransactionAttribute(TransactionAttributeType.REQUIRED)
+  public CredentialRequest findRequestById(Long id)
+      throws NoSuchCredentialException {
+    CredentialRequest request = requestRepository.findById(id);
+    if (request == null) {
+      throw new NoSuchCredentialException();
+    }
+    return request;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
   public ImportDetails prepareImport(List<FileContentModel> files,
-      Errors errors, Password passphrase) 
+      Password passphrase, Errors errors) 
       throws PassphraseException, ImportException {
     CredentialImporter importer = importerFactory.newImporter();
+    return prepareImport(importer, files, passphrase, errors);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public ImportDetails prepareImport(CredentialRequest request,
+      List<FileContentModel> files, ProtectionParameters protection,
+      Errors errors) throws PassphraseException, GroupAccessException,
+      ImportException {
+    try {
+      PrivateKeyWrapper privateKey = requestProtectionService.unprotect(
+          request, protection);
+      CredentialImporter importer = importerFactory.newImporter(privateKey);
+      return prepareImport(importer, files, EMPTY_PASSPHRASE, errors);
+    }
+    catch (GroupAccessException ex) {
+      errors.addError("groupAccessDenied", 
+          new Object[] { protection.getGroupName() });
+      throw ex;
+    }
+    catch (UserAccessException ex) {
+      errors.addError("passwordIncorrect");
+      throw new PassphraseException();
+    }
+  }
+
+  private ImportDetails prepareImport(CredentialImporter importer,
+      List<FileContentModel> files, Password passphrase, Errors errors)
+      throws ImportException, PassphraseException {
     importFiles(importer, files, errors);
     if (errors.hasErrors()) {
       throw new ImportException();
@@ -128,7 +185,7 @@ public class ConcreteImportService implements ImportService {
     try {
       Credential credential = createCredential(details);    
       credential.setOwner(resolveOwner(protection, errors));
-      protectionService.protect(credential, details.getPrivateKey(), 
+      credentialProtectionService.protect(credential, details.getPrivateKey(), 
           protection);
       return credential;
     }

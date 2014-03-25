@@ -190,6 +190,7 @@
       select distinct r from CredentialRequestEntity r
       inner join fetch r.privateKey
       inner join fetch r.certificationRequest
+      inner join fetch r.owner
       where r.id = :id
     </query>
   </named-query>

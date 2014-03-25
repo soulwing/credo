@@ -1,0 +1,33 @@
+<!DOCTYPE html [
+    <!ENTITY nbsp "&#160;"> 
+]>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+	xmlns:credo="http://xmlns.jcp.org/jsf/composite/credo">
+
+<h:body>
+	<ui:composition template="/templates/masterTemplate.xhtml">
+    <f:metadata>
+      <f:viewParam id="requestId" name="requestId" 
+        value="#{importSignedCertificateBean.requestId}"/>
+      <f:viewAction action="#{importSignedCertificateBean.findRequest}" />
+    </f:metadata>
+		<ui:define name="windowTitle">
+		  #{messages.applicationName}::#{messages.importSignedCredentialSubtitle}
+		</ui:define>
+		<ui:define name="content">
+      <credo:fileUploadEditor
+         heading="#{messages.importSignedCredentialSubtitle}"
+         detail="#{messages.importSignedCredentialUploadDetail}"
+         cancelLabel="#{messages.cancelLabel}"
+         submitLabel="#{messages.continueLabel} &#8594;"
+         cancelAction="#{importSignedCertificateBean.cancel}"
+         submitAction="#{importSignedCertificateBean.password1}"
+         editor="#{importSignedCertificateBean.fileUploadEditor}"/>
+		</ui:define>
+	</ui:composition>
+</h:body>
+
+</html>

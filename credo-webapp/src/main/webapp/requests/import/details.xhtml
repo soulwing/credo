@@ -1,0 +1,33 @@
+<!DOCTYPE html [
+    <!ENTITY nbsp "&#160;"> 
+]>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+	xmlns:credo="http://xmlns.jcp.org/jsf/composite/credo">
+
+<h:body>
+	<ui:composition template="/templates/masterTemplate.xhtml">
+		<ui:define name="windowTitle">
+		  #{messages.applicationName}::#{messages.importSignedCredentialSubtitle}
+		</ui:define>
+		<ui:define name="content">
+		  <credo:credentialEditor 
+		    heading="#{messages.importSignedCredentialSubtitle}"
+		    detail="#{messages.importSignedCredentialDetailsDetail}"
+		    submitLabel="#{messages.continueLabel} &#8594;"
+		    cancelLabel="#{messages.cancelLabel}"
+		    submitAction="#{importSignedCertificateBean.password2}"
+		    cancelAction="#{importSignedCertificateBean.cancel}" 
+		    editor="#{importSignedCertificateBean.editor}" />
+		</ui:define>
+		<ui:define name="scripts">
+		  <h:outputScript library="js" name="typeahead.bundle.js"/>
+      <h:outputScript library="js" name="selectize.js"/>
+      <h:outputScript library="js" name="components/credo/credentialEditor.js"/>     
+		</ui:define>
+	</ui:composition>
+</h:body>
+
+</html>

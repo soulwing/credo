@@ -21,6 +21,7 @@ package org.soulwing.credo.service.protect;
 import javax.crypto.SecretKey;
 import javax.enterprise.context.ApplicationScoped;
 
+import org.apache.commons.lang.Validate;
 import org.soulwing.credo.CredentialRequest;
 import org.soulwing.credo.UserGroup;
 import org.soulwing.credo.service.GroupAccessException;
@@ -52,6 +53,29 @@ public class ConcreteCredentialRequestProtectionService
     request.setOwner(group);
     request.getPrivateKey().setContent(
         wrapPrivateKey(privateKey, secretKey).getContent());
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public PrivateKeyWrapper unprotect(CredentialRequest request,
+      ProtectionParameters protection) throws UserAccessException,
+      GroupAccessException {
+    
+    try {
+      UserGroup group = findGroup(protection.getGroupName());
+      Validate.isTrue(group.equals(request.getOwner()), 
+          protection.getGroupName() + " is not the owner of request " 
+              + request.getId());
+      
+      SecretKey secretKey = getGroupSecretKey(group, protection.getPassword());  
+      return unwrapPrivateKey(request.getPrivateKey().getContent(), 
+          secretKey);
+    }
+    catch (NoSuchGroupException ex) {
+      throw new RuntimeException(ex);
+    }
   }
 
 }

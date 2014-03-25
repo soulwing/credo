@@ -56,6 +56,18 @@ public class ConcreteCredentialImporter implements CredentialImporter {
    */
   public ConcreteCredentialImporter(CredentialBag bag,
       TimeOfDayService timeOfDayService) {
+    this(null, bag, timeOfDayService);
+  }
+
+  /**
+   * Constructs a new instance.
+   * @param privateKey
+   * @param bag
+   * @param credentialBuilderFactory
+   * @param timeOfDayService
+   */
+  public ConcreteCredentialImporter(PrivateKeyWrapper privateKey,
+      CredentialBag bag, TimeOfDayService timeOfDayService) {
     this.bag = bag;
     this.timeOfDayService = timeOfDayService;
   }

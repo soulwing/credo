@@ -1,0 +1,70 @@
+<!DOCTYPE html [
+    <!ENTITY nbsp "&#160;"> 
+]>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+	xmlns:cc="http://xmlns.jcp.org/jsf/composite">
+
+<h:body>
+	<cc:interface>
+		<cc:attribute name="heading" type="java.lang.String" />
+		<cc:attribute name="detail" type="java.lang.String" />
+		<cc:attribute name="cancelLabel" type="java.lang.String" />
+		<cc:attribute name="submitLabel" type="java.lang.String" />
+		<cc:attribute name="submitAction"
+			method-signature="java.lang.String submit()" />
+		<cc:attribute name="cancelAction"
+			method-signature="java.lang.String cancel()" />
+	  <cc:attribute name="editor"
+	    type="org.soulwing.credo.facelets.FileUploadEditor"/>
+	</cc:interface>
+
+	<cc:implementation>
+		<div class="col-md-8">
+			<h1>#{cc.attrs.heading}</h1>
+			<p>
+				<h:outputFormat escape="false" value="#{cc.attrs.detail}">
+					<f:param value="#{cc.attrs.item}" />
+				</h:outputFormat>
+			</p>
+			<h:form styleClass="form-horizontal" enctype="multipart/form-data">
+				<ui:include src="/templates/messages.xhtml" />
+				<div class="form-group">
+					<h:outputLabel styleClass="col-md-4 control-label" for="file0">&nbsp;</h:outputLabel>
+					<div class="col-md-8">
+						<h:inputFile id="file0" title="#{messages.credentialFileTip}"
+							value="#{cc.attrs.editor.file0}" />
+					</div>
+				</div>
+				<div class="form-group">
+					<h:outputLabel styleClass="col-md-4 control-label" for="file1">&nbsp;</h:outputLabel>
+					<div class="col-md-8">
+						<h:inputFile id="file1" title="#{messages.credentialFileTip}"
+							value="#{cc.attrs.editor.file1}" />
+					</div>
+				</div>
+				<div class="form-group">
+					<h:outputLabel styleClass="col-md-4 control-label" for="file2">&nbsp;</h:outputLabel>
+					<div class="col-md-8">
+						<h:inputFile id="file2" title="#{messages.credentialFileTip}"
+							value="#{cc.attrs.editor.file2}" />
+					</div>
+				</div>
+				<div class="form-group">
+					<div class="col-md-offset-4 col-md-6">
+            <h:commandButton styleClass="btn btn-default"
+              value="#{cc.attrs.cancelLabel}" action="#{cc.attrs.cancelAction}"
+              immediate="true" />
+            &nbsp;
+						<h:commandLink styleClass="btn btn-primary"
+							value="#{cc.attrs.submitLabel}" action="#{cc.attrs.submitAction}" />
+					</div>
+				</div>
+			</h:form>
+		</div>
+	</cc:implementation>
+</h:body>
+
+</html>
