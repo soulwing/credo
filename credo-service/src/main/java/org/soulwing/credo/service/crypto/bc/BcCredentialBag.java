@@ -27,6 +27,7 @@ import java.util.List;
 import org.bouncycastle.cert.X509CertificateHolder;
 import org.bouncycastle.crypto.params.AsymmetricKeyParameter;
 import org.bouncycastle.crypto.params.RSAPrivateCrtKeyParameters;
+import org.bouncycastle.crypto.util.PrivateKeyFactory;
 import org.bouncycastle.openssl.PEMEncryptedKeyPair;
 import org.bouncycastle.openssl.PEMKeyPair;
 import org.bouncycastle.openssl.PEMParser;
@@ -114,10 +115,6 @@ public class BcCredentialBag implements CredentialBag {
   @Override
   public CertificateWrapper findSubjectCertificate(
       PrivateKeyWrapper privateKey) {
-    if (!(privateKey instanceof BcPrivateKeyWrapper)) {
-      throw new IllegalArgumentException("private key not from this provider");
-    }
-    
     RSAPrivateCrtKeyParameters rsaParams = deriveRSAKeyParameters(privateKey);
     
     for (BcWrapper obj : objects) {
@@ -134,15 +131,24 @@ public class BcCredentialBag implements CredentialBag {
 
   private RSAPrivateCrtKeyParameters deriveRSAKeyParameters(
       PrivateKeyWrapper privateKey) {
-    
-    AsymmetricKeyParameter params = 
-        ((BcPrivateKeyWrapper) privateKey).derivePrivateKeyParameters();
-    
-    if (!(params instanceof RSAPrivateCrtKeyParameters)) {
-      throw new UnsupportedKeyTypeException();
+    try {
+      AsymmetricKeyParameter params = null;
+      if (privateKey instanceof BcPrivateKeyWrapper) {
+        params = ((BcPrivateKeyWrapper) privateKey).derivePrivateKeyParameters();
+      }
+      else {
+        params = PrivateKeyFactory.createKey(privateKey.derive().getEncoded());
+      }
+      
+      if (!(params instanceof RSAPrivateCrtKeyParameters)) {
+        throw new UnsupportedKeyTypeException();
+      }
+      
+      return (RSAPrivateCrtKeyParameters) params;
     }
-    
-    return (RSAPrivateCrtKeyParameters) params;
+    catch (IOException ex) {
+      throw new RuntimeException(ex);
+    }
   }
 
   /**
