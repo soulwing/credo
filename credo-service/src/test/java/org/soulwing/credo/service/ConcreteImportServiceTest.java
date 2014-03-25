@@ -56,6 +56,7 @@ import org.soulwing.credo.Password;
 import org.soulwing.credo.Tag;
 import org.soulwing.credo.UserGroup;
 import org.soulwing.credo.UserGroupMember;
+import org.soulwing.credo.domain.TagEntity;
 import org.soulwing.credo.repository.CredentialRepository;
 import org.soulwing.credo.repository.CredentialRequestRepository;
 import org.soulwing.credo.repository.UserGroupMemberRepository;
@@ -73,6 +74,8 @@ import org.soulwing.credo.service.protect.CredentialRequestProtectionService;
  * @author Carl Harris
  */
 public class ConcreteImportServiceTest {
+
+  private static final String OWNER = "owner";
 
   private static final long REQUEST_ID = -1L;
 
@@ -307,7 +310,7 @@ public class ConcreteImportServiceTest {
   public void testPrepareImportUsingRequest() throws Exception {
     FileContentModel file = context.mock(FileContentModel.class);
     List<FileContentModel> files = Collections.singletonList(file);
-    context.checking(prepareImportExpectations(file, PASSPHRASE));    
+    context.checking(prepareImportExpectations(file, EMPTY_PASSPHRASE));    
     context.checking(new Expectations() { { 
       oneOf(requestProtectionService).unprotect(with(same(request)), 
           with(same(protection)));
@@ -315,6 +318,16 @@ public class ConcreteImportServiceTest {
       oneOf(importerFactory).newImporter(
           with(same(privateKey)));
       will(returnValue(importer));
+      oneOf(request).getName();
+      will(returnValue(CREDENTIAL_NAME));
+      oneOf(request).getOwner();
+      will(returnValue(group));
+      oneOf(group).getName();
+      will(returnValue(OWNER));
+      oneOf(request).getNote();
+      will(returnValue(CREDENTIAL_NOTE));
+      oneOf(request).getTags();
+      will(returnValue(Collections.singleton(new TagEntity(CREDENTIAL_TAG))));
     } });
     
     importService.prepareImport(request, files, protection, errors);
@@ -540,7 +553,7 @@ public class ConcreteImportServiceTest {
     return new Expectations() { { 
       allowing(protection).getGroupName();
       will(returnValue(GROUP_NAME));
-      oneOf(errors).addError(with("owner"), 
+      oneOf(errors).addError(with(OWNER), 
           with(containsString("Denied")),
           (Object[]) with(arrayContaining(GROUP_NAME)));
     } };
