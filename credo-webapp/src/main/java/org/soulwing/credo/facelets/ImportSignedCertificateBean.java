@@ -216,14 +216,25 @@ public class ImportSignedCertificateBean implements Serializable {
     }
   }
   
+  /**
+   * Action that is fired after the upload form is submitted.
+   * @return outcome ID
+   */
   public String password1() {
-    passwordEditor.setGroupName(request.getOwner().getName());
-    return ImportSignedCertificateBean.PASSWORD1_OUTCOME_ID;
+    try {
+      // make sure uploaded content is held in the conversation
+      fileUploadEditor.fileList();
+      
+      passwordEditor.setGroupName(request.getOwner().getName());
+      return ImportSignedCertificateBean.PASSWORD1_OUTCOME_ID;
+    }
+    catch (IOException ex) {
+      throw new RuntimeException(ex);
+    }
   }
 
   /**
-   * Action that is fired when the form containing the files to import has been
-   * submitted.
+   * Action that is fired when first password form is submitted.
    * @return outcome ID
    */
   public String prepare() {
@@ -247,13 +258,17 @@ public class ImportSignedCertificateBean implements Serializable {
     }
   }
 
+  /**
+   * Action that is fired after the details form is submitted.
+   * @return outcome ID
+   */
   public String password2() {
     passwordEditor.setGroupName(editor.getOwner());
     return ImportSignedCertificateBean.PASSWORD2_OUTCOME_ID;
   }
 
   /**
-   * Action that is fired when the password form is submitted.
+   * Action that is fired when the second password form is submitted.
    * @return outcome ID
    */
   public String protect() {
@@ -279,6 +294,7 @@ public class ImportSignedCertificateBean implements Serializable {
    */
   public String save() {
     try {
+      credential.setRequest(request);
       importService.saveCredential(credential, errors);
       endConversation();
       return SUCCESS_OUTCOME_ID;

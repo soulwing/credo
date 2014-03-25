@@ -288,10 +288,12 @@ public class ImportSignedCertificateBeanTest {
   public void testSaveSuccess() throws Exception {
     context.checking(endConversationExpectations());
     context.checking(new Expectations() { { 
+      oneOf(credential).setRequest(with(same(request)));
       oneOf(importService).saveCredential(with(same(credential)), 
           with(same(errors)));
     } });
     
+    bean.setRequest(request);
     bean.setCredential(credential);
     assertThat(bean.save(), equalTo(ImportCredentialBean.SUCCESS_OUTCOME_ID));    
   }
@@ -299,11 +301,13 @@ public class ImportSignedCertificateBeanTest {
   @Test
   public void testSaveImportError() throws Exception {
     context.checking(new Expectations() { { 
+      oneOf(credential).setRequest(with(same(request)));
       oneOf(importService).saveCredential(with(same(credential)), 
           with(same(errors)));
       will(throwException(new ImportException()));
     } });
     
+    bean.setRequest(request);
     bean.setCredential(credential);
     assertThat(bean.save(), nullValue());    
   }
