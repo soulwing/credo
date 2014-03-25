@@ -38,7 +38,6 @@ import org.soulwing.credo.UserGroup;
 import org.soulwing.credo.UserGroupMember;
 import org.soulwing.credo.UserProfile;
 import org.soulwing.credo.repository.UserGroupRepository;
-import org.soulwing.credo.service.GroupAccessException;
 import org.soulwing.credo.service.NoSuchGroupException;
 import org.soulwing.credo.service.ProtectionParameters;
 import org.soulwing.credo.service.UserContextService;
@@ -53,6 +52,8 @@ import org.soulwing.credo.service.crypto.SecretKeyWrapper;
  * @author Carl Harris
  */
 public class ConcreteCredentialProtectionServiceTest {
+
+  private static final long CREDENTIAL_ID = -1L;
 
   @Rule
   public final JUnitRuleMockery context = new JUnitRuleMockery();
@@ -146,7 +147,7 @@ public class ConcreteCredentialProtectionServiceTest {
     service.unprotect(credential, protection);
   }
   
-  @Test(expected = GroupAccessException.class)
+  @Test(expected = RuntimeException.class)
   public void testUnprotectWhenNotSameOwnerGroup() throws Exception {
     context.checking(groupExpectations(returnValue(group)));
     context.checking(checkOwnershipExpectations(returnValue(otherGroup)));
@@ -162,6 +163,8 @@ public class ConcreteCredentialProtectionServiceTest {
       oneOf(groupRepository).findByGroupName(
           with(same(GROUP_NAME)), with(same(LOGIN_NAME)));
       will(outcome);
+      allowing(credential).getId();
+      will(returnValue(CREDENTIAL_ID));
     } };    
   }
   

@@ -21,6 +21,7 @@ package org.soulwing.credo.service.protect;
 import javax.crypto.SecretKey;
 import javax.enterprise.context.ApplicationScoped;
 
+import org.apache.commons.lang.Validate;
 import org.soulwing.credo.Credential;
 import org.soulwing.credo.UserGroup;
 import org.soulwing.credo.service.GroupAccessException;
@@ -64,9 +65,9 @@ public class ConcreteCredentialProtectionService
     
     try {
       UserGroup group = findGroup(protection.getGroupName());
-      if (!group.equals(credential.getOwner())) {
-        throw new GroupAccessException(protection.getGroupName());
-      }
+      Validate.isTrue(group.equals(credential.getOwner()), 
+          protection.getGroupName() + " is not the owner of credential " 
+              + credential.getId());
   
       SecretKey secretKey = getGroupSecretKey(group, protection.getPassword());
   
