@@ -68,6 +68,7 @@ public class ConcreteCredentialImporter implements CredentialImporter {
    */
   public ConcreteCredentialImporter(PrivateKeyWrapper privateKey,
       CredentialBag bag, TimeOfDayService timeOfDayService) {
+    this.privateKey = privateKey;
     this.bag = bag;
     this.timeOfDayService = timeOfDayService;
   }

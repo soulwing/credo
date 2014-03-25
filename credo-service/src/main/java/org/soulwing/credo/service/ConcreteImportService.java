@@ -19,7 +19,9 @@
 package org.soulwing.credo.service;
 
 import java.io.IOException;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 import javax.ejb.ConcurrencyManagement;
 import javax.ejb.ConcurrencyManagementType;
@@ -35,6 +37,7 @@ import org.soulwing.credo.CredentialCertificate;
 import org.soulwing.credo.CredentialCertificateBuilder;
 import org.soulwing.credo.CredentialRequest;
 import org.soulwing.credo.Password;
+import org.soulwing.credo.Tag;
 import org.soulwing.credo.UserGroup;
 import org.soulwing.credo.repository.CredentialRepository;
 import org.soulwing.credo.repository.CredentialRequestRepository;
@@ -128,7 +131,13 @@ public class ConcreteImportService implements ImportService {
       PrivateKeyWrapper privateKey = requestProtectionService.unprotect(
           request, protection);
       CredentialImporter importer = importerFactory.newImporter(privateKey);
-      return prepareImport(importer, files, EMPTY_PASSPHRASE, errors);
+      ImportDetails details = prepareImport(importer, files, EMPTY_PASSPHRASE, 
+          errors);
+      details.setName(request.getName());
+      details.setOwner(request.getOwner().getName());
+      details.setNote(request.getNote());
+      details.setTags(getTagNames(request.getTags()));
+      return details;
     }
     catch (GroupAccessException ex) {
       errors.addError("groupAccessDenied", 
@@ -141,6 +150,16 @@ public class ConcreteImportService implements ImportService {
     }
   }
 
+  private String[] getTagNames(Set<? extends Tag> tags) {
+    String[] names = new String[tags.size()];
+    int index = 0;
+    Iterator<? extends Tag> i = tags.iterator();
+    while (i.hasNext()) {
+      names[index++] = i.next().getText(); 
+    }
+    return names;
+  }
+  
   private ImportDetails prepareImport(CredentialImporter importer,
       List<FileContentModel> files, Password passphrase, Errors errors)
       throws ImportException, PassphraseException {
