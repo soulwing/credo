@@ -36,6 +36,14 @@ public interface CredentialRequestRepository {
   void add(CredentialRequest request);
   
   /**
+   * Updates (merges) a possibly detached request, making changes to it
+   * persistent.
+   * @param request the request to update
+   * @return the updated request
+   */
+  CredentialRequest update(CredentialRequest request);
+  
+  /**
    * Removes a persistent request from the repository.
    * @param request the request to remove
    * @param removePrivateKey flag indicating whether the request's 

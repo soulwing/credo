@@ -84,6 +84,15 @@ public class JpaCredentialRequestRepository
    */
   @Override
   @Restricted(Restriction.OWNER)
+  public CredentialRequest update(CredentialRequest request) {
+    return entityManager.merge(request);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  @Restricted(Restriction.OWNER)
   public void remove(CredentialRequest request, boolean removePrivateKey) {
     if (request != null) {
       entityManager.remove(request);
