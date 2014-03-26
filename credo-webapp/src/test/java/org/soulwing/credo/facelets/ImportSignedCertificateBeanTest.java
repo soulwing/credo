@@ -176,7 +176,7 @@ public class ImportSignedCertificateBeanTest {
     bean.setRequest(request);
     bean.getFileUploadEditor().setFile0(file);
     assertThat(bean.prepare(), 
-        is(equalTo(ImportCredentialBean.DETAILS_OUTCOME_ID)));
+        is(equalTo(ImportSignedCertificateBean.DETAILS_OUTCOME_ID)));
     assertThat(bean.getDetails(), is(sameInstance(details)));
   }
 
@@ -189,7 +189,7 @@ public class ImportSignedCertificateBeanTest {
     bean.setRequest(request);
     bean.getFileUploadEditor().setFile1(file);
     assertThat(bean.prepare(), 
-        is(equalTo(ImportCredentialBean.DETAILS_OUTCOME_ID)));
+        is(equalTo(ImportSignedCertificateBean.DETAILS_OUTCOME_ID)));
     assertThat(bean.getDetails(), is(sameInstance(details)));
   }
     
@@ -201,7 +201,7 @@ public class ImportSignedCertificateBeanTest {
     bean.setRequest(request);
     bean.getFileUploadEditor().setFile2(file);
     assertThat(bean.prepare(), 
-        is(equalTo(ImportCredentialBean.DETAILS_OUTCOME_ID)));
+        is(equalTo(ImportSignedCertificateBean.DETAILS_OUTCOME_ID)));
     assertThat(bean.getDetails(), is(sameInstance(details)));
   }
 
@@ -291,13 +291,34 @@ public class ImportSignedCertificateBeanTest {
       oneOf(credential).setRequest(with(same(request)));
       oneOf(importService).saveCredential(with(same(credential)), 
           with(false), with(same(errors)));
+      oneOf(request).getCredential();
+      will(returnValue(null));
     } });
    
     bean.setRemoveRequest(false);
     bean.setRequest(request);
     bean.setCredential(credential);
-    assertThat(bean.save(), equalTo(ImportCredentialBean.SUCCESS_OUTCOME_ID));    
+    assertThat(bean.save(), 
+        is(equalTo(ImportSignedCertificateBean.SUCCESS_OUTCOME_ID)));    
   }
+
+  @Test
+  public void testSaveSuccessWhenRenewing() throws Exception {
+    context.checking(new Expectations() { { 
+      oneOf(credential).setRequest(with(same(request)));
+      oneOf(importService).saveCredential(with(same(credential)), 
+          with(false), with(same(errors)));
+      oneOf(request).getCredential();
+      will(returnValue(credential));
+    } });
+   
+    bean.setRemoveRequest(false);
+    bean.setRequest(request);
+    bean.setCredential(credential);
+    assertThat(bean.save(), 
+        is(equalTo(ImportSignedCertificateBean.CLEANUP_OUTCOME_ID)));    
+  }
+
 
   @Test
   public void testSaveAndRemoveRequest() throws Exception {
@@ -306,12 +327,14 @@ public class ImportSignedCertificateBeanTest {
       oneOf(credential).setRequest(with(same(request)));
       oneOf(importService).saveCredential(with(same(credential)), 
           with(true), with(same(errors)));
+      oneOf(request).getCredential();
+      will(returnValue(null));
     } });
     
     bean.setRemoveRequest(true);
     bean.setRequest(request);
     bean.setCredential(credential);
-    assertThat(bean.save(), equalTo(ImportCredentialBean.SUCCESS_OUTCOME_ID));    
+    assertThat(bean.save(), equalTo(ImportSignedCertificateBean.SUCCESS_OUTCOME_ID));    
   }
 
   @Test
@@ -348,7 +371,7 @@ public class ImportSignedCertificateBeanTest {
   @Test
   public void testCancel() throws Exception {
     context.checking(endConversationExpectations());    
-    assertThat(bean.cancel(), equalTo(ImportCredentialBean.CANCEL_OUTCOME_ID));
+    assertThat(bean.cancel(), equalTo(ImportSignedCertificateBean.CANCEL_OUTCOME_ID));
   }
   
   @Test
@@ -357,7 +380,7 @@ public class ImportSignedCertificateBeanTest {
     bean.setDetails(details);
     bean.setCredential(credential);
     assertThat(bean.protect(), 
-        is(equalTo(ImportCredentialBean.CONFIRM_OUTCOME_ID)));    
+        is(equalTo(ImportSignedCertificateBean.CONFIRM_OUTCOME_ID)));    
   }
   
   @Test
@@ -367,7 +390,7 @@ public class ImportSignedCertificateBeanTest {
     bean.setDetails(details);
     bean.setCredential(credential);
     assertThat(bean.protect(), 
-        is(equalTo(ImportCredentialBean.DETAILS_OUTCOME_ID)));        
+        is(equalTo(ImportSignedCertificateBean.DETAILS_OUTCOME_ID)));        
   }
 
   @Test
@@ -386,8 +409,39 @@ public class ImportSignedCertificateBeanTest {
     bean.setDetails(details);
     bean.setCredential(credential);
     assertThat(bean.protect(), 
-        is(equalTo(ImportCredentialBean.DETAILS_OUTCOME_ID)));     
+        is(equalTo(ImportSignedCertificateBean.DETAILS_OUTCOME_ID)));     
   }
+
+  @Test
+  public void testCleanup() throws Exception {
+    context.checking(endConversationExpectations());
+    context.checking(new Expectations() { {
+      oneOf(request).getCredential();
+      will(returnValue(credential));
+      oneOf(importService).removeCredential(with(same(credential)), 
+          with(same(errors)));
+    } });
+    
+    bean.setRequest(request);
+    assertThat(bean.cleanup(), 
+        is(equalTo(ImportSignedCertificateBean.SUCCESS_OUTCOME_ID)));
+  }
+
+  @Test
+  public void testCleanupWhenNotOwner() throws Exception {
+    context.checking(new Expectations() { {
+      oneOf(request).getCredential();
+      will(returnValue(credential));
+      oneOf(importService).removeCredential(with(same(credential)), 
+          with(same(errors)));
+      will(throwException(new GroupAccessException(GROUP_NAME)));
+    } });
+
+    bean.setRequest(request);
+    assertThat(bean.cleanup(), 
+        is(equalTo(ImportSignedCertificateBean.FAILURE_OUTCOME_ID)));
+  }
+  
 
   private Expectations beginConversationExpectations() {
     return new Expectations() { { 

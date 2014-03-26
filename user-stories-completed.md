@@ -326,6 +326,29 @@ A user can download the certification request file for an existing signing
 request for which she is an owner.
 
 
+Create Credential from Signing Request
+--------------------------------------
+
+A user can create a credential from an existing signing request for which
+she is an owner.
+
+* The subject certificate and authority chain must be uploaded and validated.
+* The friendly name, owner, description, and tags should be copied from the
+  request, and the user should be given the opportunity to edit them.
+* The user should be given the option to delete the signing request upon 
+  successful creation of the credential.
+* If the user chooses not to remove the signing request, it should be flagged
+  as "complete" upon successful creation of the credential.
+
+
+Remove Renewed Credential
+-------------------------
+
+After successfully importing the signed certificate for a request that renews
+an existing credential, the user should be offered the option of removing the
+old credential.
+
+
 
 
 

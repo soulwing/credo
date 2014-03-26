@@ -113,4 +113,17 @@ public interface ImportService {
   void saveCredential(Credential credential, boolean removeRequest, 
       Errors errors) throws ImportException, GroupAccessException;
 
+  /**
+   * Removes an existing credential from persistent storage.
+   * <p>
+   * This method is used to remove the old credential when a new credential
+   * from a renewal request.
+   * @param credential the credential to remove
+   * @param errors an errors object that will be updated if an error occurs
+   * @throws GroupAccessException if the logged-in user is not a member
+   *    of the group that owns {@code credential}
+   */
+  void removeCredential(Credential credential, Errors errors) 
+      throws GroupAccessException;
+
 }

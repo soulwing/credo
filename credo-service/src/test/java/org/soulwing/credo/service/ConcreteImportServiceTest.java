@@ -619,7 +619,32 @@ public class ConcreteImportServiceTest {
     importService.saveCredential(credential, true, errors);
   }
   
-
+  @Test
+  public void testRemoveCredential() throws Exception {
+    context.checking(new Expectations() { { 
+      oneOf(credential).setRequest(with(nullValue(CredentialRequest.class)));
+      oneOf(credentialRepository).update(with(same(credential)));
+      will(returnValue(credential));
+      oneOf(credentialRepository).remove(with(same(credential)));
+    } });
+    
+    importService.removeCredential(credential, errors);
+  }
+  
+  
+  @Test(expected = GroupAccessException.class)
+  public void testRemoveCredentialWhenNotOwner() throws Exception {
+    context.checking(new Expectations() { { 
+      oneOf(credential).setRequest(with(nullValue(CredentialRequest.class)));
+      oneOf(credentialRepository).update(with(same(credential)));
+      will(throwException(
+          new OwnerAccessControlException(GROUP_NAME, LOGIN_NAME)));
+      oneOf(errors).addError(with("groupAccessDenied"),
+          (Object[]) with(arrayContaining(GROUP_NAME)));
+    } });
+    
+    importService.removeCredential(credential, errors);
+  }
 
 }
 

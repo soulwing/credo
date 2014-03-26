@@ -318,5 +318,21 @@ public class ConcreteImportService implements ImportService {
 
   }
 
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public void removeCredential(Credential credential, Errors errors)
+      throws GroupAccessException {
+    try {
+      credential.setRequest(null);
+      credentialRepository.remove(credentialRepository.update(credential));
+    }
+    catch (OwnerAccessControlException ex) {
+      errors.addError("groupAccessDenied", new Object[] { ex.getGroupName() });
+      throw new GroupAccessException(ex.getGroupName());
+    }
+  }
+
 }
 

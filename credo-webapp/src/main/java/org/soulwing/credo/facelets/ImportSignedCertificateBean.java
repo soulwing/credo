@@ -66,6 +66,8 @@ public class ImportSignedCertificateBean implements Serializable {
   static final String PASSWORD1_OUTCOME_ID = "password1";
 
   static final String PASSWORD2_OUTCOME_ID = "password2";
+  
+  static final String CLEANUP_OUTCOME_ID = "cleanup";
 
   private static final long serialVersionUID = -5565484780336702769L;
 
@@ -157,17 +159,16 @@ public class ImportSignedCertificateBean implements Serializable {
 
   /**
    * Gets the credential request.
-   * <p>
-   * This method is exposed to support unit testing.
    * @return credential request
    */
-  CredentialRequest getRequest() {
+  public CredentialRequest getRequest() {
     return request;
   }
 
   /**
    * Sets the credential request.
    * <p>
+   * This method is exposed to support unit testing.
    * @param request the credential request
    */
   void setRequest(CredentialRequest request) {
@@ -314,8 +315,11 @@ public class ImportSignedCertificateBean implements Serializable {
     try {
       credential.setRequest(request);
       importService.saveCredential(credential, removeRequest, errors);
-      endConversation();
-      return SUCCESS_OUTCOME_ID;
+      if (request.getCredential() == null) {
+        endConversation();
+        return SUCCESS_OUTCOME_ID;
+      }
+      return CLEANUP_OUTCOME_ID;
     }
     catch (ImportException ex) {
       return null;
@@ -334,6 +338,22 @@ public class ImportSignedCertificateBean implements Serializable {
     return CANCEL_OUTCOME_ID;
   }
 
+  /**
+   * Action that is fired when the user chooses to remove the existing 
+   * credential that the new credential is intended to replace.
+   * @return outcome ID
+   */
+  public String cleanup() {
+    try {
+      importService.removeCredential(request.getCredential(), errors);
+      endConversation();
+      return SUCCESS_OUTCOME_ID;
+    }
+    catch (GroupAccessException ex) {
+      return FAILURE_OUTCOME_ID;
+    }
+  }
+  
   private void beginConversation() {
     if (conversation.isTransient()) {
       conversation.begin();
