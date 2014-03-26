@@ -143,3 +143,8 @@ td.table-tools a {
 	font-family: monospace;
 	font-size: 12px;
 }
+
+.tools-button.dropdown-menu {
+	left: initial;
+	right: 0;
+}

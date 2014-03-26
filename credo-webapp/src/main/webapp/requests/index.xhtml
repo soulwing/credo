@@ -49,19 +49,30 @@
           </h:column>
           
           <h:column headerClass="sorter-false filter-false">
-            <f:facet name="header">#{messages.requestTableActionsHeader}</f:facet>
-            <h:outputLink styleClass="btn btn-default btn-xs" value="download">
-              <f:param name="id" value="#{req.id}"/>
-              #{messages.downloadButtonLabel}
-            </h:outputLink>
-            <h:outputLink styleClass="btn btn-default btn-xs" value="import">
-              <f:param name="requestId" value="#{req.id}"/>
-              #{messages.importButtonLabel}
-            </h:outputLink>
-            <h:outputLink styleClass="btn btn-default btn-xs" value="remove">
-              <f:param name="id" value="#{req.id}"/>
-              #{messages.removeButtonLabel}
-            </h:outputLink>
+            <div class="dropdown btn-group">
+              <a class="dropdown-toggle" data-toggle="dropdown">
+                 <span class="glyphicon glyphicon-wrench"/></a>
+              <ul class="dropdown-menu tools-button">
+                <li>
+			            <h:outputLink value="download">
+			              <f:param name="id" value="#{req.id}"/>
+			              #{messages.downloadButtonLabel}
+			            </h:outputLink>
+                </li>
+                <li>
+			            <h:outputLink value="import">
+			              <f:param name="requestId" value="#{req.id}"/>
+			              #{messages.importButtonLabel}
+			            </h:outputLink>
+                </li>
+                <li>
+			            <h:outputLink value="remove">
+			              <f:param name="id" value="#{req.id}"/>
+			              #{messages.removeButtonLabel}
+			            </h:outputLink>
+                </li>
+              </ul>
+            </div>          
           </h:column>
         </h:dataTable>
       </div>
