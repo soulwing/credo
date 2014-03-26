@@ -10,12 +10,12 @@
 <h:body>
 	<ui:composition template="/templates/masterTemplate.xhtml">
 		<ui:define name="windowTitle">
-		  #{messages.applicationName}::#{messages.importSignedCredentialSubtitle}
+		  #{messages.applicationName}::#{messages.importSignedCertificateSubtitle}
 		</ui:define>
 		<ui:define name="content">
 		  <credo:credentialEditor 
-		    heading="#{messages.importSignedCredentialSubtitle}"
-		    detail="#{messages.importSignedCredentialDetailsDetail}"
+		    heading="#{messages.importSignedCertificateSubtitle}"
+		    detail="#{messages.importSignedCertificateDetailsDetail}"
 		    submitLabel="#{messages.continueLabel} &#8594;"
 		    cancelLabel="#{messages.cancelLabel}"
 		    submitAction="#{importSignedCertificateBean.password2}"

@@ -23,6 +23,7 @@ import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.emptyArray;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.Matchers.sameInstance;
 import static org.jmock.Expectations.returnValue;
 import static org.jmock.Expectations.throwException;
@@ -61,6 +62,7 @@ import org.soulwing.credo.repository.CredentialRepository;
 import org.soulwing.credo.repository.CredentialRequestRepository;
 import org.soulwing.credo.repository.UserGroupMemberRepository;
 import org.soulwing.credo.repository.UserGroupRepository;
+import org.soulwing.credo.security.OwnerAccessControlException;
 import org.soulwing.credo.service.crypto.CertificateWrapper;
 import org.soulwing.credo.service.crypto.PrivateKeyWrapper;
 import org.soulwing.credo.service.importer.CredentialImporter;
@@ -560,15 +562,65 @@ public class ConcreteImportServiceTest {
   }
 
   @Test
-  public void testSaveCredential() throws Exception {
+  public void testSaveCredentialWithNoRequest() throws Exception {
   
-    context.checking(new Expectations() { { 
+    context.checking(new Expectations() { {
+      oneOf(credential).getRequest();
+      will(returnValue(null));
       oneOf(credentialRepository).add(with(same(credential)));
     } });
     
-    importService.saveCredential(credential, errors);
+    importService.saveCredential(credential, false, errors);
+  }
+
+  @Test
+  public void testSaveCredentialWithRequestToRemove() throws Exception {
+  
+    context.checking(new Expectations() { {
+      oneOf(credential).getRequest();
+      will(returnValue(request));
+      oneOf(credential).setRequest(with(nullValue(CredentialRequest.class)));
+      oneOf(credentialRepository).add(with(same(credential)));
+      oneOf(requestRepository).update(with(same(request)));
+      will(returnValue(request));
+      oneOf(requestRepository).remove(with(same(request)), with(false));
+    } });
+    
+    importService.saveCredential(credential, true, errors);
   }
   
+  @Test
+  public void testSaveCredentialWithRequestToRetain() throws Exception {
+  
+    context.checking(new Expectations() { {
+      oneOf(credential).getRequest();
+      will(returnValue(request));
+      oneOf(credentialRepository).add(with(same(credential)));
+    } });
+    
+    importService.saveCredential(credential, false, errors);
+  }
+
+  @Test(expected = GroupAccessException.class)
+  public void testSaveCredentialWhenNotOwner() throws Exception {
+  
+    context.checking(new Expectations() { {
+      oneOf(credential).getRequest();
+      will(returnValue(request));
+      oneOf(credential).setRequest(with(nullValue(CredentialRequest.class)));
+      oneOf(credentialRepository).add(with(same(credential)));
+      oneOf(requestRepository).update(with(same(request)));
+      will(throwException(
+          new OwnerAccessControlException(GROUP_NAME, LOGIN_NAME)));
+      oneOf(errors).addError(with("groupAccessDenied"),
+          (Object[]) with(arrayContaining(GROUP_NAME)));
+    } });
+    
+    importService.saveCredential(credential, true, errors);
+  }
+  
+
+
 }
 
 

@@ -191,7 +191,7 @@ public class ConcreteImportServiceIT {
     Credential credential = importService.createCredential(details, 
         protection, errors);
     credential.setName(details.getSubjectCommonName());
-    importService.saveCredential(credential, errors);
+    importService.saveCredential(credential, false, errors);
   }
 
   private void createUserProfile(String loginName, Password password) {

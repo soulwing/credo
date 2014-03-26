@@ -207,7 +207,7 @@ public class ImportCredentialBeanTest {
   public void testSaveSuccess() throws Exception {
     context.checking(new Expectations() { { 
       oneOf(importService).saveCredential(with(same(credential)), 
-          with(same(errors)));
+          with(false), with(same(errors)));
       oneOf(conversation).end();
     } });
     
@@ -220,12 +220,25 @@ public class ImportCredentialBeanTest {
 
     context.checking(new Expectations() { { 
       oneOf(importService).saveCredential(with(same(credential)), 
-          with(same(errors)));
+          with(false), with(same(errors)));
       will(throwException(new ImportException()));
     } });
     
     bean.setCredential(credential);
     assertThat(bean.save(), nullValue());    
+  }
+
+  @Test
+  public void testSaveGroupAccessDenied() throws Exception {
+    context.checking(new Expectations() { { 
+      oneOf(importService).saveCredential(with(same(credential)), 
+          with(false), with(same(errors)));
+      will(throwException(new GroupAccessException("someGroup")));
+    } });
+    
+    bean.setCredential(credential);
+    assertThat(bean.save(), 
+        is(equalTo(ImportSignedCertificateBean.FAILURE_OUTCOME_ID)));    
   }
 
   @Test

@@ -93,8 +93,8 @@ public class ImportSignedCertificateBean implements Serializable {
   private Long requestId;
   private CredentialRequest request;
   private Credential credential;
-
-  
+  private boolean removeRequest = true;
+ 
   /**
    * Gets the unique identifier of the credential request that will be used
    * as the basis for this import.
@@ -137,6 +137,24 @@ public class ImportSignedCertificateBean implements Serializable {
     return editor;
   }
   
+  /**
+   * Gets a flag that determines whether the request will be removed upon
+   * successful creation of the credential.
+   * @return {@code true} if the request should be removed
+   */
+  public boolean isRemoveRequest() {
+    return removeRequest;
+  }
+
+  /**
+   * Gets a flag that determines whether the request will be removed upon
+   * successful creation of the credential.
+   * @param removeRequest the flag state to set
+   */
+  public void setRemoveRequest(boolean removeRequest) {
+    this.removeRequest = removeRequest;
+  }
+
   /**
    * Gets the credential request.
    * <p>
@@ -295,12 +313,15 @@ public class ImportSignedCertificateBean implements Serializable {
   public String save() {
     try {
       credential.setRequest(request);
-      importService.saveCredential(credential, errors);
+      importService.saveCredential(credential, removeRequest, errors);
       endConversation();
       return SUCCESS_OUTCOME_ID;
     }
     catch (ImportException ex) {
       return null;
+    }
+    catch (GroupAccessException ex) {
+      return FAILURE_OUTCOME_ID;
     }
   }
 

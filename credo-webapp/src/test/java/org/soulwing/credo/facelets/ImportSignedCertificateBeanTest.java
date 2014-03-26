@@ -290,9 +290,25 @@ public class ImportSignedCertificateBeanTest {
     context.checking(new Expectations() { { 
       oneOf(credential).setRequest(with(same(request)));
       oneOf(importService).saveCredential(with(same(credential)), 
-          with(same(errors)));
+          with(false), with(same(errors)));
+    } });
+   
+    bean.setRemoveRequest(false);
+    bean.setRequest(request);
+    bean.setCredential(credential);
+    assertThat(bean.save(), equalTo(ImportCredentialBean.SUCCESS_OUTCOME_ID));    
+  }
+
+  @Test
+  public void testSaveAndRemoveRequest() throws Exception {
+    context.checking(endConversationExpectations());
+    context.checking(new Expectations() { { 
+      oneOf(credential).setRequest(with(same(request)));
+      oneOf(importService).saveCredential(with(same(credential)), 
+          with(true), with(same(errors)));
     } });
     
+    bean.setRemoveRequest(true);
     bean.setRequest(request);
     bean.setCredential(credential);
     assertThat(bean.save(), equalTo(ImportCredentialBean.SUCCESS_OUTCOME_ID));    
@@ -303,13 +319,30 @@ public class ImportSignedCertificateBeanTest {
     context.checking(new Expectations() { { 
       oneOf(credential).setRequest(with(same(request)));
       oneOf(importService).saveCredential(with(same(credential)), 
-          with(same(errors)));
+          with(false), with(same(errors)));
       will(throwException(new ImportException()));
     } });
     
+    bean.setRemoveRequest(false);
     bean.setRequest(request);
     bean.setCredential(credential);
     assertThat(bean.save(), nullValue());    
+  }
+
+  @Test
+  public void testSaveGroupAccessDenied() throws Exception {
+    context.checking(new Expectations() { { 
+      oneOf(credential).setRequest(with(same(request)));
+      oneOf(importService).saveCredential(with(same(credential)), 
+          with(false), with(same(errors)));
+      will(throwException(new GroupAccessException("someGroup")));
+    } });
+    
+    bean.setRemoveRequest(false);
+    bean.setRequest(request);
+    bean.setCredential(credential);
+    assertThat(bean.save(), 
+        is(equalTo(ImportSignedCertificateBean.FAILURE_OUTCOME_ID)));    
   }
 
   @Test

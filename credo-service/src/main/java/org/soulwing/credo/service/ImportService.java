@@ -102,11 +102,15 @@ public interface ImportService {
   /**
    * Save the given (transient) credential making it persistent.
    * @param credential the credential to save
+   * @param removeRequest a flag that when {@code true} removes the request
+   *    upon successfully saving the credential
    * @param errors an errors object that will be updated if a recoverable
    *    error occurs
    * @throws ImportException if a recoverable error occurs
+   * @throws GroupAccessException if the logged-in user is no longer a member
+   *    of the group that owns the request associated with {@code credential}
    */
-  void saveCredential(Credential credential, Errors errors) 
-      throws ImportException;
+  void saveCredential(Credential credential, boolean removeRequest, 
+      Errors errors) throws ImportException, GroupAccessException;
 
 }

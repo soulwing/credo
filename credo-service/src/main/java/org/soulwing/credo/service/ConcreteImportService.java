@@ -43,6 +43,7 @@ import org.soulwing.credo.repository.CredentialRepository;
 import org.soulwing.credo.repository.CredentialRequestRepository;
 import org.soulwing.credo.repository.UserGroupMemberRepository;
 import org.soulwing.credo.repository.UserGroupRepository;
+import org.soulwing.credo.security.OwnerAccessControlException;
 import org.soulwing.credo.service.crypto.CertificateWrapper;
 import org.soulwing.credo.service.crypto.PrivateKeyWrapper;
 import org.soulwing.credo.service.importer.CredentialImporter;
@@ -295,9 +296,26 @@ public class ConcreteImportService implements ImportService {
    */
   @Override
   @TransactionAttribute(TransactionAttributeType.REQUIRED)
-  public void saveCredential(Credential credential, Errors errors)
-      throws ImportException {
-    credentialRepository.add(credential);
+  public void saveCredential(Credential credential, boolean removeRequest,
+      Errors errors) throws ImportException, GroupAccessException {
+    
+    try {
+      CredentialRequest request = credential.getRequest();
+      boolean willRemoveRequest = request != null && removeRequest;
+      if (willRemoveRequest) {
+        credential.setRequest(null);
+      }
+      
+      credentialRepository.add(credential);
+      if (willRemoveRequest) {
+        requestRepository.remove(requestRepository.update(request), false);
+      }
+    }
+    catch (OwnerAccessControlException ex) {
+      errors.addError("groupAccessDenied", new Object[] { ex.getGroupName() });
+      throw new GroupAccessException(ex.getGroupName());
+    }
+
   }
 
 }

@@ -15,12 +15,12 @@
       <f:viewAction action="#{importSignedCertificateBean.findRequest}" />
     </f:metadata>
 		<ui:define name="windowTitle">
-		  #{messages.applicationName}::#{messages.importSignedCredentialSubtitle}
+		  #{messages.applicationName}::#{messages.importSignedCertificateSubtitle}
 		</ui:define>
 		<ui:define name="content">
       <credo:fileUploadEditor
-         heading="#{messages.importSignedCredentialSubtitle}"
-         detail="#{messages.importSignedCredentialUploadDetail}"
+         heading="#{messages.importSignedCertificateSubtitle}"
+         detail="#{messages.importSignedCertificateUploadDetail}"
          cancelLabel="#{messages.cancelLabel}"
          submitLabel="#{messages.continueLabel} &#8594;"
          cancelAction="#{importSignedCertificateBean.cancel}"

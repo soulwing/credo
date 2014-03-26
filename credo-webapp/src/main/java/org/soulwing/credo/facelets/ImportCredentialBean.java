@@ -279,12 +279,15 @@ public class ImportCredentialBean implements Serializable {
    */
   public String save() {
     try {
-      importService.saveCredential(credential, errors);
+      importService.saveCredential(credential, false, errors);
       conversation.end();
       return SUCCESS_OUTCOME_ID;
     }
     catch (ImportException ex) {
       return null;
+    }
+    catch (GroupAccessException ex) {
+      return FAILURE_OUTCOME_ID;
     }
   }
 
