@@ -1,5 +1,5 @@
 /*
- * File created on Mar 3, 2014 
+ * File created on Mar 27, 2014 
  *
  * Copyright (c) 2014 Virginia Polytechnic Institute and State University
  *
@@ -16,24 +16,24 @@
  * limitations under the License.
  *
  */
-package org.soulwing.credo.service.crypto;
+package org.soulwing.credo.service.crypto.jca;
 
-import java.security.Key;
+import org.soulwing.credo.service.crypto.SecretKeyWrapper;
+import org.soulwing.credo.service.pem.PemObjectWrapper;
 
 /**
- * A service that encrypts a (symmetric) secret key using a public key.
- *
+ * A strategy for decoding a PEM secret key object.
+ * 
  * @author Carl Harris
  */
-public interface SecretKeyEncryptionService {
+public interface JcaSecretKeyDecoderStrategy {
 
   /**
-   * Encrypts (wraps) a secret key using the given public key.
-   * @param secretKey the key to encrypt
-   * @param key the public key that will be used to wrap the secret key 
-   * @return encrypted (wrapped) secret key
+   * Decodes the given PEM object to a secret key, if possible.
+   * @param object the object to decode
+   * @return secret key or {@code null} if this strategy cannot decode the
+   *    given object
    */
-  SecretKeyWrapper encrypt(SecretKeyWrapper secretKey, 
-      Key key);
+  SecretKeyWrapper decode(PemObjectWrapper object);
   
 }

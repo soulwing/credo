@@ -1,5 +1,5 @@
 /*
- * File created on Mar 3, 2014 
+ * File created on Mar 27, 2014 
  *
  * Copyright (c) 2014 Virginia Polytechnic Institute and State University
  *
@@ -18,34 +18,27 @@
  */
 package org.soulwing.credo.service.crypto.jca;
 
-import javax.enterprise.context.ApplicationScoped;
+import javax.enterprise.context.Dependent;
 import javax.inject.Inject;
 
 import org.apache.commons.codec.DecoderException;
 import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.lang.Validate;
-import org.soulwing.credo.service.crypto.Encoded;
-import org.soulwing.credo.service.crypto.Encoded.Type;
-import org.soulwing.credo.service.crypto.PrivateKeyDecoder;
-import org.soulwing.credo.service.crypto.PrivateKeyWrapper;
+import org.soulwing.credo.service.crypto.SecretKeyWrapper;
 import org.soulwing.credo.service.pem.PemHeaderWrapper;
 import org.soulwing.credo.service.pem.PemObjectBuilderFactory;
-import org.soulwing.credo.service.pem.PemObjectFactory;
 import org.soulwing.credo.service.pem.PemObjectWrapper;
 
 /**
- * A {@link PrivateKeyDecoder} that decodes an PEM-encoded AES-wrapped 
- * private key.
+ * A {@linK JcaSecretKeyDecoderStrategy} that decodes AES-encrypted secret
+ * keys.
  *
  * @author Carl Harris
  */
-@Encoded(Type.AES)
-@ApplicationScoped
-public class JcaAESPrivateKeyDecoder implements PrivateKeyDecoder {
+@Dependent
+public class JcaAESSecretKeyDecoderStrategy
+    implements JcaSecretKeyDecoderStrategy {
 
-  @Inject
-  protected PemObjectFactory objectFactory;
-  
   @Inject
   protected PemObjectBuilderFactory objectBuilderFactory;
   
@@ -53,16 +46,16 @@ public class JcaAESPrivateKeyDecoder implements PrivateKeyDecoder {
    * {@inheritDoc}
    */
   @Override
-  public PrivateKeyWrapper decode(String encoded) {
-    PemObjectWrapper object = objectFactory.newPemObject(encoded);
+  public SecretKeyWrapper decode(PemObjectWrapper object) {
     PemHeaderWrapper header = object.getHeader("DEK-Info");
     Validate.notNull(header, "no DEK-Info header");
     String value = header.getStringValue();
     int index = value.indexOf(',');
     String transform = value.substring(0, index);
+    if (!transform.startsWith("AES/")) return null;
     byte[] iv = decodeIV(value, index + 1);
     byte[] cipherText = object.getContent();
-    return new JcaEncryptedPrivateKeyWrapper(transform, iv, cipherText, 
+    return new JcaAESEncryptedSecretKeyWrapper(transform, iv, cipherText, 
         objectBuilderFactory);
   }
 

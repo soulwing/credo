@@ -1,5 +1,5 @@
 /*
- * File created on Mar 3, 2014 
+ * File created on Mar 27, 2014 
  *
  * Copyright (c) 2014 Virginia Polytechnic Institute and State University
  *
@@ -18,9 +18,11 @@
  */
 package org.soulwing.credo.service.crypto.jca;
 
+import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
+import java.security.Key;
 import java.security.NoSuchAlgorithmException;
-import java.security.PrivateKey;
+import java.security.spec.InvalidParameterSpecException;
 
 import javax.crypto.Cipher;
 import javax.crypto.NoSuchPaddingException;
@@ -30,18 +32,18 @@ import org.soulwing.credo.service.crypto.SecretKeyWrapper;
 import org.soulwing.credo.service.pem.PemObjectBuilderFactory;
 
 /**
- * A {@link SecretKeyWrapper} that delegates to a JCA {@link SecretKey}.
- *
+ * An abstract base for an encrypted {@link SecretKeyWrapper}.
+ * 
  * @author Carl Harris
  */
-public class JcaEncryptedSecretKeyWrapper implements SecretKeyWrapper {
+public abstract class JcaEncryptedSecretKeyWrapper
+    implements SecretKeyWrapper {
 
-  private final String transform;
-  private final byte[] cipherText;  
-  private final PemObjectBuilderFactory objectBuilderFactory;
-  
-  private PrivateKey privateKey;
-  
+  protected final String transform;
+  protected final byte[] cipherText;
+  protected final PemObjectBuilderFactory objectBuilderFactory;
+  private Key key;
+
   /**
    * Constructs a new instance.
    * @param transform the cryptographic transform that was applied to 
@@ -49,18 +51,19 @@ public class JcaEncryptedSecretKeyWrapper implements SecretKeyWrapper {
    * @param cipherText cipher text of secret key's DER encoding
    * @param objectBuilderFactory PEM object builder factory
    */
-  public JcaEncryptedSecretKeyWrapper(String transform,
+  protected JcaEncryptedSecretKeyWrapper(String transform,
       byte[] cipherText, PemObjectBuilderFactory objectBuilderFactory) {
     this.transform = transform;
     this.cipherText = cipherText;
     this.objectBuilderFactory = objectBuilderFactory;
   }
 
+
   /**
    * {@inheritDoc}
    */
   @Override
-  public boolean isPrivateKeyRequired() {
+  public boolean isEncrypted() {
     return true;
   }
 
@@ -68,16 +71,16 @@ public class JcaEncryptedSecretKeyWrapper implements SecretKeyWrapper {
    * {@inheritDoc}
    */
   @Override
-  public PrivateKey getPrivateKey() {
-    return privateKey;
+  public Key getKey() {
+    return key;
   }
 
   /**
    * {@inheritDoc}
    */
   @Override
-  public void setPrivateKey(PrivateKey privateKey) {
-    this.privateKey = privateKey;    
+  public void setKey(Key key) {
+    this.key = key;    
   }
 
   /**
@@ -88,20 +91,26 @@ public class JcaEncryptedSecretKeyWrapper implements SecretKeyWrapper {
     return objectBuilderFactory.newBuilder()
         .setType("ENCRYPTED SECRET KEY")
         .setHeader("Proc-Type", "4,ENCRYPTED")
-        .setHeader("DEK-Info", transform)
+        .setHeader("DEK-Info", getDEKInfo())
         .append(cipherText)
         .build().getEncoded();
   }
 
+  /**
+   * Gets the value for the DEK-Info header.
+   * @return header value
+   */
+  protected String getDEKInfo() {
+    return transform;
+  }
+  
   /**
    * {@inheritDoc}
    */
   @Override
   public SecretKey derive() {
     try {
-      Cipher decipher = Cipher.getInstance(transform);
-      decipher.init(Cipher.UNWRAP_MODE, privateKey);
-      return (SecretKey) decipher.unwrap(cipherText, "AES", 
+      return (SecretKey) createCipher().unwrap(cipherText, "AES", 
           Cipher.SECRET_KEY);
     }
     catch (NoSuchAlgorithmException ex) {
@@ -113,7 +122,27 @@ public class JcaEncryptedSecretKeyWrapper implements SecretKeyWrapper {
     catch (InvalidKeyException ex) {
       throw new RuntimeException(ex);
     }
+    catch (InvalidParameterSpecException ex) {
+      throw new RuntimeException(ex);    
+    }
+    catch (InvalidAlgorithmParameterException ex) {
+      throw new RuntimeException(ex);
+    }
   }
+
+  /**
+   * Creates the cipher needed to decrypt the secret key.
+   * @return cipher
+   * @throws NoSuchAlgorithmException
+   * @throws NoSuchPaddingException
+   * @throws InvalidKeyException
+   * @throws InvalidParameterSpecException
+   * @throws InvalidAlgorithmParameterException
+   */
+  protected abstract Cipher createCipher() 
+      throws NoSuchAlgorithmException, NoSuchPaddingException, 
+      InvalidKeyException, InvalidParameterSpecException,
+      InvalidAlgorithmParameterException;
 
   /**
    * {@inheritDoc}

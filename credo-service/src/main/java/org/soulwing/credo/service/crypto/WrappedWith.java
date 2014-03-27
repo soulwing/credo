@@ -1,5 +1,5 @@
 /*
- * File created on Mar 3, 2014 
+ * File created on Mar 4, 2014 
  *
  * Copyright (c) 2014 Virginia Polytechnic Institute and State University
  *
@@ -18,22 +18,30 @@
  */
 package org.soulwing.credo.service.crypto;
 
-import java.security.Key;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
+
+import javax.inject.Qualifier;
 
 /**
- * A service that encrypts a (symmetric) secret key using a public key.
+ * A qualifier that identifies the key type used to wrap (encrypt) a
+ * secret key
  *
  * @author Carl Harris
  */
-public interface SecretKeyEncryptionService {
-
-  /**
-   * Encrypts (wraps) a secret key using the given public key.
-   * @param secretKey the key to encrypt
-   * @param key the public key that will be used to wrap the secret key 
-   * @return encrypted (wrapped) secret key
-   */
-  SecretKeyWrapper encrypt(SecretKeyWrapper secretKey, 
-      Key key);
+@Qualifier
+@Retention(RetentionPolicy.RUNTIME)
+@Target({ ElementType.TYPE, ElementType.METHOD, ElementType.FIELD, 
+  ElementType.PARAMETER})
+public @interface WrappedWith {
+  
+  enum Type {
+    AES,
+    RSA;
+  }
+  
+  Type value();
   
 }

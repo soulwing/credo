@@ -18,7 +18,7 @@
  */
 package org.soulwing.credo.service.crypto;
 
-import java.security.PrivateKey;
+import java.security.Key;
 
 import javax.crypto.SecretKey;
 
@@ -30,24 +30,22 @@ import javax.crypto.SecretKey;
 public interface SecretKeyWrapper {
 
   /**
-   * Tests whether this secret key was encrypted (wrapped) using a 
-   * public key.
-   * @return {@code true} if a private key is required to derive this
-   *    secret key
+   * Tests whether this secret key is encrypted.
+   * @return {@code true} if a key is required to derive this secret key
    */
-  boolean isPrivateKeyRequired();
+  boolean isEncrypted();
   
   /**
-   * Gets the private key to use in unwrapping this secret key
-   * @return public key or {@code null} if none has been set
+   * Gets the key to use in unwrapping this secret key.
+   * @return key or {@code null} if none has been set
    */
-  PrivateKey getPrivateKey();
+  Key getKey();
   
   /**
-   * Sets the private key to use in unwrapping this secret key
-   * @param privateKey the private key to set
+   * Sets the key to use in unwrapping this secret key.
+   * @param key the key to set
    */
-  void setPrivateKey(PrivateKey privateKey);
+  void setKey(Key key);
   
   /**
    * Gets the content of this secret key in a suitable string encoding

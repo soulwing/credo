@@ -44,6 +44,7 @@ import org.soulwing.credo.service.crypto.PKCS8EncryptionService;
 import org.soulwing.credo.service.crypto.PasswordEncryptionService;
 import org.soulwing.credo.service.crypto.PublicKeyWrapper;
 import org.soulwing.credo.service.crypto.SecretKeyEncryptionService;
+import org.soulwing.credo.service.crypto.WrappedWith;
 
 /**
  * A concrete {@link UserProfileService} implementation.
@@ -80,7 +81,7 @@ public class ConcreteUserProfileService
   @Inject
   protected PKCS8EncryptionService privateKeyEncryptionService;
   
-  @Inject
+  @Inject @WrappedWith(WrappedWith.Type.RSA)
   protected SecretKeyEncryptionService secretKeyEncryptionService;
   
   @Inject

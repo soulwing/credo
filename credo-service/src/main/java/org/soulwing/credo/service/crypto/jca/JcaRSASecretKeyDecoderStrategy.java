@@ -1,5 +1,5 @@
 /*
- * File created on Mar 3, 2014 
+ * File created on Mar 27, 2014 
  *
  * Copyright (c) 2014 Virginia Polytechnic Institute and State University
  *
@@ -18,42 +18,40 @@
  */
 package org.soulwing.credo.service.crypto.jca;
 
-import javax.enterprise.context.ApplicationScoped;
-import javax.enterprise.inject.Instance;
+import javax.enterprise.context.Dependent;
 import javax.inject.Inject;
 
-import org.soulwing.credo.service.crypto.SecretKeyDecoder;
+import org.apache.commons.lang.Validate;
 import org.soulwing.credo.service.crypto.SecretKeyWrapper;
-import org.soulwing.credo.service.pem.PemObjectFactory;
+import org.soulwing.credo.service.pem.PemHeaderWrapper;
+import org.soulwing.credo.service.pem.PemObjectBuilderFactory;
 import org.soulwing.credo.service.pem.PemObjectWrapper;
 
 /**
- * A {@link SecretKeyDecoder} that decodes an PEM-encoded secret key.
+ * A {@linK JcaSecretKeyDecoderStrategy} that decodes RSA-encrypted secret
+ * keys.
  *
  * @author Carl Harris
  */
-@ApplicationScoped
-public class JcaSecretKeyDecoder implements SecretKeyDecoder {
+@Dependent
+public class JcaRSASecretKeyDecoderStrategy
+    implements JcaSecretKeyDecoderStrategy {
 
   @Inject
-  protected PemObjectFactory objectFactory;
-  
-  @Inject
-  protected Instance<JcaSecretKeyDecoderStrategy> strategies;
+  protected PemObjectBuilderFactory objectBuilderFactory;
   
   /**
    * {@inheritDoc}
    */
   @Override
-  public SecretKeyWrapper decode(String encoded) {
-    PemObjectWrapper object = objectFactory.newPemObject(encoded);
-    for (JcaSecretKeyDecoderStrategy strategy : strategies) {
-      SecretKeyWrapper secretKey = strategy.decode(object);
-      if (secretKey != null) {
-        return secretKey;
-      }
-    }
-    throw new IllegalArgumentException("cannot decode the given object");
+  public SecretKeyWrapper decode(PemObjectWrapper object) {
+    PemHeaderWrapper header = object.getHeader("DEK-Info");
+    Validate.notNull(header, "no DEK-Info header");
+    String transform = header.getStringValue();
+    if (!transform.startsWith("RSA/")) return null;
+    byte[] cipherText = object.getContent();
+    return new JcaRSAEncryptedSecretKeyWrapper(transform, cipherText, 
+        objectBuilderFactory);
   }
 
 }

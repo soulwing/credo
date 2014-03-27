@@ -18,7 +18,7 @@
  */
 package org.soulwing.credo.service.crypto.jca;
 
-import java.security.PrivateKey;
+import java.security.Key;
 
 import javax.crypto.SecretKey;
 
@@ -50,7 +50,7 @@ public class JcaSecretKeyWrapper implements SecretKeyWrapper {
    * {@inheritDoc}
    */
   @Override
-  public boolean isPrivateKeyRequired() {
+  public boolean isEncrypted() {
     return false;
   }
 
@@ -58,7 +58,7 @@ public class JcaSecretKeyWrapper implements SecretKeyWrapper {
    * {@inheritDoc}
    */
   @Override
-  public PrivateKey getPrivateKey() {
+  public Key getKey() {
     throw new UnsupportedOperationException();
   }
 
@@ -66,7 +66,7 @@ public class JcaSecretKeyWrapper implements SecretKeyWrapper {
    * {@inheritDoc}
    */
   @Override
-  public void setPrivateKey(PrivateKey publicKey) {
+  public void setKey(Key publicKey) {
     throw new UnsupportedOperationException();
   }
 

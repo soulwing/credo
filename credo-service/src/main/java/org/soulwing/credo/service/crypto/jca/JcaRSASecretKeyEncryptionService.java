@@ -19,8 +19,8 @@
 package org.soulwing.credo.service.crypto.jca;
 
 import java.security.InvalidKeyException;
+import java.security.Key;
 import java.security.NoSuchAlgorithmException;
-import java.security.PublicKey;
 
 import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
@@ -30,6 +30,8 @@ import javax.inject.Inject;
 
 import org.soulwing.credo.service.crypto.SecretKeyEncryptionService;
 import org.soulwing.credo.service.crypto.SecretKeyWrapper;
+import org.soulwing.credo.service.crypto.WrappedWith;
+import org.soulwing.credo.service.crypto.WrappedWith.Type;
 import org.soulwing.credo.service.pem.PemObjectBuilderFactory;
 
 /**
@@ -38,8 +40,9 @@ import org.soulwing.credo.service.pem.PemObjectBuilderFactory;
  *
  * @author Carl Harris
  */
+@WrappedWith(Type.RSA)
 @ApplicationScoped
-public class JcaSecretKeyEncryptionService
+public class JcaRSASecretKeyEncryptionService
     implements SecretKeyEncryptionService {
 
   private static final String TRANSFORM = "RSA/ECB/OAEPWithSHA256AndMGF1Padding";
@@ -52,12 +55,12 @@ public class JcaSecretKeyEncryptionService
    */
   @Override
   public SecretKeyWrapper encrypt(SecretKeyWrapper secretKey,
-      PublicKey publicKey) {
+      Key key) {
     try {
       Cipher cipher = Cipher.getInstance(TRANSFORM);
-      cipher.init(Cipher.WRAP_MODE, publicKey);
+      cipher.init(Cipher.WRAP_MODE, key);
       byte[] cipherText = cipher.wrap(secretKey.derive());
-      return new JcaEncryptedSecretKeyWrapper(TRANSFORM, cipherText, 
+      return new JcaRSAEncryptedSecretKeyWrapper(TRANSFORM, cipherText, 
           objectBuilderFactory);
     }
     catch (NoSuchAlgorithmException ex) {
