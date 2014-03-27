@@ -4,7 +4,8 @@
 <html xmlns="http://www.w3.org/1999/xhtml"
 	xmlns:f="http://xmlns.jcp.org/jsf/core"
 	xmlns:h="http://xmlns.jcp.org/jsf/html"
-	xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+	xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+	xmlns:credo="http://xmlns.jcp.org/jsf/composite/credo">
 
 <h:body>
 	<ui:composition template="/templates/masterTemplate.xhtml">
@@ -16,19 +17,11 @@
 		  #{messages.applicationName}::#{messages.removeGroupFailedHeading}
 		</ui:define>
 		<ui:define name="content">
-			<h1>#{messages.removeGroupFailedHeading}</h1>
-			<p>
-				<h:outputFormat value="#{message.removeGroupFailedDetail}">
-					<f:param value="#{removeGroupBean.group.name}" />
-				</h:outputFormat>
-				<ui:include src="/templates/messages.xhtml" />
-			</p>
-			<p>
-				<h:outputLink styleClass="btn btn-default btn-xs"
-					value="#{request.contextPath}/groups">
-            &#8592; #{messages.returnToGroups}
-        </h:outputLink>
-			</p>
+		  <credo:failureReview heading="#{messages.removeGroupFailedHeading}"
+        detail="#{messages.removeGroupFailedDetail}"
+        item="#{removeGroupBean.group.name}"
+        returnLabel="#{messages.returnToGroups}"
+        returnLink="#{request.contextPath}/groups"/>
 		</ui:define>
 	</ui:composition>
 </h:body>

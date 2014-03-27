@@ -1,0 +1,36 @@
+<!DOCTYPE html [
+    <!ENTITY nbsp "&#160;"> 
+]>
+<html xmlns="http://www.w3.org/1999/xhtml"
+  xmlns:f="http://xmlns.jcp.org/jsf/core"
+  xmlns:h="http://xmlns.jcp.org/jsf/html"
+  xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+  xmlns:cc="http://xmlns.jcp.org/jsf/composite"
+  xmlns:credo="http://xmlns.jcp.org/jsf/composite/credo">
+
+<h:body>
+  <cc:interface>
+    <cc:attribute name="heading" type="java.lang.String"/>
+    <cc:attribute name="detail" type="java.lang.String"/>
+    <cc:attribute name="returnLabel" type="java.lang.String"/>
+    <cc:attribute name="returnLink" type="java.lang.String"/>
+  </cc:interface>
+  <cc:implementation>
+    <credo:formPanel title="#{cc.attrs.heading}">
+      <p>
+        <h:outputFormat escape="false" value="#{cc.attrs.detail}">
+          <f:param value="#{cc.attrs.item}" />
+        </h:outputFormat>
+        <ui:include src="/templates/messages.xhtml" />
+      </p>
+      <p>
+        <h:outputLink styleClass="btn btn-default btn-xs"
+          value="#{cc.attrs.returnLink}">
+            &#8592; #{cc.attrs.returnLabel}
+        </h:outputLink>
+      </p>
+    </credo:formPanel>
+  </cc:implementation>
+</h:body>
+
+</html>

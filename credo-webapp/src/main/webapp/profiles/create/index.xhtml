@@ -4,7 +4,8 @@
 <html xmlns="http://www.w3.org/1999/xhtml"
 	xmlns:f="http://xmlns.jcp.org/jsf/core"
 	xmlns:h="http://xmlns.jcp.org/jsf/html"
-	xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+	xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+	xmlns:credo="http://xmlns.jcp.org/jsf/composite/credo">
 
 <h:body>
 	<ui:composition template="/templates/masterTemplate.xhtml">
@@ -14,19 +15,18 @@
 		<ui:define name="navbarLinks"/>
 		<ui:define name="navbarLogin"/>
 		<ui:define name="content">
-		  <div class="col-md-8">
-	      <h1>#{messages.createUserProfileSubtitle}</h1>
-	      <p>#{messages.createUserProfileDetail}</p>
-			  <h:form prependId="false" styleClass="form-horizontal">		 
+		  <credo:formPanel title="#{messages.createUserProfileSubtitle}">
+        <p>#{messages.createUserProfileDetail}</p>
+        <h:form prependId="false" styleClass="form-horizontal">    
           <ui:include src="/templates/messages.xhtml"/>
-	  		  <div class="form-group">
-	  		    <h:outputLabel styleClass="col-md-4 control-label">
-	  		      #{messages.userLoginNameLabel}</h:outputLabel>
-	  		    <p id="userLoginName" class="form-control-static col-md-4" 
+          <div class="form-group">
+            <h:outputLabel styleClass="col-md-4 control-label">
+              #{messages.userLoginNameLabel}</h:outputLabel>
+            <p id="userLoginName" class="form-control-static col-md-4" 
               title="#{messages.userLoginNameTip}">
               #{createUserProfileBean.loginName}
             </p>
-	  		  </div>
+          </div>
           <div class="form-group">
             <h:outputLabel styleClass="col-md-4 control-label" 
               for="userFullName">#{messages.userFullNameLabel}</h:outputLabel>
@@ -44,8 +44,8 @@
             <h:outputLabel styleClass="col-md-4 control-label" 
               for="password">#{messages.passwordLabel}</h:outputLabel>
             <div class="col-md-4" id="pw-container">
-	            <h:inputSecret id="password" styleClass="form-control" 
-	              redisplay="true"
+              <h:inputSecret id="password" styleClass="form-control" 
+                redisplay="true"
                 title="#{messages.passwordTip}" 
                 value="#{createUserProfileBean.password}"
                 converter="org.soulwing.credo.converters.EmptyPassword">
@@ -53,7 +53,6 @@
               <span class="form-control-feedback glyphicon glyphicon-warning-sign"
                   title="The selected password is weak."></span>
               <div id="pw-progress"></div>
-              <div id="pw-verdict">&nbsp;</div>              
             </div>
           </div>
           <div class="form-group has-feedback">
@@ -70,20 +69,20 @@
               <span class="form-control-feedback"></span>
             </div>
           </div>
-	  		  <div class="form-group">
-	          <div class="col-md-8 col-md-push-4">      
+          <div class="form-group">
+            <div class="col-md-8 col-md-push-4">      
               <h:commandLink styleClass="btn btn-default" 
                 value="#{messages.cancelLabel}" 
                 action="#{createUserProfileBean.cancel}" 
                 immediate="true"/>
               &nbsp;
-	            <h:commandButton styleClass="btn btn-primary" 
-	              value="#{messages.saveLabel}" 
-	              action="#{createUserProfileBean.createProfile}" />
-	          </div>
-	        </div>
-	  		</h:form>
-  		</div>
+              <h:commandButton styleClass="btn btn-primary" 
+                value="#{messages.saveLabel}" 
+                action="#{createUserProfileBean.createProfile}" />
+            </div>
+          </div>
+        </h:form>
+		  </credo:formPanel>
 		</ui:define>
 		<ui:define name="scripts">
       <script src="#{request.contextPath}/resources/js/zxcvbn-async.js" 

@@ -97,6 +97,14 @@ body {
 	margin-top: 30px;
 }
 
+.container .panel {
+	margin-top: 30px;
+}
+
+.container .panel form {
+	margin-top: 20px;
+}
+
 .hidden {
 	display: none;
 }

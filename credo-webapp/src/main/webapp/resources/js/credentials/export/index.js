@@ -1,9 +1,9 @@
 $(document).ready(function() { 
 	"use strict";
-	validatePassword($('#exportPassphrase'), $('#exportPassphraseAgain'));
+	validatePassword($("[id$=':exportPassphrase']"), $("[id$=':exportPassphraseAgain']"));
 	
 	$("#btn-generate").on("click", function(event) { 
-		var target = $("#btn-generate-command");
+		var target = $("[id$=':btn-generate-command']");
 		var wrapper = function(event) {
 			target.trigger(event);
 		};
@@ -13,7 +13,7 @@ $(document).ready(function() {
 	
 	var $revealButton = $("#btn-reveal");
 	$revealButton.on("click", function() { 
-		var $input = $("#exportPassphraseAgain");
+		var $input = $("[id$=':exportPassphraseAgain']");
 		var $icon = $("#btn-reveal i");
 		if ($input.attr("type") == "password") {
 			$input.attr("type", "text");

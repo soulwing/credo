@@ -4,7 +4,8 @@
 <html xmlns="http://www.w3.org/1999/xhtml"
 	xmlns:f="http://xmlns.jcp.org/jsf/core"
 	xmlns:h="http://xmlns.jcp.org/jsf/html"
-	xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+	xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+	xmlns:credo="http://xmlns.jcp.org/jsf/composite/credo">
 
 <h:body>
 	<ui:composition template="/templates/masterTemplate.xhtml">
@@ -12,19 +13,18 @@
 		  #{messages.applicationName}::#{messages.createRequestSuccessHeading}
 		</ui:define>
 		<ui:define name="content">
-      <h1>#{messages.createRequestSuccessHeading}</h1>
-      <p>
-       <h:outputText escape="false" 
-         value="#{messages.createRequestSuccessDetail}"/>
-      </p>
-      <div class="col-md-12">
+		  <credo:formPanel title="#{messages.createRequestSuccessHeading}">
+	      <p>
+ 	        <h:outputText escape="false" 
+	          value="#{messages.createRequestSuccessDetail}"/>
+	      </p>
         <div class="row form-group">
           <label class="control-label col-md-3">
             #{messages.credentialNameLabel}
           </label>
           <p id="name" class="form-control-static col-md-9"  
-	            title="#{messages.credentialNameTip}">
-	          #{createCredentialRequestBean.editor.name}
+              title="#{messages.credentialNameTip}">
+            #{createCredentialRequestBean.editor.name}
           </p>
         </div>
         <div class="row form-group">
@@ -32,18 +32,18 @@
             #{messages.credentialSubjectLabel}
           </label>
           <p id="subject" class="form-control-static col-md-9" 
-	          title="#{messages.credentialSubjectTip}">
-	          #{createCredentialRequestBean.editor.subject}
-	        </p>
+            title="#{messages.credentialSubjectTip}">
+            #{createCredentialRequestBean.editor.subject}
+          </p>
         </div>
         <div class="row form-group">
           <label class="control-label col-md-3">
             Certification Request:
           </label>
           <div class="col-md-7">
-	          <textarea id="certificationRequest" 
-	            readonly="readonly" rows="16" class="form-control pem-text" 
-	            title="#{messages.requestContentTip}">#{createCredentialRequestBean.certificationRequest}</textarea>
+            <textarea id="certificationRequest" 
+              readonly="readonly" rows="16" class="form-control pem-text" 
+              title="#{messages.requestContentTip}">#{createCredentialRequestBean.certificationRequest}</textarea>
           </div>
           <h:form class="col-md-2">
             <h:commandLink 
@@ -52,14 +52,14 @@
               value="#{messages.downloadButtonLabel}"/>
           </h:form>
         </div>
-	      <p>
-	        <h:outputLink id="returnToRequests" 
-	          styleClass="btn btn-default btn-xs"
-	          value="#{request.contextPath}/requests">
-	            &#8592; #{messages.returnToRequests}
-	        </h:outputLink>
-	      </p>
-      </div>
+        <p>
+          <h:outputLink id="returnToRequests" 
+            styleClass="btn btn-default btn-xs"
+            value="#{request.contextPath}/requests">
+              &#8592; #{messages.returnToRequests}
+          </h:outputLink>
+        </p>
+		  </credo:formPanel>
 		</ui:define>
 		<ui:define name="scripts">
 		  <h:outputScript library="js" name="requests/create/success.js"/>

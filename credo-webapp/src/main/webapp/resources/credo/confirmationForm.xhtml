@@ -5,7 +5,8 @@
 	xmlns:f="http://xmlns.jcp.org/jsf/core"
 	xmlns:h="http://xmlns.jcp.org/jsf/html"
 	xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
-	xmlns:cc="http://xmlns.jcp.org/jsf/composite">
+	xmlns:cc="http://xmlns.jcp.org/jsf/composite"
+	xmlns:credo="http://xmlns.jcp.org/jsf/composite/credo">
 
 <h:body>
 	<cc:interface>
@@ -22,34 +23,33 @@
 	</cc:interface>
 
 	<cc:implementation>
-		<div class="col-md-12">
-			<h1>#{cc.attrs.heading}</h1>
-			<p>
-				<h:outputFormat escape="false" value="#{cc.attrs.detail}">
-				  <f:param value="#{cc.attrs.item}"/>
-				</h:outputFormat>
-			</p>
-			<h:form styleClass="form-horizontal">
-				<ui:include src="/templates/messages.xhtml" />
-				<div class="form-group">
-				  <h:outputFormat 
-				    styleClass="form-control-static col-md-12" 
-				    escape="false" value="#{cc.attrs.prompt}">
-				    <f:param value="#{cc.attrs.item}"/>
-				  </h:outputFormat>
+	  <credo:formPanel title="#{cc.attrs.heading}">
+      <p>
+        <h:outputFormat escape="false" value="#{cc.attrs.detail}">
+          <f:param value="#{cc.attrs.item}"/>
+        </h:outputFormat>
+      </p>
+      <h:form styleClass="form-horizontal">
+        <ui:include src="/templates/messages.xhtml" />
+        <div class="form-group">
+          <h:outputFormat 
+            styleClass="form-control-static col-md-12" 
+            escape="false" value="#{cc.attrs.prompt}">
+            <f:param value="#{cc.attrs.item}"/>
+          </h:outputFormat>
         </div>
-				<div class="form-group">
-					<div class="col-md-3">
-						<h:commandLink styleClass="btn btn-default"
-							value="#{cc.attrs.submitLabel}" action="#{cc.attrs.submitAction}" />
+        <div class="form-group">
+          <div class="col-md-3">
+            <h:commandLink styleClass="btn btn-default"
+              value="#{cc.attrs.submitLabel}" action="#{cc.attrs.submitAction}" />
             &nbsp;
             <h:commandButton styleClass="btn btn-primary"
               value="#{cc.attrs.cancelLabel}" action="#{cc.attrs.cancelAction}"
               immediate="true" />
-					</div>
-				</div>
-			</h:form>
-		</div>
+          </div>
+        </div>
+      </h:form>
+	  </credo:formPanel>
 	</cc:implementation>
 </h:body>
 
