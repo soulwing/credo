@@ -99,7 +99,7 @@ public class FileUploadEditor implements Serializable {
    * @throws IOException
    */
   public List<FileContentModel> fileList() throws IOException {
-    if (files == null) {
+    if (files == null || files.isEmpty()) {
       files = new ArrayList<FileContentModel>();
       if (file0.isLoadable()) {
         file0.load();
