@@ -21,11 +21,14 @@ package org.soulwing.credo.service.protect;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.sameInstance;
+import static org.jmock.Expectations.onConsecutiveCalls;
 import static org.jmock.Expectations.returnValue;
 import static org.jmock.Expectations.throwException;
 
 import java.security.PrivateKey;
 import java.security.PublicKey;
+
+import javax.crypto.SecretKey;
 
 import org.jmock.Expectations;
 import org.jmock.api.Action;
@@ -59,6 +62,8 @@ import org.soulwing.credo.service.crypto.SecretKeyWrapper;
  * @author Carl Harris
  */
 public class ConcreteGroupProtectionServiceTest {
+
+  private static final String ENCODED_SECRET_KEY = new String();
 
   private static final Password PASSWORD = new Password(new char[0]);
   
@@ -94,6 +99,9 @@ public class ConcreteGroupProtectionServiceTest {
   private UserGroup group;
   
   @Mock
+  private UserGroup owner;
+  
+  @Mock
   private UserProfile profile;
   
   @Mock
@@ -117,6 +125,8 @@ public class ConcreteGroupProtectionServiceTest {
   @Mock
   private PrivateKey privateKey;
   
+  @Mock
+  private SecretKey secretKey;
 
   private ConcreteGroupProtectionService service = 
       new ConcreteGroupProtectionService();
@@ -126,7 +136,7 @@ public class ConcreteGroupProtectionServiceTest {
     service.publicKeyDecoder = publicKeyDecoder;
     service.pkcs8Decoder = pkcs8Decoder;
     service.secretKeyDecoder = secretKeyDecoder;
-    service.secretKeyEncryptionService = secretKeyEncryptionService;
+    service.rsaSecretKeyEncryptionService = secretKeyEncryptionService;
     service.memberBuilderFactory = memberBuilderFactory;
     service.memberRepository = memberRepository;
     service.userContextService = userContextService;
@@ -141,23 +151,38 @@ public class ConcreteGroupProtectionServiceTest {
   }
   
   @Test
-  public void testUnprotect() throws Exception {
-    context.checking(memberExpectationsOnUnprotect(returnValue(member)));
+  public void testUnprotectSelfOwnedGroup() throws Exception {
+    context.checking(memberExpectationsOnUnprotect(group, returnValue(member)));
+    context.checking(groupExpectationsOnUnprotect(returnValue(null)));
+    context.checking(privateKeyExpectations(returnValue(privateKey)));
+    context.checking(secretKeyExpectationsOnUnprotect());
+    assertThat(service.unprotect(group, PASSWORD), 
+        is(sameInstance(secretKeyWrapper)));
+  }
+
+  @Test
+  public void testUnprotectGroupOwnedByOtherGroup() throws Exception {
+    context.checking(memberExpectationsOnUnprotect(owner,
+        onConsecutiveCalls(returnValue(null), returnValue(member))));
+    context.checking(groupExpectationsOnUnprotect(returnValue(owner)));
     context.checking(privateKeyExpectations(returnValue(privateKey)));
     context.checking(secretKeyExpectationsOnUnprotect());
     assertThat(service.unprotect(group, PASSWORD), 
         is(sameInstance(secretKeyWrapper)));
   }
   
+
   @Test(expected = GroupAccessException.class)
   public void testUnprotectWhenUserNotMember() throws Exception {
-    context.checking(memberExpectationsOnUnprotect(returnValue(null)));
+    context.checking(memberExpectationsOnUnprotect(group, returnValue(null)));
+    context.checking(groupExpectationsOnUnprotect(returnValue(null)));
     service.unprotect(group, PASSWORD);
   }
   
   @Test(expected = UserAccessException.class)
   public void testUnprotectWhenPasswordIncorrect() throws Exception {
-    context.checking(memberExpectationsOnUnprotect(returnValue(member)));
+    context.checking(memberExpectationsOnUnprotect(group, returnValue(member)));
+    context.checking(groupExpectationsOnUnprotect(returnValue(null)));
     context.checking(privateKeyExpectations(
         throwException(new IncorrectPassphraseException())));
     service.unprotect(group, PASSWORD);
@@ -165,7 +190,7 @@ public class ConcreteGroupProtectionServiceTest {
   
 
   private Expectations publicKeyExpectations() {
-    final String encodedPublicKey = new String();
+    final String encodedPublicKey = ENCODED_SECRET_KEY;
     return new Expectations() { { 
       oneOf(profile).getPublicKey();
       will(returnValue(encodedPublicKey));
@@ -185,7 +210,7 @@ public class ConcreteGroupProtectionServiceTest {
   }
   
   private Expectations memberExpectationsOnProtect() {
-    final String encodedSecretKey = new String();
+    final String encodedSecretKey = ENCODED_SECRET_KEY;
     return new Expectations() { { 
       oneOf(secretKeyWrapper).getContent();
       will(returnValue(encodedSecretKey));
@@ -204,7 +229,7 @@ public class ConcreteGroupProtectionServiceTest {
   }
    
   private Expectations privateKeyExpectations(final Action outcome) {
-    final String encodedPrivateKey = new String();
+    final String encodedPrivateKey = ENCODED_SECRET_KEY;
     return new Expectations() { {
       oneOf(member).getUser();
       will(returnValue(profile));
@@ -219,28 +244,46 @@ public class ConcreteGroupProtectionServiceTest {
   }
   
   private Expectations secretKeyExpectationsOnUnprotect() {
-    final String encodedSecretKey = new String();
     return new Expectations() { { 
       oneOf(member).getSecretKey();
-      will(returnValue(encodedSecretKey));
-      oneOf(secretKeyDecoder).decode(with(same(encodedSecretKey)));
+      will(returnValue(ENCODED_SECRET_KEY));
+      atLeast(1).of(secretKeyDecoder).decode(with(same(ENCODED_SECRET_KEY)));
       will(returnValue(secretKeyWrapper));
-      oneOf(secretKeyWrapper).setPrivateKey(with(same(privateKey)));
-      oneOf(secretKeyWrapper).deriveWrapper();
+      oneOf(secretKeyWrapper).setKey(with(same(privateKey)));
+      allowing(secretKeyWrapper).setKey(with(same(secretKey)));
+      atLeast(1).of(secretKeyWrapper).deriveWrapper();
       will(returnValue(secretKeyWrapper));
+      allowing(secretKeyWrapper).derive();
+      will(returnValue(secretKey));
+      allowing(group).getSecretKey();
+      will(returnValue(ENCODED_SECRET_KEY));
     } };
   }
   
-  private Expectations memberExpectationsOnUnprotect(final Action outcome) {
+  private Expectations memberExpectationsOnUnprotect(
+      final UserGroup group, final Action outcome) {
     return new Expectations() { {
-      oneOf(group).getName();
-      will(returnValue(GROUP_NAME));
-      oneOf(userContextService).getLoginName();
+      allowing(member).getGroup();
+      will(returnValue(group));
+      allowing(userContextService).getLoginName();
       will(returnValue(LOGIN_NAME));
-      oneOf(memberRepository).findByGroupNameAndLoginName(
+      allowing(memberRepository).findByGroupNameAndLoginName(
           with(same(GROUP_NAME)), with(same(LOGIN_NAME)));
       will(outcome);
     } };
   }
 
+  private Expectations groupExpectationsOnUnprotect(final Action outcome) {
+    return new Expectations() { {
+      allowing(group).getName();
+      will(returnValue(GROUP_NAME));
+      allowing(group).getOwner();
+      will(outcome);
+      allowing(owner).getName();
+      will(returnValue(GROUP_NAME));
+      allowing(owner).getOwner();
+      will(returnValue(null));
+    } };
+  }
+    
 }

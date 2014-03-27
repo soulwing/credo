@@ -34,7 +34,6 @@ import org.soulwing.credo.service.GroupAccessException;
 import org.soulwing.credo.service.UserAccessException;
 import org.soulwing.credo.service.UserContextService;
 import org.soulwing.credo.service.crypto.Encoded;
-import org.soulwing.credo.service.crypto.Encoded.Type;
 import org.soulwing.credo.service.crypto.IncorrectPassphraseException;
 import org.soulwing.credo.service.crypto.PrivateKeyDecoder;
 import org.soulwing.credo.service.crypto.PrivateKeyWrapper;
@@ -42,6 +41,7 @@ import org.soulwing.credo.service.crypto.PublicKeyDecoder;
 import org.soulwing.credo.service.crypto.SecretKeyDecoder;
 import org.soulwing.credo.service.crypto.SecretKeyEncryptionService;
 import org.soulwing.credo.service.crypto.SecretKeyWrapper;
+import org.soulwing.credo.service.crypto.WrappedWith;
 
 /**
  * A concrete {@link GroupProtectionService} implementation.
@@ -55,14 +55,14 @@ public class ConcreteGroupProtectionService
   @Inject
   protected PublicKeyDecoder publicKeyDecoder;
   
-  @Inject @Encoded(Type.PKCS8)
+  @Inject @Encoded(Encoded.Type.PKCS8)
   protected PrivateKeyDecoder pkcs8Decoder;
   
   @Inject
   protected SecretKeyDecoder secretKeyDecoder;
 
-  @Inject
-  protected SecretKeyEncryptionService secretKeyEncryptionService;
+  @Inject @WrappedWith(WrappedWith.Type.RSA)
+  protected SecretKeyEncryptionService rsaSecretKeyEncryptionService;
   
   @Inject
   protected UserGroupMemberBuilderFactory memberBuilderFactory;
@@ -82,7 +82,7 @@ public class ConcreteGroupProtectionService
     PublicKey publicKey = publicKeyDecoder.decode(profile.getPublicKey())
         .derive();
     SecretKeyWrapper encryptedSecretKey = 
-        secretKeyEncryptionService.encrypt(secretKey, publicKey);
+        rsaSecretKeyEncryptionService.encrypt(secretKey, publicKey);
     UserGroupMember member = memberBuilderFactory.newBuilder()
         .setGroup(group)
         .setUser(profile)
@@ -97,28 +97,38 @@ public class ConcreteGroupProtectionService
   @Override
   public SecretKeyWrapper unprotect(UserGroup group, Password password) 
       throws GroupAccessException, UserAccessException {
-    UserGroupMember member = findGroupMember(group.getName(), 
+    UserGroupMember member = findGroupMember(group, 
         userContextService.getLoginName());
-    return unwrapSecretKey(member, unwrapPrivateKey(member, password));
+    if (member == null) {
+      throw new GroupAccessException(group.getName());
+    }
+    return unwrapSecretKey(group, member, unwrapPrivateKey(member, password));        
   }
 
   /**
    * Finds a group member entity for a given group and user.
-   * @param groupName subject group name 
+   * <p>
+   * The group and owner ancestry are searched to find a member that matches
+   * the given login name.
+   * 
+   * @param group the group to search 
    * @param loginName subject user login name
    * @return group member entity
-   * @throws GroupAccessException if the user is not a member of the group
+   * @throws GroupAccessException if the user is not a member of the group or
+   *    any of its owner ancestors
    */
-  private UserGroupMember findGroupMember(String groupName, 
-      String loginName) throws GroupAccessException {
+  private UserGroupMember findGroupMember(UserGroup group,
+      String loginName) {
     UserGroupMember groupMember = memberRepository
-        .findByGroupNameAndLoginName(groupName, loginName);
-    if (groupMember == null) {
-      throw new GroupAccessException(groupName);
+        .findByGroupNameAndLoginName(group.getName(), loginName);
+    if (groupMember == null && group.getOwner() != null) {
+      return findGroupMember(group.getOwner(), loginName);
     }
-    return groupMember;
+    return groupMember;   
   }
-
+  
+  
+  
   /**
    * Unwraps (decrypts) the private key of a group member.
    * @param member the subject group member
@@ -145,18 +155,25 @@ public class ConcreteGroupProtectionService
   }
 
   /**
-   * Unwraps (decrypts) the secret key associated with a given group member.
-   * @param member the subject group member
-   * @param privateKey (unwrapped) private key of the group member 
+   * Unwraps (decrypts) the secret key for a given group.
+   * @param group the subject group
+   * @param member a member of group or one of its owner ancestors
+   * @param privateKey (unwrapped) private key of {@code member} 
    * @return unwrapped secret key
    */
-  private SecretKeyWrapper unwrapSecretKey(UserGroupMember member,
-      PrivateKey privateKey) {
+  private SecretKeyWrapper unwrapSecretKey(UserGroup group,
+      UserGroupMember member, PrivateKey privateKey) {
     
-    SecretKeyWrapper encryptedSecretKey = secretKeyDecoder.decode(
-        member.getSecretKey());     
-    
-    encryptedSecretKey.setPrivateKey(privateKey);
+    SecretKeyWrapper encryptedSecretKey = null;
+    if (group.equals(member.getGroup())) {
+      encryptedSecretKey = secretKeyDecoder.decode(member.getSecretKey());      
+      encryptedSecretKey.setKey(privateKey);
+    }
+    else {
+      encryptedSecretKey = secretKeyDecoder.decode(group.getSecretKey());           
+      encryptedSecretKey.setKey(
+          unwrapSecretKey(group.getOwner(), member, privateKey).derive());
+    }
     
     return encryptedSecretKey.deriveWrapper();
   }
