@@ -8,19 +8,19 @@
 	<ui:composition>
 			<ul class="nav navbar-nav">
 				<li>
-				  <h:commandLink action="credentials">#{messages.navbarCredentialsLabel}</h:commandLink>
+				  <h:outputLink value="#{request.contextPath}/credentials">#{messages.navbarCredentialsLabel}</h:outputLink>
 				</li>
 				<li>
-				  <h:commandLink action="requests">#{messages.navbarRequestsLabel}</h:commandLink>
+          <h:outputLink value="#{request.contextPath}/requests">#{messages.navbarRequestsLabel}</h:outputLink>
 				</li>
         <li>
-          <h:commandLink action="groups">#{messages.navbarGroupsLabel}</h:commandLink>
+          <h:outputLink value="#{request.contextPath}/groups">#{messages.navbarGroupsLabel}</h:outputLink>
         </li>
         <li>
-          <h:commandLink action="reports">#{messages.navbarReportsLabel}</h:commandLink>
+          <h:outputLink value="#{request.contextPath}/reports">#{messages.navbarReportsLabel}</h:outputLink>
         </li>
         <li>
-          <h:commandLink action="about">#{messages.navbarAboutLabel}</h:commandLink>
+          <h:outputLink value="#{request.contextPath}/about">#{messages.navbarAboutLabel}</h:outputLink>
         </li>
 			</ul>
 	</ui:composition>
