@@ -22,6 +22,8 @@ import java.util.Date;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.Lob;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -44,6 +46,13 @@ public class UserGroupEntity extends AbstractEntity implements UserGroup {
   
   @Column(name = "description")
   private String description;
+  
+  @ManyToOne(optional = true)
+  private UserGroupEntity owner;
+  
+  @Lob
+  @Column(name = "secret_key")
+  private String secretKey;
   
   @Temporal(TemporalType.TIMESTAMP)
   @Column(name = "date_created")
@@ -104,6 +113,42 @@ public class UserGroupEntity extends AbstractEntity implements UserGroup {
   @Override
   public void setDescription(String description) {
     this.description = description;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public UserGroup getOwner() {
+    return owner;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public void setOwner(UserGroup owner) {
+    if (owner != null && !(owner instanceof UserGroupEntity)) {
+      throw new IllegalArgumentException("unsupported group type: "
+          + owner.getClass().getName());
+    }
+    this.owner = (UserGroupEntity) owner;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public String getSecretKey() {
+    return secretKey;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public void setSecretKey(String secretKey) {
+    this.secretKey = secretKey;
   }
 
   /**

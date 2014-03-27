@@ -23,7 +23,7 @@ package org.soulwing.credo;
  *
  * @author Carl Harris
  */
-public interface UserGroup {
+public interface UserGroup extends Owned {
 
   /**
    * Name of the "self" group.
@@ -60,6 +60,30 @@ public interface UserGroup {
    * @param description the description to set
    */
   void setDescription(String description);
+
+  /**
+   * Gets the group that owns this group.
+   * @return group or {@code null} if this group doesn't have an owner
+   */
+  UserGroup getOwner();
+  
+  /**
+   * Sets the group that owns this group.
+   * @param owner the owner to set
+   */
+  void setOwner(UserGroup owner);
+  
+  /**
+   * Gets the group owner's copy of the group secret key.
+   * @return secret key or {@code null} if this group does not have an owner
+   */
+  String getSecretKey();
+  
+  /**
+   * Sets the group owner's copy of the group secret key.
+   * @param secretKey the secret key to set
+   */
+  void setSecretKey(String secretKey);
 
 }
 
