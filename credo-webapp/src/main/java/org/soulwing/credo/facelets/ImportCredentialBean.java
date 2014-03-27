@@ -20,20 +20,16 @@ package org.soulwing.credo.facelets;
 
 import java.io.IOException;
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
 
 import javax.enterprise.context.Conversation;
 import javax.enterprise.context.ConversationScoped;
 import javax.faces.context.FacesContext;
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.servlet.http.Part;
 
 import org.soulwing.credo.Credential;
 import org.soulwing.credo.Password;
 import org.soulwing.credo.service.Errors;
-import org.soulwing.credo.service.FileContentModel;
 import org.soulwing.credo.service.GroupAccessException;
 import org.soulwing.credo.service.ImportDetails;
 import org.soulwing.credo.service.ImportException;
@@ -72,10 +68,6 @@ public class ImportCredentialBean implements Serializable {
 
   private static final long serialVersionUID = -5565484780336702769L;
 
-  private final PartContent file0 = new PartContent();
-  private final PartContent file1 = new PartContent();
-  private final PartContent file2 = new PartContent();
-
   @Inject
   protected Conversation conversation;
 
@@ -89,61 +81,24 @@ public class ImportCredentialBean implements Serializable {
   protected FacesContext facesContext;
   
   @Inject
+  protected FileUploadEditor fileUploadEditor;
+  
+  @Inject
   protected DelegatingCredentialEditor<ImportDetails> editor;
 
   @Inject
   protected PasswordFormEditor passwordEditor;
 
-  private List<FileContentModel> files;
   private Password passphrase;
   private Credential credential;
 
-  /**
-   * Gets the {@code file0} property.
-   * @return
-   */
-  public Part getFile0() {
-    return file0.getPart();
-  }
 
   /**
-   * Sets the {@code file0} property.
-   * @param file0
+   * Gets the file upload editor component.
+   * @return editor
    */
-  public void setFile0(Part part) {
-    file0.setPart(part);
-  }
-
-  /**
-   * Gets the {@code file1} property.
-   * @return
-   */
-  public Part getFile1() {
-    return file1.getPart();
-  }
-
-  /**
-   * Sets the {@code file1} property.
-   * @param file1
-   */
-  public void setFile1(Part part) {
-    file1.setPart(part);
-  }
-
-  /**
-   * Gets the {@code file2} property.
-   * @return
-   */
-  public Part getFile2() {
-    return file2.getPart();
-  }
-
-  /**
-   * Sets the {@code file2} property.
-   * @param file2
-   */
-  public void setFile2(Part part) {
-    file2.setPart(part);
+  public FileUploadEditor getFileUploadEditor() {
+    return fileUploadEditor;
   }
 
   /**
@@ -227,8 +182,9 @@ public class ImportCredentialBean implements Serializable {
       conversation.begin();
     }
     try {
-      editor.setDelegate(
-          importService.prepareImport(fileList(), passphrase, errors));
+      ImportDetails details = importService.prepareImport(
+          fileUploadEditor.fileList(), passphrase, errors);
+      editor.setDelegate(details);
       return DETAILS_OUTCOME_ID;
     }
     catch (PassphraseException ex) {
@@ -300,30 +256,6 @@ public class ImportCredentialBean implements Serializable {
       conversation.end();
     }
     return CANCEL_OUTCOME_ID;
-  }
-
-  /**
-   * Produces a list containing the files that were uploaded by the user.
-   * @return list of file content models
-   * @throws IOException
-   */
-  private List<FileContentModel> fileList() throws IOException {
-    if (files == null) {
-      files = new ArrayList<FileContentModel>();
-      if (file0.isLoadable()) {
-        file0.load();
-        files.add(file0);
-      }
-      if (file1.isLoadable()) {
-        file1.load();
-        files.add(file1);
-      }
-      if (file2.isLoadable()) {
-        file2.load();
-        files.add(file2);
-      }
-    }
-    return files;
   }
 
 }

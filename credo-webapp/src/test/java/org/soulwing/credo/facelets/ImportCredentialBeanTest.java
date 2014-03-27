@@ -95,6 +95,7 @@ public class ImportCredentialBeanTest {
     bean.importService = importService;
     bean.facesContext = facesContext;
     bean.passwordEditor = new PasswordFormEditor();
+    bean.fileUploadEditor = new FileUploadEditor();
     bean.editor = new DelegatingCredentialEditor<ImportDetails>();
     bean.setPassphrase(PASSPHRASE);
   }
@@ -110,9 +111,9 @@ public class ImportCredentialBeanTest {
       will(throwException(new ImportException()));
     } });
     
-    bean.setFile0(null);
-    bean.setFile1(null);
-    bean.setFile2(null);
+    bean.getFileUploadEditor().setFile0(null);
+    bean.getFileUploadEditor().setFile1(null);
+    bean.getFileUploadEditor().setFile2(null);
     assertThat(bean.upload(), nullValue());
   }
   
@@ -122,7 +123,7 @@ public class ImportCredentialBeanTest {
     context.checking(conversationExpectations());
     context.checking(prepareImportExpectations(file, returnValue(details)));
     
-    bean.setFile0(file);
+    bean.getFileUploadEditor().setFile0(file);
     assertThat(bean.upload(), 
         is(equalTo(ImportCredentialBean.DETAILS_OUTCOME_ID)));
     assertThat(bean.getDetails(), is(sameInstance(details)));
@@ -135,7 +136,7 @@ public class ImportCredentialBeanTest {
     context.checking(prepareImportExpectations(file, 
         returnValue(details)));
     
-    bean.setFile1(file);
+    bean.getFileUploadEditor().setFile1(file);
     assertThat(bean.upload(), 
         is(equalTo(ImportCredentialBean.DETAILS_OUTCOME_ID)));
     assertThat(bean.getDetails(), is(sameInstance(details)));
@@ -146,7 +147,7 @@ public class ImportCredentialBeanTest {
     final Part file = context.mock(Part.class);
     context.checking(conversationExpectations());
     context.checking(prepareImportExpectations(file, returnValue(details)));
-    bean.setFile2(file);
+    bean.getFileUploadEditor().setFile2(file);
     assertThat(bean.upload(), 
         is(equalTo(ImportCredentialBean.DETAILS_OUTCOME_ID)));
     assertThat(bean.getDetails(), sameInstance(details));
@@ -158,7 +159,7 @@ public class ImportCredentialBeanTest {
     context.checking(conversationExpectations());
     context.checking(prepareImportExpectations(file, 
         throwException(new PassphraseException())));
-    bean.setFile0(file);
+    bean.getFileUploadEditor().setFile0(file);
     assertThat(bean.upload(), 
         is(equalTo(ImportCredentialBean.PASSPHRASE_OUTCOME_ID)));
   }
@@ -177,7 +178,7 @@ public class ImportCredentialBeanTest {
       will(throwException(new ImportException()));
     } });
     
-    bean.setFile0(file);
+    bean.getFileUploadEditor().setFile0(file);
     assertThat(bean.upload(), nullValue());
   }
 
