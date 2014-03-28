@@ -30,6 +30,8 @@ public class Password implements Serializable {
 
   private static final long serialVersionUID = 5140371712391706218L;
   
+  public static final Password EMPTY = new Password(new char[0]);
+  
   private final char[] value;
 
   /**
