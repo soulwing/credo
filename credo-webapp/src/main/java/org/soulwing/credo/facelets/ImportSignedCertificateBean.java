@@ -68,6 +68,8 @@ public class ImportSignedCertificateBean implements Serializable {
   static final String PASSWORD2_OUTCOME_ID = "password2";
   
   static final String CLEANUP_OUTCOME_ID = "cleanup";
+  
+  static final String CLEANUP_FAILURE_OUTCOME_ID = "cleanupFailure";
 
   private static final long serialVersionUID = -5565484780336702769L;
 
@@ -325,7 +327,7 @@ public class ImportSignedCertificateBean implements Serializable {
       return null;
     }
     catch (GroupAccessException ex) {
-      return FAILURE_OUTCOME_ID;
+      return DETAILS_OUTCOME_ID;
     }
   }
 
@@ -350,7 +352,7 @@ public class ImportSignedCertificateBean implements Serializable {
       return SUCCESS_OUTCOME_ID;
     }
     catch (GroupAccessException ex) {
-      return FAILURE_OUTCOME_ID;
+      return CLEANUP_FAILURE_OUTCOME_ID;
     }
   }
   

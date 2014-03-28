@@ -365,7 +365,7 @@ public class ImportSignedCertificateBeanTest {
     bean.setRequest(request);
     bean.setCredential(credential);
     assertThat(bean.save(), 
-        is(equalTo(ImportSignedCertificateBean.FAILURE_OUTCOME_ID)));    
+        is(equalTo(ImportSignedCertificateBean.DETAILS_OUTCOME_ID)));    
   }
 
   @Test
@@ -439,7 +439,7 @@ public class ImportSignedCertificateBeanTest {
 
     bean.setRequest(request);
     assertThat(bean.cleanup(), 
-        is(equalTo(ImportSignedCertificateBean.FAILURE_OUTCOME_ID)));
+        is(equalTo(ImportSignedCertificateBean.CLEANUP_FAILURE_OUTCOME_ID)));
   }
   
 
