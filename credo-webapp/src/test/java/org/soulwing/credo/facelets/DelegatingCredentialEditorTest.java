@@ -22,9 +22,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 
-import javax.faces.component.UIViewRoot;
 import javax.faces.context.FacesContext;
-import javax.faces.context.PartialViewContext;
 import javax.faces.event.ValueChangeEvent;
 
 import org.jmock.Expectations;
@@ -60,12 +58,6 @@ public class DelegatingCredentialEditorTest {
   private FacesContext facesContext;
   
   @Mock
-  private PartialViewContext partialViewContext;
-  
-  @Mock
-  private UIViewRoot viewRoot;
-  
-  @Mock
   private ValueChangeEvent event;
   
   private DelegatingCredentialEditor<CredentialEditor> bean = 
@@ -79,7 +71,6 @@ public class DelegatingCredentialEditorTest {
   
   @Test
   public void testOwnerChangedToBlank() throws Exception {
-    context.checking(resetComponentsExpectations());
     context.checking(new Expectations() { { 
       oneOf(event).getNewValue();
       will(returnValue(""));
@@ -91,7 +82,6 @@ public class DelegatingCredentialEditorTest {
 
   @Test
   public void testOwnerChangedWhenGroupExists() throws Exception {
-    context.checking(resetComponentsExpectations());
     context.checking(new Expectations() { { 
       oneOf(event).getNewValue();
       will(returnValue(GROUP_NAME));
@@ -105,7 +95,6 @@ public class DelegatingCredentialEditorTest {
 
   @Test
   public void testOwnerChangedWhenGroupDoesNotExist() throws Exception {
-    context.checking(resetComponentsExpectations());
     context.checking(new Expectations() { {
       oneOf(event).getNewValue();
       will(returnValue(GROUP_NAME));
@@ -119,7 +108,6 @@ public class DelegatingCredentialEditorTest {
 
   @Test
   public void testOwnerChangedWhenGroupAccessDenied() throws Exception {
-    context.checking(resetComponentsExpectations());
     context.checking(new Expectations() { {       
       oneOf(event).getNewValue();
       will(returnValue(GROUP_NAME));
@@ -129,15 +117,6 @@ public class DelegatingCredentialEditorTest {
     
     bean.ownerChanged(event);
     assertThat(bean.getOwnerStatus(), is(equalTo(OwnerStatus.INACCESSIBLE)));
-  }
-
-  private Expectations resetComponentsExpectations() throws Exception { 
-    return new Expectations() { { 
-      oneOf(facesContext).getPartialViewContext();
-      returnValue(partialViewContext);
-      oneOf(facesContext).getViewRoot();
-      returnValue(viewRoot);
-    } };
   }
 
 }

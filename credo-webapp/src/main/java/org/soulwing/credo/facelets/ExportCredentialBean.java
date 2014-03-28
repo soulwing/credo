@@ -29,6 +29,7 @@ import javax.enterprise.context.ConversationScoped;
 import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
 import javax.faces.event.AjaxBehaviorEvent;
+import javax.faces.event.ValueChangeEvent;
 import javax.inject.Inject;
 import javax.inject.Named;
 
@@ -244,22 +245,36 @@ public class ExportCredentialBean implements Serializable {
    * A listener method that is invoked when a format is selected.
    * @param event subject event
    */
-  public void formatSelected(AjaxBehaviorEvent event) {   
-    FacesAjaxUtil.resetRenderedInputs(facesContext);
-    selectedFormat = exportService.findFormat(getFormat());
-    setVariant(selectedFormat.getDefaultVariant().getId());
-    variantSelected(event);
+  public void formatSelected(ValueChangeEvent event) {
+    selectedFormat = exportService.getDefaultFormat();
+    if (event != null) {
+      selectedFormat = exportService.findFormat(
+          (String) event.getNewValue());
+    }
+    formatSelected();
   }
 
+  private void formatSelected() {
+    selectedVariant = selectedFormat.getDefaultVariant();
+    setVariant(selectedVariant.getId());
+    variantSelected();
+  }
+  
   /**
    * A listener method that is invoked when a variant is selected.
    * @param event subject event
    */
-  public void variantSelected(AjaxBehaviorEvent event) {   
-    FacesAjaxUtil.resetRenderedInputs(facesContext);
-    selectedVariant = selectedFormat.findVariant(getVariant());
-    setFileName(replaceSuffix(getFileName(), 
-        selectedVariant.getSuffix()));
+  public void variantSelected(ValueChangeEvent event) {   
+    selectedVariant = selectedFormat.getDefaultVariant();
+    if (event != null) {
+      selectedVariant = selectedFormat.findVariant(
+          (String) event.getNewValue());
+    }
+    variantSelected();
+  }
+
+  private void variantSelected() {
+    setFileName(replaceSuffix(getFileName(), selectedVariant.getSuffix()));
   }
 
   private String replaceSuffix(String fileName, String suffix) {
@@ -320,7 +335,6 @@ public class ExportCredentialBean implements Serializable {
    * @param event source event
    */
   public void generateExportPassphrase(AjaxBehaviorEvent event) {
-    FacesAjaxUtil.resetRenderedInputs(facesContext);
     generateExportPassphrase();
   }
 

@@ -29,14 +29,11 @@ import static org.hamcrest.Matchers.sameInstance;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.Collections;
 
 import javax.enterprise.context.Conversation;
-import javax.faces.component.UIViewRoot;
 import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
-import javax.faces.context.PartialViewContext;
-import javax.faces.event.AjaxBehaviorEvent;
+import javax.faces.event.ValueChangeEvent;
 
 import org.jmock.Expectations;
 import org.jmock.auto.Mock;
@@ -102,12 +99,9 @@ public class ExportCredentialBeanTest {
   
   @Mock
   private ExternalContext externalContext;
-  
+
   @Mock
-  private PartialViewContext partialViewContext;
-  
-  @Mock
-  private UIViewRoot viewRoot;
+  private ValueChangeEvent event;
   
   @Mock
   private ExportFormat format;
@@ -141,18 +135,21 @@ public class ExportCredentialBeanTest {
       oneOf(group).getName();
       will(returnValue(GROUP_NAME));
       oneOf(request).setProtectionParameters(with(same(bean.getPasswordEditor())));
-      oneOf(exportService).getDefaultFormat();
+      allowing(exportService).getDefaultFormat();
       will(returnValue(format));
+      allowing(format).getDefaultVariant();
+      will(returnValue(variant));
       oneOf(format).getId();
       will(returnValue(FORMAT_ID));
       oneOf(request).setFormat(FORMAT_ID);
+      oneOf(variant).getId();
+      will(returnValue(VARIANT_ID));
+      oneOf(request).setVariant(VARIANT_ID);
       oneOf(conversation).isTransient();
       will(returnValue(true));
       oneOf(conversation).begin();
     } });
-    context.checking(newFormatSelectedExpectations());
-    context.checking(newVariantSelectedExpectations());
-    context.checking(resetRenderedInputsExpectations());
+    context.checking(fileNameExpectations());
     bean.setId(id);
     assertThat(bean.createExportRequest(), is(nullValue()));
     assertThat(bean.getExportRequest(), is(sameInstance(request)));
@@ -313,11 +310,10 @@ public class ExportCredentialBeanTest {
       oneOf(request).setFormat(with(FORMAT_ID));
     } });
     context.checking(newFormatSelectedExpectations());
-    context.checking(newVariantSelectedExpectations());
-    context.checking(resetRenderedInputsExpectations());
+    context.checking(fileNameExpectations());
     bean.setExportRequest(request);
     bean.setFormat(FORMAT_ID);
-    bean.formatSelected(context.mock(AjaxBehaviorEvent.class));
+    bean.formatSelected(event);
   }
 
   @Test
@@ -326,16 +322,18 @@ public class ExportCredentialBeanTest {
       oneOf(request).setVariant(with(VARIANT_ID));
     } });
     context.checking(newVariantSelectedExpectations());
-    context.checking(resetRenderedInputsExpectations());
+    context.checking(fileNameExpectations());
     bean.setSelectedFormat(format);
     bean.setExportRequest(request);
     bean.setVariant(VARIANT_ID);
-    bean.variantSelected(context.mock(AjaxBehaviorEvent.class));
+    bean.variantSelected(event);
   }
 
   private Expectations newFormatSelectedExpectations() {
-    return new Expectations() { { 
-      oneOf(request).getFormat();
+    return new Expectations() { {
+      oneOf(exportService).getDefaultFormat();
+      will(returnValue(format));
+      oneOf(event).getNewValue();
       will(returnValue(FORMAT_ID));
       oneOf(exportService).findFormat(with(FORMAT_ID));
       will(returnValue(format));      
@@ -350,26 +348,22 @@ public class ExportCredentialBeanTest {
   
   private Expectations newVariantSelectedExpectations() {
     return new Expectations() { { 
-      oneOf(request).getVariant();
+      oneOf(format).getDefaultVariant();
+      will(returnValue(variant));
+      oneOf(event).getNewValue();
       will(returnValue(VARIANT_ID));
       oneOf(format).findVariant(with(VARIANT_ID));
       will(returnValue(variant));
+    } };
+  }
+  
+  private Expectations fileNameExpectations() {
+    return new Expectations() { { 
       oneOf(request).getFileName();
       will(returnValue(FILE_NAME));
       oneOf(variant).getSuffix();
       will(returnValue(SUFFIX));
       oneOf(request).setFileName(with(FILE_NAME + SUFFIX));      
-    } };
-  }
-  
-  private Expectations resetRenderedInputsExpectations() {
-    return new Expectations() { { 
-      allowing(facesContext).getPartialViewContext();
-      will(returnValue(partialViewContext));
-      allowing(partialViewContext).getRenderIds();
-      will(returnValue(Collections.emptySet()));
-      allowing(facesContext).getViewRoot();
-      will(returnValue(viewRoot));
     } };
   }
   

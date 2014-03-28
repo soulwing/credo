@@ -125,6 +125,7 @@ $(document).ready(function() {
 			jsf.ajax.request(source, event, {
 				execute: $owner.attr("id"),
 				render: $ownerStatus.attr("id") + " " + $ownerErrors.attr("id"),
+				resetValues: true,
 				onevent: function(data) {
 					if (data.status == "success") {
 						$ownerErrors = $("[id$=':ownerErrors']");

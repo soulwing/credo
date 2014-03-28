@@ -134,7 +134,7 @@ public class ConcreteExportService implements ExportService {
       throw new GroupAccessException(groupName);
     }
     catch (PassphraseException|UserAccessException ex) {
-      errors.addError("passphrase", "passphraseIncorrect");
+      errors.addError("password", "passwordIncorrect");
       throw new PassphraseException();
     }
     catch (IOException ex) {
