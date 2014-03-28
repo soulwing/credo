@@ -22,6 +22,8 @@ import javax.inject.Inject;
 import javax.interceptor.AroundInvoke;
 import javax.interceptor.Interceptor;
 import javax.interceptor.InvocationContext;
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import javax.transaction.Transactional;
 
 import org.slf4j.Logger;
@@ -54,6 +56,9 @@ public class OwnerAccessControlInterceptor {
   @Inject
   protected UserGroupMemberRepository memberRepository;
   
+  @PersistenceContext
+  protected EntityManager entityManager;
+  
   @AroundInvoke
   @Transactional(Transactional.TxType.MANDATORY)
   public Object validateAccessAllowed(InvocationContext context) 
@@ -71,7 +76,7 @@ public class OwnerAccessControlInterceptor {
   }
 
   private void validateOwner(Owned owned) throws OwnerAccessControlException {
-    UserGroup owner = owned.getOwner();
+    UserGroup owner = entityManager.merge(owned.getOwner());
     if (owner != null) {
       String loginName = userContextService.getLoginName();
       String groupName = owner.getName();
