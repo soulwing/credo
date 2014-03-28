@@ -120,7 +120,8 @@ $(document).ready(function() {
 		return false;
 	});
 
-	if (!$resetButton.data("enabled")) {
+	var editing = $("#editing").text();
+	if (editing == "false") {
 		$resetButton.prop("disabled", true);
 	}
 	

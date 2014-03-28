@@ -80,10 +80,10 @@
             </button>
             <span>&nbsp;</span>
             <button id="btn-reset" class="btn btn-default btn-xs"
-              title="#{messages.groupEditorResetTip}" 
-              data-enabled="#{not empty cc.attrs.editor.id}">
+              title="#{messages.groupEditorResetTip}">
               <i class="glyphicon glyphicon-repeat"/>
             </button>
+            <span id="editing" class="hidden">#{not empty cc.attrs.editor.id}</span>
           </div>
           <div class="col-md-3">
             <label for="available">
