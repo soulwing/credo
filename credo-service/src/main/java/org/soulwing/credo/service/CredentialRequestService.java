@@ -86,8 +86,12 @@ public interface CredentialRequestService {
   /**
    * Saves the given (transient) request making it persistent.
    * @param request the subject request
+   * @param errors an errors object that will be updated if an errors occurs
+   * @throws GroupAccessException if the logged in user is not a member of the
+   *    group specified as the request owner 
    */
-  void saveRequest(CredentialRequest request);
+  void saveRequest(CredentialRequest request, Errors errors) 
+      throws GroupAccessException;
   
   /**
    * Transfers a request to a client via the given response object.

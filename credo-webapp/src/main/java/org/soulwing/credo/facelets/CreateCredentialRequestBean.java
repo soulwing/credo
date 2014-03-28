@@ -67,7 +67,7 @@ public class CreateCredentialRequestBean implements Serializable {
   protected Conversation conversation;
   
   @Inject
-  protected CredentialRequestService signingRequestService;
+  protected CredentialRequestService requestService;
   
   @Inject
   protected DelegatingCredentialEditor<CredentialRequestEditor> editor;
@@ -164,7 +164,7 @@ public class CreateCredentialRequestBean implements Serializable {
       }  
       try {
         editor.setDelegate(
-            signingRequestService.createEditor(credentialId, errors));
+            requestService.createEditor(credentialId, errors));
         return DETAILS_OUTCOME_ID;
       }
       catch (NoSuchCredentialException ex) {
@@ -200,7 +200,7 @@ public class CreateCredentialRequestBean implements Serializable {
    */
   public String prepare() {
     try {
-      signingRequest = signingRequestService.createRequest(
+      signingRequest = requestService.createRequest(
           editor.getDelegate(), passwordEditor, errors);
       return CONFIRM_OUTCOME_ID;      
     }
@@ -223,8 +223,13 @@ public class CreateCredentialRequestBean implements Serializable {
    * @return outcome ID
    */
   public String save() {
-    signingRequestService.saveRequest(signingRequest);
-    return CreateCredentialRequestBean.SUCCESS_OUTCOME_ID;
+    try {
+      requestService.saveRequest(signingRequest, errors);
+      return CreateCredentialRequestBean.SUCCESS_OUTCOME_ID;
+    }
+    catch (GroupAccessException ex) {
+      return DETAILS_OUTCOME_ID;
+    }
   }
 
   /**
@@ -237,7 +242,7 @@ public class CreateCredentialRequestBean implements Serializable {
    */
   public String download() {    
     try {
-      signingRequestService.downloadRequest(signingRequest, 
+      requestService.downloadRequest(signingRequest, 
           new FacesFileDownloadResponse(facesContext));
       facesContext.responseComplete();
       return null;

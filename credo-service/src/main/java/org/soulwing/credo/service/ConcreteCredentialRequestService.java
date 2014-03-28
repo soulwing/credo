@@ -159,8 +159,15 @@ public class ConcreteCredentialRequestService implements CredentialRequestServic
    */
   @Override
   @TransactionAttribute(TransactionAttributeType.REQUIRED)
-  public void saveRequest(CredentialRequest request) {
-    requestRepository.add(request);
+  public void saveRequest(CredentialRequest request, Errors errors) 
+      throws GroupAccessException {
+    try {
+      requestRepository.add(request);
+    }
+    catch (OwnerAccessControlException ex) {
+      errors.addError("owner", "groupAccessDenied", ex.getGroupName());
+      throw new GroupAccessException(ex.getGroupName());
+    }
   }
 
   /**

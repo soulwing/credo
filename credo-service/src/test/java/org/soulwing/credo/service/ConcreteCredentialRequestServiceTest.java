@@ -48,6 +48,7 @@ import org.soulwing.credo.CredentialRequest;
 import org.soulwing.credo.Tag;
 import org.soulwing.credo.repository.CredentialRepository;
 import org.soulwing.credo.repository.CredentialRequestRepository;
+import org.soulwing.credo.security.OwnerAccessControlException;
 import org.soulwing.credo.service.request.CredentialRequestEditorFactory;
 import org.soulwing.credo.service.request.CredentialRequestGenerator;
 
@@ -343,9 +344,23 @@ public class ConcreteCredentialRequestServiceTest {
       oneOf(requestRepository).add(with(same(request)));
     } });
     
-    service.saveRequest(request);
+    service.saveRequest(request, errors);
+  }
+
+  @Test(expected = GroupAccessException.class)
+  public void testSaveRequestWhenOwnerAccessDenied() throws Exception {
+    context.checking(new Expectations() { { 
+      oneOf(requestRepository).add(with(same(request)));
+      will(throwException(
+          new OwnerAccessControlException(GROUP_NAME, LOGIN_NAME)));
+      oneOf(errors).addError(with("owner"), with("groupAccessDenied"), 
+          (Object[]) with(arrayContaining(GROUP_NAME)));
+    } });
+    
+    service.saveRequest(request, errors);
   }
   
+
   @Test
   public void testDownloadRequest() throws Exception {
     final StringWriter writer = new StringWriter();

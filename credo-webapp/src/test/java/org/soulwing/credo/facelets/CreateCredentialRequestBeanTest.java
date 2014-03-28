@@ -64,7 +64,7 @@ public class CreateCredentialRequestBeanTest {
   } };
   
   @Mock
-  private CredentialRequestService signingRequestService;
+  private CredentialRequestService requestService;
   
   @Mock
   private CredentialRequest signingRequest;
@@ -86,7 +86,7 @@ public class CreateCredentialRequestBeanTest {
   @Before
   public void setUp() throws Exception {
     bean.conversation = conversation;
-    bean.signingRequestService = signingRequestService;
+    bean.requestService = requestService;
     bean.editor = new DelegatingCredentialEditor<CredentialRequestEditor>();
     bean.passwordEditor = new PasswordFormEditor();
     bean.errors = errors;
@@ -123,7 +123,7 @@ public class CreateCredentialRequestBeanTest {
   private Expectations existingCredentialEditorExpectations(
       final Action outcome) throws Exception {
     return new Expectations() { { 
-      oneOf(signingRequestService).createEditor(with(CREDENTIAL_ID), 
+      oneOf(requestService).createEditor(with(CREDENTIAL_ID), 
           with(same(errors)));
       will(outcome);
     } };
@@ -193,7 +193,7 @@ public class CreateCredentialRequestBeanTest {
   private Expectations createSigningRequestExpectations(
       final Action outcome) throws Exception {
     return new Expectations() { { 
-      oneOf(signingRequestService).createRequest(
+      oneOf(requestService).createRequest(
           with(same(editor)), 
           with(same(bean.getPasswordEditor())), 
           with(same(errors)));
@@ -204,15 +204,29 @@ public class CreateCredentialRequestBeanTest {
   @Test  
   public void testSaveAction() throws Exception {
     context.checking(new Expectations() { { 
-      oneOf(signingRequestService).saveRequest(
-          with(same(signingRequest)));
+      oneOf(requestService).saveRequest(
+          with(same(signingRequest)), errors);
     } });
     
     bean.setSigningRequest(signingRequest);
     assertThat(bean.save(), 
         is(equalTo(CreateCredentialRequestBean.SUCCESS_OUTCOME_ID)));
   }
+
+  @Test  
+  public void testSaveWhenGroupAccessDenied() throws Exception {
+    context.checking(new Expectations() { { 
+      oneOf(requestService).saveRequest(         
+          with(same(signingRequest)), errors);
+      will(throwException(new GroupAccessException(GROUP_NAME)));
+    } });
+    
+    bean.setSigningRequest(signingRequest);
+    assertThat(bean.save(), 
+        is(equalTo(CreateCredentialRequestBean.DETAILS_OUTCOME_ID)));
+  }
   
+
   @Test
   public void testCancelAction() throws Exception {
     context.checking(endConversationExpectations());
@@ -223,7 +237,7 @@ public class CreateCredentialRequestBeanTest {
   @Test
   public void testDownloadAction() throws Exception {
     context.checking(new Expectations() { { 
-      oneOf(signingRequestService).downloadRequest(
+      oneOf(requestService).downloadRequest(
           with(same(signingRequest)), 
           with(any(FacesFileDownloadResponse.class)));
       oneOf(facesContext).responseComplete();
