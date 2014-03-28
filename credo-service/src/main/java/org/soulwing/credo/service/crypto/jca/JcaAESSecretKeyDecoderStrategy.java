@@ -50,9 +50,12 @@ public class JcaAESSecretKeyDecoderStrategy
     PemHeaderWrapper header = object.getHeader("DEK-Info");
     Validate.notNull(header, "no DEK-Info header");
     String value = header.getStringValue();
+    if (!value.startsWith("AES/")) return null;
     int index = value.indexOf(',');
+    if (index == -1) {
+      throw new IllegalArgumentException("AES transform requires IV");
+    }
     String transform = value.substring(0, index);
-    if (!transform.startsWith("AES/")) return null;
     byte[] iv = decodeIV(value, index + 1);
     byte[] cipherText = object.getContent();
     return new JcaAESEncryptedSecretKeyWrapper(transform, iv, cipherText, 
