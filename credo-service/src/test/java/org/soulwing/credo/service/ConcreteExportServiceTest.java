@@ -161,7 +161,7 @@ public class ConcreteExportServiceTest {
     context.checking(unprotectCredentialExpectations(
         throwException(new UserAccessException(new Exception()))));
     context.checking(new Expectations() { { 
-      oneOf(errors).addError(with(equalTo("passphrase")), 
+      oneOf(errors).addError(with(equalTo("password")), 
           with(containsString("Incorrect")),
           with(emptyArray()));
     } });
