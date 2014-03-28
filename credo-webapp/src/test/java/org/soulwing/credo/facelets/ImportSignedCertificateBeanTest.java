@@ -47,6 +47,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.soulwing.credo.Credential;
 import org.soulwing.credo.CredentialRequest;
+import org.soulwing.credo.UserGroup;
 import org.soulwing.credo.service.Errors;
 import org.soulwing.credo.service.FileContentModel;
 import org.soulwing.credo.service.GroupAccessException;
@@ -93,6 +94,9 @@ public class ImportSignedCertificateBeanTest {
   
   @Mock
   private FacesContext facesContext;
+  
+  @Mock
+  private UserGroup group;
   
   private ImportSignedCertificateBean bean = new ImportSignedCertificateBean();
   
@@ -310,6 +314,10 @@ public class ImportSignedCertificateBeanTest {
           with(false), with(same(errors)));
       oneOf(request).getCredential();
       will(returnValue(credential));
+      oneOf(credential).getOwner();
+      will(returnValue(group));
+      oneOf(request).getOwner();
+      will(returnValue(group));
     } });
    
     bean.setRemoveRequest(false);

@@ -317,11 +317,13 @@ public class ImportSignedCertificateBean implements Serializable {
     try {
       credential.setRequest(request);
       importService.saveCredential(credential, removeRequest, errors);
-      if (request.getCredential() == null) {
-        endConversation();
-        return SUCCESS_OUTCOME_ID;
+      Credential renewingCredential = request.getCredential();
+      if (renewingCredential != null
+          && renewingCredential.getOwner().equals(request.getOwner())) {
+        return CLEANUP_OUTCOME_ID;
       }
-      return CLEANUP_OUTCOME_ID;
+      endConversation();
+      return SUCCESS_OUTCOME_ID;
     }
     catch (ImportException ex) {
       return null;
