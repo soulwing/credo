@@ -40,6 +40,7 @@ import org.soulwing.credo.resource.Bundle;
 public class PasswordValidator implements Validator, Serializable {
 
   private static final String PASSWORD_ATTR = "password";
+  private static final String REQUIRED_ATTR = "required";
   
   private static final long serialVersionUID = 7428124321407973883L;
 
@@ -54,6 +55,10 @@ public class PasswordValidator implements Validator, Serializable {
       // the component ID is 'password' by default
       passwordId = PASSWORD_ATTR;  
     }
+    Boolean required = (Boolean) component.getAttributes().get(REQUIRED_ATTR);
+    if (required == null) {
+      required = Boolean.TRUE;
+    }
     
     UIInput passwordComponent = (UIInput) component.findComponent(
         passwordId.toString());
@@ -65,11 +70,23 @@ public class PasswordValidator implements Validator, Serializable {
     }
     
     Password passwordAgain = (Password) value;
+    if (passwordAgain == null) {
+      passwordAgain = Password.EMPTY;
+    }
+    
     Password password = (Password) passwordComponent.getLocalValue();
-    if (password == null || password.isEmpty()) {
+    if (password == null) {
+      password = Password.EMPTY;
+    }
+
+    if (password.isEmpty() && passwordAgain.isEmpty() && !required) {
+      return;
+    }
+    
+    if (password.isEmpty()) {
       throw new ValidatorException(new FacesMessage(FacesMessage.SEVERITY_ERROR,
           Bundle.get(context.getViewRoot().getLocale()).getString(
-              "passwordRequired"), null));              
+              "passwordRequired"), null));
     }
     if (!password.equals(passwordAgain)) {
       throw new ValidatorException(new FacesMessage(FacesMessage.SEVERITY_ERROR,
