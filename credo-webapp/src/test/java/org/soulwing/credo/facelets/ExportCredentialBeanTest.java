@@ -375,7 +375,7 @@ public class ExportCredentialBeanTest {
   
   @Test
   public void testGenerateExportPassphrase() throws Exception {
-    final Password passphrase = new Password(new char[0]);
+    final Password passphrase = Password.EMPTY;
     context.checking(new Expectations() { { 
       oneOf(exportService).generatePassphrase();
       will(returnValue(passphrase));

@@ -65,7 +65,7 @@ public class ConcreteGroupProtectionServiceTest {
 
   private static final String ENCODED_SECRET_KEY = new String();
 
-  private static final Password PASSWORD = new Password(new char[0]);
+  private static final Password PASSWORD = Password.EMPTY;
   
   private static final String GROUP_NAME = "someGroup";
   

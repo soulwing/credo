@@ -43,7 +43,7 @@ public class ExistingGroupEditorTest
     extends AbstractGroupEditorTest<ExistingGroupEditor> {
 
   private static final Long PROFILE_ID = -100L;
-  private static final Password PASSWORD = new Password(new char[0]);
+  private static final Password PASSWORD = Password.EMPTY;
   
   @Mock
   private UserGroupMemberRepository memberRepository;

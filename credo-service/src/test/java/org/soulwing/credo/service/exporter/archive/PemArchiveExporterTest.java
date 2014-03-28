@@ -77,7 +77,7 @@ public class PemArchiveExporterTest {
 
   private final byte[] archive = new byte[] { 0, 1, 2, 3 };
   
-  private final Password password = new Password(new char[0]);
+  private final Password password = Password.EMPTY;
 
   @Mock
   private ExportRequest request;

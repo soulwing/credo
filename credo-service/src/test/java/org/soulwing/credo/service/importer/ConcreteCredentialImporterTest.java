@@ -56,7 +56,7 @@ public class ConcreteCredentialImporterTest {
 
   private static final Password PASSPHRASE = new Password(new char[] { 'a' });
 
-  private static final Password EMPTY_PASSPHRASE = new Password(new char[0]);
+  private static final Password EMPTY_PASSPHRASE = Password.EMPTY;
 
   @Rule
   public JUnitRuleMockery context = new JUnitRuleMockery();

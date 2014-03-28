@@ -181,7 +181,7 @@ public class ConcreteExportServiceTest {
 
   @Test
   public void testGeneratePassword() throws Exception {
-    final Password password = new Password(new char[0]);
+    final Password password = Password.EMPTY;
     
     context.checking(new Expectations() { { 
       oneOf(passwordGenerator).generatePassword();

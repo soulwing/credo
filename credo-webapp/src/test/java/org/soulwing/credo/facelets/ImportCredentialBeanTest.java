@@ -61,7 +61,7 @@ import org.soulwing.credo.service.PassphraseException;
  */
 public class ImportCredentialBeanTest {
 
-  private static final Password PASSPHRASE = new Password(new char[0]);
+  private static final Password PASSPHRASE = Password.EMPTY;
   
   @Rule
   public JUnitRuleMockery context = new JUnitRuleMockery() { {

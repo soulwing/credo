@@ -59,7 +59,7 @@ public class KeyStoreExporterTest {
   private final String contentType = "contentType";
   private final String fileName = "fileName";
   private final String suffix = "suffix";
-  private final Password password = new Password(new char[0]);
+  private final Password password = Password.EMPTY;
   private final byte[] content = { 0, 1, 2, 3 };
   
   @Mock

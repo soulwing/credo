@@ -62,7 +62,7 @@ public class ConcreteCredentialRequestProtectionServiceTest {
   
   private static final String GROUP_NAME = "someGroup";
 
-  private static final Password PASSWORD = new Password(new char[0]);
+  private static final Password PASSWORD = Password.EMPTY;
 
   @Mock
   private UserGroupRepository groupRepository; 
