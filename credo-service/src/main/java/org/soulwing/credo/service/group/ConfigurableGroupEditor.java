@@ -25,6 +25,7 @@ import org.soulwing.credo.service.Errors;
 import org.soulwing.credo.service.GroupAccessException;
 import org.soulwing.credo.service.GroupEditException;
 import org.soulwing.credo.service.GroupEditor;
+import org.soulwing.credo.service.MergeConflictException;
 import org.soulwing.credo.service.NoSuchGroupException;
 import org.soulwing.credo.service.PassphraseException;
 import org.soulwing.credo.service.UserDetail;
@@ -67,8 +68,10 @@ public interface ConfigurableGroupEditor extends GroupEditor {
    *    provided or is incorrect
    * @throws GroupAccessException if the logged in user is not a member
    *    of the edited group
+   * @throws MergeConflictException if the group cannot be saved because
+   *    its persistent state has changed since this editor was created
    */
   void save(Errors errors) throws GroupEditException, NoSuchGroupException,
-      PassphraseException, GroupAccessException;
+      PassphraseException, GroupAccessException, MergeConflictException;
  
 }

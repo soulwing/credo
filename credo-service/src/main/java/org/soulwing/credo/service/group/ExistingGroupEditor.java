@@ -24,12 +24,15 @@ import java.util.Collection;
 
 import javax.enterprise.context.Dependent;
 import javax.inject.Inject;
+import javax.persistence.OptimisticLockException;
 
 import org.soulwing.credo.UserGroup;
 import org.soulwing.credo.UserGroupMember;
 import org.soulwing.credo.repository.UserGroupMemberRepository;
+import org.soulwing.credo.security.OwnerAccessControlException;
 import org.soulwing.credo.service.Errors;
 import org.soulwing.credo.service.GroupAccessException;
+import org.soulwing.credo.service.MergeConflictException;
 import org.soulwing.credo.service.PassphraseException;
 import org.soulwing.credo.service.UserAccessException;
 import org.soulwing.credo.service.crypto.SecretKeyWrapper;
@@ -92,8 +95,18 @@ public class ExistingGroupEditor extends AbstractGroupEditor {
    * {@inheritDoc}
    */
   @Override
-  protected UserGroup saveGroup(UserGroup group) {
-    return groupRepository.update(group);
+  protected UserGroup saveGroup(UserGroup group, Errors errors) 
+      throws MergeConflictException, GroupAccessException {
+    try {
+      return groupRepository.update(group);
+    }
+    catch (OwnerAccessControlException ex) {
+      throw new GroupAccessException(ex.getGroupName());
+    }
+    catch (OptimisticLockException ex) {
+      errors.addWarning("groupMergeConflict");
+      throw new MergeConflictException();
+    }
   }
 
   /**

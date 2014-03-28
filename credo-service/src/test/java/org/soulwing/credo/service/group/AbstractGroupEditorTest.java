@@ -110,7 +110,7 @@ public abstract class AbstractGroupEditorTest<T extends AbstractGroupEditor> {
   public void testSave() throws Exception {
     Long[] membership = new Long[] { 1L, 2L, 3L };
     context.checking(beforeSaveExpectations(membership));
-    context.checking(groupExpectations());
+    context.checking(groupExpectations(returnValue(group)));
     context.checking(profileExpectations(membership.length,
         returnValue(profile)));
     context.checking(secretKeyExpectations(returnValue(secretKey)));
@@ -129,7 +129,7 @@ public abstract class AbstractGroupEditorTest<T extends AbstractGroupEditor> {
     Long userId = 2L;
     Long[] membership = new Long[] { ownerId, userId };
     context.checking(beforeSaveExpectations(membership));
-    context.checking(groupExpectations());
+    context.checking(groupExpectations(returnValue(group)));
     context.checking(profileExpectations(membership.length,
         onConsecutiveCalls(returnValue(profile), returnValue(null))));
     context.checking(secretKeyExpectations(returnValue(secretKey)));
@@ -152,7 +152,7 @@ public abstract class AbstractGroupEditorTest<T extends AbstractGroupEditor> {
           with(emptyArray()));
     } });
     
-    context.checking(groupExpectations());
+    context.checking(groupExpectations(returnValue(group)));
     context.checking(profileExpectations(membership.length + 1,
         returnValue(profile)));
     context.checking(secretKeyExpectations(returnValue(secretKey)));
@@ -183,7 +183,8 @@ public abstract class AbstractGroupEditorTest<T extends AbstractGroupEditor> {
     } };
   }
   
-  protected abstract Expectations groupExpectations() throws Exception;
+  protected abstract Expectations groupExpectations(final Action outcome) 
+      throws Exception;
     
   protected abstract Expectations secretKeyExpectations(final Action outcome) 
       throws Exception;

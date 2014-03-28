@@ -74,10 +74,12 @@ public interface GroupService {
    *    provided or was incorrect
    * @throws GroupAccessException if the logged in user is not a member
    *    of the edited group
+   * @throws MergeConflictException if the persistent state of the group
+   *    has changed since the editor was created
    */
   void saveGroup(GroupEditor editor, Errors errors) 
       throws GroupEditException, NoSuchGroupException, GroupAccessException,
-      PassphraseException;
+      PassphraseException, MergeConflictException;
   
   /**
    * Removes the group with the given unique identifier.

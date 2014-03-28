@@ -30,6 +30,7 @@ import org.soulwing.credo.service.GroupAccessException;
 import org.soulwing.credo.service.GroupEditException;
 import org.soulwing.credo.service.GroupEditor;
 import org.soulwing.credo.service.GroupService;
+import org.soulwing.credo.service.MergeConflictException;
 import org.soulwing.credo.service.NoSuchGroupException;
 import org.soulwing.credo.service.PassphraseException;
 
@@ -49,6 +50,8 @@ public class EditGroupBean implements Serializable {
   static final String CANCEL_OUTCOME_ID = "cancel";
   
   static final String PASSWORD_OUTCOME_ID = "password";
+  
+  static final String FAILURE_OUTCOME_ID = "failure";
   
   @Inject
   protected Conversation conversation;
@@ -121,11 +124,13 @@ public class EditGroupBean implements Serializable {
       editor = groupService.editGroup(id);
       passwordEditor.setGroupName(editor.getName());
       beginConversation();
+      return null;
     }
     catch (NoSuchGroupException ex) {
       errors.addError("id", "groupNotFound");
+      endConversation();
+      return FAILURE_OUTCOME_ID;
     }
-    return null;
   }
   
   /**
@@ -151,14 +156,15 @@ public class EditGroupBean implements Serializable {
     catch (PassphraseException ex) {      
       return PASSWORD_OUTCOME_ID;
     }
+    catch (MergeConflictException ex) {
+      return createEditor();
+    }
     catch (GroupEditException ex) {
       return null;
     }
-    catch (NoSuchGroupException|GroupAccessException ex) {
-      // TODO -- need to think about how we could ever get here that
-      // isn't a programming error
+    catch (GroupAccessException|NoSuchGroupException ex) {
       endConversation();
-      throw new RuntimeException(ex);
+      return FAILURE_OUTCOME_ID;
     }
   }
   

@@ -219,6 +219,26 @@ public class ConcreteGroupServiceTest {
     
     service.saveGroup(editor, errors);
   }
+
+  @Test(expected = GroupAccessException.class)
+  public void testSaveGroupWhenGroupAccessDenied() throws Exception {
+    context.checking(new Expectations() { { 
+      oneOf(editor).save(with(same(errors)));
+      will(throwException(new GroupAccessException(GROUP_NAME)));
+    } });
+    
+    service.saveGroup(editor, errors);
+  }
+  
+  @Test(expected = MergeConflictException.class)
+  public void testSaveGroupWhenMergeConflictException() throws Exception {
+    context.checking(new Expectations() { { 
+      oneOf(editor).save(with(same(errors)));
+      will(throwException(new MergeConflictException()));
+    } });
+    
+    service.saveGroup(editor, errors);
+  }
   
   @Test
   public void testRemoveGroupSuccess() throws Exception {

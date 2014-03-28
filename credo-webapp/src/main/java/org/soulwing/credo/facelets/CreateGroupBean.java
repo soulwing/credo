@@ -28,6 +28,7 @@ import org.soulwing.credo.service.GroupAccessException;
 import org.soulwing.credo.service.GroupEditException;
 import org.soulwing.credo.service.GroupEditor;
 import org.soulwing.credo.service.GroupService;
+import org.soulwing.credo.service.MergeConflictException;
 import org.soulwing.credo.service.NoSuchGroupException;
 import org.soulwing.credo.service.PassphraseException;
 
@@ -101,6 +102,9 @@ public class CreateGroupBean {
     }
     catch (GroupAccessException ex) {
       return null;
+    }
+    catch (MergeConflictException ex) {
+      throw new RuntimeException(ex);
     }
     catch (NoSuchGroupException ex) {
       throw new RuntimeException(ex);

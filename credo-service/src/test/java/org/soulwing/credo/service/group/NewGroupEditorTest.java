@@ -45,7 +45,7 @@ public class NewGroupEditorTest
   }
   
   @Override
-  protected Expectations groupExpectations() {
+  protected Expectations groupExpectations(final Action outcome) {
     return new Expectations() { { 
       allowing(group).getName();
       will(returnValue(GROUP_NAME));

@@ -238,12 +238,9 @@ public class ConcreteImportService implements ImportService {
         groupService.saveGroup(editor, errors);
         group = findOwnerGroup(protection);
       }
-      catch (GroupEditException gex) {
-        throw new RuntimeException(gex);
+      catch (GroupEditException|PassphraseException|MergeConflictException oex) {
+        throw new RuntimeException(oex);
       }
-      catch (PassphraseException pex) {
-        throw new RuntimeException(pex);
-      }      
     }
     return group;
   }

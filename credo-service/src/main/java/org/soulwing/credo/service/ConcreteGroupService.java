@@ -129,15 +129,9 @@ public class ConcreteGroupService implements GroupService {
   @TransactionAttribute(TransactionAttributeType.REQUIRED)
   public void saveGroup(GroupEditor editor, Errors errors)
       throws GroupEditException, NoSuchGroupException, GroupAccessException,
-          PassphraseException {
-    try {
-      Validate.isTrue(editor instanceof ConfigurableGroupEditor);
-      ((ConfigurableGroupEditor) editor).save(errors);
-    }
-    catch (GroupAccessException ex) {
-      errors.addError("groupAccessDenied", new Object[] { ex.getGroupName() });
-      throw ex;
-    }
+          PassphraseException, MergeConflictException {
+    Validate.isTrue(editor instanceof ConfigurableGroupEditor);
+    ((ConfigurableGroupEditor) editor).save(errors);
   }
 
   @Override

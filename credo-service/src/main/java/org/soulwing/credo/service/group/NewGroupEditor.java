@@ -60,7 +60,7 @@ public class NewGroupEditor extends AbstractGroupEditor {
    * {@inheritDoc}
    */
   @Override
-  protected UserGroup saveGroup(UserGroup group) {
+  protected UserGroup saveGroup(UserGroup group, Errors errors) {
     groupRepository.add(group);   
     return group;
   }

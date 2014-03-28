@@ -42,6 +42,7 @@ import org.soulwing.credo.service.Errors;
 import org.soulwing.credo.service.GroupEditException;
 import org.soulwing.credo.service.GroupEditor;
 import org.soulwing.credo.service.GroupService;
+import org.soulwing.credo.service.MergeConflictException;
 import org.soulwing.credo.service.NoSuchGroupException;
 import org.soulwing.credo.service.PassphraseException;
 
@@ -102,8 +103,10 @@ public class EditGroupBeanTest {
     context.checking(editGroupExpectations(
         throwException(new NoSuchGroupException())));
     context.checking(errorExpectations("id", "NotFound"));    
+    context.checking(endConversationExpectations());
     bean.setId(GROUP_ID);
-    assertThat(bean.createEditor(), is(nullValue()));
+    assertThat(bean.createEditor(), 
+        is(equalTo(EditGroupBean.FAILURE_OUTCOME_ID)));
   }
 
   @Test
@@ -122,24 +125,23 @@ public class EditGroupBeanTest {
     assertThat(bean.save(), is(nullValue()));
   }
 
-  @Test(expected = RuntimeException.class)
+  @Test
   public void testSaveWhenNoSuchGroupException() throws Exception {
     context.checking(saveGroupExpectations(
         throwException(new NoSuchGroupException())));
     context.checking(endConversationExpectations());
     bean.setEditor(editor);
-    bean.save();
+    assertThat(bean.save(), is(equalTo(EditGroupBean.FAILURE_OUTCOME_ID)));
   }
 
-  @Test(expected = RuntimeException.class)
+  @Test
   public void testSaveWhenGroupAccessException() throws Exception {
     context.checking(saveGroupExpectations(
         throwException(new NoSuchGroupException())));
     context.checking(endConversationExpectations());
     bean.setEditor(editor);
-    bean.save();
+    assertThat(bean.save(), is(equalTo(EditGroupBean.FAILURE_OUTCOME_ID)));
   }
-
 
   @Test
   public void testSaveWhenPassphraseException() throws Exception {
@@ -147,6 +149,17 @@ public class EditGroupBeanTest {
         throwException(new PassphraseException())));
     bean.setEditor(editor);
     assertThat(bean.save(), is(equalTo(EditGroupBean.PASSWORD_OUTCOME_ID)));
+  }
+
+  @Test
+  public void testSaveWhenMergeConflict() throws Exception {
+    context.checking(saveGroupExpectations(
+        throwException(new MergeConflictException())));
+    context.checking(editGroupExpectations(returnValue(editor)));
+    context.checking(beginConversationExpectations());
+    bean.setId(GROUP_ID);
+    bean.setEditor(editor);
+    assertThat(bean.save(), is(nullValue()));
   }
 
   @Test

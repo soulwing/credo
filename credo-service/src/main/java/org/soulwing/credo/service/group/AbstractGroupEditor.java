@@ -35,6 +35,7 @@ import org.soulwing.credo.repository.UserProfileRepository;
 import org.soulwing.credo.service.Errors;
 import org.soulwing.credo.service.GroupAccessException;
 import org.soulwing.credo.service.GroupEditException;
+import org.soulwing.credo.service.MergeConflictException;
 import org.soulwing.credo.service.NoSuchGroupException;
 import org.soulwing.credo.service.PassphraseException;
 import org.soulwing.credo.service.UserDetail;
@@ -66,6 +67,14 @@ abstract class AbstractGroupEditor implements ConfigurableGroupEditor,
   @Inject
   protected UserGroupRepository groupRepository;
 
+  /**
+   * Gets the group to be edited.
+   * @return group
+   */
+  protected UserGroup getGroup() {
+    return group;
+  }
+  
   /**
    * {@inheritDoc}
    */
@@ -176,37 +185,44 @@ abstract class AbstractGroupEditor implements ConfigurableGroupEditor,
    */
   @Override
   public void save(Errors errors) throws GroupEditException,
-      NoSuchGroupException, PassphraseException, GroupAccessException {
+      NoSuchGroupException, PassphraseException, GroupAccessException,
+      MergeConflictException {
     
     Validate.isTrue(!UserGroup.SELF_GROUP_NAME.equals(getName()),
         "group name cannot be '" + UserGroup.SELF_GROUP_NAME + "'");
 
-    beforeSave(errors);
-    group = saveGroup(group);
-
-    if (!membership.contains(ownerId)) {
-      membership.add(ownerId);
-      errors.addWarning("members", "groupEditorUserMustBeMember");
-    }
-    
-    SecretKeyWrapper secretKey = createSecretKey(group, errors);
-    for (Long userId : membership) {
-      if (isNewMember(userId)) {
-        UserProfile profile = profileRepository.findById(userId);
-        if (profile != null) {
-          protectionService.protect(group, secretKey, profile);
-        }
-        else {
-          UserDetail user = findUserDetail(userId);
-          errors.addWarning("members", "groupEditorNoSuchUser",
-              user.getLoginName(), user.getFullName());
+    try {
+      beforeSave(errors);
+      group = saveGroup(group, errors);
+  
+      if (!membership.contains(ownerId)) {
+        membership.add(ownerId);
+        errors.addWarning("members", "groupEditorUserMustBeMember");
+      }
+      
+      SecretKeyWrapper secretKey = createSecretKey(group, errors);
+      for (Long userId : membership) {
+        if (isNewMember(userId)) {
+          UserProfile profile = profileRepository.findById(userId);
+          if (profile != null) {
+            protectionService.protect(group, secretKey, profile);
+          }
+          else {
+            UserDetail user = findUserDetail(userId);
+            errors.addWarning("members", "groupEditorNoSuchUser",
+                user.getLoginName(), user.getFullName());
+          }
         }
       }
+      if (errors.hasWarnings() || errors.hasErrors()) {
+        throw new GroupEditException();
+      }
+      afterSave(errors);
     }
-    if (errors.hasWarnings() || errors.hasErrors()) {
-      throw new GroupEditException();
+    catch (GroupAccessException ex) {
+      errors.addError("groupAccessDenied", new Object[] { ex.getGroupName() });
+      throw ex;
     }
-    afterSave(errors);
   }
   
   protected abstract SecretKeyWrapper createSecretKey(UserGroup group, Errors errors)
@@ -217,7 +233,8 @@ abstract class AbstractGroupEditor implements ConfigurableGroupEditor,
   protected void beforeSave(Errors errors) {    
   }
   
-  protected abstract UserGroup saveGroup(UserGroup group);
+  protected abstract UserGroup saveGroup(UserGroup group, Errors errors)
+      throws MergeConflictException, GroupAccessException;
   
   protected void afterSave(Errors errors) {    
   }

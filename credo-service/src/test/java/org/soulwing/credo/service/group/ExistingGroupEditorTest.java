@@ -18,11 +18,15 @@
  */
 package org.soulwing.credo.service.group;
 
+import static org.hamcrest.Matchers.arrayContaining;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.emptyArray;
+import static org.jmock.Expectations.returnValue;
 import static org.jmock.Expectations.throwException;
 
 import java.util.Collections;
+
+import javax.persistence.OptimisticLockException;
 
 import org.jmock.Expectations;
 import org.jmock.api.Action;
@@ -31,6 +35,9 @@ import org.junit.Test;
 import org.soulwing.credo.Password;
 import org.soulwing.credo.UserGroupMember;
 import org.soulwing.credo.repository.UserGroupMemberRepository;
+import org.soulwing.credo.security.OwnerAccessControlException;
+import org.soulwing.credo.service.GroupAccessException;
+import org.soulwing.credo.service.MergeConflictException;
 import org.soulwing.credo.service.PassphraseException;
 import org.soulwing.credo.service.UserAccessException;
 
@@ -69,7 +76,7 @@ public class ExistingGroupEditorTest
   public void testSaveWhenPassphaseException() throws Exception {
     Long[] membership = new Long[] { 1L, 2L, 3L };
     context.checking(beforeSaveExpectations(membership));
-    context.checking(groupExpectations());
+    context.checking(groupExpectations(returnValue(group)));
     context.checking(secretKeyExpectations(
         throwException(new UserAccessException(null))));
     context.checking(new Expectations() { { 
@@ -80,6 +87,41 @@ public class ExistingGroupEditorTest
     editor.setMembership(membership);
     editor.save(errors);
   }
+
+  @Test(expected = GroupAccessException.class)
+  public void testSaveWhenGroupAccessDenied() throws Exception {
+    Long ownerId = 1L;
+    Long userId = 2L;
+    Long[] membership = new Long[] { ownerId, userId };
+    context.checking(beforeSaveExpectations(membership));
+    context.checking(groupExpectations(throwException(
+        new OwnerAccessControlException(GROUP_NAME, LOGIN_NAME))));
+    context.checking(new Expectations() { { 
+      oneOf(errors).addError(with(containsString("AccessDenied")),
+          (Object[]) with(arrayContaining(GROUP_NAME)));
+    } });
+    editor.setOwner(ownerId);
+    editor.setMembership(membership);
+    editor.save(errors);
+  }
+
+  @Test(expected = MergeConflictException.class)
+  public void testSaveWhenMergeConflict() throws Exception {
+    Long ownerId = 1L;
+    Long userId = 2L;
+    Long[] membership = new Long[] { ownerId, userId };
+    context.checking(beforeSaveExpectations(membership));
+    context.checking(groupExpectations(throwException(
+        new OptimisticLockException())));
+    context.checking(new Expectations() { { 
+      oneOf(errors).addWarning(with(containsString("MergeConflict")),
+          with(emptyArray()));
+    } });
+    editor.setOwner(ownerId);
+    editor.setMembership(membership);
+    editor.save(errors);
+  }
+
 
   /**
    * {@inheritDoc}
@@ -114,12 +156,13 @@ public class ExistingGroupEditorTest
   }
 
   @Override
-  protected Expectations groupExpectations() throws Exception {
+  protected Expectations groupExpectations(final Action outcome) 
+      throws Exception {
     return new Expectations() { { 
       allowing(group).getName();
       will(returnValue(GROUP_NAME));
       oneOf(groupRepository).update(group);
-      will(returnValue(group));
+      will(outcome);
     } };
   }
 
