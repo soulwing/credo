@@ -192,7 +192,8 @@
       inner join fetch r.certificationRequest
       inner join fetch r.owner
       left outer join fetch r.tags
-      left outer join fetch r.credential
+      left outer join fetch r.credential c
+      left outer join fetch c.owner
       where r.id = :id
     </query>
   </named-query>
