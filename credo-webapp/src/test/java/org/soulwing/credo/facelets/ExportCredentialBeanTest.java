@@ -29,10 +29,13 @@ import static org.hamcrest.Matchers.sameInstance;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.Collections;
 
 import javax.enterprise.context.Conversation;
+import javax.faces.component.UIViewRoot;
 import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
+import javax.faces.context.PartialViewContext;
 import javax.faces.event.AjaxBehaviorEvent;
 
 import org.jmock.Expectations;
@@ -101,6 +104,12 @@ public class ExportCredentialBeanTest {
   private ExternalContext externalContext;
   
   @Mock
+  private PartialViewContext partialViewContext;
+  
+  @Mock
+  private UIViewRoot viewRoot;
+  
+  @Mock
   private ExportFormat format;
   
   @Mock
@@ -143,6 +152,7 @@ public class ExportCredentialBeanTest {
     } });
     context.checking(newFormatSelectedExpectations());
     context.checking(newVariantSelectedExpectations());
+    context.checking(resetRenderedInputsExpectations());
     bean.setId(id);
     assertThat(bean.createExportRequest(), is(nullValue()));
     assertThat(bean.getExportRequest(), is(sameInstance(request)));
@@ -304,6 +314,7 @@ public class ExportCredentialBeanTest {
     } });
     context.checking(newFormatSelectedExpectations());
     context.checking(newVariantSelectedExpectations());
+    context.checking(resetRenderedInputsExpectations());
     bean.setExportRequest(request);
     bean.setFormat(FORMAT_ID);
     bean.formatSelected(context.mock(AjaxBehaviorEvent.class));
@@ -315,6 +326,7 @@ public class ExportCredentialBeanTest {
       oneOf(request).setVariant(with(VARIANT_ID));
     } });
     context.checking(newVariantSelectedExpectations());
+    context.checking(resetRenderedInputsExpectations());
     bean.setSelectedFormat(format);
     bean.setExportRequest(request);
     bean.setVariant(VARIANT_ID);
@@ -332,6 +344,7 @@ public class ExportCredentialBeanTest {
       oneOf(variant).getId();
       will(returnValue(VARIANT_ID));
       oneOf(request).setVariant(VARIANT_ID);
+      
     } };
   }
   
@@ -346,6 +359,17 @@ public class ExportCredentialBeanTest {
       oneOf(variant).getSuffix();
       will(returnValue(SUFFIX));
       oneOf(request).setFileName(with(FILE_NAME + SUFFIX));      
+    } };
+  }
+  
+  private Expectations resetRenderedInputsExpectations() {
+    return new Expectations() { { 
+      allowing(facesContext).getPartialViewContext();
+      will(returnValue(partialViewContext));
+      allowing(partialViewContext).getRenderIds();
+      will(returnValue(Collections.emptySet()));
+      allowing(facesContext).getViewRoot();
+      will(returnValue(viewRoot));
     } };
   }
   
