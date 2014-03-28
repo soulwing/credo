@@ -1,17 +1,18 @@
 
 $(document).ready(function() { 
 	var passwordTimeout = function() { };
+	
 	var $password = $("[id$=':password']");
+	var $inputGroup = $password.parent().parent();
+	var $feedback = $password.parent().children(".form-control-feedback");
+	
 	$password.on("input", function(event) {
 		var source = this;
 		var $correct = $("[id$=':correct']");
 		var applyFeedback = function(ok) {
-			var $source = $("[id$=':password']");
-	    	var $inputGroup = $source.parent().parent();
 	    	$inputGroup.toggleClass("has-success", ok);
-	    	var $feedback = $source.parent().children(".form-control-feedback");
 	    	$feedback.toggleClass("glyphicon glyphicon-ok", ok);
-	    	$feedback.css("display", ok ? "block" : "none");
+	    	$feedback.toggleClass("hidden", !ok);
 		};
 		var validate = function(data) {
 			if (data.status == "success") {
