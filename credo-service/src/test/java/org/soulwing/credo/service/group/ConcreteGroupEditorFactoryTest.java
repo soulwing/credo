@@ -116,7 +116,7 @@ public class ConcreteGroupEditorFactoryTest {
       oneOf(profile).getId();
       will(returnValue(OWNER_ID));
       oneOf(editor).setGroup(with(same(group)));
-      oneOf(editor).setOwner(with(OWNER_ID));
+      oneOf(editor).setUserId(with(OWNER_ID));
       oneOf(editor).setMembership(with(arrayContaining(OWNER_ID)));
       oneOf(editor).setUsers(with(same(users)));
     } });
@@ -144,7 +144,7 @@ public class ConcreteGroupEditorFactoryTest {
       exactly(2).of(profile).getId();
       will(onConsecutiveCalls(returnValue(USER_ID), returnValue(OWNER_ID)));
       oneOf(editor).setGroup(with(same(group)));
-      oneOf(editor).setOwner(with(OWNER_ID));
+      oneOf(editor).setUserId(with(OWNER_ID));
       oneOf(editor).setMembership(with(arrayContaining(USER_ID, OWNER_ID)));
       oneOf(editor).setUsers(with(same(users)));
     } });

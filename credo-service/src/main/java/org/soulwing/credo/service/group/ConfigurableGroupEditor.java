@@ -44,10 +44,10 @@ public interface ConfigurableGroupEditor extends GroupEditor {
   void setGroup(UserGroup group);
   
   /**
-   * Sets the ID of the group owner.
+   * Sets the ID of the user editing the group.
    * @param id the ID to set
    */
-  void setOwner(Long id);
+  void setUserId(Long id);
   
   /**
    * Sets the collection of users who will be made available to set as 

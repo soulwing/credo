@@ -53,7 +53,8 @@ abstract class AbstractGroupEditor implements ConfigurableGroupEditor,
   private static final long serialVersionUID = 1017537361170816221L;
   
   private UserGroup group;
-  private Long ownerId;
+  private Long userId;
+  private String owner;
   private Collection<UserDetail> users;
   private Password password;
   private List<Long> membership = new ArrayList<>();
@@ -68,27 +69,25 @@ abstract class AbstractGroupEditor implements ConfigurableGroupEditor,
   protected UserGroupRepository groupRepository;
 
   /**
-   * Gets the group to be edited.
-   * @return group
-   */
-  protected UserGroup getGroup() {
-    return group;
-  }
-  
-  /**
    * {@inheritDoc}
    */
   @Override
   public void setGroup(UserGroup group) {
     this.group = group;
+    if (group != null) {
+      UserGroup owner = group.getOwner();
+      if (owner != null) {
+        this.owner = owner.getName();
+      }
+    }
   }
 
   /**
    * {@inheritDoc}
    */
   @Override
-  public void setOwner(Long id) {
-    this.ownerId = id;
+  public void setUserId(Long id) {
+    this.userId = id;
   }
 
   /**
@@ -121,6 +120,29 @@ abstract class AbstractGroupEditor implements ConfigurableGroupEditor,
   @Override
   public void setName(String name) {
     group.setName(name);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public String getOwner() {
+    if (owner == null) return UserGroup.SELF_GROUP_NAME;
+    return owner;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public void setOwner(String owner) {
+    if (owner != null) {
+      owner = owner.trim();
+      if (owner.equalsIgnoreCase(UserGroup.SELF_GROUP_NAME)) {
+        owner = null;
+      }
+    }
+    this.owner = owner;
   }
 
   /**
@@ -193,10 +215,16 @@ abstract class AbstractGroupEditor implements ConfigurableGroupEditor,
 
     try {
       beforeSave(errors);
+      if (owner != null) {
+        group.setOwner(groupRepository.findByGroupName(owner, null));
+        if (group.getOwner() == null) {
+          errors.addError("owner", "groupNotFound", owner);
+        }
+      }
       group = saveGroup(group, errors);
   
-      if (!membership.contains(ownerId)) {
-        membership.add(ownerId);
+      if (!membership.contains(userId)) {
+        membership.add(userId);
         errors.addWarning("members", "groupEditorUserMustBeMember");
       }
       

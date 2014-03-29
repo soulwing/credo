@@ -83,7 +83,7 @@ public class ExistingGroupEditorTest
       oneOf(errors).addError(with("password"), with(containsString("Incorrect")),
           with(emptyArray()));
     } });
-    editor.setOwner(1L);
+    editor.setUserId(1L);
     editor.setMembership(membership);
     editor.save(errors);
   }
@@ -100,7 +100,7 @@ public class ExistingGroupEditorTest
       oneOf(errors).addError(with(containsString("AccessDenied")),
           (Object[]) with(arrayContaining(GROUP_NAME)));
     } });
-    editor.setOwner(ownerId);
+    editor.setUserId(ownerId);
     editor.setMembership(membership);
     editor.save(errors);
   }
@@ -117,7 +117,7 @@ public class ExistingGroupEditorTest
       oneOf(errors).addWarning(with(containsString("MergeConflict")),
           with(emptyArray()));
     } });
-    editor.setOwner(ownerId);
+    editor.setUserId(ownerId);
     editor.setMembership(membership);
     editor.save(errors);
   }

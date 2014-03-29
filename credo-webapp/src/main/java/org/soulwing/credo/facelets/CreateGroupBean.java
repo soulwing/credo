@@ -26,7 +26,6 @@ import javax.inject.Named;
 import org.soulwing.credo.service.Errors;
 import org.soulwing.credo.service.GroupAccessException;
 import org.soulwing.credo.service.GroupEditException;
-import org.soulwing.credo.service.GroupEditor;
 import org.soulwing.credo.service.GroupService;
 import org.soulwing.credo.service.MergeConflictException;
 import org.soulwing.credo.service.NoSuchGroupException;
@@ -51,30 +50,20 @@ public class CreateGroupBean {
   @Inject
   protected Errors errors;
  
-  private GroupEditor editor;
+  @Inject
+  protected DelegatingGroupEditor editor;
  
-
   @PostConstruct
   public void init() {
-    editor = groupService.newGroup();
+    editor.setDelegate(groupService.newGroup());
   }
   
   /**
    * Gets the editor for the group to create.
    * @return editor
    */
-  public GroupEditor getEditor() {
+  public DelegatingGroupEditor getEditor() {
     return editor;
-  }
-  
-  /**
-   * Sets the editor for the group to create.
-   * <p>
-   * This method is exposed to support unit testing.
-   * @param editor the editor to set
-   */
-  void setEditor(GroupEditor editor) {
-    this.editor = editor;
   }
   
   /**
@@ -91,7 +80,7 @@ public class CreateGroupBean {
    */
   public String save() {
     try {
-      groupService.saveGroup(editor, errors);
+      groupService.saveGroup(editor.getDelegate(), errors);
       return SUCCESS_OUTCOME_ID;
     }
     catch (PassphraseException ex) {

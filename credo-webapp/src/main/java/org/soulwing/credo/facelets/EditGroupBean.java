@@ -28,7 +28,6 @@ import javax.inject.Named;
 import org.soulwing.credo.service.Errors;
 import org.soulwing.credo.service.GroupAccessException;
 import org.soulwing.credo.service.GroupEditException;
-import org.soulwing.credo.service.GroupEditor;
 import org.soulwing.credo.service.GroupService;
 import org.soulwing.credo.service.MergeConflictException;
 import org.soulwing.credo.service.NoSuchGroupException;
@@ -61,11 +60,12 @@ public class EditGroupBean implements Serializable {
   
   @Inject
   protected Errors errors;
- 
+
+  @Inject
+  protected DelegatingGroupEditor editor;
+  
   @Inject
   protected PasswordFormEditor passwordEditor = new PasswordFormEditor();
-
-  private GroupEditor editor;
 
   private Long id;
  
@@ -89,18 +89,8 @@ public class EditGroupBean implements Serializable {
    * Gets the editor for the group to create.
    * @return editor
    */
-  public GroupEditor getEditor() {
+  public DelegatingGroupEditor getEditor() {
     return editor;
-  }
-  
-  /**
-   * Sets the editor for the group to create.
-   * <p>
-   * This method is exposed to support unit testing.
-   * @param editor the editor to set
-   */
-  void setEditor(GroupEditor editor) {
-    this.editor = editor;
   }
   
   /**
@@ -121,7 +111,7 @@ public class EditGroupBean implements Serializable {
       return null;
     }
     try {
-      editor = groupService.editGroup(id);
+      editor.setDelegate(groupService.editGroup(id));
       passwordEditor.setGroupName(editor.getName());
       beginConversation();
       return null;
@@ -149,7 +139,7 @@ public class EditGroupBean implements Serializable {
   public String save() {
     try {
       editor.setPassword(passwordEditor.getPassword());
-      groupService.saveGroup(editor, errors);
+      groupService.saveGroup(editor.getDelegate(), errors);
       endConversation();
       return SUCCESS_OUTCOME_ID;
     }

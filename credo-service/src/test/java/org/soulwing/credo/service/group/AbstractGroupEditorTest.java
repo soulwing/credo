@@ -21,6 +21,7 @@ package org.soulwing.credo.service.group;
 import static org.hamcrest.Matchers.arrayContaining;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.emptyArray;
+import static org.hamcrest.Matchers.nullValue;
 import static org.jmock.Expectations.onConsecutiveCalls;
 import static org.jmock.Expectations.returnValue;
 
@@ -52,6 +53,8 @@ import org.soulwing.credo.service.protect.GroupProtectionService;
  */
 public abstract class AbstractGroupEditorTest<T extends AbstractGroupEditor> {
 
+  private static final String OWNER_NAME = "someOwner";
+
   protected static final String FULL_NAME = "Full Name";
 
   protected static final String LOGIN_NAME = "loginName";
@@ -74,6 +77,9 @@ public abstract class AbstractGroupEditorTest<T extends AbstractGroupEditor> {
   protected UserGroup group;
   
   @Mock
+  protected UserGroup owner;
+  
+  @Mock
   protected UserProfile profile;
   
   @Mock
@@ -92,6 +98,10 @@ public abstract class AbstractGroupEditorTest<T extends AbstractGroupEditor> {
   
   @Before
   public final void setUp() throws Exception {
+    context.checking(new Expectations() { { 
+      oneOf(group).getOwner();
+      will(returnValue(null));
+    } });
     editor = newEditor();
     editor.setGroup(group);
     editor.setUsers(Collections.singleton(user));
@@ -107,7 +117,7 @@ public abstract class AbstractGroupEditorTest<T extends AbstractGroupEditor> {
   }
   
   @Test
-  public void testSave() throws Exception {
+  public void testSaveWithoutOwner() throws Exception {
     Long[] membership = new Long[] { 1L, 2L, 3L };
     context.checking(beforeSaveExpectations(membership));
     context.checking(groupExpectations(returnValue(group)));
@@ -118,9 +128,47 @@ public abstract class AbstractGroupEditorTest<T extends AbstractGroupEditor> {
     context.checking(errorCheckExpectations(returnValue(false)));
     context.checking(afterSaveExpectations(membership));
     
-    editor.setOwner(1L);
+    editor.setUserId(1L);
     editor.setMembership(membership);
     editor.save(errors);
+  }
+
+  @Test
+  public void testSaveWithOwner() throws Exception {
+    Long[] membership = new Long[] { 1L, 2L, 3L };
+    context.checking(beforeSaveExpectations(membership));
+    context.checking(ownerExpectations(owner));
+    context.checking(groupExpectations(returnValue(group)));
+    context.checking(profileExpectations(membership.length,
+        returnValue(profile)));
+    context.checking(secretKeyExpectations(returnValue(secretKey)));
+    context.checking(protectionExpectations(membership.length));
+    context.checking(errorCheckExpectations(returnValue(false)));
+    context.checking(afterSaveExpectations(membership));
+    
+    editor.setOwner(OWNER_NAME);
+    editor.setUserId(1L);
+    editor.setMembership(membership);
+    editor.save(errors);    
+  }
+
+  @Test(expected = GroupEditException.class)
+  public void testSaveWhenOwnerNotFound() throws Exception {
+    Long[] membership = new Long[] { 1L, 2L, 3L };
+    context.checking(beforeSaveExpectations(membership));
+    context.checking(ownerExpectations(null));
+    context.checking(ownerErrorExpectations());
+    context.checking(groupExpectations(returnValue(group)));
+    context.checking(profileExpectations(membership.length,
+        returnValue(profile)));
+    context.checking(secretKeyExpectations(returnValue(secretKey)));
+    context.checking(protectionExpectations(membership.length));
+    context.checking(errorCheckExpectations(returnValue(true)));
+    
+    editor.setOwner(OWNER_NAME);
+    editor.setUserId(1L);
+    editor.setMembership(membership);
+    editor.save(errors);    
   }
 
   @Test(expected = GroupEditException.class)
@@ -136,7 +184,7 @@ public abstract class AbstractGroupEditorTest<T extends AbstractGroupEditor> {
     context.checking(protectionExpectations(membership.length));
     context.checking(errorExpectations(userId, membership.length));
     context.checking(errorCheckExpectations(returnValue(true)));
-    editor.setOwner(ownerId);
+    editor.setUserId(ownerId);
     editor.setMembership(membership);
     editor.setUsers(Collections.singleton(user));
     editor.save(errors);
@@ -159,7 +207,7 @@ public abstract class AbstractGroupEditorTest<T extends AbstractGroupEditor> {
     context.checking(protectionExpectations(membership.length + 1));
     context.checking(errorCheckExpectations(returnValue(true)));
     
-    editor.setOwner(-1L);
+    editor.setUserId(-1L);
     editor.setMembership(membership);
     editor.save(errors);
   }
@@ -180,6 +228,25 @@ public abstract class AbstractGroupEditorTest<T extends AbstractGroupEditor> {
       between(1, memberCount).of(profileRepository).findById(
           with(any(Long.class)));
       will(outcome);
+    } };
+  }
+  
+  protected Expectations ownerExpectations(final UserGroup owner) {
+    return new Expectations() { { 
+      oneOf(groupRepository).findByGroupName(with(OWNER_NAME),
+          with(nullValue(String.class)));
+      will(returnValue(owner));
+      oneOf(group).setOwner(owner);
+      oneOf(group).getOwner();
+      will(returnValue(owner));
+    } };
+  }
+
+  protected Expectations ownerErrorExpectations() {
+    return new Expectations() { { 
+      oneOf(errors).addError(with("owner"),
+          with(containsString("NotFound")),
+          (Object[]) with(arrayContaining(OWNER_NAME)));
     } };
   }
   

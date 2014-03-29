@@ -79,6 +79,8 @@ public class EditGroupBeanTest {
     bean.groupService = groupService;
     bean.errors = errors;
     bean.conversation = conversation;
+    bean.editor = new DelegatingGroupEditor();
+    bean.editor.setDelegate(this.editor);
     bean.passwordEditor = new PasswordFormEditor();
     bean.getPasswordEditor().setPassword(PASSWORD);
   }
@@ -89,7 +91,7 @@ public class EditGroupBeanTest {
     context.checking(beginConversationExpectations());
     bean.setId(GROUP_ID);
     assertThat(bean.createEditor(), is(nullValue()));
-    assertThat(bean.getEditor(), is(sameInstance(editor)));
+    assertThat(bean.getEditor().getDelegate(), is(sameInstance(editor)));
   }
 
   @Test
@@ -113,7 +115,6 @@ public class EditGroupBeanTest {
   public void testSaveSuccess() throws Exception {
     context.checking(saveGroupExpectations(returnValue(null)));
     context.checking(endConversationExpectations());
-    bean.setEditor(editor);
     assertThat(bean.save(), is(equalTo(EditGroupBean.SUCCESS_OUTCOME_ID)));
   }
   
@@ -121,7 +122,6 @@ public class EditGroupBeanTest {
   public void testSaveWhenGroupEditException() throws Exception {
     context.checking(saveGroupExpectations(
         throwException(new GroupEditException())));
-    bean.setEditor(editor);
     assertThat(bean.save(), is(nullValue()));
   }
 
@@ -130,7 +130,6 @@ public class EditGroupBeanTest {
     context.checking(saveGroupExpectations(
         throwException(new NoSuchGroupException())));
     context.checking(endConversationExpectations());
-    bean.setEditor(editor);
     assertThat(bean.save(), is(equalTo(EditGroupBean.FAILURE_OUTCOME_ID)));
   }
 
@@ -139,7 +138,6 @@ public class EditGroupBeanTest {
     context.checking(saveGroupExpectations(
         throwException(new NoSuchGroupException())));
     context.checking(endConversationExpectations());
-    bean.setEditor(editor);
     assertThat(bean.save(), is(equalTo(EditGroupBean.FAILURE_OUTCOME_ID)));
   }
 
@@ -147,7 +145,6 @@ public class EditGroupBeanTest {
   public void testSaveWhenPassphraseException() throws Exception {
     context.checking(saveGroupExpectations(
         throwException(new PassphraseException())));
-    bean.setEditor(editor);
     assertThat(bean.save(), is(equalTo(EditGroupBean.PASSWORD_OUTCOME_ID)));
   }
 
@@ -158,7 +155,6 @@ public class EditGroupBeanTest {
     context.checking(editGroupExpectations(returnValue(editor)));
     context.checking(beginConversationExpectations());
     bean.setId(GROUP_ID);
-    bean.setEditor(editor);
     assertThat(bean.save(), is(nullValue()));
   }
 

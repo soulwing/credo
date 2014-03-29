@@ -40,6 +40,12 @@ public interface GroupDetail {
   String getName();
   
   /**
+   * Gets the group's owner.
+   * @return
+   */
+  String getOwner();
+  
+  /**
    * Gets the group's description.
    * @return group description
    */

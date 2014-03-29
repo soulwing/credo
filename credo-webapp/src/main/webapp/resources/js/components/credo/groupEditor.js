@@ -1,4 +1,12 @@
 $(document).ready(function() {
+	var $owner = $("[id$=':owner']");
+	var $ownerStatus = $("[id$=':ownerStatus']");
+	var $inputGroup = $owner.parent().parent();
+	var $feedback = $owner.parent().children(".form-control-feedback");
+	var $helpNotFound = $("#help-not-found");
+	var $helpInaccessible = $("#help-inaccessible");
+	var $ownerErrors = $("[id$=':ownerErrors']");
+
 	var $members = $("#members");
 	var $available = $("#available");
 	var $memberFilter = $("#member-filter");
@@ -12,8 +20,102 @@ $(document).ready(function() {
 	var $resetButton = $("#btn-reset");
 	var $submitButton = $("input[type='submit']");
 	
+	var groups = new Bloodhound({
+		datumTokenizer: Bloodhound.tokenizers.obj.whitespace('name'),
+		queryTokenizer: Bloodhound.tokenizers.whitespace,
+		prefetch: {
+			url: $owner.parent().data("autocomplete-url"),
+			// the data is returned as an array of string group names
+			// convert to an array of objects with a name property
+			filter: function(list) {
+				return $.map(list, function(group) { return { name: group }; });
+			}
+		}
+	});
+	
+	groups.clearPrefetchCache();
+	groups.initialize();
+	
+	$owner.typeahead(
+		{
+			minLength: 1,
+			highlight: true,
+		},
+		{
+			name: 'groups',
+			displayKey: 'name',
+			source: groups.ttAdapter()
+		}
+	);
+	
 	var optionSort = function(a, b) { return a.text > b.text; };
 	
+	var updateFeedback = function() {
+		if ($ownerErrors.text().length > 0) {
+			$inputGroup.removeClass("has-warning has-success");
+			$inputGroup.addClass("has-error");
+			$feedback.removeClass("glyphicon glyphicon-ok");
+			$feedback.addClass("glyphicon glyphicon-exclamation-sign");
+			$feedback.removeClass("hidden");
+			$helpNotFound.addClass("hidden");
+			$helpInaccessible.addClass("hidden");
+			$ownerErrors.removeClass("hidden");
+			return;
+		}		
+		var status = $ownerStatus.val();
+		if (status == "EXISTS") {
+			hideFeedback();
+		}
+		else if (status == "NOT_FOUND") {
+			$inputGroup.removeClass("has-error has-success");
+			$inputGroup.addClass("has-warning");
+			$feedback.removeClass("glyphicon glyphicon-ok");
+			$feedback.addClass("glyphicon glyphicon-exclamation-sign");
+			$feedback.removeClass("hidden");
+			$helpNotFound.removeClass("hidden");
+			$helpInaccessible.addClass("hidden");
+			$ownerErrors.addClass("hidden");
+		}
+		else if (status == "INACCESSIBLE") {
+			$inputGroup.removeClass("has-warning has-success");
+			$inputGroup.addClass("has-error");
+			$feedback.removeClass("glyphicon glyphicon-ok");
+			$feedback.addClass("glyphicon glyphicon-exclamation-sign");
+			$feedback.removeClass("hidden");
+			$helpNotFound.addClass("hidden");
+			$helpInaccessible.removeClass("hidden");
+			$ownerErrors.addClass("hidden");
+		}
+	};
+
+	$owner.on("focus", function(event) { 
+		hideFeedback();
+		return false;
+	});
+	
+	$owner.on("blur", function(event) { 
+		var source = this;
+		var ajaxRequest = function() { 
+			jsf.ajax.request(source, event, {
+				execute: $owner.attr("id"),
+				render: $ownerStatus.attr("id") + " " + $ownerErrors.attr("id"),
+				resetValues: true,
+				onevent: function(data) {
+					if (data.status == "success") {
+						$ownerErrors = $("[id$=':ownerErrors']");
+						updateFeedback();
+					}			
+				}
+			});
+		};
+		ajaxRequest();
+		return false;
+	});
+
+	if ($ownerStatus.val() != "EXISTS") {
+		updateFeedback();
+	}
+
 	var split = function($a, $b) {
 		var $source = $("[id$=':members']");
 		var $m = $source.children().filter("option:selected");

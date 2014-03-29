@@ -31,11 +31,16 @@
         <h:dataTable id="groups" var="group" 
           value="#{groupTableBean.groups}"
           styleClass="table"
-          columnClasses="column-nowrap,,column-width30,column-nowrap table-tools">
+          columnClasses="column-nowrap,column-nowrap,,column-width30,table-tools">
           
           <h:column>
             <f:facet name="header">#{messages.groupTableNameHeader}</f:facet>
             #{group.name}
+          </h:column>
+
+          <h:column>
+            <f:facet name="header">#{messages.groupTableOwnerHeader}</f:facet>
+            #{group.owner}
           </h:column>
 
           <h:column>

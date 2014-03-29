@@ -69,6 +69,17 @@ class UserGroupWrapper implements GroupDetail, Serializable {
     return delegate.getName();
   }
 
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public String getOwner() {
+    if (delegate.getOwner() == null) {
+      return UserGroup.SELF_GROUP_NAME;
+    }
+    return delegate.getOwner().getName();
+  }
+
   /** 
    * {@inheritDoc}
    */

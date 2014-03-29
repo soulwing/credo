@@ -62,6 +62,8 @@ public class CreateGroupBeanTest {
   public void setUp() throws Exception {
     bean.groupService = groupService;
     bean.errors = errors;
+    bean.editor = new DelegatingGroupEditor();
+    bean.editor.setDelegate(this.editor);
   }
   
   @Test
@@ -72,7 +74,7 @@ public class CreateGroupBeanTest {
     } });
     
     bean.init();
-    assertThat(bean.getEditor(), is(sameInstance(editor)));
+    assertThat(bean.getEditor().getDelegate(), is(sameInstance(editor)));
   }
   
   @Test
@@ -81,7 +83,6 @@ public class CreateGroupBeanTest {
       oneOf(groupService).saveGroup(with(same(editor)), with(same(errors)));      
     } });
     
-    bean.setEditor(editor);
     assertThat(bean.save(), is(equalTo(CreateGroupBean.SUCCESS_OUTCOME_ID)));
   }
   
@@ -92,7 +93,6 @@ public class CreateGroupBeanTest {
       will(throwException(new GroupEditException()));
     } });
     
-    bean.setEditor(editor);
     assertThat(bean.save(), is(nullValue()));
   }
 
@@ -103,7 +103,6 @@ public class CreateGroupBeanTest {
       will(throwException(new NoSuchGroupException()));
     } });
     
-    bean.setEditor(editor);
     bean.save();
   }
 
@@ -114,7 +113,6 @@ public class CreateGroupBeanTest {
       will(throwException(new PassphraseException()));
     } });
     
-    bean.setEditor(editor);
     bean.save();
   }
 
@@ -122,4 +120,5 @@ public class CreateGroupBeanTest {
   public void testCancel() throws Exception {
     assertThat(bean.cancel(), is(equalTo(CreateGroupBean.CANCEL_OUTCOME_ID)));
   }
+
 }

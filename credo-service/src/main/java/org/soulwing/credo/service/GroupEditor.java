@@ -50,6 +50,18 @@ public interface GroupEditor {
   void setName(String name);
   
   /**
+   * Gets the group's owner.
+   * @return owner group name
+   */
+  String getOwner();
+  
+  /**
+   * Sets the group's owner.
+   * @param owner name of the group that will own this group.
+   */
+  void setOwner(String owner);
+  
+  /**
    * Gets the group description.
    * @return group description
    */
@@ -93,5 +105,5 @@ public interface GroupEditor {
    * @param password the password to set
    */
   void setPassword(Password password);
-    
+ 
 }
