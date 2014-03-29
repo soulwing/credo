@@ -67,7 +67,7 @@ public class CreateCredentialRequestBeanTest {
   private CredentialRequestService requestService;
   
   @Mock
-  private CredentialRequest signingRequest;
+  private CredentialRequest request;
   
   @Mock
   private Errors errors;
@@ -183,11 +183,11 @@ public class CreateCredentialRequestBeanTest {
   @Test 
   public void testPrepareSuccess() throws Exception {
     context.checking(createSigningRequestExpectations(
-        returnValue(signingRequest)));
+        returnValue(request)));
     bean.getEditor().setDelegate(editor);
     assertThat(bean.prepare(),
         is(equalTo(CreateCredentialRequestBean.CONFIRM_OUTCOME_ID)));
-    assertThat(bean.getSigningRequest(), is(sameInstance(signingRequest)));
+    assertThat(bean.getSigningRequest(), is(sameInstance(request)));
   }
   
   private Expectations createSigningRequestExpectations(
@@ -205,10 +205,10 @@ public class CreateCredentialRequestBeanTest {
   public void testSaveAction() throws Exception {
     context.checking(new Expectations() { { 
       oneOf(requestService).saveRequest(
-          with(same(signingRequest)), errors);
+          with(same(request)), with(errors));
     } });
     
-    bean.setSigningRequest(signingRequest);
+    bean.setSigningRequest(request);
     assertThat(bean.save(), 
         is(equalTo(CreateCredentialRequestBean.SUCCESS_OUTCOME_ID)));
   }
@@ -217,11 +217,11 @@ public class CreateCredentialRequestBeanTest {
   public void testSaveWhenGroupAccessDenied() throws Exception {
     context.checking(new Expectations() { { 
       oneOf(requestService).saveRequest(         
-          with(same(signingRequest)), errors);
+          with(same(request)), with(errors));
       will(throwException(new GroupAccessException(GROUP_NAME)));
     } });
     
-    bean.setSigningRequest(signingRequest);
+    bean.setSigningRequest(request);
     assertThat(bean.save(), 
         is(equalTo(CreateCredentialRequestBean.DETAILS_OUTCOME_ID)));
   }
@@ -238,12 +238,12 @@ public class CreateCredentialRequestBeanTest {
   public void testDownloadAction() throws Exception {
     context.checking(new Expectations() { { 
       oneOf(requestService).downloadRequest(
-          with(same(signingRequest)), 
+          with(same(request)), 
           with(any(FacesFileDownloadResponse.class)));
       oneOf(facesContext).responseComplete();
     } });
     
-    bean.setSigningRequest(signingRequest);
+    bean.setSigningRequest(request);
     assertThat(bean.download(), is(nullValue()));
   }
   
