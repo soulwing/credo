@@ -27,6 +27,8 @@ import static org.jmock.Expectations.returnValue;
 
 import java.util.Collections;
 
+import javax.crypto.SecretKey;
+
 import org.jmock.Expectations;
 import org.jmock.api.Action;
 import org.jmock.auto.Mock;
@@ -34,6 +36,7 @@ import org.jmock.integration.junit4.JUnitRuleMockery;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.soulwing.credo.Password;
 import org.soulwing.credo.UserGroup;
 import org.soulwing.credo.UserProfile;
 import org.soulwing.credo.repository.UserGroupRepository;
@@ -42,6 +45,7 @@ import org.soulwing.credo.service.Errors;
 import org.soulwing.credo.service.GroupEditException;
 import org.soulwing.credo.service.UserContextService;
 import org.soulwing.credo.service.UserDetail;
+import org.soulwing.credo.service.crypto.SecretKeyEncryptionService;
 import org.soulwing.credo.service.crypto.SecretKeyWrapper;
 import org.soulwing.credo.service.protect.GroupProtectionService;
 
@@ -53,6 +57,8 @@ import org.soulwing.credo.service.protect.GroupProtectionService;
  */
 public abstract class AbstractGroupEditorTest<T extends AbstractGroupEditor> {
 
+  private static final String ENCODED_SECRET_KEY = "encodedSecretKey";
+
   private static final String OWNER_NAME = "someOwner";
 
   protected static final String FULL_NAME = "Full Name";
@@ -61,6 +67,8 @@ public abstract class AbstractGroupEditorTest<T extends AbstractGroupEditor> {
 
   protected static final String GROUP_NAME = "groupName";
   
+  protected static final Password PASSWORD = Password.EMPTY;
+
   @Rule
   public final JUnitRuleMockery context = new JUnitRuleMockery();
   
@@ -86,8 +94,20 @@ public abstract class AbstractGroupEditorTest<T extends AbstractGroupEditor> {
   protected GroupProtectionService protectionService;
   
   @Mock
+  protected SecretKeyEncryptionService secretKeyEncryptionService;
+  
+  @Mock
   protected SecretKeyWrapper secretKey;
 
+  @Mock
+  protected SecretKeyWrapper ownerKeyWrapper;
+  
+  @Mock
+  protected SecretKeyWrapper ownerGroupKey;
+  
+  @Mock
+  protected SecretKey ownerKey;
+  
   @Mock
   protected Errors errors;
 
@@ -106,6 +126,7 @@ public abstract class AbstractGroupEditorTest<T extends AbstractGroupEditor> {
     editor.setGroup(group);
     editor.setUsers(Collections.singleton(user));
     editor.protectionService = protectionService;
+    editor.secretKeyEncryptionService = secretKeyEncryptionService;
     editor.profileRepository = profileRepository;
     editor.groupRepository = groupRepository;
     onSetUp(editor);
@@ -138,6 +159,7 @@ public abstract class AbstractGroupEditorTest<T extends AbstractGroupEditor> {
     Long[] membership = new Long[] { 1L, 2L, 3L };
     context.checking(beforeSaveExpectations(membership));
     context.checking(ownerExpectations(owner));
+    context.checking(ownerKeyExpectations());
     context.checking(groupExpectations(returnValue(group)));
     context.checking(profileExpectations(membership.length,
         returnValue(profile)));
@@ -146,6 +168,7 @@ public abstract class AbstractGroupEditorTest<T extends AbstractGroupEditor> {
     context.checking(errorCheckExpectations(returnValue(false)));
     context.checking(afterSaveExpectations(membership));
     
+    editor.setPassword(PASSWORD);
     editor.setOwner(OWNER_NAME);
     editor.setUserId(1L);
     editor.setMembership(membership);
@@ -159,11 +182,6 @@ public abstract class AbstractGroupEditorTest<T extends AbstractGroupEditor> {
     context.checking(ownerExpectations(null));
     context.checking(ownerErrorExpectations());
     context.checking(groupExpectations(returnValue(group)));
-    context.checking(profileExpectations(membership.length,
-        returnValue(profile)));
-    context.checking(secretKeyExpectations(returnValue(secretKey)));
-    context.checking(protectionExpectations(membership.length));
-    context.checking(errorCheckExpectations(returnValue(true)));
     
     editor.setOwner(OWNER_NAME);
     editor.setUserId(1L);
@@ -212,6 +230,28 @@ public abstract class AbstractGroupEditorTest<T extends AbstractGroupEditor> {
     editor.save(errors);
   }
 
+  @Test
+  public void testSaveWithOwnerWhenUserNotMember() throws Exception {
+    Long[] membership = new Long[] { 1L, 2L, 3L };
+    context.checking(beforeSaveExpectations(membership));
+    context.checking(ownerExpectations(owner));
+    context.checking(ownerKeyExpectations());
+    context.checking(groupExpectations(returnValue(group)));
+    context.checking(profileExpectations(membership.length,
+        returnValue(profile)));
+    context.checking(secretKeyExpectations(returnValue(secretKey)));
+    context.checking(protectionExpectations(membership.length));
+    context.checking(errorCheckExpectations(returnValue(false)));
+    context.checking(afterSaveExpectations(membership));
+    
+    editor.setPassword(PASSWORD);
+    editor.setOwner(OWNER_NAME);
+    editor.setUserId(-1L);
+    editor.setMembership(membership);
+    editor.save(errors);    
+  }
+
+
   protected Expectations beforeSaveExpectations(Long[] membership) 
       throws Exception {
     return new Expectations();
@@ -237,8 +277,6 @@ public abstract class AbstractGroupEditorTest<T extends AbstractGroupEditor> {
           with(nullValue(String.class)));
       will(returnValue(owner));
       oneOf(group).setOwner(owner);
-      oneOf(group).getOwner();
-      will(returnValue(owner));
     } };
   }
 
@@ -247,6 +285,21 @@ public abstract class AbstractGroupEditorTest<T extends AbstractGroupEditor> {
       oneOf(errors).addError(with("owner"),
           with(containsString("NotFound")),
           (Object[]) with(arrayContaining(OWNER_NAME)));
+    } };
+  }
+  
+  protected Expectations ownerKeyExpectations() throws Exception {
+    return new Expectations() { { 
+      oneOf(protectionService).unprotect(with(owner), with(PASSWORD));
+      will(returnValue(ownerKeyWrapper));
+      oneOf(ownerKeyWrapper).derive();
+      will(returnValue(ownerKey));
+      oneOf(secretKeyEncryptionService).encrypt(with(secretKey), 
+          with(ownerKey));
+      will(returnValue(secretKey));
+      oneOf(secretKey).getContent();
+      will(returnValue(ENCODED_SECRET_KEY));
+      oneOf(group).setSecretKey(with(ENCODED_SECRET_KEY));
     } };
   }
   

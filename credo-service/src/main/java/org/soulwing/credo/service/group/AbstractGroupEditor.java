@@ -38,8 +38,11 @@ import org.soulwing.credo.service.GroupEditException;
 import org.soulwing.credo.service.MergeConflictException;
 import org.soulwing.credo.service.NoSuchGroupException;
 import org.soulwing.credo.service.PassphraseException;
+import org.soulwing.credo.service.UserAccessException;
 import org.soulwing.credo.service.UserDetail;
+import org.soulwing.credo.service.crypto.SecretKeyEncryptionService;
 import org.soulwing.credo.service.crypto.SecretKeyWrapper;
+import org.soulwing.credo.service.crypto.WrappedWith;
 import org.soulwing.credo.service.protect.GroupProtectionService;
 
 /**
@@ -62,6 +65,9 @@ abstract class AbstractGroupEditor implements ConfigurableGroupEditor,
   @Inject
   protected GroupProtectionService protectionService;
 
+  @Inject @WrappedWith(WrappedWith.Type.AES)
+  protected SecretKeyEncryptionService secretKeyEncryptionService;
+  
   @Inject
   protected UserProfileRepository profileRepository;
 
@@ -215,33 +221,19 @@ abstract class AbstractGroupEditor implements ConfigurableGroupEditor,
 
     try {
       beforeSave(errors);
-      if (owner != null) {
-        group.setOwner(groupRepository.findByGroupName(owner, null));
-        if (group.getOwner() == null) {
-          errors.addError("owner", "groupNotFound", owner);
-        }
-      }
       group = saveGroup(group, errors);
+      UserGroup ownerGroup = resolveOwner(errors);
   
-      if (!membership.contains(userId)) {
+      if (ownerGroup == null && !membership.contains(userId)) {
         membership.add(userId);
         errors.addWarning("members", "groupEditorUserMustBeMember");
       }
       
       SecretKeyWrapper secretKey = createSecretKey(group, errors);
-      for (Long userId : membership) {
-        if (isNewMember(userId)) {
-          UserProfile profile = profileRepository.findById(userId);
-          if (profile != null) {
-            protectionService.protect(group, secretKey, profile);
-          }
-          else {
-            UserDetail user = findUserDetail(userId);
-            errors.addWarning("members", "groupEditorNoSuchUser",
-                user.getLoginName(), user.getFullName());
-          }
-        }
+      if (ownerGroup != null) {
+        setOwnerSecretKey(secretKey, ownerGroup);
       }
+      addNewMembers(secretKey, errors);
       if (errors.hasWarnings() || errors.hasErrors()) {
         throw new GroupEditException();
       }
@@ -251,6 +243,49 @@ abstract class AbstractGroupEditor implements ConfigurableGroupEditor,
       errors.addError("groupAccessDenied", new Object[] { ex.getGroupName() });
       throw ex;
     }
+  }
+
+  private void setOwnerSecretKey(SecretKeyWrapper secretKey,
+      UserGroup ownerGroup) throws PassphraseException, GroupAccessException {
+    try {
+      SecretKeyWrapper ownerKey = protectionService.unprotect(
+          ownerGroup, password);
+      SecretKeyWrapper groupOwnerKey = secretKeyEncryptionService.encrypt(
+          secretKey, ownerKey.derive());
+      group.setSecretKey(groupOwnerKey.getContent());
+    }
+    catch (UserAccessException ex) {
+      throw new PassphraseException();
+    }
+  }
+
+  private void addNewMembers(SecretKeyWrapper secretKey, Errors errors) {
+    for (Long userId : membership) {
+      if (isNewMember(userId)) {
+        UserProfile profile = profileRepository.findById(userId);
+        if (profile != null) {
+          protectionService.protect(group, secretKey, profile);
+        }
+        else {
+          UserDetail user = findUserDetail(userId);
+          errors.addWarning("members", "groupEditorNoSuchUser",
+              user.getLoginName(), user.getFullName());
+        }
+      }
+    }
+  }
+
+  private UserGroup resolveOwner(Errors errors) throws GroupEditException {
+    UserGroup ownerGroup = null;
+    if (owner != null) {
+      ownerGroup = groupRepository.findByGroupName(owner, null);
+      group.setOwner(ownerGroup);
+      if (ownerGroup == null) {
+        errors.addError("owner", "groupNotFound", owner);
+        throw new GroupEditException();
+      }
+    }
+    return ownerGroup;
   }
   
   protected abstract SecretKeyWrapper createSecretKey(UserGroup group, Errors errors)

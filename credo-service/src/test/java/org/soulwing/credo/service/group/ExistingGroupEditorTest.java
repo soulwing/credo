@@ -32,7 +32,6 @@ import org.jmock.Expectations;
 import org.jmock.api.Action;
 import org.jmock.auto.Mock;
 import org.junit.Test;
-import org.soulwing.credo.Password;
 import org.soulwing.credo.UserGroupMember;
 import org.soulwing.credo.repository.UserGroupMemberRepository;
 import org.soulwing.credo.security.OwnerAccessControlException;
@@ -50,7 +49,6 @@ public class ExistingGroupEditorTest
     extends AbstractGroupEditorTest<ExistingGroupEditor> {
 
   private static final Long PROFILE_ID = -100L;
-  private static final Password PASSWORD = Password.EMPTY;
   
   @Mock
   private UserGroupMemberRepository memberRepository;
