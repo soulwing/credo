@@ -19,16 +19,20 @@
 package org.soulwing.credo.domain;
 
 import java.util.Date;
+import java.util.Set;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
 import org.soulwing.credo.UserGroup;
+import org.soulwing.credo.UserGroupMember;
 
 /**
  * A {@link UserGroup} that is a JPA entity.
@@ -53,6 +57,12 @@ public class UserGroupEntity extends AbstractEntity implements UserGroup {
   @Lob
   @Column(name = "secret_key")
   private String secretKey;
+  
+  @OneToMany(mappedBy = "group", fetch = FetchType.LAZY)
+  private Set<UserGroupMemberEntity> members;
+  
+  @Column(name = "ancestry_path", nullable = false)
+  private String ancestryPath = PATH_DELIMITER;
   
   @Temporal(TemporalType.TIMESTAMP)
   @Column(name = "date_created")
@@ -132,7 +142,13 @@ public class UserGroupEntity extends AbstractEntity implements UserGroup {
       throw new IllegalArgumentException("unsupported group type: "
           + owner.getClass().getName());
     }
+    if (owner.getId() == null) {
+      throw new IllegalArgumentException("transient owner not supported");
+    }
+  
     this.owner = (UserGroupEntity) owner;
+
+    setAncestryPath(owner);
   }
 
   /**
@@ -149,6 +165,38 @@ public class UserGroupEntity extends AbstractEntity implements UserGroup {
   @Override
   public void setSecretKey(String secretKey) {
     this.secretKey = secretKey;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public Set<? extends UserGroupMember> getMembers() {
+    return members;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public String getAncestryPath() {
+    return ancestryPath;
+  }
+
+  /**
+   * Sets the ancestry path for this group relative to the given owner.
+   * @param owner the owner whose path is the basis for this group's
+   *    ancestry
+   */
+  private void setAncestryPath(UserGroup owner) {
+    StringBuilder path = new StringBuilder();
+    if (owner != null) {
+      path.append(owner.getAncestryPath());
+      path.append(owner.getId());
+    }
+    path.append(UserGroup.PATH_DELIMITER);
+    
+    ancestryPath = path.toString();
   }
 
   /**

@@ -18,6 +18,8 @@
  */
 package org.soulwing.credo;
 
+import java.util.Set;
+
 /**
  * A group of users who share ownership of assigned credentials.
  *
@@ -29,6 +31,11 @@ public interface UserGroup extends Owned {
    * Name of the "self" group.
    */
   String SELF_GROUP_NAME = "self";
+  
+  /**
+   * Delimiter for a group's ancestry path.
+   */
+  String PATH_DELIMITER = "/";
   
   /**
    * Gets the unique identifier of the group.
@@ -85,5 +92,17 @@ public interface UserGroup extends Owned {
    */
   void setSecretKey(String secretKey);
 
+  /**
+   * Gets the members of this group.
+   * @return set of members
+   */
+  Set<? extends UserGroupMember> getMembers();
+  
+  /**
+   * Gets the path of ancestors for this group.
+   * @return path string (never {@code null})
+   */
+  String getAncestryPath();
+  
 }
 
