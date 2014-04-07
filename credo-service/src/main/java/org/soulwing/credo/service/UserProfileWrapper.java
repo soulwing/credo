@@ -60,6 +60,24 @@ class UserProfileWrapper implements UserDetail, Serializable {
    * {@inheritDoc}
    */
   @Override
+  public int hashCode() {
+    return delegate.hashCode();
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public boolean equals(Object obj) {
+    if (obj == this) return true;
+    if (!(obj instanceof UserProfileWrapper)) return false;
+    return delegate.equals(((UserProfileWrapper) obj).delegate);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
   public String toString() {
     return String.format("%s (%s)", getFullName(), getLoginName());
   }

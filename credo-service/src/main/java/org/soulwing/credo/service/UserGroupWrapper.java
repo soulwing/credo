@@ -46,6 +46,14 @@ class UserGroupWrapper implements GroupDetail, Serializable {
   }
 
   /**
+   * Gets the {@code delegate} property.
+   * @return
+   */
+  public UserGroup getDelegate() {
+    return delegate;
+  }
+
+  /**
    * Adds a member to the group represented by this wrapper.
    * @param member the member to add
    */
@@ -110,6 +118,29 @@ class UserGroupWrapper implements GroupDetail, Serializable {
    */
   public void setInUse(boolean inUse) {
     this.inUse = inUse;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public int hashCode() {
+    return delegate.hashCode();
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public boolean equals(Object obj) {
+    if (obj == this) return true;
+    if (!(obj instanceof UserGroupWrapper)) return false;
+    return delegate.equals(((UserGroupWrapper) obj).delegate);
+  }
+
+  @Override
+  public String toString() {
+    return delegate.toString();
   }
   
 }
