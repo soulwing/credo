@@ -18,8 +18,10 @@
  */
 package org.soulwing.credo.repository;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
+import java.util.List;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.persistence.EntityManager;
@@ -126,27 +128,6 @@ public class JpaUserGroupMemberRepository
     }
   }
 
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public UserGroupMember findByGroupAndLoginName(UserGroup group,
-      String loginName) {
-
-    TypedQuery<UserGroupMember> query = entityManager.createNamedQuery(
-        "findGroupMemberWithGroupAndLoginName", UserGroupMember.class);
-
-    query.setParameter("group", group);
-    query.setParameter("loginName", loginName);
-
-    try {
-      return query.getSingleResult();
-    }
-    catch (NoResultException ex) {
-      return null;
-    }
-  }
-
 
   /**
    * {@inheritDoc}
@@ -199,5 +180,52 @@ public class JpaUserGroupMemberRepository
     
     return (Collection<UserGroupMember>) query.getResultList();
   }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public UserGroupMember findByGroupAndLoginName(UserGroup group,
+      String loginName) {
+
+    // We can't use a typed query here because we have more than one 
+    // item in the select clause, in order to allow sorting.
+    Query query = null;
+
+    if (group.getOwner() == null) {
+      query = entityManager.createNamedQuery(
+          "findGroupMemberWithGroupAndLoginName");
+    }
+    else {
+      query = entityManager.createNamedQuery(
+          "findGroupMemberWithGroupAndLoginNameIncludingAncestors");
+      query.setParameter("ancestors", makeAncestorList(group));
+    }
+
+    query.setParameter("groupId", group.getId());
+    query.setParameter("loginName", loginName);
+
+    List results = query.getResultList();
+    if (results.isEmpty()) return null;
+    
+    if (group.getOwner() == null) {
+      return (UserGroupMember) results.get(0);
+    }
+    
+    Object[] row = (Object[]) results.get(0);
+    return (UserGroupMember) row[0];
+  }
+
+  private List<Long> makeAncestorList(UserGroup group) {
+    List<Long> ancestors = new ArrayList<>();
+    String path = group.getAncestryPath();
+    String[] ids = path.length() < 2 ?
+        new String[0] : path.substring(1, path.length() - 1).split("/");
+    for (String id : ids) {
+      ancestors.add(Long.valueOf(id));
+    }
+    return ancestors;
+  }
+
 
 }

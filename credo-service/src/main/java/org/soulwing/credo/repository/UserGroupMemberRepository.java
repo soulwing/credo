@@ -58,13 +58,19 @@ public interface UserGroupMemberRepository {
   UserGroupMember findByGroupAndProfileId(String groupName, Long profileId);
   
   /**
-   * Finds a group member for the given group and login name.
+   * Finds a group member for the given group name and login name.
    * @param groupName the subject group name
    * @param loginName the subject user's login name
    * @return matching group member or {@code null} if no such member exists
    */
   UserGroupMember findByGroupNameAndLoginName(String groupName, String loginName);
   
+  /**
+   * Finds a group member for the given group and login name.
+   * @param group the subject group
+   * @param loginName the subject user's login name
+   * @return matching group member or {@code null} if no such member exists
+   */
   UserGroupMember findByGroupAndLoginName(UserGroup group, String loginName);
   
   /**
@@ -84,7 +90,7 @@ public interface UserGroupMemberRepository {
   Collection<UserGroupMember> findByLoginName(String loginName);
 
   /**
-   * Finds all group memebers for the given group and login name.
+   * Finds all group members for the given group and login name.
    * @param groupName unique identifier of the subject group
    * @param loginName the subject user's login name
    * @return matching group member or {@code null} if no such member exists

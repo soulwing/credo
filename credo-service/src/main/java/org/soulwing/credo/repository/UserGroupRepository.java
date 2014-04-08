@@ -18,7 +18,7 @@
  */
 package org.soulwing.credo.repository;
 
-import java.util.Set;
+import java.util.List;
 
 import org.soulwing.credo.UserGroup;
 import org.soulwing.credo.UserGroupFactory;
@@ -74,6 +74,20 @@ public interface UserGroupRepository extends UserGroupFactory {
    * @return set of groups for which the user with {@code loginName} is
    *     a member
    */
-  Set<? extends UserGroup> findByLoginName(String loginName);
+  List<UserGroup> findByLoginName(String loginName);
+
+  /**
+   * Finds the groups are owned by the given owner.
+   * @param owner the group owner to match
+   * @return set of groups owned by {@code owner}
+   */
+  List<UserGroup> findByOwner(UserGroup owner);
+  
+  /**
+   * Finds all of the descendants of the given group.
+   * @param group the subject group
+   * @return set of descendant of {@code group}
+   */
+  List<UserGroup> findDescendants(UserGroup group);
 
 }

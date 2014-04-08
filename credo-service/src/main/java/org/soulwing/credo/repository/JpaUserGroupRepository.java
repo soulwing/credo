@@ -19,8 +19,7 @@
 package org.soulwing.credo.repository;
 
 import java.util.Date;
-import java.util.LinkedHashSet;
-import java.util.Set;
+import java.util.List;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.persistence.EntityManager;
@@ -131,13 +130,34 @@ public class JpaUserGroupRepository implements UserGroupRepository {
    * {@inheritDoc}
    */
   @Override
-  public Set<? extends UserGroup> findByLoginName(String loginName) {
+  public List<UserGroup> findByLoginName(String loginName) {
     TypedQuery<UserGroup> query = entityManager.createNamedQuery(
         "findGroupsByLoginName", UserGroup.class);
     query.setParameter("loginName", loginName);
-    Set<UserGroup> groups = new LinkedHashSet<>();
-    groups.addAll(query.getResultList());
-    return groups;
+    return query.getResultList();
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public List<UserGroup> findByOwner(UserGroup owner) {
+    TypedQuery<UserGroup> query = entityManager.createNamedQuery(
+        "findGroupsByOwner", UserGroup.class);
+    query.setParameter("owner", owner);
+    return query.getResultList();
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public List<UserGroup> findDescendants(UserGroup group) {
+    TypedQuery<UserGroup> query = entityManager.createNamedQuery(
+        "findGroupDescendants", UserGroup.class);
+    query.setParameter("pattern", String.format("%%%s%d%s%%",
+        UserGroup.PATH_DELIMITER, group.getId(), UserGroup.PATH_DELIMITER));
+    return query.getResultList();
   }
 
 }

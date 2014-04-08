@@ -362,40 +362,6 @@ public class JpaUserGroupMemberRepositoryIT {
   }
 
   @Test
-  public void testFindByGroupIdAndLoginName() throws Exception {
-    UserProfileEntity user1 = EntityUtil.newUser("someUser1");
-    UserProfileEntity user2 = EntityUtil.newUser("someUser2");
-    UserGroupEntity group = EntityUtil.newGroup("someGroup");
-    
-    UserGroupMemberEntity groupMember1 = EntityUtil.newGroupMember(user1, group);
-    UserGroupMemberEntity groupMember2 = EntityUtil.newGroupMember(user2, group);
-    
-    entityManager.persist(user1);
-    entityManager.persist(user2);
-    entityManager.persist(group);
-    entityManager.persist(groupMember1);
-    entityManager.persist(groupMember2);
-    entityManager.flush();
-    entityManager.clear();
-    
-    Iterator<UserGroupMember> members = 
-        repository.findByGroupIdAndLoginName(group.getId(), 
-            user1.getLoginName()).iterator();
-
-    assertThat(members.hasNext(), is(true));
-    UserGroupMember member1 = members.next();
-    assertThat(member1.getUser(), 
-        hasProperty("loginName", equalTo(user1.getLoginName())));
-
-    assertThat(members.hasNext(), is(true));
-    UserGroupMember member2 = members.next();
-    assertThat(member2.getUser(), 
-        hasProperty("loginName", equalTo(user2.getLoginName())));
-    
-    assertThat(members.hasNext(), is(false));
-  }
-
-  @Test
   public void testFindByLoginNameWhenOnlyOneMember() throws Exception {
     UserProfileEntity user = EntityUtil.newUser("someUser");
     UserGroupEntity group = EntityUtil.newGroup("someGroup");
@@ -416,6 +382,111 @@ public class JpaUserGroupMemberRepositoryIT {
     assertThat(member.getUser(), 
         hasProperty("loginName", equalTo(user.getLoginName())));
 
+    assertThat(members.hasNext(), is(false));
+  }
+
+  @Test
+  public void testFindByGroupAndLoginNameWhenMemberOfGroup() throws Exception {
+    UserProfileEntity user = EntityUtil.newUser("someUser");
+    UserGroupEntity group = EntityUtil.newGroup("someGroup");
+    UserGroupEntity parent = EntityUtil.newGroup("parentGroup");
+    
+    UserGroupMemberEntity groupMember1 = EntityUtil.newGroupMember(user, group);
+    UserGroupMemberEntity groupMember2 = EntityUtil.newGroupMember(user, parent);
+    
+    entityManager.persist(user);
+    entityManager.persist(parent);
+    group.setOwner(parent);
+    entityManager.persist(group);
+    entityManager.persist(groupMember1);
+    entityManager.persist(groupMember2);
+    entityManager.flush();
+    entityManager.clear();
+    
+    UserGroupMember member = repository.findByGroupAndLoginName(group, 
+        user.getLoginName());
+  
+    assertThat(member, is(not(nullValue())));
+    assertThat(member.getUser().getLoginName(), is(equalTo(user.getLoginName())));
+    assertThat(member.getGroup().getName(), is(equalTo(group.getName())));
+  }
+
+  @Test
+  public void testFindByGroupAndLoginNameWhenMemberOfAncestor() throws Exception {
+    UserProfileEntity user = EntityUtil.newUser("someUser");
+    UserGroupEntity group = EntityUtil.newGroup("someGroup");
+    UserGroupEntity parent = EntityUtil.newGroup("parentGroup");
+    
+    UserGroupMemberEntity groupMember = EntityUtil.newGroupMember(user, parent);
+    
+    entityManager.persist(user);
+    entityManager.persist(parent);
+    group.setOwner(parent);
+    entityManager.persist(group);
+    entityManager.persist(groupMember);
+    entityManager.flush();
+    entityManager.clear();
+    
+    UserGroupMember member = repository.findByGroupAndLoginName(group, 
+        user.getLoginName());
+  
+    assertThat(member, is(not(nullValue())));
+    assertThat(member.getUser().getLoginName(), is(equalTo(user.getLoginName())));
+    assertThat(member.getGroup().getName(), is(equalTo(parent.getName())));
+  }
+
+  @Test
+  public void testFindByGroupAndLoginNameWhenOwnerIsSelf() throws Exception {
+    UserProfileEntity user = EntityUtil.newUser("someUser");
+    UserGroupEntity group = EntityUtil.newGroup("someGroup");
+    
+    UserGroupMemberEntity groupMember1 = EntityUtil.newGroupMember(user, group);
+    
+    entityManager.persist(user);
+    entityManager.persist(group);
+    entityManager.persist(groupMember1);
+    entityManager.flush();
+    entityManager.clear();
+    
+    UserGroupMember member = repository.findByGroupAndLoginName(group, 
+        user.getLoginName());
+  
+    assertThat(member, is(not(nullValue())));
+    assertThat(member.getUser().getLoginName(), is(equalTo(user.getLoginName())));
+    assertThat(member.getGroup().getName(), is(equalTo(group.getName())));
+  }
+
+  @Test
+  public void testFindByGroupIdAndLoginName() throws Exception {
+    UserProfileEntity user1 = EntityUtil.newUser("someUser1");
+    UserProfileEntity user2 = EntityUtil.newUser("someUser2");
+    UserGroupEntity group = EntityUtil.newGroup("someGroup");
+    
+    UserGroupMemberEntity groupMember1 = EntityUtil.newGroupMember(user1, group);
+    UserGroupMemberEntity groupMember2 = EntityUtil.newGroupMember(user2, group);
+    
+    entityManager.persist(user1);
+    entityManager.persist(user2);
+    entityManager.persist(group);
+    entityManager.persist(groupMember1);
+    entityManager.persist(groupMember2);
+    entityManager.flush();
+    entityManager.clear();
+    
+    Iterator<UserGroupMember> members = 
+        repository.findByGroupIdAndLoginName(group.getId(), 
+            user1.getLoginName()).iterator();
+  
+    assertThat(members.hasNext(), is(true));
+    UserGroupMember member1 = members.next();
+    assertThat(member1.getUser(), 
+        hasProperty("loginName", equalTo(user1.getLoginName())));
+  
+    assertThat(members.hasNext(), is(true));
+    UserGroupMember member2 = members.next();
+    assertThat(member2.getUser(), 
+        hasProperty("loginName", equalTo(user2.getLoginName())));
+    
     assertThat(members.hasNext(), is(false));
   }
 

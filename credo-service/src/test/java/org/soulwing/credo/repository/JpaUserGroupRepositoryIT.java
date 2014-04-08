@@ -27,7 +27,7 @@ import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertThat;
 
-import java.util.Set;
+import java.util.List;
 
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
@@ -182,7 +182,7 @@ public class JpaUserGroupRepositoryIT {
   @Test
   public void testFindByLoginName() throws Exception {
     final String loginName = "someUser";
-    UserProfileEntity user = EntityUtil.newUser("someUser");
+    UserProfileEntity user = EntityUtil.newUser(loginName);
     UserGroupEntity group = EntityUtil.newGroup("someGroup");
     
     UserGroupMemberEntity groupMember = EntityUtil.newGroupMember(user, group);
@@ -193,9 +193,98 @@ public class JpaUserGroupRepositoryIT {
     entityManager.flush();
     entityManager.clear();
     
-    Set<? extends UserGroup> groups = 
-        repository.findByLoginName(loginName);
+    List<UserGroup> groups = repository.findByLoginName(loginName);
     assertThat(groups, contains(hasProperty("name", equalTo("someGroup"))));
   }
 
+  @Test
+  public void testFindByOwnerWithChild() throws Exception {
+    UserProfileEntity user = EntityUtil.newUser("someUser");
+    UserGroupEntity group = EntityUtil.newGroup("someGroup");
+    UserGroupEntity owner = EntityUtil.newGroup("someOwner");
+    
+    UserGroupMemberEntity groupMember = EntityUtil.newGroupMember(user, group);
+    
+    entityManager.persist(user);
+    entityManager.persist(owner);
+
+    group.setOwner(owner);
+    entityManager.persist(group);
+    entityManager.persist(groupMember);
+    entityManager.flush();
+    entityManager.clear();
+    
+    List<UserGroup> groups = repository.findByOwner(owner);
+    assertThat(groups, contains(hasProperty("name", equalTo("someGroup"))));
+
+    
+    assertThat(groups, contains(hasProperty("ancestryPath", 
+        equalTo(makePath(owner.getId())))));
+  }
+
+  @Test
+  public void testFindByOwnerWithGrandchild() throws Exception {
+    UserGroupEntity child = EntityUtil.newGroup("child");
+    UserGroupEntity grandchild = EntityUtil.newGroup("grandchild");
+    UserGroupEntity parent = EntityUtil.newGroup("parent");
+    
+    
+    entityManager.persist(parent);
+
+    child.setOwner(parent);
+    entityManager.persist(child);
+    
+    grandchild.setOwner(child);
+    entityManager.persist(grandchild);
+
+    entityManager.flush();
+    entityManager.clear();
+    
+    List<UserGroup> groups = repository.findByOwner(child);
+    assertThat(groups.size(), is(equalTo(1)));
+    
+    assertThat(groups.get(0).getName(), is(equalTo("grandchild")));
+    assertThat(groups.get(0).getAncestryPath(), 
+        is(equalTo(makePath(parent.getId(), child.getId()))));    
+  }
+
+  @Test
+  public void testFindDescendants() throws Exception {
+    UserGroupEntity parent = EntityUtil.newGroup("parent");
+    UserGroupEntity child = EntityUtil.newGroup("child");
+    UserGroupEntity grandchild = EntityUtil.newGroup("grandchild");
+        
+    entityManager.persist(parent);
+
+    child.setOwner(parent);
+    entityManager.persist(child);
+    
+    grandchild.setOwner(child);
+    entityManager.persist(grandchild);
+
+    entityManager.flush();
+    entityManager.clear();
+    
+    List<UserGroup> groups = repository.findDescendants(parent);
+    assertThat(groups.size(), is(equalTo(2)));
+    
+    assertThat(groups.get(0).getName(), is(equalTo("child")));
+    assertThat(groups.get(0).getAncestryPath(), 
+        is(equalTo(makePath(parent.getId()))));    
+    
+    assertThat(groups.get(1).getName(), is(equalTo("grandchild")));
+    assertThat(groups.get(1).getAncestryPath(), 
+        is(equalTo(makePath(parent.getId(), child.getId()))));    
+
+  }
+
+  private String makePath(Long... ids) {
+    StringBuilder sb = new StringBuilder();
+    sb.append(UserGroup.PATH_DELIMITER);
+    for (Long id : ids) {
+      sb.append(id).append(UserGroup.PATH_DELIMITER);
+    }
+    return sb.toString();
+  }
+  
 }
