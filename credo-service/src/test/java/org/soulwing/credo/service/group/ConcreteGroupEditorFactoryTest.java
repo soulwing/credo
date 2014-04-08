@@ -109,6 +109,8 @@ public class ConcreteGroupEditorFactoryTest {
       will(returnValue(editor));
       oneOf(groupRepository).newGroup(with(""));
       will(returnValue(group));
+      oneOf(group).getId();
+      will(returnValue(null));
       oneOf(profileService).findAllProfiles();
       will(returnValue(users));
       oneOf(profileService).getLoggedInUserProfile();
@@ -131,6 +133,8 @@ public class ConcreteGroupEditorFactoryTest {
       will(returnValue(editor));
       oneOf(groupRepository).findById(with(GROUP_ID));
       will(returnValue(group));
+      oneOf(group).getId();
+      will(returnValue(GROUP_ID));      
       oneOf(group).getName();
       will(returnValue(GROUP_NAME));
       oneOf(memberRepository).findAllMembers(with(GROUP_NAME));
@@ -145,7 +149,7 @@ public class ConcreteGroupEditorFactoryTest {
       will(onConsecutiveCalls(returnValue(USER_ID), returnValue(OWNER_ID)));
       oneOf(editor).setGroup(with(same(group)));
       oneOf(editor).setUserId(with(OWNER_ID));
-      oneOf(editor).setMembership(with(arrayContaining(USER_ID, OWNER_ID)));
+      oneOf(editor).setMembership(with(arrayContaining(USER_ID)));
       oneOf(editor).setUsers(with(same(users)));
     } });
     

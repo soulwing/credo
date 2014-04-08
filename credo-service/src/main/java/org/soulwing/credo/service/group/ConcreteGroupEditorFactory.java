@@ -96,7 +96,9 @@ public class ConcreteGroupEditorFactory implements GroupEditorFactory {
   private ConfigurableGroupEditor configure(ConfigurableGroupEditor editor,
       UserGroup group, Set<Long> membership) {
     Long ownerId = profileService.getLoggedInUserProfile().getId();
-    membership.add(ownerId);
+    if (group.getId() == null) {
+      membership.add(ownerId);
+    }
     editor.setGroup(group);
     editor.setUserId(ownerId);
     editor.setUsers(profileService.findAllProfiles());

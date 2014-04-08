@@ -224,7 +224,8 @@ abstract class AbstractGroupEditor implements ConfigurableGroupEditor,
       group = saveGroup(group, errors);
       UserGroup ownerGroup = resolveOwner(errors);
   
-      if (ownerGroup == null && !membership.contains(userId)) {
+      if (ownerGroup == null && 
+          !membership.contains(userId)) {
         membership.add(userId);
         errors.addWarning("members", "groupEditorUserMustBeMember");
       }
