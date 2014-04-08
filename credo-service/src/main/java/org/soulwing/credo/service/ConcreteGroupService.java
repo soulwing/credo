@@ -20,6 +20,11 @@ package org.soulwing.credo.service;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 import javax.ejb.ConcurrencyManagement;
 import javax.ejb.ConcurrencyManagementType;
@@ -31,6 +36,7 @@ import javax.inject.Inject;
 import org.apache.commons.lang.Validate;
 import org.soulwing.credo.UserGroup;
 import org.soulwing.credo.UserGroupMember;
+import org.soulwing.credo.UserProfile;
 import org.soulwing.credo.repository.CredentialRepository;
 import org.soulwing.credo.repository.UserGroupMemberRepository;
 import org.soulwing.credo.repository.UserGroupRepository;
@@ -87,13 +93,26 @@ public class ConcreteGroupService implements GroupService {
   @Override
   @TransactionAttribute(TransactionAttributeType.REQUIRED)
   public Collection<GroupDetail> findAllGroups() {
-    return assembleGroupDetails(memberRepository.findByLoginName(
-        userContextService.getLoginName()));
+    Set<GroupDetail> allDetails = new HashSet<>();
+    
+    Collection<UserGroupMember> members = 
+        memberRepository.findByLoginName(userContextService.getLoginName());
+    
+    Set<GroupDetail> details = assembleGroupDetails(members);
+    allDetails.addAll(details);
+    
+    for (GroupDetail detail : details) {
+      UserGroup group = ((UserGroupWrapper) detail).getDelegate();
+      List<UserGroup> descendants = groupRepository.findDescendants(group);
+      allDetails.addAll(assembleGroupDetails(descendants));
+    }
+    
+    return sortedDetails(allDetails);
   }
 
-  private Collection<GroupDetail> assembleGroupDetails(
+  private Set<GroupDetail> assembleGroupDetails(
       Collection<UserGroupMember> members) {
-    Collection<GroupDetail> groupDetails = new ArrayList<>();
+    Set<GroupDetail> details = new HashSet<>();
     UserGroupWrapper wrapper = null;
     for (UserGroupMember member : members) {
       UserGroup group = member.getGroup();
@@ -102,13 +121,41 @@ public class ConcreteGroupService implements GroupService {
       if (wrapper == null || !wrapper.getName().equals(groupName)) {
         wrapper = new UserGroupWrapper(group);
         wrapper.setInUse(resolveGroupInUse(group));
-        groupDetails.add(wrapper);
+        details.add(wrapper);
       }
-      wrapper.addMember(new UserProfileWrapper(member.getUser()));
+      UserProfile user = member.getUser();
+      if (user != null) {
+        wrapper.addMember(new UserProfileWrapper(user));
+      }
     }
-    return groupDetails;
+    return details;
   }
 
+  private Set<GroupDetail> assembleGroupDetails(List<UserGroup> groups) {
+    Set<GroupDetail> details = new HashSet<>();  
+    for (UserGroup group : groups) {
+      UserGroupWrapper wrapper = new UserGroupWrapper(group);
+      wrapper.setInUse(resolveGroupInUse(group));
+      for (UserGroupMember member : group.getMembers()) {
+        wrapper.addMember(new UserProfileWrapper(member.getUser()));
+      }
+      details.add(wrapper);
+    }
+    return details;
+  }
+  
+  private List<GroupDetail> sortedDetails(Set<GroupDetail> details) {
+    List<GroupDetail> allDetails = new ArrayList<>(details.size());
+    allDetails.addAll(details);
+    Collections.sort(allDetails, new Comparator<GroupDetail>() {
+      @Override
+      public int compare(GroupDetail a, GroupDetail b) {
+        return a.getName().compareTo(b.getName());
+      }
+    });
+    return allDetails;
+  }
+  
   private boolean resolveGroupInUse(UserGroup group) {
     return !credentialRepository.findAllByOwnerId(group.getId()).isEmpty();
   }
@@ -164,11 +211,11 @@ public class ConcreteGroupService implements GroupService {
   public boolean isExistingGroup(String groupName)
       throws GroupAccessException {
     String loginName = userContextService.getLoginName();
-    boolean exists = groupRepository
-        .findByGroupName(groupName, loginName) != null;
+    UserGroup group = groupRepository.findByGroupName(groupName, loginName);
+    boolean exists = group != null;
     if (exists) {
-      UserGroupMember member = memberRepository.findByGroupNameAndLoginName(
-          groupName, loginName);
+      UserGroupMember member = memberRepository.findByGroupAndLoginName(
+          group, loginName);
       if (member == null) {
         throw new GroupAccessException(groupName);
       }
