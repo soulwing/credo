@@ -44,6 +44,28 @@
     </query>
   </named-query>
 
+  <named-query name="findGroupsByOwner">
+    <query>
+      select distinct g from UserGroupEntity g
+      left outer join fetch g.members gm
+      left outer join fetch gm.user
+      where g.owner = :owner
+      and g.name is not null
+      order by g.name
+    </query>
+  </named-query>
+
+  <named-query name="findGroupDescendants">
+    <query>
+      select distinct g from UserGroupEntity g
+      left outer join fetch g.members gm
+      left outer join fetch gm.user
+      where g.ancestryPath like :pattern
+      and g.name is not null
+      order by g.name
+    </query>
+  </named-query>
+  
   <named-query name="findAllGroupMembers">
     <query>
       select distinct gm, u from UserGroupMemberEntity gm
@@ -90,11 +112,21 @@
       inner join gm.group g
       inner join gm.user u
       where u.loginName = :loginName
-      and g = :group
+      and g.id = :groupId
     </query>
   </named-query>
-  
-  
+
+  <named-query name="findGroupMemberWithGroupAndLoginNameIncludingAncestors">
+    <query>
+      select distinct gm, g from UserGroupMemberEntity gm
+      inner join gm.group g
+      inner join gm.user u
+      where u.loginName = :loginName
+      and g.id = :groupId or g.id in :ancestors
+      order by g.ancestorCount desc, g.name
+    </query>
+  </named-query>
+
   <named-query name="findGroupsAndMembersByLoginName">
     <query>
       select distinct gm, g, u from UserGroupMemberEntity gm
