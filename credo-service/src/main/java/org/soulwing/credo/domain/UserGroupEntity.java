@@ -64,6 +64,9 @@ public class UserGroupEntity extends AbstractEntity implements UserGroup {
   @Column(name = "ancestry_path", nullable = false)
   private String ancestryPath = PATH_DELIMITER;
   
+  @Column(name = "ancestor_count", nullable = false)
+  private int ancestorCount = 0;
+  
   @Temporal(TemporalType.TIMESTAMP)
   @Column(name = "date_created")
   private Date dateCreated;
@@ -149,6 +152,7 @@ public class UserGroupEntity extends AbstractEntity implements UserGroup {
     this.owner = (UserGroupEntity) owner;
 
     setAncestryPath(owner);
+    setAncestorCount(owner);
   }
 
   /**
@@ -198,7 +202,20 @@ public class UserGroupEntity extends AbstractEntity implements UserGroup {
     
     ancestryPath = path.toString();
   }
+  
+  @Override
+  public int getAncestorCount() {
+    return ancestorCount;
+  }
 
+  /**
+   * Sets the ancestry path for this group relative to the given owner.
+   * @param owner the owner that is the basis for this group's ancestry
+   */
+  private void setAncestorCount(UserGroup owner) {
+    this.ancestorCount = owner.getAncestorCount() + 1;
+  }
+  
   /**
    * Gets the {@code dateCreated} property.
    * @return

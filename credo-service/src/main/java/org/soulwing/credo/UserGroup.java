@@ -104,5 +104,11 @@ public interface UserGroup extends Owned {
    */
   String getAncestryPath();
   
+  /**
+   * Gets the number of ancestors for this group.
+   * @return number of ancestors
+   */
+  int getAncestorCount();
+    
 }
 
