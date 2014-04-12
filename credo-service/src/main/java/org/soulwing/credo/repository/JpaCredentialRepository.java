@@ -18,6 +18,8 @@
  */
 package org.soulwing.credo.repository;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -32,6 +34,7 @@ import javax.persistence.TypedQuery;
 import org.soulwing.credo.Credential;
 import org.soulwing.credo.CredentialCertificate;
 import org.soulwing.credo.Tag;
+import org.soulwing.credo.UserGroup;
 import org.soulwing.credo.domain.CredentialEntity;
 import org.soulwing.credo.security.Restricted;
 import org.soulwing.credo.security.Restricted.Restriction;
@@ -127,7 +130,29 @@ public class JpaCredentialRepository implements CredentialRepository {
     query.setParameter("loginName", loginName);
     return query.getResultList();
   }
+  
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public List<Credential> findAllByOwners(Collection<UserGroup> owners) {
+    TypedQuery<Credential> query = entityManager.createNamedQuery(
+        "findAllCredentialsByOwners", Credential.class);
+    query.setParameter("owners", ownerIds(owners));
+    return query.getResultList();
+  }
 
+  private Collection<Long> ownerIds(Collection<UserGroup> owners) {
+    List<Long> ownerIds = new ArrayList<>();
+    for (UserGroup owner : owners) {
+      if (owner.getId() == null) {
+        throw new IllegalArgumentException("all owners must be persistent");
+      }
+      ownerIds.add(owner.getId());
+    }
+    return ownerIds;
+  }
+  
   /**
    * {@inheritDoc}
    */

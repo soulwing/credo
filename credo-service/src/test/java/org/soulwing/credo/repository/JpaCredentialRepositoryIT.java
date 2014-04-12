@@ -25,6 +25,7 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.nullValue;
 
+import java.util.Arrays;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -43,6 +44,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.soulwing.credo.Credential;
+import org.soulwing.credo.UserGroup;
 import org.soulwing.credo.domain.CredentialCertificateEntity;
 import org.soulwing.credo.domain.CredentialEntity;
 import org.soulwing.credo.domain.CredentialKeyEntity;
@@ -305,6 +307,40 @@ public class JpaCredentialRepositoryIT {
     assertThat(actual, is(not(nullValue())));
     assertThat(actual.getName(), is(equalTo(credential.getName())));
   }
+
+  @Test
+  public void testFindAllByOwners() throws Exception {
+    UserGroupEntity group1 = EntityUtil.newGroup("group1");
+    UserGroupEntity group2 = EntityUtil.newGroup("group2");
+    CredentialEntity credential1 = EntityUtil.newCredential(group1, 
+        EntityUtil.newPrivateKey());
+    CredentialEntity credential2 = EntityUtil.newCredential(group2, 
+        EntityUtil.newPrivateKey());
+
+    credential1.setName("credential1");
+    credential2.setName("credential2");
+    credential1.setOwner(group1);
+    credential2.setOwner(group2);
+    
+    entityManager.persist(group1);
+    entityManager.persist(group2);    
+    repository.add(credential1);
+    repository.add(credential2);
+    
+    entityManager.flush();
+    entityManager.clear();
+    
+    List<UserGroup> owners = Arrays.asList(new UserGroup[] { group1, group2 });
+    List<Credential> credentials = repository.findAllByOwners(owners);
+    assertThat(credentials.size(), is(equalTo(2)));    
+    
+    Credential actual1 = credentials.get(0);
+    assertThat(actual1.getId(), is(equalTo(credential1.getId())));
+    
+    Credential actual2 = credentials.get(1);
+    assertThat(actual2.getId(), is(equalTo(credential2.getId())));
+  }
+
 
   @Test
   public void testFindByRequestId() throws Exception {

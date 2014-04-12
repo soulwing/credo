@@ -18,9 +18,11 @@
  */
 package org.soulwing.credo.repository;
 
+import java.util.Collection;
 import java.util.List;
 
 import org.soulwing.credo.Credential;
+import org.soulwing.credo.UserGroup;
 
 /**
  * A repository of persistent {@link Credential} objects.
@@ -65,6 +67,14 @@ public interface CredentialRepository {
    * @return list of credentials
    */
   List<Credential> findAllByLoginName(String loginName);
+  
+  /**
+   * Finds all credentials in the repository whose owner is contained in the
+   * given collection. 
+   * @param owners the collection of owners
+   * @return list of matching credentials
+   */
+  List<Credential> findAllByOwners(Collection<UserGroup> owners);
   
   /**
    * Finds a credential in the repository with a given owner.

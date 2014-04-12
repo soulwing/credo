@@ -201,6 +201,16 @@
     </query>
   </named-query>
 
+  <named-query name="findAllCredentialsByOwners">
+    <query>
+      select distinct c from CredentialEntity c
+      inner join fetch c.owner g
+      left outer join fetch c.tags t
+      where g.id in :owners
+      order by c.name
+    </query>
+  </named-query>
+  
   <named-query name="findAllCredentialsByOwnerId">
     <query>
       select distinct c from CredentialEntity c
@@ -246,4 +256,14 @@
     </query>
   </named-query>
 
+  <named-query name="findAllRequestsByOwners">
+    <query>
+      select distinct r from CredentialRequestEntity r
+      inner join fetch r.owner g
+      left outer join fetch r.tags t
+      where g.id in :owners
+      order by r.name
+    </query>
+  </named-query>
+  
 </entity-mappings>

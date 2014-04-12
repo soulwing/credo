@@ -18,9 +18,11 @@
  */
 package org.soulwing.credo.repository;
 
+import java.util.Collection;
 import java.util.List;
 
 import org.soulwing.credo.CredentialRequest;
+import org.soulwing.credo.UserGroup;
 
 /**
  * A repository of {@link CredentialRequest} objects.
@@ -66,5 +68,12 @@ public interface CredentialRequestRepository {
    */
   List<CredentialRequest> findAllByLoginName(String loginName);
   
+  /**
+   * Finds all credential requests in the repository whose owner is contained 
+   * in the given collection. 
+   * @param owners the collection of owners
+   * @return list of matching requests
+   */
+  List<CredentialRequest> findAllByOwners(Collection<UserGroup> owners);
 
 }
