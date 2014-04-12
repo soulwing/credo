@@ -32,6 +32,7 @@ import static org.jmock.Expectations.throwException;
 
 import java.io.StringWriter;
 import java.io.Writer;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Set;
 
@@ -46,8 +47,10 @@ import org.soulwing.credo.Credential;
 import org.soulwing.credo.CredentialCertificationRequest;
 import org.soulwing.credo.CredentialRequest;
 import org.soulwing.credo.Tag;
+import org.soulwing.credo.UserGroup;
 import org.soulwing.credo.repository.CredentialRepository;
 import org.soulwing.credo.repository.CredentialRequestRepository;
+import org.soulwing.credo.repository.UserGroupRepository;
 import org.soulwing.credo.security.OwnerAccessControlException;
 import org.soulwing.credo.service.request.CredentialRequestEditorFactory;
 import org.soulwing.credo.service.request.CredentialRequestGenerator;
@@ -80,6 +83,9 @@ public class ConcreteCredentialRequestServiceTest {
   
   @Mock
   private CredentialRepository credentialRepository;
+  
+  @Mock
+  private UserGroupRepository groupRepository;
   
   @Mock
   private CredentialRequestEditorFactory editorFactory;
@@ -120,12 +126,19 @@ public class ConcreteCredentialRequestServiceTest {
   @Mock
   private Set<? extends Tag> tags;
   
+  @Mock
+  private UserGroup group1;
+  
+  @Mock
+  private UserGroup group2;
+  
   private ConcreteCredentialRequestService service =
       new ConcreteCredentialRequestService();
   
   @Before
   public void setUp() throws Exception {
     service.credentialRepository = credentialRepository;
+    service.groupRepository = groupRepository;
     service.editorFactory = editorFactory;
     service.generator = generator;
     service.requestRepository = requestRepository;
@@ -176,11 +189,17 @@ public class ConcreteCredentialRequestServiceTest {
   }
   
   @Test
+  @SuppressWarnings("unchecked")
   public void testFindAllRequests() throws Exception {
-    context.checking(new Expectations() { { 
+    context.checking(new Expectations() { {
       oneOf(userContextService).getLoginName();
       will(returnValue(LOGIN_NAME));
-      oneOf(requestRepository).findAllByLoginName(with(LOGIN_NAME));
+      oneOf(groupRepository).findByLoginName(with(LOGIN_NAME));
+      will(returnValue(Collections.singletonList(group1)));
+      oneOf(groupRepository).findDescendants(with(same(group1)));
+      will(returnValue(Collections.singletonList(group2)));
+      oneOf(requestRepository).findAllByOwners(
+          (Collection<UserGroup>) with(contains(group1, group2)));
       will(returnValue(Collections.singletonList(request)));
     } });
     

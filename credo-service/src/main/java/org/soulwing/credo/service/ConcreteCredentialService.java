@@ -18,6 +18,7 @@
  */
 package org.soulwing.credo.service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.ejb.ConcurrencyManagement;
@@ -28,7 +29,9 @@ import javax.ejb.TransactionAttributeType;
 import javax.inject.Inject;
 
 import org.soulwing.credo.Credential;
+import org.soulwing.credo.UserGroup;
 import org.soulwing.credo.repository.CredentialRepository;
+import org.soulwing.credo.repository.UserGroupRepository;
 import org.soulwing.credo.security.OwnerAccessControlException;
 
 /**
@@ -42,6 +45,9 @@ public class ConcreteCredentialService implements CredentialService {
 
   @Inject
   protected CredentialRepository credentialRepository;
+  
+  @Inject
+  protected UserGroupRepository groupRepository;
   
   @Inject
   protected UserContextService userContextService;
@@ -64,8 +70,14 @@ public class ConcreteCredentialService implements CredentialService {
    */
   @Override
   public List<Credential> findAllCredentials() {
-    return credentialRepository.findAllByLoginName(
+    List<UserGroup> allGroups = new ArrayList<>();
+    List<UserGroup> groups = groupRepository.findByLoginName(
         userContextService.getLoginName());
+    allGroups.addAll(groups);
+    for (UserGroup group : groups) {
+      allGroups.addAll(groupRepository.findDescendants(group));
+    }
+    return credentialRepository.findAllByOwners(allGroups);
   }
 
   /**

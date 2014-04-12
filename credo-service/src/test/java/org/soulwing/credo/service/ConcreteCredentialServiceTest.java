@@ -19,11 +19,13 @@
 package org.soulwing.credo.service;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.sameInstance;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
@@ -34,7 +36,9 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.soulwing.credo.Credential;
+import org.soulwing.credo.UserGroup;
 import org.soulwing.credo.repository.CredentialRepository;
+import org.soulwing.credo.repository.UserGroupRepository;
 
 /**
  * Unit tests for {@link ConcreteCredentialService}.
@@ -57,13 +61,23 @@ public class ConcreteCredentialServiceTest {
   private CredentialRepository credentialRepository;
   
   @Mock
+  private UserGroupRepository groupRepository;
+  
+  @Mock
   private UserContextService userContextService;
   
+  @Mock
+  private UserGroup group1;
+
+  @Mock
+  private UserGroup group2;
+
   private ConcreteCredentialService service = new ConcreteCredentialService();
   
   @Before
   public void setUp() throws Exception {
     service.credentialRepository = credentialRepository;
+    service.groupRepository = groupRepository;
     service.userContextService = userContextService;
   }
   
@@ -89,11 +103,17 @@ public class ConcreteCredentialServiceTest {
   }
 
   @Test
-  public void testFindAllCredentialsByLoginName() throws Exception {
+  @SuppressWarnings("unchecked")
+  public void testFindAllCredentials() throws Exception {
     context.checking(new Expectations() { {
       oneOf(userContextService).getLoginName();
       will(returnValue(LOGIN_NAME));
-      oneOf(credentialRepository).findAllByLoginName(with(LOGIN_NAME));
+      oneOf(groupRepository).findByLoginName(with(LOGIN_NAME));
+      will(returnValue(Collections.singletonList(group1)));
+      oneOf(groupRepository).findDescendants(with(same(group1)));
+      will(returnValue(Collections.singletonList(group2)));
+      oneOf(credentialRepository).findAllByOwners(
+          (Collection<UserGroup>) with(contains(group1, group2)));
       will(returnValue(Collections.singletonList(credential)));
     } });
     

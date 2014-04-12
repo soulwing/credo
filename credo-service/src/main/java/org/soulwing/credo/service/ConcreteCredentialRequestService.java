@@ -20,6 +20,7 @@ package org.soulwing.credo.service;
 
 import java.io.IOException;
 import java.io.Writer;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.ejb.ConcurrencyManagement;
@@ -31,8 +32,10 @@ import javax.inject.Inject;
 
 import org.soulwing.credo.Credential;
 import org.soulwing.credo.CredentialRequest;
+import org.soulwing.credo.UserGroup;
 import org.soulwing.credo.repository.CredentialRepository;
 import org.soulwing.credo.repository.CredentialRequestRepository;
+import org.soulwing.credo.repository.UserGroupRepository;
 import org.soulwing.credo.security.OwnerAccessControlException;
 import org.soulwing.credo.service.request.CredentialRequestEditorFactory;
 import org.soulwing.credo.service.request.CredentialRequestGenerator;
@@ -55,6 +58,9 @@ public class ConcreteCredentialRequestService implements CredentialRequestServic
   @Inject
   protected CredentialRepository credentialRepository;
 
+  @Inject
+  protected UserGroupRepository groupRepository;
+  
   @Inject
   protected CredentialRequestEditorFactory editorFactory;
   
@@ -97,8 +103,14 @@ public class ConcreteCredentialRequestService implements CredentialRequestServic
   @Override
   @TransactionAttribute(TransactionAttributeType.REQUIRED)
   public List<CredentialRequest> findAllRequests() {
-    return requestRepository.findAllByLoginName(
+    List<UserGroup> allGroups = new ArrayList<>();
+    List<UserGroup> groups = groupRepository.findByLoginName(
         userContextService.getLoginName());
+    allGroups.addAll(groups);
+    for (UserGroup group : groups) {
+      allGroups.addAll(groupRepository.findDescendants(group));
+    }
+    return requestRepository.findAllByOwners(allGroups);
   }
 
   /**
