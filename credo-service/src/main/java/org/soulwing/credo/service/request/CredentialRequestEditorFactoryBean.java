@@ -32,7 +32,7 @@ import org.soulwing.credo.CredentialCertificate;
  * @author Carl Harris
  */
 @ApplicationScoped
-public class ConcreteRequestEditorFactory
+public class CredentialRequestEditorFactoryBean
     implements CredentialRequestEditorFactory {
 
   @Inject

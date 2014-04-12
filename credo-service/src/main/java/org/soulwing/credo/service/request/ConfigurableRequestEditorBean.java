@@ -34,7 +34,7 @@ import org.soulwing.credo.service.X500PrincipalUtil;
  * @author Carl Harris
  */
 @Dependent
-public class ConcreteConfigurableRequestEditor
+public class ConfigurableRequestEditorBean
     implements ConfigurableRequestEditor {
 
   private Long credentialId;

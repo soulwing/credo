@@ -1,5 +1,5 @@
 /*
- * File created on Mar 20, 2014 
+ * File created on Apr 12, 2014 
  *
  * Copyright (c) 2014 Virginia Polytechnic Institute and State University
  *
@@ -20,22 +20,16 @@ package org.soulwing.credo.service.request;
 
 import java.io.IOException;
 import java.io.Writer;
-import java.util.ArrayList;
-import java.util.List;
 
-import javax.ejb.ConcurrencyManagement;
-import javax.ejb.ConcurrencyManagementType;
-import javax.ejb.Singleton;
 import javax.ejb.TransactionAttribute;
 import javax.ejb.TransactionAttributeType;
+import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
 import org.soulwing.credo.Credential;
 import org.soulwing.credo.CredentialRequest;
-import org.soulwing.credo.UserGroup;
 import org.soulwing.credo.repository.CredentialRepository;
 import org.soulwing.credo.repository.CredentialRequestRepository;
-import org.soulwing.credo.repository.UserGroupRepository;
 import org.soulwing.credo.security.OwnerAccessControlException;
 import org.soulwing.credo.service.Errors;
 import org.soulwing.credo.service.FileDownloadResponse;
@@ -46,18 +40,14 @@ import org.soulwing.credo.service.PassphraseException;
 import org.soulwing.credo.service.ProtectionParameters;
 import org.soulwing.credo.service.TagService;
 import org.soulwing.credo.service.UserAccessException;
-import org.soulwing.credo.service.UserContextService;
 
 /**
- * A concrete {@link CredentialRequestService} as a singleton session bean.
+ * A {@link CreateRequestService} implemented as a simple bean.
  *
  * @author Carl Harris
  */
-@Singleton
-@ConcurrencyManagement(ConcurrencyManagementType.BEAN)
-public class ConcreteCredentialRequestService 
-  implements CredentialRequestService, CreateRequestService, 
-  DownloadRequestService, RemoveRequestService {
+@ApplicationScoped
+public class CreateRequestServiceBean implements CreateRequestService {
 
   static final String CONTENT_TYPE = "application/pkcs10";
   
@@ -69,9 +59,6 @@ public class ConcreteCredentialRequestService
   protected CredentialRepository credentialRepository;
 
   @Inject
-  protected UserGroupRepository groupRepository;
-  
-  @Inject
   protected CredentialRequestEditorFactory editorFactory;
   
   @Inject
@@ -81,47 +68,7 @@ public class ConcreteCredentialRequestService
   protected CredentialRequestRepository requestRepository;
 
   @Inject
-  protected UserContextService userContextService;
-  
-  @Inject
   protected TagService tagService;
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  @TransactionAttribute(TransactionAttributeType.REQUIRED)
-  public CredentialRequestDetail findRequestById(Long id)
-      throws NoSuchCredentialException {
-    
-    CredentialRequest request = requestRepository.findById(id);
-    if (request == null) {
-      throw new NoSuchCredentialException();
-    }
-    
-    Credential credential = credentialRepository.findByRequestId(id);
-    
-    CredentialRequestWrapper detail = new CredentialRequestWrapper(request);
-    detail.setCredentialCreated(credential != null);
-    
-    return detail;
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  @TransactionAttribute(TransactionAttributeType.REQUIRED)
-  public List<CredentialRequest> findAllRequests() {
-    List<UserGroup> allGroups = new ArrayList<>();
-    List<UserGroup> groups = groupRepository.findByLoginName(
-        userContextService.getLoginName());
-    allGroups.addAll(groups);
-    for (UserGroup group : groups) {
-      allGroups.addAll(groupRepository.findDescendants(group));
-    }
-    return requestRepository.findAllByOwners(allGroups);
-  }
 
   /**
    * {@inheritDoc}
@@ -207,19 +154,6 @@ public class ConcreteCredentialRequestService
   }
 
   /**
-   * {@inheritDoc}
-   */
-  @Override
-  public void downloadRequest(Long requestId, FileDownloadResponse response)
-      throws NoSuchCredentialException, IOException {
-    CredentialRequest request = requestRepository.findById(requestId);
-    if (request == null) {
-      throw new NoSuchCredentialException();
-    }
-    downloadRequest(request, response);
-  }
-
-  /**
    * Creates a normalized file name from a base name and a suffix.
    * @param base base name
    * @param suffix suffix
@@ -229,26 +163,4 @@ public class ConcreteCredentialRequestService
     return base.trim().replaceAll("\\.|\\s+", "_") + suffix;
   }
 
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public void removeRequest(Long id) throws GroupAccessException {
-    try {
-      Credential credential = credentialRepository.findByRequestId(id);
-      if (credential != null) {
-        credential.setRequest(null);
-        credentialRepository.update(credential);
-      }
-      CredentialRequest request = requestRepository.findById(id);
-      if (request != null) {
-        requestRepository.remove(request, credential == null);
-      }
-    }
-    catch (OwnerAccessControlException ex) {
-      throw new GroupAccessException(ex.getGroupName());
-    }
-  }
-  
-  
 }

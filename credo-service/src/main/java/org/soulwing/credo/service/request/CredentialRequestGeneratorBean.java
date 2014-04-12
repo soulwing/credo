@@ -42,7 +42,7 @@ import org.soulwing.credo.service.protect.CredentialRequestProtectionService;
  * @author Carl Harris
  */
 @ApplicationScoped
-public class ConcreteRequestGenerator
+public class CredentialRequestGeneratorBean
     implements CredentialRequestGenerator {
 
   @Inject

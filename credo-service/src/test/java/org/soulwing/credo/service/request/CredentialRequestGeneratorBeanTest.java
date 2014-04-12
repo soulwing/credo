@@ -48,11 +48,11 @@ import org.soulwing.credo.service.crypto.PublicKeyWrapper;
 import org.soulwing.credo.service.protect.CredentialRequestProtectionService;
 
 /**
- * Unit tests for {@link ConcreteRequestGenerator}.
+ * Unit tests for {@link CredentialRequestGeneratorBean}.
  *
  * @author Carl Harris
  */
-public class ConcreteRequestGeneratorTest {
+public class CredentialRequestGeneratorBeanTest {
 
   private static final String ENCODED_CSR = "encodedCertificationRequest";
 
@@ -100,8 +100,8 @@ public class ConcreteRequestGeneratorTest {
   @Mock
   private CertificationRequestWrapper csr;
   
-  private ConcreteRequestGenerator generator =
-      new ConcreteRequestGenerator();
+  private CredentialRequestGeneratorBean generator =
+      new CredentialRequestGeneratorBean();
   
   @Before
   public void setUp() throws Exception {

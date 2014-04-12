@@ -41,11 +41,11 @@ import org.soulwing.credo.UserGroup;
 import org.soulwing.credo.domain.TagEntity;
 
 /**
- * Unit tests for {@link ConcreteRequestEditorFactory}.
+ * Unit tests for {@link CredentialRequestEditorFactoryBean}.
  *
  * @author Carl Harris
  */
-public class ConcreteRequestEditorFactoryTest {
+public class CredentialRequestEditorFactoryBeanTest {
 
   private static final long CREDENTIAL_ID = -1L;
 
@@ -79,8 +79,8 @@ public class ConcreteRequestEditorFactoryTest {
   @Mock
   private UserGroup owner;
   
-  private ConcreteRequestEditorFactory factory = 
-      new ConcreteRequestEditorFactory();
+  private CredentialRequestEditorFactoryBean factory = 
+      new CredentialRequestEditorFactoryBean();
   
   @Before
   public void setUp() throws Exception {
