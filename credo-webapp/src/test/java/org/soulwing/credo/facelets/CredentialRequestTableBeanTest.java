@@ -34,7 +34,7 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.soulwing.credo.CredentialRequest;
-import org.soulwing.credo.service.CredentialRequestService;
+import org.soulwing.credo.service.request.CredentialRequestService;
 
 /**
  * Unit tests for {@link CredentialRequestTableBean}.

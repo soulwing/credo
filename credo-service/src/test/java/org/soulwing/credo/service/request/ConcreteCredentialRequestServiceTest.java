@@ -16,7 +16,7 @@
  * limitations under the License.
  *
  */
-package org.soulwing.credo.service;
+package org.soulwing.credo.service.request;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.arrayContaining;
@@ -52,7 +52,21 @@ import org.soulwing.credo.repository.CredentialRepository;
 import org.soulwing.credo.repository.CredentialRequestRepository;
 import org.soulwing.credo.repository.UserGroupRepository;
 import org.soulwing.credo.security.OwnerAccessControlException;
+import org.soulwing.credo.service.Errors;
+import org.soulwing.credo.service.FileDownloadResponse;
+import org.soulwing.credo.service.GroupAccessException;
+import org.soulwing.credo.service.NoSuchCredentialException;
+import org.soulwing.credo.service.NoSuchGroupException;
+import org.soulwing.credo.service.PassphraseException;
+import org.soulwing.credo.service.ProtectionParameters;
+import org.soulwing.credo.service.TagService;
+import org.soulwing.credo.service.UserAccessException;
+import org.soulwing.credo.service.UserContextService;
+import org.soulwing.credo.service.request.ConcreteCredentialRequestService;
+import org.soulwing.credo.service.request.CredentialRequestDetail;
+import org.soulwing.credo.service.request.CredentialRequestEditor;
 import org.soulwing.credo.service.request.CredentialRequestEditorFactory;
+import org.soulwing.credo.service.request.CredentialRequestException;
 import org.soulwing.credo.service.request.CredentialRequestGenerator;
 
 /**

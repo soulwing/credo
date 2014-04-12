@@ -39,7 +39,6 @@ import org.soulwing.credo.CredentialCertificate;
 import org.soulwing.credo.Tag;
 import org.soulwing.credo.UserGroup;
 import org.soulwing.credo.domain.TagEntity;
-import org.soulwing.credo.service.CredentialRequestEditor;
 
 /**
  * Unit tests for {@link ConcreteRequestEditorFactory}.

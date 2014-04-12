@@ -25,8 +25,6 @@ import javax.inject.Inject;
 
 import org.soulwing.credo.CredentialRequest;
 import org.soulwing.credo.CredentialRequestBuilderFactory;
-import org.soulwing.credo.service.CredentialRequestEditor;
-import org.soulwing.credo.service.CredentialRequestException;
 import org.soulwing.credo.service.GroupAccessException;
 import org.soulwing.credo.service.NoSuchGroupException;
 import org.soulwing.credo.service.ProtectionParameters;

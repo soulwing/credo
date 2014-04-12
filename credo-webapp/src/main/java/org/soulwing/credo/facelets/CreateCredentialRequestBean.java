@@ -28,14 +28,14 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.soulwing.credo.CredentialRequest;
-import org.soulwing.credo.service.CredentialRequestEditor;
-import org.soulwing.credo.service.CredentialRequestException;
-import org.soulwing.credo.service.CredentialRequestService;
 import org.soulwing.credo.service.Errors;
 import org.soulwing.credo.service.GroupAccessException;
 import org.soulwing.credo.service.NoSuchCredentialException;
 import org.soulwing.credo.service.NoSuchGroupException;
 import org.soulwing.credo.service.PassphraseException;
+import org.soulwing.credo.service.request.CreateRequestService;
+import org.soulwing.credo.service.request.CredentialRequestEditor;
+import org.soulwing.credo.service.request.CredentialRequestException;
 
 /**
  * A bean that supports the Create Credential Request interaction.
@@ -67,7 +67,7 @@ public class CreateCredentialRequestBean implements Serializable {
   protected Conversation conversation;
   
   @Inject
-  protected CredentialRequestService requestService;
+  protected CreateRequestService requestService;
   
   @Inject
   protected DelegatingCredentialEditor<CredentialRequestEditor> editor;

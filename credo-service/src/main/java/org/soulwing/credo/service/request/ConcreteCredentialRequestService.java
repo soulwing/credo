@@ -16,7 +16,7 @@
  * limitations under the License.
  *
  */
-package org.soulwing.credo.service;
+package org.soulwing.credo.service.request;
 
 import java.io.IOException;
 import java.io.Writer;
@@ -37,8 +37,16 @@ import org.soulwing.credo.repository.CredentialRepository;
 import org.soulwing.credo.repository.CredentialRequestRepository;
 import org.soulwing.credo.repository.UserGroupRepository;
 import org.soulwing.credo.security.OwnerAccessControlException;
-import org.soulwing.credo.service.request.CredentialRequestEditorFactory;
-import org.soulwing.credo.service.request.CredentialRequestGenerator;
+import org.soulwing.credo.service.Errors;
+import org.soulwing.credo.service.FileDownloadResponse;
+import org.soulwing.credo.service.GroupAccessException;
+import org.soulwing.credo.service.NoSuchCredentialException;
+import org.soulwing.credo.service.NoSuchGroupException;
+import org.soulwing.credo.service.PassphraseException;
+import org.soulwing.credo.service.ProtectionParameters;
+import org.soulwing.credo.service.TagService;
+import org.soulwing.credo.service.UserAccessException;
+import org.soulwing.credo.service.UserContextService;
 
 /**
  * A concrete {@link CredentialRequestService} as a singleton session bean.
@@ -47,7 +55,9 @@ import org.soulwing.credo.service.request.CredentialRequestGenerator;
  */
 @Singleton
 @ConcurrencyManagement(ConcurrencyManagementType.BEAN)
-public class ConcreteCredentialRequestService implements CredentialRequestService {
+public class ConcreteCredentialRequestService 
+  implements CredentialRequestService, CreateRequestService, 
+  DownloadRequestService, RemoveRequestService {
 
   static final String CONTENT_TYPE = "application/pkcs10";
   

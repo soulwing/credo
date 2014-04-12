@@ -16,7 +16,7 @@
  * limitations under the License.
  *
  */
-package org.soulwing.credo.service;
+package org.soulwing.credo.service.request;
 
 /**
  * An exception that is thrown when an error occurs in producing a credential

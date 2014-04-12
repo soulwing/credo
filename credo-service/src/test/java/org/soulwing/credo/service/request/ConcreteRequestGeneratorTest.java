@@ -36,8 +36,6 @@ import org.junit.Test;
 import org.soulwing.credo.CredentialRequest;
 import org.soulwing.credo.CredentialRequestBuilder;
 import org.soulwing.credo.CredentialRequestBuilderFactory;
-import org.soulwing.credo.service.CredentialRequestEditor;
-import org.soulwing.credo.service.CredentialRequestException;
 import org.soulwing.credo.service.ProtectionParameters;
 import org.soulwing.credo.service.crypto.CertificationRequestBuilder;
 import org.soulwing.credo.service.crypto.CertificationRequestBuilderFactory;

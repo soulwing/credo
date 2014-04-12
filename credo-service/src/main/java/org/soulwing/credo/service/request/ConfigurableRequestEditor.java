@@ -21,7 +21,6 @@ package org.soulwing.credo.service.request;
 import java.util.Set;
 
 import org.soulwing.credo.Tag;
-import org.soulwing.credo.service.CredentialRequestEditor;
 
 /**
  * A configurable {@link CredentialRequestEditor}.

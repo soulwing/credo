@@ -1,5 +1,5 @@
 /*
- * File created on Mar 22, 2014 
+ * File created on Mar 19, 2014 
  *
  * Copyright (c) 2014 Virginia Polytechnic Institute and State University
  *
@@ -16,25 +16,27 @@
  * limitations under the License.
  *
  */
-package org.soulwing.credo.service;
+package org.soulwing.credo.service.request;
+
+import java.util.List;
+
+import javax.ejb.Local;
+
+import org.soulwing.credo.CredentialRequest;
+
 
 /**
- * An object that describes the details of a credential request.
+ * A service that supports the creation and manipulation of credential requests.
  *
  * @author Carl Harris
  */
-public interface CredentialRequestDetail {
+@Local
+public interface CredentialRequestService {
 
   /**
-   * Gets the friendly name associated with the credential request.
-   * @return friendly name
+   * Finds all credential requests for which the logged-in user is an owner.
+   * @return list of requests
    */
-  String getName();
-  
-  /**
-   * Tests whether a credential has been created from the request.
-   * @return
-   */
-  boolean isCredentialCreated();
+  List<CredentialRequest> findAllRequests();
   
 }

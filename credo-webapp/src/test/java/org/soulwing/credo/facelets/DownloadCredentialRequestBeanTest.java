@@ -31,9 +31,9 @@ import org.jmock.lib.legacy.ClassImposteriser;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.soulwing.credo.service.CredentialRequestService;
 import org.soulwing.credo.service.FileDownloadResponse;
 import org.soulwing.credo.service.NoSuchCredentialException;
+import org.soulwing.credo.service.request.DownloadRequestService;
 
 /**
  * Unit tests for {@link DownloadCredentialRequestBean}.
@@ -50,7 +50,7 @@ public class DownloadCredentialRequestBeanTest {
   } };
   
   @Mock
-  private CredentialRequestService requestService;
+  private DownloadRequestService requestService;
   
   @Mock
   private FacesContext facesContext;

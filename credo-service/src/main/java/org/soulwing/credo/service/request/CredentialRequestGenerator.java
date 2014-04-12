@@ -22,8 +22,6 @@ import org.soulwing.credo.CredentialRequest;
 import org.soulwing.credo.service.GroupAccessException;
 import org.soulwing.credo.service.NoSuchGroupException;
 import org.soulwing.credo.service.ProtectionParameters;
-import org.soulwing.credo.service.CredentialRequestEditor;
-import org.soulwing.credo.service.CredentialRequestException;
 import org.soulwing.credo.service.UserAccessException;
 
 /**

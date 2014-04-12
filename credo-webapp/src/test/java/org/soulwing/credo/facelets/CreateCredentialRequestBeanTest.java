@@ -43,9 +43,9 @@ import org.soulwing.credo.service.GroupAccessException;
 import org.soulwing.credo.service.NoSuchCredentialException;
 import org.soulwing.credo.service.NoSuchGroupException;
 import org.soulwing.credo.service.PassphraseException;
-import org.soulwing.credo.service.CredentialRequestEditor;
-import org.soulwing.credo.service.CredentialRequestException;
-import org.soulwing.credo.service.CredentialRequestService;
+import org.soulwing.credo.service.request.CreateRequestService;
+import org.soulwing.credo.service.request.CredentialRequestEditor;
+import org.soulwing.credo.service.request.CredentialRequestException;
 
 /**
  * Unit tests for {@link CreateCredentialRequestBean}.
@@ -64,7 +64,7 @@ public class CreateCredentialRequestBeanTest {
   } };
   
   @Mock
-  private CredentialRequestService requestService;
+  private CreateRequestService requestService;
   
   @Mock
   private CredentialRequest request;

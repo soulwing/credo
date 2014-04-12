@@ -1,5 +1,5 @@
 /*
- * File created on Mar 20, 2014 
+ * File created on Mar 22, 2014 
  *
  * Copyright (c) 2014 Virginia Polytechnic Institute and State University
  *
@@ -18,23 +18,23 @@
  */
 package org.soulwing.credo.service.request;
 
-import org.soulwing.credo.Credential;
-import org.soulwing.credo.service.CredentialEditor;
-
 /**
- * A factory that produces {@link CredentialEditor} objects for 
- *  requests.
+ * An object that describes the details of a credential request.
  *
  * @author Carl Harris
  */
-public interface CredentialRequestEditorFactory {
+public interface CredentialRequestDetail {
 
   /**
-   * Creates an editor for a  request based on contents of the given 
-   * credential.
-   * @param credential basis for the request that will be edited
-   * @return editor
+   * Gets the friendly name associated with the credential request.
+   * @return friendly name
    */
-  CredentialRequestEditor newEditor(Credential credential);
+  String getName();
+  
+  /**
+   * Tests whether a credential has been created from the request.
+   * @return
+   */
+  boolean isCredentialCreated();
   
 }

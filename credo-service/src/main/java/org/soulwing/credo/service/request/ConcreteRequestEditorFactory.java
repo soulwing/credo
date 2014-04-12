@@ -25,7 +25,6 @@ import javax.inject.Inject;
 import org.apache.commons.lang.Validate;
 import org.soulwing.credo.Credential;
 import org.soulwing.credo.CredentialCertificate;
-import org.soulwing.credo.service.CredentialRequestEditor;
 
 /**
  * A concrete {@link CredentialRequestEditorFactory} implementation.

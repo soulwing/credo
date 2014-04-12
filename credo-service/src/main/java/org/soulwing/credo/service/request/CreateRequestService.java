@@ -1,5 +1,5 @@
 /*
- * File created on Mar 19, 2014 
+ * File created on Apr 12, 2014 
  *
  * Copyright (c) 2014 Virginia Polytechnic Institute and State University
  *
@@ -16,40 +16,30 @@
  * limitations under the License.
  *
  */
-package org.soulwing.credo.service;
+package org.soulwing.credo.service.request;
 
 import java.io.IOException;
-import java.util.List;
 
 import javax.ejb.Local;
 
 import org.soulwing.credo.CredentialRequest;
-
+import org.soulwing.credo.service.Errors;
+import org.soulwing.credo.service.FileDownloadResponse;
+import org.soulwing.credo.service.GroupAccessException;
+import org.soulwing.credo.service.NoSuchCredentialException;
+import org.soulwing.credo.service.NoSuchGroupException;
+import org.soulwing.credo.service.PassphraseException;
+import org.soulwing.credo.service.ProtectionParameters;
 
 /**
- * A service that supports the creation and manipulation of credential requests.
+ * A service that provides support for creating {@link CredentialRequest}
+ * objects via a user interaction.
  *
  * @author Carl Harris
  */
 @Local
-public interface CredentialRequestService {
+public interface CreateRequestService {
 
-  /**
-   * Finds a request using its unique identifier.
-   * @param id unique identifier of the subject request
-   * @return request
-   * @throws NoSuchCredentialException if no request exists with the given
-   *    identifier
-   */
-  CredentialRequestDetail findRequestById(Long id) 
-      throws NoSuchCredentialException;
-  
-  /**
-   * Finds all credential requests for which the logged-in user is an owner.
-   * @return list of requests
-   */
-  List<CredentialRequest> findAllRequests();
-  
   /**
    * Creates an editor for a request that is based on an existing
    * credential.
@@ -104,24 +94,5 @@ public interface CredentialRequestService {
   void downloadRequest(CredentialRequest request,
       FileDownloadResponse response) throws IOException;
   
-  /**
-   * Transfers a request to a client via the given response object.
-   * @param requestId unique identifier of the request to download
-   * @param response response object that will be used to transfer the
-   *    request content
-   * @throws IOException if an error occurs in transferring the 
-   *    request content to the remote client
-   */
-  void downloadRequest(Long requestId,
-      FileDownloadResponse response) 
-      throws NoSuchCredentialException, IOException;
-  
-  /**
-   * Removes a request.
-   * @param id unique identifier of the request to remove
-   * @throws GroupAccessException if the logged-in user is not a member of
-   *    the group that owns the given request
-   */
-  void removeRequest(Long id) throws GroupAccessException;
-  
+
 }
