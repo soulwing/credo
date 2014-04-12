@@ -32,7 +32,7 @@ import org.soulwing.credo.service.NoSuchCredentialException;
  * @author Carl Harris
  */
 @Local
-public interface DownloadRequestService {
+public interface DownloadCredentialRequestService {
 
   /**
    * Transfers a request to a client via the given response object.

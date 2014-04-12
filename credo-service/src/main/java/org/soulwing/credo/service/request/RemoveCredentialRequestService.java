@@ -31,7 +31,7 @@ import org.soulwing.credo.service.NoSuchCredentialException;
  * @author Carl Harris
  */
 @Local
-public interface RemoveRequestService {
+public interface RemoveCredentialRequestService {
 
   /**
    * Finds a request using its unique identifier.

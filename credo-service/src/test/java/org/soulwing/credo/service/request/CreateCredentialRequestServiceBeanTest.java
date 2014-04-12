@@ -57,11 +57,11 @@ import org.soulwing.credo.service.TagService;
 import org.soulwing.credo.service.UserAccessException;
 
 /**
- * Unit tests for {@link CreateRequestServiceBean}.
+ * Unit tests for {@link CreateCredentialRequestServiceBean}.
  * 
  * @author Carl Harris
  */
-public class CreateRequestServiceBeanTest {
+public class CreateCredentialRequestServiceBeanTest {
 
   private static final long REQUEST_ID = -1L;
 
@@ -121,7 +121,7 @@ public class CreateRequestServiceBeanTest {
   @Mock
   private Set<? extends Tag> tags;
 
-  private CreateRequestServiceBean service = new CreateRequestServiceBean();
+  private CreateCredentialRequestServiceBean service = new CreateCredentialRequestServiceBean();
 
   @Before
   public void setUp() throws Exception {
@@ -340,9 +340,9 @@ public class CreateRequestServiceBeanTest {
         will(returnValue(REQUEST_NAME));
         oneOf(response).setFileName(with(containsString(REQUEST_NAME)));
         oneOf(response).setContentType(
-            with(CreateRequestServiceBean.CONTENT_TYPE));
+            with(CreateCredentialRequestServiceBean.CONTENT_TYPE));
         oneOf(response).setCharacterEncoding(
-            with(CreateRequestServiceBean.CHARACTER_ENCODING));
+            with(CreateCredentialRequestServiceBean.CHARACTER_ENCODING));
         oneOf(response).getWriter();
         will(returnValue(writer));
       }

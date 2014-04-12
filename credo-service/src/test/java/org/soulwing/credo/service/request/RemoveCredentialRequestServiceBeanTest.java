@@ -36,11 +36,11 @@ import org.soulwing.credo.repository.CredentialRequestRepository;
 import org.soulwing.credo.service.NoSuchCredentialException;
 
 /**
- * Unit tests for {@link RemoveRequestServiceBean}.
+ * Unit tests for {@link RemoveCredentialRequestServiceBean}.
  *
  * @author Carl Harris
  */
-public class RemoveRequestServiceBeanTest {
+public class RemoveCredentialRequestServiceBeanTest {
 
   private static final long REQUEST_ID = -1L;
 
@@ -61,7 +61,7 @@ public class RemoveRequestServiceBeanTest {
   @Mock
   private CredentialRequest request;
   
-  private RemoveRequestServiceBean service = new RemoveRequestServiceBean();
+  private RemoveCredentialRequestServiceBean service = new RemoveCredentialRequestServiceBean();
   
   @Before
   public void setUp() throws Exception {

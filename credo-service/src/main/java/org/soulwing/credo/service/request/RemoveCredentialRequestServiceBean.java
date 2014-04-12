@@ -32,12 +32,12 @@ import org.soulwing.credo.service.GroupAccessException;
 import org.soulwing.credo.service.NoSuchCredentialException;
 
 /**
- * A {@link RemoveRequestService} implemented as a simple bean.
+ * A {@link RemoveCredentialRequestService} implemented as a simple bean.
  *
  * @author Carl Harris
  */
 @ApplicationScoped
-public class RemoveRequestServiceBean implements RemoveRequestService {
+public class RemoveCredentialRequestServiceBean implements RemoveCredentialRequestService {
 
   @Inject
   protected CredentialRepository credentialRepository;

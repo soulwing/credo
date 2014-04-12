@@ -42,12 +42,12 @@ import org.soulwing.credo.service.TagService;
 import org.soulwing.credo.service.UserAccessException;
 
 /**
- * A {@link CreateRequestService} implemented as a simple bean.
+ * A {@link CreateCredentialRequestService} implemented as a simple bean.
  *
  * @author Carl Harris
  */
 @ApplicationScoped
-public class CreateRequestServiceBean implements CreateRequestService {
+public class CreateCredentialRequestServiceBean implements CreateCredentialRequestService {
 
   static final String CONTENT_TYPE = "application/pkcs10";
   

@@ -38,7 +38,7 @@ import org.soulwing.credo.service.ProtectionParameters;
  * @author Carl Harris
  */
 @Local
-public interface CreateRequestService {
+public interface CreateCredentialRequestService {
 
   /**
    * Creates an editor for a request that is based on an existing

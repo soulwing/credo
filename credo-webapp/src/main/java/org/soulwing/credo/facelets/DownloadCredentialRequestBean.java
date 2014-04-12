@@ -28,7 +28,7 @@ import javax.inject.Named;
 
 import org.soulwing.credo.service.Errors;
 import org.soulwing.credo.service.NoSuchCredentialException;
-import org.soulwing.credo.service.request.DownloadRequestService;
+import org.soulwing.credo.service.request.DownloadCredentialRequestService;
 
 /**
  * A bean that supports the Download Credential Request interaction.
@@ -44,7 +44,7 @@ public class DownloadCredentialRequestBean implements Serializable {
   static final String SUCCESS_OUTCOME_ID = "success";
   
   @Inject
-  protected DownloadRequestService requestService;
+  protected DownloadCredentialRequestService requestService;
    
   @Inject
   protected FacesContext facesContext;

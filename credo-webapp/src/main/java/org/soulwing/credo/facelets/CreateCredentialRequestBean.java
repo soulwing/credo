@@ -33,7 +33,7 @@ import org.soulwing.credo.service.GroupAccessException;
 import org.soulwing.credo.service.NoSuchCredentialException;
 import org.soulwing.credo.service.NoSuchGroupException;
 import org.soulwing.credo.service.PassphraseException;
-import org.soulwing.credo.service.request.CreateRequestService;
+import org.soulwing.credo.service.request.CreateCredentialRequestService;
 import org.soulwing.credo.service.request.CredentialRequestEditor;
 import org.soulwing.credo.service.request.CredentialRequestException;
 
@@ -67,7 +67,7 @@ public class CreateCredentialRequestBean implements Serializable {
   protected Conversation conversation;
   
   @Inject
-  protected CreateRequestService requestService;
+  protected CreateCredentialRequestService requestService;
   
   @Inject
   protected DelegatingCredentialEditor<CredentialRequestEditor> editor;

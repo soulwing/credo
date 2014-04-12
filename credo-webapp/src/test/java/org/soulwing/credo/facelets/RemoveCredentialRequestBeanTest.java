@@ -41,7 +41,7 @@ import org.junit.Test;
 import org.soulwing.credo.service.Errors;
 import org.soulwing.credo.service.NoSuchCredentialException;
 import org.soulwing.credo.service.request.CredentialRequestDetail;
-import org.soulwing.credo.service.request.RemoveRequestService;
+import org.soulwing.credo.service.request.RemoveCredentialRequestService;
 
 /**
  * Unit tests for {@link RemoveCredentialRequestBean}.
@@ -56,7 +56,7 @@ public class RemoveCredentialRequestBeanTest {
   public final JUnitRuleMockery context = new JUnitRuleMockery();
   
   @Mock
-  private RemoveRequestService requestService;
+  private RemoveCredentialRequestService requestService;
   
   @Mock
   private CredentialRequestDetail request;

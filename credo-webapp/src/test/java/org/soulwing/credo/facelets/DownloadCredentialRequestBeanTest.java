@@ -33,7 +33,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.soulwing.credo.service.FileDownloadResponse;
 import org.soulwing.credo.service.NoSuchCredentialException;
-import org.soulwing.credo.service.request.DownloadRequestService;
+import org.soulwing.credo.service.request.DownloadCredentialRequestService;
 
 /**
  * Unit tests for {@link DownloadCredentialRequestBean}.
@@ -50,7 +50,7 @@ public class DownloadCredentialRequestBeanTest {
   } };
   
   @Mock
-  private DownloadRequestService requestService;
+  private DownloadCredentialRequestService requestService;
   
   @Mock
   private FacesContext facesContext;

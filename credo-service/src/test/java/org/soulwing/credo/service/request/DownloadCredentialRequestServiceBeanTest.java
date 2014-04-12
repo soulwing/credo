@@ -30,11 +30,11 @@ import org.soulwing.credo.service.FileDownloadResponse;
 import org.soulwing.credo.service.NoSuchCredentialException;
 
 /**
- * Unit tests for {@link DownloadRequestServiceBean}.
+ * Unit tests for {@link DownloadCredentialRequestServiceBean}.
  *
  * @author Carl Harris
  */
-public class DownloadRequestServiceBeanTest {
+public class DownloadCredentialRequestServiceBeanTest {
 
   private static final long REQUEST_ID = -1L;
 
@@ -45,7 +45,7 @@ public class DownloadRequestServiceBeanTest {
   private CredentialRequestRepository requestRepository;
 
   @Mock
-  private CreateRequestService createRequestService;
+  private CreateCredentialRequestService createRequestService;
   
   @Mock
   private CredentialRequest request;
@@ -54,7 +54,7 @@ public class DownloadRequestServiceBeanTest {
   private FileDownloadResponse response;
   
 
-  private DownloadRequestServiceBean service = new DownloadRequestServiceBean();
+  private DownloadCredentialRequestServiceBean service = new DownloadCredentialRequestServiceBean();
   
   @Before
   public void setUp() throws Exception {

@@ -29,7 +29,7 @@ import org.soulwing.credo.service.Errors;
 import org.soulwing.credo.service.GroupAccessException;
 import org.soulwing.credo.service.NoSuchCredentialException;
 import org.soulwing.credo.service.request.CredentialRequestDetail;
-import org.soulwing.credo.service.request.RemoveRequestService;
+import org.soulwing.credo.service.request.RemoveCredentialRequestService;
 
 /**
  * A bean that supports the Remove Credential Request interaction.
@@ -47,7 +47,7 @@ public class RemoveCredentialRequestBean implements Serializable {
   static final String CANCEL_OUTCOME_ID = "cancel";
   
   @Inject
-  protected RemoveRequestService requestService;
+  protected RemoveCredentialRequestService requestService;
   
   @Inject
   protected Conversation conversation;

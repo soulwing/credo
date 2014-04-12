@@ -31,18 +31,18 @@ import org.soulwing.credo.service.FileDownloadResponse;
 import org.soulwing.credo.service.NoSuchCredentialException;
 
 /**
- * A {@link DownloadRequestService} implemented as a simple bean.
+ * A {@link DownloadCredentialRequestService} implemented as a simple bean.
  *
  * @author Carl Harris
  */
 @ApplicationScoped
-public class DownloadRequestServiceBean implements DownloadRequestService {
+public class DownloadCredentialRequestServiceBean implements DownloadCredentialRequestService {
 
   @Inject
   protected CredentialRequestRepository requestRepository;
   
   @Inject
-  protected CreateRequestService createRequestService;
+  protected CreateCredentialRequestService createRequestService;
   
   /**
    * {@inheritDoc}
