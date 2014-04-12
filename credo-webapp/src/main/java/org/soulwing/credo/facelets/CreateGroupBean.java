@@ -25,7 +25,7 @@ import javax.inject.Named;
 
 import org.soulwing.credo.service.Errors;
 import org.soulwing.credo.service.GroupAccessException;
-import org.soulwing.credo.service.GroupEditException;
+import org.soulwing.credo.service.EditException;
 import org.soulwing.credo.service.GroupService;
 import org.soulwing.credo.service.MergeConflictException;
 import org.soulwing.credo.service.NoSuchGroupException;
@@ -86,7 +86,7 @@ public class CreateGroupBean {
     catch (PassphraseException ex) {
       throw new RuntimeException(ex);
     }
-    catch (GroupEditException ex) {
+    catch (EditException ex) {
       return null;
     }
     catch (GroupAccessException ex) {

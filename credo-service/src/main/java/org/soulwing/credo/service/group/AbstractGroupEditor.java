@@ -34,7 +34,7 @@ import org.soulwing.credo.repository.UserGroupRepository;
 import org.soulwing.credo.repository.UserProfileRepository;
 import org.soulwing.credo.service.Errors;
 import org.soulwing.credo.service.GroupAccessException;
-import org.soulwing.credo.service.GroupEditException;
+import org.soulwing.credo.service.EditException;
 import org.soulwing.credo.service.MergeConflictException;
 import org.soulwing.credo.service.NoSuchGroupException;
 import org.soulwing.credo.service.PassphraseException;
@@ -212,7 +212,7 @@ abstract class AbstractGroupEditor implements ConfigurableGroupEditor,
    * {@inheritDoc}
    */
   @Override
-  public void save(Errors errors) throws GroupEditException,
+  public void save(Errors errors) throws EditException,
       NoSuchGroupException, PassphraseException, GroupAccessException,
       MergeConflictException {
     
@@ -236,7 +236,7 @@ abstract class AbstractGroupEditor implements ConfigurableGroupEditor,
       }
       addNewMembers(secretKey, errors);
       if (errors.hasWarnings() || errors.hasErrors()) {
-        throw new GroupEditException();
+        throw new EditException();
       }
       afterSave(errors);
     }
@@ -276,14 +276,14 @@ abstract class AbstractGroupEditor implements ConfigurableGroupEditor,
     }
   }
 
-  private UserGroup resolveOwner(Errors errors) throws GroupEditException {
+  private UserGroup resolveOwner(Errors errors) throws EditException {
     UserGroup ownerGroup = null;
     if (owner != null) {
       ownerGroup = groupRepository.findByGroupName(owner, null);
       group.setOwner(ownerGroup);
       if (ownerGroup == null) {
         errors.addError("owner", "groupNotFound", owner);
-        throw new GroupEditException();
+        throw new EditException();
       }
     }
     return ownerGroup;

@@ -26,7 +26,7 @@ import javax.ejb.ApplicationException;
  * @author Carl Harris
  */
 @ApplicationException(rollback = true)
-public class GroupEditException extends Exception {
+public class EditException extends Exception {
 
   private static final long serialVersionUID = -4617035829971622339L;
 

@@ -39,7 +39,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.soulwing.credo.Password;
 import org.soulwing.credo.service.Errors;
-import org.soulwing.credo.service.GroupEditException;
+import org.soulwing.credo.service.EditException;
 import org.soulwing.credo.service.GroupEditor;
 import org.soulwing.credo.service.GroupService;
 import org.soulwing.credo.service.MergeConflictException;
@@ -121,7 +121,7 @@ public class EditGroupBeanTest {
   @Test
   public void testSaveWhenGroupEditException() throws Exception {
     context.checking(saveGroupExpectations(
-        throwException(new GroupEditException())));
+        throwException(new EditException())));
     assertThat(bean.save(), is(nullValue()));
   }
 

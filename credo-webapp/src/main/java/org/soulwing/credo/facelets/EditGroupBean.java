@@ -27,7 +27,7 @@ import javax.inject.Named;
 
 import org.soulwing.credo.service.Errors;
 import org.soulwing.credo.service.GroupAccessException;
-import org.soulwing.credo.service.GroupEditException;
+import org.soulwing.credo.service.EditException;
 import org.soulwing.credo.service.GroupService;
 import org.soulwing.credo.service.MergeConflictException;
 import org.soulwing.credo.service.NoSuchGroupException;
@@ -149,7 +149,7 @@ public class EditGroupBean implements Serializable {
     catch (MergeConflictException ex) {
       return createEditor();
     }
-    catch (GroupEditException ex) {
+    catch (EditException ex) {
       return null;
     }
     catch (GroupAccessException|NoSuchGroupException ex) {

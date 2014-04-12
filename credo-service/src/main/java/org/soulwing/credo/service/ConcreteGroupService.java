@@ -175,7 +175,7 @@ public class ConcreteGroupService implements GroupService {
   @Override
   @TransactionAttribute(TransactionAttributeType.REQUIRED)
   public void saveGroup(GroupEditor editor, Errors errors)
-      throws GroupEditException, NoSuchGroupException, GroupAccessException,
+      throws EditException, NoSuchGroupException, GroupAccessException,
           PassphraseException, MergeConflictException {
     Validate.isTrue(editor instanceof ConfigurableGroupEditor);
     ((ConfigurableGroupEditor) editor).save(errors);
@@ -183,7 +183,7 @@ public class ConcreteGroupService implements GroupService {
 
   @Override
   @TransactionAttribute(TransactionAttributeType.REQUIRED)
-  public void removeGroup(Long id, Errors errors) throws GroupEditException,
+  public void removeGroup(Long id, Errors errors) throws EditException,
       NoSuchGroupException {
     String loginName = userContextService.getLoginName();
     Collection<UserGroupMember> members = memberRepository
@@ -194,7 +194,7 @@ public class ConcreteGroupService implements GroupService {
     }
     if (!credentialRepository.findAllByOwnerId(id).isEmpty()) {
       errors.addError("groupInUse", id);
-      throw new GroupEditException();
+      throw new EditException();
     }
     
     for (UserGroupMember member : members) {

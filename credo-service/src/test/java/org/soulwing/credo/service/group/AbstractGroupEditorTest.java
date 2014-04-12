@@ -42,7 +42,7 @@ import org.soulwing.credo.UserProfile;
 import org.soulwing.credo.repository.UserGroupRepository;
 import org.soulwing.credo.repository.UserProfileRepository;
 import org.soulwing.credo.service.Errors;
-import org.soulwing.credo.service.GroupEditException;
+import org.soulwing.credo.service.EditException;
 import org.soulwing.credo.service.UserContextService;
 import org.soulwing.credo.service.UserDetail;
 import org.soulwing.credo.service.crypto.SecretKeyEncryptionService;
@@ -175,7 +175,7 @@ public abstract class AbstractGroupEditorTest<T extends AbstractGroupEditor> {
     editor.save(errors);    
   }
 
-  @Test(expected = GroupEditException.class)
+  @Test(expected = EditException.class)
   public void testSaveWhenOwnerNotFound() throws Exception {
     Long[] membership = new Long[] { 1L, 2L, 3L };
     context.checking(beforeSaveExpectations(membership));
@@ -189,7 +189,7 @@ public abstract class AbstractGroupEditorTest<T extends AbstractGroupEditor> {
     editor.save(errors);    
   }
 
-  @Test(expected = GroupEditException.class)
+  @Test(expected = EditException.class)
   public void testSaveWhenUserNotFound() throws Exception {
     Long ownerId = 1L;
     Long userId = 2L;
@@ -208,7 +208,7 @@ public abstract class AbstractGroupEditorTest<T extends AbstractGroupEditor> {
     editor.save(errors);
   }
 
-  @Test(expected = GroupEditException.class)
+  @Test(expected = EditException.class)
   public void testSaveWhenUserNotMember() throws Exception {
     Long[] membership = new Long[] { 1L }; 
     context.checking(beforeSaveExpectations(membership));

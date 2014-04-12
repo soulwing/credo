@@ -340,7 +340,7 @@ public class ConcreteGroupServiceTest {
     service.removeGroup(GROUP_ID1, errors);
   }
 
-  @Test(expected = GroupEditException.class)
+  @Test(expected = EditException.class)
   public void testRemoveGroupWhenCredentialsExist() throws Exception {
     context.checking(new Expectations() { {
       oneOf(userContextService).getLoginName();

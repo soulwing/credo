@@ -39,7 +39,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.soulwing.credo.service.Errors;
 import org.soulwing.credo.service.GroupDetail;
-import org.soulwing.credo.service.GroupEditException;
+import org.soulwing.credo.service.EditException;
 import org.soulwing.credo.service.GroupService;
 import org.soulwing.credo.service.NoSuchGroupException;
 
@@ -128,7 +128,7 @@ public class RemoveGroupBeanTest {
   @Test
   public void testRemoveWhenGroupEditException() throws Exception {
     context.checking(removeGroupExpectations(
-        throwException(new GroupEditException())));
+        throwException(new EditException())));
     context.checking(endConversationExpectations());
     bean.setId(GROUP_ID);
     assertThat(bean.remove(), is(equalTo(RemoveGroupBean.FAILURE_OUTCOME_ID)));

@@ -66,7 +66,7 @@ public interface GroupService {
    * @param editor the editor to apply
    * @param errors an errors object that will be updated if the edits cannot
    *    be successfully applied
-   * @throws GroupEditException if a recoverable error occurs in applying
+   * @throws EditException if a recoverable error occurs in applying
    *    the editor to the target group
    * @throws NoSuchGroupException if an existing was removed after the
    *    editor was created
@@ -78,7 +78,7 @@ public interface GroupService {
    *    has changed since the editor was created
    */
   void saveGroup(GroupEditor editor, Errors errors) 
-      throws GroupEditException, NoSuchGroupException, GroupAccessException,
+      throws EditException, NoSuchGroupException, GroupAccessException,
       PassphraseException, MergeConflictException;
   
   /**
@@ -86,12 +86,12 @@ public interface GroupService {
    * @param id unique identifier of the group to remove
    * @param errors errors object that will be updated if the group cannot be
    *    removed
-   * @throws GroupEditException if the group cannot be removed (i.e because it
+   * @throws EditException if the group cannot be removed (i.e because it
    *    is in use)
    * @throws NoSuchGroupException if the specified group does not exist
    */
   void removeGroup(Long id, Errors errors) 
-      throws GroupEditException, NoSuchGroupException;
+      throws EditException, NoSuchGroupException;
   
   /**
    * Tests whether the existing group name exists for the logged-in user.

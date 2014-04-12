@@ -23,7 +23,7 @@ import java.util.Collection;
 import org.soulwing.credo.UserGroup;
 import org.soulwing.credo.service.Errors;
 import org.soulwing.credo.service.GroupAccessException;
-import org.soulwing.credo.service.GroupEditException;
+import org.soulwing.credo.service.EditException;
 import org.soulwing.credo.service.GroupEditor;
 import org.soulwing.credo.service.MergeConflictException;
 import org.soulwing.credo.service.NoSuchGroupException;
@@ -61,7 +61,7 @@ public interface ConfigurableGroupEditor extends GroupEditor {
    * represents persistent.
    * @param errors an errors object that will be updated in the case of
    *    recoverable error(s)
-   * @throws GroupEditException if a recoverable error occurs
+   * @throws EditException if a recoverable error occurs
    * @throws NoSuchGroupException if the group identified by the editor
    *    was removed after the editor was created
    * @throws PassphraseException if a passphrase is required and was not
@@ -71,7 +71,7 @@ public interface ConfigurableGroupEditor extends GroupEditor {
    * @throws MergeConflictException if the group cannot be saved because
    *    its persistent state has changed since this editor was created
    */
-  void save(Errors errors) throws GroupEditException, NoSuchGroupException,
+  void save(Errors errors) throws EditException, NoSuchGroupException,
       PassphraseException, GroupAccessException, MergeConflictException;
  
 }

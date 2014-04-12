@@ -31,7 +31,7 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.soulwing.credo.service.Errors;
-import org.soulwing.credo.service.GroupEditException;
+import org.soulwing.credo.service.EditException;
 import org.soulwing.credo.service.GroupEditor;
 import org.soulwing.credo.service.GroupService;
 import org.soulwing.credo.service.NoSuchGroupException;
@@ -90,7 +90,7 @@ public class CreateGroupBeanTest {
   public void testSaveWhenGroupEditException() throws Exception {
     context.checking(new Expectations() { { 
       oneOf(groupService).saveGroup(with(same(editor)), with(same(errors)));
-      will(throwException(new GroupEditException()));
+      will(throwException(new EditException()));
     } });
     
     assertThat(bean.save(), is(nullValue()));

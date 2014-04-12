@@ -27,7 +27,7 @@ import javax.inject.Named;
 
 import org.soulwing.credo.service.Errors;
 import org.soulwing.credo.service.GroupDetail;
-import org.soulwing.credo.service.GroupEditException;
+import org.soulwing.credo.service.EditException;
 import org.soulwing.credo.service.GroupService;
 import org.soulwing.credo.service.NoSuchGroupException;
 
@@ -122,7 +122,7 @@ public class RemoveGroupBean implements Serializable {
       groupService.removeGroup(id, errors);
       return SUCCESS_OUTCOME_ID;
     }
-    catch (GroupEditException ex) {
+    catch (EditException ex) {
       return FAILURE_OUTCOME_ID;
     }
     catch (NoSuchGroupException ex) {
