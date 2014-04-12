@@ -65,7 +65,7 @@ public class EditGroupBean implements Serializable {
   protected DelegatingGroupEditor editor;
   
   @Inject
-  protected PasswordFormEditor passwordEditor = new PasswordFormEditor();
+  protected PasswordFormEditor passwordEditor;
 
   private Long id;
  
