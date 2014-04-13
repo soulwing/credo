@@ -18,9 +18,11 @@
  */
 package org.soulwing.credo.service.request;
 
+import javax.ejb.ConcurrencyManagement;
+import javax.ejb.ConcurrencyManagementType;
+import javax.ejb.Singleton;
 import javax.ejb.TransactionAttribute;
 import javax.ejb.TransactionAttributeType;
-import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
 import org.apache.commons.lang.Validate;
@@ -37,7 +39,8 @@ import org.soulwing.credo.service.PassphraseException;
  *
  * @author Carl Harris
  */
-@ApplicationScoped
+@Singleton
+@ConcurrencyManagement(ConcurrencyManagementType.BEAN)
 public class EditCredentialRequestServiceBean
     implements EditCredentialRequestService {
 

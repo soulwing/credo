@@ -18,6 +18,8 @@
  */
 package org.soulwing.credo.service.request;
 
+import javax.ejb.Local;
+
 import org.soulwing.credo.CredentialRequest;
 import org.soulwing.credo.service.Errors;
 import org.soulwing.credo.service.GroupAccessException;
@@ -32,6 +34,7 @@ import org.soulwing.credo.service.PassphraseException;
  *
  * @author Carl Harris
  */
+@Local
 public interface EditCredentialRequestService {
 
   /**
