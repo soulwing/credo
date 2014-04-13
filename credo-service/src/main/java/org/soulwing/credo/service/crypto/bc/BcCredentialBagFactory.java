@@ -23,25 +23,23 @@ import javax.enterprise.inject.Produces;
 import javax.inject.Inject;
 
 import org.soulwing.credo.service.crypto.CredentialBag;
-import org.soulwing.credo.service.crypto.CredentialBagFactory;
 import org.soulwing.credo.service.pem.PemObjectBuilderFactory;
 
 /**
- * A {@link CredentialBagFactory} that produces {@link BcCredentialBag}
- * objects.
+ * A factory that produces {@link BcCredentialBag} objects.
  *
  * @author Carl Harris
  */
 @ApplicationScoped
-public class BcCredentialBagFactory implements CredentialBagFactory {
+public class BcCredentialBagFactory {
 
   @Inject
   protected PemObjectBuilderFactory objectBuilderFactory;
-  
+
   /**
-   * {@inheritDoc}
+   * Creates a new {@link CredentialBag}.
+   * @return
    */
-  @Override
   @Produces
   public CredentialBag newCredentialBag() {
     return new BcCredentialBag(objectBuilderFactory);
