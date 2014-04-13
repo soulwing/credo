@@ -43,15 +43,12 @@ import org.junit.Test;
 import org.soulwing.credo.Credential;
 import org.soulwing.credo.Password;
 import org.soulwing.credo.UserGroup;
+import org.soulwing.credo.repository.CredentialRepository;
 import org.soulwing.credo.service.Errors;
 import org.soulwing.credo.service.GroupAccessException;
 import org.soulwing.credo.service.PassphraseException;
 import org.soulwing.credo.service.ProtectionParameters;
 import org.soulwing.credo.service.UserAccessException;
-import org.soulwing.credo.service.credential.ExportServiceBean;
-import org.soulwing.credo.service.credential.CredentialService;
-import org.soulwing.credo.service.credential.ExportPreparation;
-import org.soulwing.credo.service.credential.ExportRequest;
 import org.soulwing.credo.service.crypto.PasswordGenerator;
 import org.soulwing.credo.service.crypto.PrivateKeyWrapper;
 import org.soulwing.credo.service.exporter.CredentialExporter;
@@ -71,7 +68,7 @@ public class ExportServiceBeanTest {
   public final JUnitRuleMockery context = new JUnitRuleMockery();
   
   @Mock
-  private CredentialService credentialService;
+  private CredentialRepository credentialRepository;
   
   @Mock
   private CredentialExporterRegistry exporterRegistry;
@@ -107,7 +104,7 @@ public class ExportServiceBeanTest {
   
   @Before
   public void setUp() throws Exception {
-    exportService.credentialService = credentialService;
+    exportService.credentialRepository = credentialRepository;
     exportService.exporterRegistry = exporterRegistry;
     exportService.protectionService = protectionService;
     exportService.passwordGenerator = passwordGenerator;
@@ -117,7 +114,7 @@ public class ExportServiceBeanTest {
   public void testCreateExportRequest() throws Exception {
     final Long id = -1L;
     context.checking(new Expectations() { {
-      oneOf(credentialService).findCredentialById(with(same(id)));
+      oneOf(credentialRepository).findById(with(same(id)));
       will(returnValue(credential));
     } });
     
@@ -130,8 +127,8 @@ public class ExportServiceBeanTest {
   public void testCreateExportRequestNotFound() throws Exception {
     final Long id = -1L;
     context.checking(new Expectations() { {
-      oneOf(credentialService).findCredentialById(with(same(id)));
-      will(throwException(new NoSuchCredentialException()));
+      oneOf(credentialRepository).findById(with(same(id)));
+      will(returnValue(null));
     } });
     
     exportService.newExportRequest(id);

@@ -30,6 +30,7 @@ import javax.inject.Inject;
 
 import org.soulwing.credo.Credential;
 import org.soulwing.credo.Password;
+import org.soulwing.credo.repository.CredentialRepository;
 import org.soulwing.credo.security.OwnerAccessControlException;
 import org.soulwing.credo.service.Errors;
 import org.soulwing.credo.service.GroupAccessException;
@@ -53,7 +54,7 @@ import org.soulwing.credo.service.protect.CredentialProtectionService;
 public class ExportServiceBean implements ExportService {
 
   @Inject
-  protected CredentialService credentialService;
+  protected CredentialRepository credentialRepository;
 
   @Inject
   protected CredentialExporterRegistry exporterRegistry;
@@ -71,8 +72,11 @@ public class ExportServiceBean implements ExportService {
   @TransactionAttribute(TransactionAttributeType.REQUIRED)
   public ExportRequest newExportRequest(Long credentialId)
       throws NoSuchCredentialException {
-    return new ExportRequestBean(
-        credentialService.findCredentialById(credentialId));
+    Credential credential = credentialRepository.findById(credentialId);
+    if (credential == null) {
+      throw new NoSuchCredentialException();
+    }
+    return new ExportRequestBean(credential);
   }
 
   /**
