@@ -71,6 +71,12 @@
                   </h:outputLink>
                 </li>
                 <li>
+                  <h:outputLink value="edit">
+                    <f:param name="id" value="#{req.id}"/>
+                    #{messages.editButtonLabel}
+                  </h:outputLink>
+                </li>
+                <li>
                   <h:outputLink value="remove">
                     <f:param name="id" value="#{req.id}"/>
                     #{messages.removeButtonLabel}
