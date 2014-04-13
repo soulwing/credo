@@ -110,7 +110,6 @@ public class DelegatingRequestEditorBeanTest {
 
   @Test(expected = NoSuchCredentialException.class)
   public void testSaveWhenEntityNotFound() throws Exception {
-    context.checking(tagsExpectations());
     context.checking(repositoryExpectations(
         throwException(new IllegalArgumentException())));
     context.checking(new Expectations() { { 
@@ -125,7 +124,6 @@ public class DelegatingRequestEditorBeanTest {
 
   @Test(expected = MergeConflictException.class)
   public void testSaveWhenMergeConflict() throws Exception {
-    context.checking(tagsExpectations());
     context.checking(repositoryExpectations(
         throwException(new OptimisticLockException())));
     context.checking(new Expectations() { {
@@ -140,7 +138,6 @@ public class DelegatingRequestEditorBeanTest {
     editor.save(errors);    
   }
 
-
   @Test
   public void testSaveWhenOwnerChanged() throws Exception {
     context.checking(ownerExpectations());
@@ -154,7 +151,7 @@ public class DelegatingRequestEditorBeanTest {
     return new Expectations() { {
       allowing(request).getOwner();
       will(returnValue(group));
-      oneOf(group).getName();
+      allowing(group).getName();
       will(returnValue(GROUP_NAME));
       oneOf(protectionService).unprotect(with(same(request)), with(
          allOf(any(ProtectionParameters.class), 
