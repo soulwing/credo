@@ -57,6 +57,8 @@ public class EditCredentialRequestBeanTest {
   
   private static final Password PASSWORD = Password.EMPTY;
   
+  private static final String GROUP_NAME = "someGroup";
+  
   @Rule
   public final JUnitRuleMockery context = new JUnitRuleMockery();
   
@@ -149,8 +151,14 @@ public class EditCredentialRequestBeanTest {
   public void testSaveWhenPassphraseException() throws Exception {
     context.checking(saveRequestExpectations(
         throwException(new PassphraseException())));
+    context.checking(new Expectations() { { 
+      oneOf(editor).getOwner();
+      will(returnValue(GROUP_NAME));
+    } });
     assertThat(bean.save(), 
         is(equalTo(EditCredentialRequestBean.PASSWORD_OUTCOME_ID)));
+    assertThat(bean.getPasswordEditor().getGroupName(), 
+        is(equalTo(GROUP_NAME)));
   }
 
   @Test

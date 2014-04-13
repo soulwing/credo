@@ -143,7 +143,8 @@ public class EditCredentialRequestBean implements Serializable {
       endConversation();
       return SUCCESS_OUTCOME_ID;
     }
-    catch (PassphraseException ex) {      
+    catch (PassphraseException ex) {
+      passwordEditor.setGroupName(editor.getOwner());
       return PASSWORD_OUTCOME_ID;
     }
     catch (MergeConflictException ex) {
