@@ -25,7 +25,6 @@ import org.soulwing.credo.service.MergeConflictException;
 import org.soulwing.credo.service.NoSuchCredentialException;
 import org.soulwing.credo.service.NoSuchGroupException;
 import org.soulwing.credo.service.PassphraseException;
-import org.soulwing.credo.service.ProtectionParameters;
 
 /**
  * A service that provides support for editing {@link CredentialRequest}
@@ -49,8 +48,6 @@ public interface EditCredentialRequestService {
    * Applies the changes in the given editor to the request it represents, 
    * effectively making the requested changes persistent.
    * @param editor the editor to apply
-   * @param protection protection parameters that will be used if the 
-   *    owner has changed
    * @param errors an errors object that will be updated if the edits cannot
    *    be successfully applied
    * @throws CredentialRequestException if a recoverable error occurs in 
@@ -65,7 +62,7 @@ public interface EditCredentialRequestService {
    *    has changed since the editor was created
    */
   void saveRequest(CredentialRequestEditor editor, 
-      ProtectionParameters protection, Errors errors) 
+      Errors errors) 
       throws CredentialRequestException, NoSuchCredentialException, 
       GroupAccessException, PassphraseException, MergeConflictException;
 

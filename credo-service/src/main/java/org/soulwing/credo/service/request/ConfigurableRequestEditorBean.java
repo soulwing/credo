@@ -25,6 +25,7 @@ import java.util.Set;
 import javax.enterprise.context.Dependent;
 import javax.security.auth.x500.X500Principal;
 
+import org.soulwing.credo.Password;
 import org.soulwing.credo.Tag;
 import org.soulwing.credo.service.X500PrincipalUtil;
 
@@ -43,6 +44,7 @@ public class ConfigurableRequestEditorBean
   private String owner;
   private String note;
   private String[] tags;
+  private Password password;
   
   /**
    * {@inheritDoc}
@@ -180,6 +182,22 @@ public class ConfigurableRequestEditorBean
       tags[index++] = i.next().getText();
     }
     setTags(tags);
+  }
+
+  /**
+   * Gets the {@code password} property.
+   * @return
+   */
+  public Password getPassword() {
+    return password;
+  }
+
+  /**
+   * Sets the {@code password} property.
+   * @param password
+   */
+  public void setPassword(Password password) {
+    this.password = password;
   }
 
 }

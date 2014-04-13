@@ -32,7 +32,6 @@ import org.soulwing.credo.CredentialRequest;
 import org.soulwing.credo.repository.CredentialRequestRepository;
 import org.soulwing.credo.service.Errors;
 import org.soulwing.credo.service.NoSuchCredentialException;
-import org.soulwing.credo.service.ProtectionParameters;
 
 /**
  * Unit tests for {@link EditCredentialRequestBean}.
@@ -57,9 +56,6 @@ public class EditCredentialRequestServiceBeanTest {
   
   @Mock
   private SaveableRequestEditor editor;
-  
-  @Mock
-  private ProtectionParameters protection;
   
   @Mock
   private Errors errors;
@@ -99,10 +95,10 @@ public class EditCredentialRequestServiceBeanTest {
   @Test
   public void testSaveRequest() throws Exception {
     context.checking(new Expectations() { { 
-      oneOf(editor).save(with(same(protection)), with(same(errors)));
+      oneOf(editor).save(with(same(errors)));
     } });
 
-    service.saveRequest(editor, protection, errors);
+    service.saveRequest(editor, errors);
   }
 
 }

@@ -23,7 +23,6 @@ import org.soulwing.credo.service.GroupAccessException;
 import org.soulwing.credo.service.MergeConflictException;
 import org.soulwing.credo.service.NoSuchCredentialException;
 import org.soulwing.credo.service.PassphraseException;
-import org.soulwing.credo.service.ProtectionParameters;
 
 
 /**
@@ -36,7 +35,6 @@ public interface SaveableRequestEditor extends CredentialRequestEditor {
   /**
    * Saves the contents of the editor to the target request, creating or
    * updating the underlying request entity as needed.
-   * @param protection protection parameters
    * @param errors an errors object that will be updated if a recoverable
    *    error occurs
    * @throws CredentialRequestException if a recoverable error occurs in 
@@ -50,8 +48,7 @@ public interface SaveableRequestEditor extends CredentialRequestEditor {
    * @throws MergeConflictException if the persistent state of the request
    *    has changed since the editor was created
    */
-  void save(ProtectionParameters protection, 
-      Errors errors) throws CredentialRequestException,
+  void save(Errors errors) throws CredentialRequestException,
       NoSuchCredentialException, GroupAccessException, PassphraseException, 
       MergeConflictException;
   

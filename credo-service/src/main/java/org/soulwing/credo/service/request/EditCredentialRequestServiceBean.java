@@ -31,7 +31,6 @@ import org.soulwing.credo.service.GroupAccessException;
 import org.soulwing.credo.service.MergeConflictException;
 import org.soulwing.credo.service.NoSuchCredentialException;
 import org.soulwing.credo.service.PassphraseException;
-import org.soulwing.credo.service.ProtectionParameters;
 
 /**
  * A {@link EditCredentialRequestService} implemented as a simple bean.
@@ -70,12 +69,12 @@ public class EditCredentialRequestServiceBean
   @Override
   @TransactionAttribute(TransactionAttributeType.REQUIRED)
   public void saveRequest(CredentialRequestEditor editor,
-      ProtectionParameters protection, Errors errors)
+      Errors errors)
       throws CredentialRequestException, NoSuchCredentialException,
       GroupAccessException, PassphraseException, MergeConflictException {
     
     Validate.isTrue(editor instanceof SaveableRequestEditor);
-    ((SaveableRequestEditor) editor).save(protection, errors);
+    ((SaveableRequestEditor) editor).save(errors);
   }
   
 }

@@ -138,7 +138,8 @@ public class EditCredentialRequestBean implements Serializable {
    */
   public String save() {
     try {
-      requestService.saveRequest(editor.getDelegate(), passwordEditor, errors);
+      editor.getDelegate().setPassword(passwordEditor.getPassword());
+      requestService.saveRequest(editor.getDelegate(), errors);
       endConversation();
       return SUCCESS_OUTCOME_ID;
     }

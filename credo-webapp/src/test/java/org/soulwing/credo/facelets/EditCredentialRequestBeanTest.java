@@ -36,6 +36,7 @@ import org.jmock.integration.junit4.JUnitRuleMockery;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.soulwing.credo.Password;
 import org.soulwing.credo.service.Errors;
 import org.soulwing.credo.service.GroupAccessException;
 import org.soulwing.credo.service.MergeConflictException;
@@ -53,6 +54,8 @@ import org.soulwing.credo.service.request.EditCredentialRequestService;
 public class EditCredentialRequestBeanTest {
 
   private static final long REQUEST_ID = -1L;
+  
+  private static final Password PASSWORD = Password.EMPTY;
   
   @Rule
   public final JUnitRuleMockery context = new JUnitRuleMockery();
@@ -79,6 +82,7 @@ public class EditCredentialRequestBeanTest {
     bean.editor = new DelegatingCredentialEditor<CredentialRequestEditor>();
     bean.editor.setDelegate(this.editor);
     bean.passwordEditor = new PasswordFormEditor();
+    bean.passwordEditor.setPassword(PASSWORD);
   }
   
   @Test
@@ -177,8 +181,9 @@ public class EditCredentialRequestBeanTest {
   private Expectations saveRequestExpectations(final Action outcome) 
       throws Exception {
     return new Expectations() { { 
+      oneOf(editor).setPassword(with(PASSWORD));
       oneOf(requestService).saveRequest(with(same(editor)), 
-          with(bean.passwordEditor), with(same(errors)));
+          with(same(errors)));
       will(outcome);
     } };
   }
