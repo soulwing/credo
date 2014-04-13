@@ -67,7 +67,8 @@ public class CredentialRequestEntity extends AbstractEntity
   @Lob
   private String note;
   
-  @ManyToMany(fetch = FetchType.LAZY)
+  @ManyToMany(fetch = FetchType.LAZY, 
+      cascade = { CascadeType.PERSIST, CascadeType.MERGE })
   @JoinTable(name = "credential_request_tag", inverseJoinColumns = { 
       @JoinColumn(name = "tag_id")
   })
