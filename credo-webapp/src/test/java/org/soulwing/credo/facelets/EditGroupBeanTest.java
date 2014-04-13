@@ -38,8 +38,9 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.soulwing.credo.Password;
-import org.soulwing.credo.service.Errors;
 import org.soulwing.credo.service.EditException;
+import org.soulwing.credo.service.Errors;
+import org.soulwing.credo.service.GroupAccessException;
 import org.soulwing.credo.service.GroupEditor;
 import org.soulwing.credo.service.GroupService;
 import org.soulwing.credo.service.MergeConflictException;
@@ -136,7 +137,7 @@ public class EditGroupBeanTest {
   @Test
   public void testSaveWhenGroupAccessException() throws Exception {
     context.checking(saveGroupExpectations(
-        throwException(new NoSuchGroupException())));
+        throwException(new GroupAccessException("message"))));
     context.checking(endConversationExpectations());
     assertThat(bean.save(), is(equalTo(EditGroupBean.FAILURE_OUTCOME_ID)));
   }
