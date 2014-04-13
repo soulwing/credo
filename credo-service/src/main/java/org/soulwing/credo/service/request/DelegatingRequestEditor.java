@@ -1,5 +1,5 @@
 /*
- * File created on Mar 20, 2014 
+ * File created on Apr 13, 2014 
  *
  * Copyright (c) 2014 Virginia Polytechnic Institute and State University
  *
@@ -18,31 +18,26 @@
  */
 package org.soulwing.credo.service.request;
 
-import org.soulwing.credo.Credential;
 import org.soulwing.credo.CredentialRequest;
-import org.soulwing.credo.service.CredentialEditor;
 
 /**
- * A factory that produces {@link CredentialEditor} objects for 
- *  requests.
+ * A {@link CredentialRequestEditor} that delegates to an underlying 
+ * {@link CredentialRequest}.
  *
  * @author Carl Harris
  */
-public interface CredentialRequestEditorFactory {
+public interface DelegatingRequestEditor extends CredentialRequestEditor {
 
   /**
-   * Creates an editor for a request based on contents of the given 
-   * credential.
-   * @param credential basis for the request that will be edited
-   * @return editor
+   * Gets the request delegate.
+   * @return delegate
    */
-  CredentialRequestEditor newEditor(Credential credential);
+  CredentialRequest getDelegate();
   
   /**
-   * Creates an editor for a given request.
-   * @param request the subject request
-   * @return editor
+   * Sets the request delegate.
+   * @param delegate the delegate to set
    */
-  CredentialRequestEditor newEditor(CredentialRequest request);
-
+  void setDelegate(CredentialRequest delegate);
+  
 }

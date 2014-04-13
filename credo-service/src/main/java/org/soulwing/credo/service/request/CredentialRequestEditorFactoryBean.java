@@ -25,6 +25,7 @@ import javax.inject.Inject;
 import org.apache.commons.lang.Validate;
 import org.soulwing.credo.Credential;
 import org.soulwing.credo.CredentialCertificate;
+import org.soulwing.credo.CredentialRequest;
 
 /**
  * A concrete {@link CredentialRequestEditorFactory} implementation.
@@ -36,7 +37,10 @@ public class CredentialRequestEditorFactoryBean
     implements CredentialRequestEditorFactory {
 
   @Inject
-  protected Instance<ConfigurableRequestEditor> editorInstance;
+  protected Instance<ConfigurableRequestEditor> configurableEditors;
+  
+  @Inject
+  protected Instance<DelegatingRequestEditor> delegatingEditors;
   
   /**
    * {@inheritDoc}
@@ -45,7 +49,7 @@ public class CredentialRequestEditorFactoryBean
   public CredentialRequestEditor newEditor(Credential credential) {
     Validate.isTrue(!credential.getCertificates().isEmpty());
     CredentialCertificate certificate = credential.getCertificates().get(0);
-    ConfigurableRequestEditor editor = editorInstance.get();
+    ConfigurableRequestEditor editor = configurableEditors.get();
     editor.setCredentialId(credential.getId());
     editor.setSubjectName(certificate.getSubject());
     editor.setName(credential.getName());
@@ -55,4 +59,14 @@ public class CredentialRequestEditorFactoryBean
     return editor;
   }
 
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public CredentialRequestEditor newEditor(CredentialRequest request) {
+    DelegatingRequestEditor editor = delegatingEditors.get();
+    editor.setDelegate(request);
+    return editor;
+  }
+  
 }

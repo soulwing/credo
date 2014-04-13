@@ -36,6 +36,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.soulwing.credo.Credential;
 import org.soulwing.credo.CredentialCertificate;
+import org.soulwing.credo.CredentialRequest;
 import org.soulwing.credo.Tag;
 import org.soulwing.credo.UserGroup;
 import org.soulwing.credo.domain.TagEntity;
@@ -65,13 +66,22 @@ public class CredentialRequestEditorFactoryBeanTest {
   public final JUnitRuleMockery context = new JUnitRuleMockery();
   
   @Mock
-  private Instance<ConfigurableRequestEditor> editorInstance;
-  
+  private Instance<ConfigurableRequestEditor> configurableEditors;
+
   @Mock
-  private ConfigurableRequestEditor editor;
-  
+  private Instance<DelegatingRequestEditor> delegatingEditors;
+
+  @Mock
+  private ConfigurableRequestEditor configurableEditor;
+
+  @Mock
+  private DelegatingRequestEditor delegatingEditor;
+
   @Mock
   private Credential credential;
+  
+  @Mock
+  private CredentialRequest request;
   
   @Mock
   private CredentialCertificate certificate;
@@ -84,27 +94,28 @@ public class CredentialRequestEditorFactoryBeanTest {
   
   @Before
   public void setUp() throws Exception {
-    factory.editorInstance = editorInstance;
+    factory.configurableEditors = configurableEditors;
+    factory.delegatingEditors = delegatingEditors;
   }
 
   @Test
   public void testNewEditorWithCredential() throws Exception {
-    context.checking(editorExpectations());
+    context.checking(editorWithCredentialExpectations());
     context.checking(credentialExpectations());
     assertThat(factory.newEditor(credential), 
-        is(sameInstance((CredentialRequestEditor) editor)));
+        is(sameInstance((CredentialRequestEditor) configurableEditor)));
   }
   
-  private Expectations editorExpectations() throws Exception {
+  private Expectations editorWithCredentialExpectations() throws Exception {
     return new Expectations() { {
-      oneOf(editorInstance).get();
-      will(returnValue(editor));
-      oneOf(editor).setCredentialId(with(CREDENTIAL_ID));
-      oneOf(editor).setName(with(NAME));
-      oneOf(editor).setSubjectName(with(SUBJECT));
-      oneOf(editor).setOwner(with(OWNER));
-      oneOf(editor).setNote(with(NOTE));
-      oneOf(editor).setTags((Set<? extends Tag>) with(contains(TAG)));
+      oneOf(configurableEditors).get();
+      will(returnValue(configurableEditor));
+      oneOf(configurableEditor).setCredentialId(with(CREDENTIAL_ID));
+      oneOf(configurableEditor).setName(with(NAME));
+      oneOf(configurableEditor).setSubjectName(with(SUBJECT));
+      oneOf(configurableEditor).setOwner(with(OWNER));
+      oneOf(configurableEditor).setNote(with(NOTE));
+      oneOf(configurableEditor).setTags((Set<? extends Tag>) with(contains(TAG)));
     } };
   }
   
@@ -129,5 +140,17 @@ public class CredentialRequestEditorFactoryBeanTest {
     } };
   }
   
+  @Test
+  public void testNewEditorWithRequest() throws Exception {
+    context.checking(new Expectations() { { 
+      oneOf(delegatingEditors).get();
+      will(returnValue(delegatingEditor));
+      oneOf(delegatingEditor).setDelegate(with(same(request)));
+    } });
+    
+    assertThat(factory.newEditor(request), 
+        is(sameInstance((Object) delegatingEditor)));
+  }
+
 }
 
