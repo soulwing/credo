@@ -19,8 +19,8 @@
 package org.soulwing.credo.service.request;
 
 /**
- * An exception that is thrown when an error occurs in producing a credential
- * request.
+ * An exception that is thrown when an error occurs in creating or modifying
+ * a credential request.
  *
  * @author Carl Harris
  */
