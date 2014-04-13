@@ -349,6 +349,14 @@ an existing credential, the user should be offered the option of removing the
 old credential.
 
 
+Edit Credential Signing Request
+-------------------------------
+
+A user can edit an existing signing request for which she is an owner.
+
+* The friendly name, description, and tags, and owner can be changed.
+* None of the attributes of the X.509 signing request object can be changed.
+
 
 
 
