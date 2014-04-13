@@ -48,11 +48,11 @@ import org.soulwing.credo.service.crypto.IncorrectPassphraseException;
 import org.soulwing.credo.service.crypto.PrivateKeyWrapper;
 
 /**
- * Unit tests for {@link ConcreteCredentialImporter}.
+ * Unit tests for {@link CredentialImporterBean}.
  *
  * @author Carl Harris
  */
-public class ConcreteCredentialImporterTest {
+public class CredentialImporterBeanTest {
 
   private static final Password PASSPHRASE = new Password(new char[] { 'a' });
 
@@ -76,11 +76,12 @@ public class ConcreteCredentialImporterTest {
   @Mock
   private CertificateWrapper certificate;
 
-  private ConcreteCredentialImporter importer;
+  private CredentialImporterBean importer = new CredentialImporterBean();
   
   @Before
   public void setUp() throws Exception {
-    importer = new ConcreteCredentialImporter(bag, timeOfDayService);
+    importer.bag = bag;
+    importer.timeOfDayService = timeOfDayService;
   }
   
   @Test

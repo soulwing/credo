@@ -19,36 +19,30 @@
 package org.soulwing.credo.service.importer;
 
 import javax.enterprise.context.ApplicationScoped;
+import javax.enterprise.inject.Instance;
 import javax.inject.Inject;
 
-import org.soulwing.credo.service.TimeOfDayService;
-import org.soulwing.credo.service.crypto.CredentialBagFactory;
 import org.soulwing.credo.service.crypto.PrivateKeyWrapper;
 
 /**
  * A {@link CredentialImporterFactory} that produces 
- * {@link ConcreteCredentialImporter} objects.
+ * {@link CredentialImporterBean} objects.
  *
  * @author Carl Harris
  */
 @ApplicationScoped
-public class ConcreteCredentialImporterFactory
+public class CredentialImporterFactoryBean
     implements CredentialImporterFactory {
 
   @Inject
-  protected CredentialBagFactory credentialBagFactory;
-  
-  @Inject
-  protected TimeOfDayService timeOfDayService;
+  protected Instance<ConfigurableCredentialImporter> importers;
   
   /**
    * {@inheritDoc}
    */
   @Override
   public CredentialImporter newImporter() {
-    return new ConcreteCredentialImporter(
-        credentialBagFactory.newCredentialBag(), 
-        timeOfDayService);
+    return importers.get();
   }
 
   /**
@@ -56,9 +50,9 @@ public class ConcreteCredentialImporterFactory
    */
   @Override
   public CredentialImporter newImporter(PrivateKeyWrapper privateKey) {
-    return new ConcreteCredentialImporter(
-        privateKey, credentialBagFactory.newCredentialBag(), 
-        timeOfDayService);
+    ConfigurableCredentialImporter importer = importers.get();
+    importer.setPrivateKey(privateKey);
+    return importer;
   }
 
 }

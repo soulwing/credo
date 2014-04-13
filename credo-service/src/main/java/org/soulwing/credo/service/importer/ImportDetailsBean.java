@@ -39,7 +39,7 @@ import org.soulwing.credo.service.crypto.PrivateKeyWrapper;
  *
  * @author Carl Harris
  */
-public class ConcreteImportDetails implements ImportDetails, Serializable {
+public class ImportDetailsBean implements ImportDetails, Serializable {
 
   private static final long serialVersionUID = -5190604068859062839L;
 
@@ -56,7 +56,7 @@ public class ConcreteImportDetails implements ImportDetails, Serializable {
   private String note;
   private String[] tags;
 
-  public ConcreteImportDetails(PrivateKeyWrapper privateKey,
+  public ImportDetailsBean(PrivateKeyWrapper privateKey,
       CertificateWrapper certificate, 
       List<CertificateWrapper> authorities) {
     this.subject = certificate.getSubject().getName();

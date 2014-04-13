@@ -22,6 +22,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 
+import javax.enterprise.context.Dependent;
+import javax.inject.Inject;
+
 import org.soulwing.credo.Password;
 import org.soulwing.credo.service.Errors;
 import org.soulwing.credo.service.ImportDetails;
@@ -39,40 +42,27 @@ import org.soulwing.credo.service.crypto.PrivateKeyWrapper;
  *
  * @author Carl Harris
  */
-public class ConcreteCredentialImporter implements CredentialImporter {
+@Dependent
+public class CredentialImporterBean implements ConfigurableCredentialImporter {
 
-  private final CredentialBag bag;
-  private final TimeOfDayService timeOfDayService;
+  @Inject
+  protected CredentialBag bag;
+  
+  @Inject
+  protected TimeOfDayService timeOfDayService;
   
   private PrivateKeyWrapper privateKey;
   private CertificateWrapper certificate;
   private List<CertificateWrapper> chain;
   
   /**
-   * Constructs a new instance.
-   * @param bag
-   * @param credentialBuilderFactory
-   * @param timeOfDayService
+   * {@inheritDoc}
    */
-  public ConcreteCredentialImporter(CredentialBag bag,
-      TimeOfDayService timeOfDayService) {
-    this(null, bag, timeOfDayService);
-  }
-
-  /**
-   * Constructs a new instance.
-   * @param privateKey
-   * @param bag
-   * @param credentialBuilderFactory
-   * @param timeOfDayService
-   */
-  public ConcreteCredentialImporter(PrivateKeyWrapper privateKey,
-      CredentialBag bag, TimeOfDayService timeOfDayService) {
+  @Override
+  public void setPrivateKey(PrivateKeyWrapper privateKey) {
     this.privateKey = privateKey;
-    this.bag = bag;
-    this.timeOfDayService = timeOfDayService;
   }
-
+  
   /**
    * {@inheritDoc}
    */
@@ -132,7 +122,7 @@ public class ConcreteCredentialImporter implements CredentialImporter {
       }
     }
 
-    return new ConcreteImportDetails(privateKey, certificate, chain);
+    return new ImportDetailsBean(privateKey, certificate, chain);
   }
 
 }

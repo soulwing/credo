@@ -19,6 +19,7 @@
 package org.soulwing.credo.service.crypto.bc;
 
 import javax.enterprise.context.ApplicationScoped;
+import javax.enterprise.inject.Produces;
 import javax.inject.Inject;
 
 import org.soulwing.credo.service.crypto.CredentialBag;
@@ -41,6 +42,7 @@ public class BcCredentialBagFactory implements CredentialBagFactory {
    * {@inheritDoc}
    */
   @Override
+  @Produces
   public CredentialBag newCredentialBag() {
     return new BcCredentialBag(objectBuilderFactory);
   }
