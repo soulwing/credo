@@ -16,7 +16,7 @@
  * limitations under the License.
  *
  */
-package org.soulwing.credo.service;
+package org.soulwing.credo.service.credential;
 
 import java.io.IOException;
 import java.util.Iterator;
@@ -44,6 +44,20 @@ import org.soulwing.credo.repository.CredentialRequestRepository;
 import org.soulwing.credo.repository.UserGroupMemberRepository;
 import org.soulwing.credo.repository.UserGroupRepository;
 import org.soulwing.credo.security.OwnerAccessControlException;
+import org.soulwing.credo.service.EditException;
+import org.soulwing.credo.service.Errors;
+import org.soulwing.credo.service.FileContentModel;
+import org.soulwing.credo.service.GroupAccessException;
+import org.soulwing.credo.service.GroupEditor;
+import org.soulwing.credo.service.GroupService;
+import org.soulwing.credo.service.MergeConflictException;
+import org.soulwing.credo.service.NoContentException;
+import org.soulwing.credo.service.NoSuchGroupException;
+import org.soulwing.credo.service.PassphraseException;
+import org.soulwing.credo.service.ProtectionParameters;
+import org.soulwing.credo.service.TagService;
+import org.soulwing.credo.service.UserAccessException;
+import org.soulwing.credo.service.UserContextService;
 import org.soulwing.credo.service.crypto.CertificateWrapper;
 import org.soulwing.credo.service.crypto.PrivateKeyWrapper;
 import org.soulwing.credo.service.importer.CredentialImporter;
@@ -58,7 +72,7 @@ import org.soulwing.credo.service.protect.CredentialRequestProtectionService;
  */
 @Singleton
 @ConcurrencyManagement(ConcurrencyManagementType.BEAN)
-public class ConcreteImportService implements ImportService {
+public class ImportServiceBean implements ImportService {
 
   private static final Password EMPTY_PASSPHRASE = new Password(new char[0]);
 

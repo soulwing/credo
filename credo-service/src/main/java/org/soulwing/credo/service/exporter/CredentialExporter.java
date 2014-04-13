@@ -20,11 +20,11 @@ package org.soulwing.credo.service.exporter;
 
 import java.io.IOException;
 
-import org.soulwing.credo.service.ExportException;
-import org.soulwing.credo.service.ExportFormat;
-import org.soulwing.credo.service.ExportPreparation;
-import org.soulwing.credo.service.ExportRequest;
 import org.soulwing.credo.service.PassphraseException;
+import org.soulwing.credo.service.credential.ExportException;
+import org.soulwing.credo.service.credential.ExportFormat;
+import org.soulwing.credo.service.credential.ExportPreparation;
+import org.soulwing.credo.service.credential.ExportRequest;
 import org.soulwing.credo.service.crypto.PrivateKeyWrapper;
 
 /**

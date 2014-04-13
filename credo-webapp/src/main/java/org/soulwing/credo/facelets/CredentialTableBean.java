@@ -25,7 +25,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.soulwing.credo.Credential;
-import org.soulwing.credo.service.CredentialService;
+import org.soulwing.credo.service.credential.CredentialService;
 
 /**
  * A bean that supports a view containing a table of credentials.

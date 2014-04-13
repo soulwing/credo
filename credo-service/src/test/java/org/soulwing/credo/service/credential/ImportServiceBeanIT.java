@@ -16,7 +16,7 @@
  * limitations under the License.
  *
  */
-package org.soulwing.credo.service;
+package org.soulwing.credo.service.credential;
 
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.empty;
@@ -53,7 +53,17 @@ import org.soulwing.credo.domain.CredentialEntity;
 import org.soulwing.credo.logging.LoggerCategory;
 import org.soulwing.credo.repository.CredentialRepository;
 import org.soulwing.credo.security.OwnerAccessControlException;
+import org.soulwing.credo.service.Errors;
+import org.soulwing.credo.service.FileContentModel;
+import org.soulwing.credo.service.MockUserContextService;
+import org.soulwing.credo.service.ProtectionParameters;
+import org.soulwing.credo.service.UserProfilePreparation;
+import org.soulwing.credo.service.UserProfileService;
 import org.soulwing.credo.service.archive.ArchiveBuilder;
+import org.soulwing.credo.service.credential.ImportServiceBean;
+import org.soulwing.credo.service.credential.CredentialService;
+import org.soulwing.credo.service.credential.ImportDetails;
+import org.soulwing.credo.service.credential.ImportService;
 import org.soulwing.credo.service.crypto.PrivateKeyWrapper;
 import org.soulwing.credo.service.crypto.bc.BcPrivateKeyWrapper;
 import org.soulwing.credo.service.crypto.jca.JcaPrivateKeyWrapper;
@@ -66,12 +76,12 @@ import org.soulwing.credo.service.protect.CredentialProtectionService;
 import org.soulwing.credo.service.request.CredentialRequestEditorFactory;
 
 /**
- * Integration tests for {@link ConcreteImportService}.
+ * Integration tests for {@link ImportServiceBean}.
  * 
  * @author Carl Harris
  */
 @RunWith(Arquillian.class)
-public class ConcreteImportServiceIT {
+public class ImportServiceBeanIT {
 
   private static final String LOGIN_NAME = "someUser";
 
@@ -85,6 +95,7 @@ public class ConcreteImportServiceIT {
         .addPackage(CredentialRepository.class.getPackage())
         .addPackage(LoggerCategory.class.getPackage())
         .addPackage(OwnerAccessControlException.class.getPackage())
+        .addPackage(Errors.class.getPackage())
         .addPackage(CredentialService.class.getPackage())
         .addPackage(ArchiveBuilder.class.getPackage())
         .addPackage(CredentialExporter.class.getPackage())

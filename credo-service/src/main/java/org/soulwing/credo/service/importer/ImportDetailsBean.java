@@ -29,8 +29,8 @@ import javax.naming.ldap.Rdn;
 import javax.security.auth.x500.X500Principal;
 
 import org.soulwing.credo.UserGroup;
-import org.soulwing.credo.service.ImportDetails;
 import org.soulwing.credo.service.X500PrincipalUtil;
+import org.soulwing.credo.service.credential.ImportDetails;
 import org.soulwing.credo.service.crypto.CertificateWrapper;
 import org.soulwing.credo.service.crypto.PrivateKeyWrapper;
 

@@ -16,7 +16,7 @@
  * limitations under the License.
  *
  */
-package org.soulwing.credo.service;
+package org.soulwing.credo.service.credential;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.arrayContaining;
@@ -43,6 +43,15 @@ import org.junit.Test;
 import org.soulwing.credo.Credential;
 import org.soulwing.credo.Password;
 import org.soulwing.credo.UserGroup;
+import org.soulwing.credo.service.Errors;
+import org.soulwing.credo.service.GroupAccessException;
+import org.soulwing.credo.service.PassphraseException;
+import org.soulwing.credo.service.ProtectionParameters;
+import org.soulwing.credo.service.UserAccessException;
+import org.soulwing.credo.service.credential.ExportServiceBean;
+import org.soulwing.credo.service.credential.CredentialService;
+import org.soulwing.credo.service.credential.ExportPreparation;
+import org.soulwing.credo.service.credential.ExportRequest;
 import org.soulwing.credo.service.crypto.PasswordGenerator;
 import org.soulwing.credo.service.crypto.PrivateKeyWrapper;
 import org.soulwing.credo.service.exporter.CredentialExporter;
@@ -50,11 +59,11 @@ import org.soulwing.credo.service.exporter.CredentialExporterRegistry;
 import org.soulwing.credo.service.protect.CredentialProtectionService;
 
 /**
- * Unit tests for {@link ConcreteExportService}.
+ * Unit tests for {@link ExportServiceBean}.
  *
  * @author Carl Harris
  */
-public class ConcreteExportServiceTest {
+public class ExportServiceBeanTest {
 
   private static final String GROUP_NAME = "someGroup";
 
@@ -94,7 +103,7 @@ public class ConcreteExportServiceTest {
   @Mock
   private Errors errors;
   
-  private ConcreteExportService exportService = new ConcreteExportService();
+  private ExportServiceBean exportService = new ExportServiceBean();
   
   @Before
   public void setUp() throws Exception {

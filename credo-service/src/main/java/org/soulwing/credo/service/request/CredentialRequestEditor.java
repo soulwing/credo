@@ -19,7 +19,7 @@
 package org.soulwing.credo.service.request;
 
 import org.soulwing.credo.Password;
-import org.soulwing.credo.service.CredentialEditor;
+import org.soulwing.credo.service.credential.CredentialEditor;
 
 
 

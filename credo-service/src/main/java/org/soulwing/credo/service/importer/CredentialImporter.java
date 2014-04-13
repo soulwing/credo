@@ -24,10 +24,10 @@ import java.io.InputStream;
 import org.soulwing.credo.Credential;
 import org.soulwing.credo.Password;
 import org.soulwing.credo.service.Errors;
-import org.soulwing.credo.service.ImportDetails;
-import org.soulwing.credo.service.ImportException;
 import org.soulwing.credo.service.NoContentException;
 import org.soulwing.credo.service.PassphraseException;
+import org.soulwing.credo.service.credential.ImportDetails;
+import org.soulwing.credo.service.credential.ImportException;
 
 /**
  * A builder for a {@link Credential}.

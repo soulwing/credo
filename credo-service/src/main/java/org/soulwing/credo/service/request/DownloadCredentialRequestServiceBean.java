@@ -28,7 +28,7 @@ import javax.inject.Inject;
 import org.soulwing.credo.CredentialRequest;
 import org.soulwing.credo.repository.CredentialRequestRepository;
 import org.soulwing.credo.service.FileDownloadResponse;
-import org.soulwing.credo.service.NoSuchCredentialException;
+import org.soulwing.credo.service.credential.NoSuchCredentialException;
 
 /**
  * A {@link DownloadCredentialRequestService} implemented as a simple bean.

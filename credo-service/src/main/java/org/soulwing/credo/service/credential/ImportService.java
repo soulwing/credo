@@ -16,7 +16,7 @@
  * limitations under the License.
  *
  */
-package org.soulwing.credo.service;
+package org.soulwing.credo.service.credential;
 
 import java.util.List;
 
@@ -25,6 +25,12 @@ import javax.ejb.Local;
 import org.soulwing.credo.Credential;
 import org.soulwing.credo.CredentialRequest;
 import org.soulwing.credo.Password;
+import org.soulwing.credo.service.Errors;
+import org.soulwing.credo.service.FileContentModel;
+import org.soulwing.credo.service.GroupAccessException;
+import org.soulwing.credo.service.NoSuchGroupException;
+import org.soulwing.credo.service.PassphraseException;
+import org.soulwing.credo.service.ProtectionParameters;
 
 /**
  * A service that imports credentials using the contents of uploaded files.

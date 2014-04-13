@@ -23,7 +23,7 @@ import java.io.IOException;
 import javax.ejb.Local;
 
 import org.soulwing.credo.service.FileDownloadResponse;
-import org.soulwing.credo.service.NoSuchCredentialException;
+import org.soulwing.credo.service.credential.NoSuchCredentialException;
 
 /**
  * A service that provides support for downloading a credential request object

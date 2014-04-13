@@ -29,9 +29,9 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.inject.Instance;
 import javax.inject.Inject;
 
-import org.soulwing.credo.service.ExportFormat;
-import org.soulwing.credo.service.ExportFormat.Variant;
-import org.soulwing.credo.service.ExportRequest;
+import org.soulwing.credo.service.credential.ExportFormat;
+import org.soulwing.credo.service.credential.ExportRequest;
+import org.soulwing.credo.service.credential.ExportFormat.Variant;
 
 /**
  * A concrete {@link CredentialExporterRegistry} implementation.

@@ -39,9 +39,9 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.soulwing.credo.Credential;
-import org.soulwing.credo.service.CredentialService;
 import org.soulwing.credo.service.Errors;
-import org.soulwing.credo.service.NoSuchCredentialException;
+import org.soulwing.credo.service.credential.CredentialService;
+import org.soulwing.credo.service.credential.NoSuchCredentialException;
 
 /**
  * Unit tests for {@link RemoveCredentialBean}.

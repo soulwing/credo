@@ -16,7 +16,7 @@
  * limitations under the License.
  *
  */
-package org.soulwing.credo.service;
+package org.soulwing.credo.service.credential;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,6 +33,8 @@ import org.soulwing.credo.UserGroup;
 import org.soulwing.credo.repository.CredentialRepository;
 import org.soulwing.credo.repository.UserGroupRepository;
 import org.soulwing.credo.security.OwnerAccessControlException;
+import org.soulwing.credo.service.GroupAccessException;
+import org.soulwing.credo.service.UserContextService;
 
 /**
  * A concrete {@link CredentialService} implementation.
@@ -41,7 +43,7 @@ import org.soulwing.credo.security.OwnerAccessControlException;
 @Singleton
 @ConcurrencyManagement(ConcurrencyManagementType.BEAN)
 @TransactionAttribute(TransactionAttributeType.REQUIRED)
-public class ConcreteCredentialService implements CredentialService {
+public class CredentialServiceBean implements CredentialService {
 
   @Inject
   protected CredentialRepository credentialRepository;

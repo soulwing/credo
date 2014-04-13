@@ -21,8 +21,8 @@ package org.soulwing.credo.service.request;
 import org.soulwing.credo.service.Errors;
 import org.soulwing.credo.service.GroupAccessException;
 import org.soulwing.credo.service.MergeConflictException;
-import org.soulwing.credo.service.NoSuchCredentialException;
 import org.soulwing.credo.service.PassphraseException;
+import org.soulwing.credo.service.credential.NoSuchCredentialException;
 
 
 /**

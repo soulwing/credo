@@ -25,12 +25,12 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
 import org.soulwing.credo.CredentialCertificate;
-import org.soulwing.credo.service.ExportException;
-import org.soulwing.credo.service.ExportFormat;
-import org.soulwing.credo.service.ExportPreparation;
-import org.soulwing.credo.service.ExportRequest;
 import org.soulwing.credo.service.PassphraseException;
 import org.soulwing.credo.service.archive.ArchiveBuilder;
+import org.soulwing.credo.service.credential.ExportException;
+import org.soulwing.credo.service.credential.ExportFormat;
+import org.soulwing.credo.service.credential.ExportPreparation;
+import org.soulwing.credo.service.credential.ExportRequest;
 import org.soulwing.credo.service.crypto.PKCS8EncryptionService;
 import org.soulwing.credo.service.crypto.PrivateKeyWrapper;
 import org.soulwing.credo.service.exporter.AbstractVariantExporter;

@@ -46,9 +46,9 @@ import org.soulwing.credo.domain.TagEntity;
 import org.soulwing.credo.repository.CredentialRequestRepository;
 import org.soulwing.credo.service.Errors;
 import org.soulwing.credo.service.MergeConflictException;
-import org.soulwing.credo.service.NoSuchCredentialException;
 import org.soulwing.credo.service.ProtectionParameters;
 import org.soulwing.credo.service.TagService;
+import org.soulwing.credo.service.credential.NoSuchCredentialException;
 import org.soulwing.credo.service.crypto.PrivateKeyWrapper;
 import org.soulwing.credo.service.protect.CredentialRequestProtectionService;
 

@@ -27,10 +27,10 @@ import javax.inject.Inject;
 
 import org.apache.commons.lang.Validate;
 import org.soulwing.credo.CredentialCertificate;
-import org.soulwing.credo.service.ExportException;
-import org.soulwing.credo.service.ExportPreparation;
-import org.soulwing.credo.service.ExportRequest;
 import org.soulwing.credo.service.PassphraseException;
+import org.soulwing.credo.service.credential.ExportException;
+import org.soulwing.credo.service.credential.ExportPreparation;
+import org.soulwing.credo.service.credential.ExportRequest;
 import org.soulwing.credo.service.crypto.CertificateWrapperFactory;
 import org.soulwing.credo.service.crypto.KeyStoreBuilder;
 import org.soulwing.credo.service.crypto.KeyStoreBuilderFactory;

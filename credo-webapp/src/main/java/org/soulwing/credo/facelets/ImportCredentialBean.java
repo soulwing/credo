@@ -31,11 +31,11 @@ import org.soulwing.credo.Credential;
 import org.soulwing.credo.Password;
 import org.soulwing.credo.service.Errors;
 import org.soulwing.credo.service.GroupAccessException;
-import org.soulwing.credo.service.ImportDetails;
-import org.soulwing.credo.service.ImportException;
-import org.soulwing.credo.service.ImportService;
 import org.soulwing.credo.service.NoSuchGroupException;
 import org.soulwing.credo.service.PassphraseException;
+import org.soulwing.credo.service.credential.ImportDetails;
+import org.soulwing.credo.service.credential.ImportException;
+import org.soulwing.credo.service.credential.ImportService;
 
 /**
  * A bean that supports the Import Credential interaction.

@@ -16,7 +16,7 @@
  * limitations under the License.
  *
  */
-package org.soulwing.credo.service;
+package org.soulwing.credo.service.credential;
 
 import static org.hamcrest.Matchers.arrayContaining;
 import static org.hamcrest.Matchers.contains;
@@ -63,6 +63,20 @@ import org.soulwing.credo.repository.CredentialRequestRepository;
 import org.soulwing.credo.repository.UserGroupMemberRepository;
 import org.soulwing.credo.repository.UserGroupRepository;
 import org.soulwing.credo.security.OwnerAccessControlException;
+import org.soulwing.credo.service.Errors;
+import org.soulwing.credo.service.FileContentModel;
+import org.soulwing.credo.service.GroupAccessException;
+import org.soulwing.credo.service.GroupEditor;
+import org.soulwing.credo.service.GroupService;
+import org.soulwing.credo.service.NoContentException;
+import org.soulwing.credo.service.PassphraseException;
+import org.soulwing.credo.service.ProtectionParameters;
+import org.soulwing.credo.service.TagService;
+import org.soulwing.credo.service.UserAccessException;
+import org.soulwing.credo.service.UserContextService;
+import org.soulwing.credo.service.credential.ImportServiceBean;
+import org.soulwing.credo.service.credential.ImportDetails;
+import org.soulwing.credo.service.credential.ImportException;
 import org.soulwing.credo.service.crypto.CertificateWrapper;
 import org.soulwing.credo.service.crypto.PrivateKeyWrapper;
 import org.soulwing.credo.service.importer.CredentialImporter;
@@ -71,11 +85,11 @@ import org.soulwing.credo.service.protect.CredentialProtectionService;
 import org.soulwing.credo.service.protect.CredentialRequestProtectionService;
 
 /**
- * Unit tests for {@link ConcreteImportService}.
+ * Unit tests for {@link ImportServiceBean}.
  *
  * @author Carl Harris
  */
-public class ConcreteImportServiceTest {
+public class ImportServiceBeanTest {
 
   private static final String OWNER = "owner";
 
@@ -194,7 +208,7 @@ public class ConcreteImportServiceTest {
   private CredentialRequestProtectionService requestProtectionService;
   
 
-  public ConcreteImportService importService = new ConcreteImportService();
+  public ImportServiceBean importService = new ImportServiceBean();
   
   @Before
   public void setUp() throws Exception {

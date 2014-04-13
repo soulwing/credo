@@ -31,12 +31,12 @@ import org.soulwing.credo.Credential;
 import org.soulwing.credo.CredentialRequest;
 import org.soulwing.credo.service.Errors;
 import org.soulwing.credo.service.GroupAccessException;
-import org.soulwing.credo.service.ImportDetails;
-import org.soulwing.credo.service.ImportException;
-import org.soulwing.credo.service.ImportService;
-import org.soulwing.credo.service.NoSuchCredentialException;
 import org.soulwing.credo.service.NoSuchGroupException;
 import org.soulwing.credo.service.PassphraseException;
+import org.soulwing.credo.service.credential.ImportDetails;
+import org.soulwing.credo.service.credential.ImportException;
+import org.soulwing.credo.service.credential.ImportService;
+import org.soulwing.credo.service.credential.NoSuchCredentialException;
 
 /**
  * A bean that supports the Import Signed Certificate interaction.

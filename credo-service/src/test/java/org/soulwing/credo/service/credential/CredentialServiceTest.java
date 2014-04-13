@@ -16,7 +16,7 @@
  * limitations under the License.
  *
  */
-package org.soulwing.credo.service;
+package org.soulwing.credo.service.credential;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
@@ -39,13 +39,15 @@ import org.soulwing.credo.Credential;
 import org.soulwing.credo.UserGroup;
 import org.soulwing.credo.repository.CredentialRepository;
 import org.soulwing.credo.repository.UserGroupRepository;
+import org.soulwing.credo.service.UserContextService;
+import org.soulwing.credo.service.credential.CredentialServiceBean;
 
 /**
- * Unit tests for {@link ConcreteCredentialService}.
+ * Unit tests for {@link CredentialServiceBean}.
  *
  * @author Carl Harris
  */
-public class ConcreteCredentialServiceTest {
+public class CredentialServiceTest {
 
   private static final String LOGIN_NAME = "loginName";
 
@@ -72,7 +74,7 @@ public class ConcreteCredentialServiceTest {
   @Mock
   private UserGroup group2;
 
-  private ConcreteCredentialService service = new ConcreteCredentialService();
+  private CredentialServiceBean service = new CredentialServiceBean();
   
   @Before
   public void setUp() throws Exception {

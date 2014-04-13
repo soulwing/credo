@@ -16,19 +16,20 @@
  * limitations under the License.
  *
  */
-package org.soulwing.credo.service;
+package org.soulwing.credo.service.credential;
 
 import java.io.Serializable;
 
 import org.soulwing.credo.Credential;
 import org.soulwing.credo.Password;
+import org.soulwing.credo.service.ProtectionParameters;
 
 /**
  * A concrete {@link ExportRequest} implementation.
  *
  * @author Carl Harris
  */
-public class ConcreteExportRequest 
+public class ExportRequestBean 
     implements Serializable, ExportRequest {
 
   private static final long serialVersionUID = -195819883911230303L;
@@ -45,7 +46,7 @@ public class ConcreteExportRequest
    * Constructs a new instance.
    * @param credential
    */
-  public ConcreteExportRequest(Credential credential) {
+  public ExportRequestBean(Credential credential) {
     this.credential = credential;
   }
 

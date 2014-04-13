@@ -16,7 +16,7 @@
  * limitations under the License.
  *
  */
-package org.soulwing.credo.service;
+package org.soulwing.credo.service.credential;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
@@ -29,13 +29,14 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.soulwing.credo.Credential;
+import org.soulwing.credo.service.credential.ExportRequestBean;
 
 /**
- * Unit tests for {@link ConcreteExportRequest}.
+ * Unit tests for {@link ExportRequestBean}.
  *
  * @author Carl Harris
  */
-public class ConcreteExportRequestTest {
+public class ExportRequestBeanTest {
 
   @Rule
   public final JUnitRuleMockery context = new JUnitRuleMockery();
@@ -43,11 +44,11 @@ public class ConcreteExportRequestTest {
   @Mock
   private Credential credential;
   
-  private ConcreteExportRequest request;
+  private ExportRequestBean request;
   
   @Before
   public void setUp() throws Exception {
-    request = new ConcreteExportRequest(credential);
+    request = new ExportRequestBean(credential);
   }
   
   @Test

@@ -22,7 +22,7 @@ import javax.ejb.Local;
 
 import org.soulwing.credo.CredentialRequest;
 import org.soulwing.credo.service.GroupAccessException;
-import org.soulwing.credo.service.NoSuchCredentialException;
+import org.soulwing.credo.service.credential.NoSuchCredentialException;
 
 /**
  * A service that provides support for removing {@link CredentialRequest}

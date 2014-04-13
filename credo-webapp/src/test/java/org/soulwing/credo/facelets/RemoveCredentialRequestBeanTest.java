@@ -39,7 +39,7 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.soulwing.credo.service.Errors;
-import org.soulwing.credo.service.NoSuchCredentialException;
+import org.soulwing.credo.service.credential.NoSuchCredentialException;
 import org.soulwing.credo.service.request.CredentialRequestDetail;
 import org.soulwing.credo.service.request.RemoveCredentialRequestService;
 

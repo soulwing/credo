@@ -16,13 +16,14 @@
  * limitations under the License.
  *
  */
-package org.soulwing.credo.service;
+package org.soulwing.credo.service.credential;
 
 import java.util.List;
 
 import javax.ejb.Local;
 
 import org.soulwing.credo.Credential;
+import org.soulwing.credo.service.GroupAccessException;
 
 /**
  * A service that provides access to the credentials managed by the 

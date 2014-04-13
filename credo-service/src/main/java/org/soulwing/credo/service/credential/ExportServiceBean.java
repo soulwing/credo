@@ -16,7 +16,7 @@
  * limitations under the License.
  *
  */
-package org.soulwing.credo.service;
+package org.soulwing.credo.service.credential;
 
 import java.io.IOException;
 import java.util.Collection;
@@ -31,7 +31,12 @@ import javax.inject.Inject;
 import org.soulwing.credo.Credential;
 import org.soulwing.credo.Password;
 import org.soulwing.credo.security.OwnerAccessControlException;
-import org.soulwing.credo.service.ExportFormat.Variant;
+import org.soulwing.credo.service.Errors;
+import org.soulwing.credo.service.GroupAccessException;
+import org.soulwing.credo.service.PassphraseException;
+import org.soulwing.credo.service.ProtectionParameters;
+import org.soulwing.credo.service.UserAccessException;
+import org.soulwing.credo.service.credential.ExportFormat.Variant;
 import org.soulwing.credo.service.crypto.PasswordGenerator;
 import org.soulwing.credo.service.crypto.PrivateKeyWrapper;
 import org.soulwing.credo.service.exporter.CredentialExporter;
@@ -45,7 +50,7 @@ import org.soulwing.credo.service.protect.CredentialProtectionService;
  */
 @Singleton
 @ConcurrencyManagement(ConcurrencyManagementType.BEAN)
-public class ConcreteExportService implements ExportService {
+public class ExportServiceBean implements ExportService {
 
   @Inject
   protected CredentialService credentialService;
@@ -66,7 +71,7 @@ public class ConcreteExportService implements ExportService {
   @TransactionAttribute(TransactionAttributeType.REQUIRED)
   public ExportRequest newExportRequest(Long credentialId)
       throws NoSuchCredentialException {
-    return new ConcreteExportRequest(
+    return new ExportRequestBean(
         credentialService.findCredentialById(credentialId));
   }
 

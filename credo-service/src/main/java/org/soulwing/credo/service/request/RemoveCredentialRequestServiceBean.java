@@ -29,7 +29,7 @@ import org.soulwing.credo.repository.CredentialRepository;
 import org.soulwing.credo.repository.CredentialRequestRepository;
 import org.soulwing.credo.security.OwnerAccessControlException;
 import org.soulwing.credo.service.GroupAccessException;
-import org.soulwing.credo.service.NoSuchCredentialException;
+import org.soulwing.credo.service.credential.NoSuchCredentialException;
 
 /**
  * A {@link RemoveCredentialRequestService} implemented as a simple bean.

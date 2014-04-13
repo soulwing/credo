@@ -18,7 +18,7 @@
  */
 package org.soulwing.credo.service.exporter.keystore;
 
-import org.soulwing.credo.service.ExportFormat;
+import org.soulwing.credo.service.credential.ExportFormat;
 
 /**
  * A description of a {@link KeyStoreExporter} variant.

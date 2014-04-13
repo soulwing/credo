@@ -26,10 +26,10 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.soulwing.credo.Credential;
-import org.soulwing.credo.service.CredentialService;
 import org.soulwing.credo.service.Errors;
 import org.soulwing.credo.service.GroupAccessException;
-import org.soulwing.credo.service.NoSuchCredentialException;
+import org.soulwing.credo.service.credential.CredentialService;
+import org.soulwing.credo.service.credential.NoSuchCredentialException;
 
 /**
  * A bean that supports the Remove Credential interaction.

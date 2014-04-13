@@ -28,7 +28,7 @@ import java.util.List;
 import javax.enterprise.inject.Instance;
 import javax.inject.Inject;
 
-import org.soulwing.credo.service.ExportFormat;
+import org.soulwing.credo.service.credential.ExportFormat;
 
 /**
  * An abstract base for {@link CredentialExporter} objects must select a 

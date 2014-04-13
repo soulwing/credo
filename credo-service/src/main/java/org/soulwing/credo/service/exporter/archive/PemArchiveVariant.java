@@ -18,8 +18,8 @@
  */
 package org.soulwing.credo.service.exporter.archive;
 
-import org.soulwing.credo.service.ExportFormat;
 import org.soulwing.credo.service.archive.ArchiveBuilder;
+import org.soulwing.credo.service.credential.ExportFormat;
 
 /**
  * A variant of a PEM archive export.

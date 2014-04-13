@@ -27,7 +27,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.soulwing.credo.service.Errors;
-import org.soulwing.credo.service.NoSuchCredentialException;
+import org.soulwing.credo.service.credential.NoSuchCredentialException;
 import org.soulwing.credo.service.request.DownloadCredentialRequestService;
 
 /**

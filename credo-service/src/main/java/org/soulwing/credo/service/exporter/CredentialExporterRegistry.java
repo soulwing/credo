@@ -20,8 +20,8 @@ package org.soulwing.credo.service.exporter;
 
 import java.util.Collection;
 
-import org.soulwing.credo.service.ExportFormat;
-import org.soulwing.credo.service.ExportRequest;
+import org.soulwing.credo.service.credential.ExportFormat;
+import org.soulwing.credo.service.credential.ExportRequest;
 
 /**
  * An object that keeps track of available {@link CredentialExporter} objects.

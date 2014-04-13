@@ -49,12 +49,12 @@ import org.soulwing.credo.security.OwnerAccessControlException;
 import org.soulwing.credo.service.Errors;
 import org.soulwing.credo.service.FileDownloadResponse;
 import org.soulwing.credo.service.GroupAccessException;
-import org.soulwing.credo.service.NoSuchCredentialException;
 import org.soulwing.credo.service.NoSuchGroupException;
 import org.soulwing.credo.service.PassphraseException;
 import org.soulwing.credo.service.ProtectionParameters;
 import org.soulwing.credo.service.TagService;
 import org.soulwing.credo.service.UserAccessException;
+import org.soulwing.credo.service.credential.NoSuchCredentialException;
 
 /**
  * Unit tests for {@link CreateCredentialRequestServiceBean}.

@@ -16,10 +16,11 @@
  * limitations under the License.
  *
  */
-package org.soulwing.credo.service;
+package org.soulwing.credo.service.credential;
 
 import org.soulwing.credo.Credential;
 import org.soulwing.credo.Password;
+import org.soulwing.credo.service.ProtectionParameters;
 
 /**
  * An object that describes a request to export a credential.

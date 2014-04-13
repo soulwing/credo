@@ -27,7 +27,7 @@ import org.junit.Test;
 import org.soulwing.credo.CredentialRequest;
 import org.soulwing.credo.repository.CredentialRequestRepository;
 import org.soulwing.credo.service.FileDownloadResponse;
-import org.soulwing.credo.service.NoSuchCredentialException;
+import org.soulwing.credo.service.credential.NoSuchCredentialException;
 
 /**
  * Unit tests for {@link DownloadCredentialRequestServiceBean}.

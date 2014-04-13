@@ -27,9 +27,9 @@ import javax.faces.event.ValueChangeEvent;
 import javax.inject.Inject;
 import javax.security.auth.x500.X500Principal;
 
-import org.soulwing.credo.service.CredentialEditor;
 import org.soulwing.credo.service.GroupAccessException;
 import org.soulwing.credo.service.GroupService;
+import org.soulwing.credo.service.credential.CredentialEditor;
 
 /**
  * A {@link CredentialEditor} that delegates to another.

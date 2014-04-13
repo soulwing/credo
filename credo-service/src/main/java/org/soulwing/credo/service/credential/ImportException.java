@@ -1,5 +1,5 @@
 /*
- * File created on Feb 25, 2014 
+ * File created on Feb 13, 2014 
  *
  * Copyright (c) 2014 Virginia Polytechnic Institute and State University
  *
@@ -16,16 +16,16 @@
  * limitations under the License.
  *
  */
-package org.soulwing.credo.service;
+package org.soulwing.credo.service.credential;
 
 /**
- * An exception thrown when a request to prepare a credential for export
- * fails.1
- *
+ * An exception thrown when a credential import operation fails to due
+ * a validation error.
+ * 
  * @author Carl Harris
  */
-public class ExportException extends Exception {
+public class ImportException extends Exception {
 
-  private static final long serialVersionUID = 2361976649479478935L;
+  private static final long serialVersionUID = 9030511464110297963L;
 
 }

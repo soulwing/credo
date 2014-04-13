@@ -21,7 +21,7 @@ package org.soulwing.credo.service.exporter;
 import java.io.IOException;
 import java.io.OutputStream;
 
-import org.soulwing.credo.service.ExportPreparation;
+import org.soulwing.credo.service.credential.ExportPreparation;
 
 /**
  * A concrete {@link ExportPreparation} implementation.

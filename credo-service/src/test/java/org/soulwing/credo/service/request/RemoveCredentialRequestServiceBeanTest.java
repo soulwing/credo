@@ -33,7 +33,7 @@ import org.soulwing.credo.Credential;
 import org.soulwing.credo.CredentialRequest;
 import org.soulwing.credo.repository.CredentialRepository;
 import org.soulwing.credo.repository.CredentialRequestRepository;
-import org.soulwing.credo.service.NoSuchCredentialException;
+import org.soulwing.credo.service.credential.NoSuchCredentialException;
 
 /**
  * Unit tests for {@link RemoveCredentialRequestServiceBean}.

@@ -18,7 +18,7 @@
  */
 package org.soulwing.credo.service.exporter;
 
-import org.soulwing.credo.service.ExportFormat;
+import org.soulwing.credo.service.credential.ExportFormat;
 
 /**
  * An abstract base for format variant implementations.

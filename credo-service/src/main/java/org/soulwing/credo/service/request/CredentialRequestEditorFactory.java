@@ -20,7 +20,7 @@ package org.soulwing.credo.service.request;
 
 import org.soulwing.credo.Credential;
 import org.soulwing.credo.CredentialRequest;
-import org.soulwing.credo.service.CredentialEditor;
+import org.soulwing.credo.service.credential.CredentialEditor;
 
 /**
  * A factory that produces {@link CredentialEditor} objects for 
