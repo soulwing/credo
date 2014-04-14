@@ -28,8 +28,8 @@ import javax.inject.Named;
 import org.soulwing.credo.Credential;
 import org.soulwing.credo.service.Errors;
 import org.soulwing.credo.service.GroupAccessException;
-import org.soulwing.credo.service.credential.CredentialService;
 import org.soulwing.credo.service.credential.NoSuchCredentialException;
+import org.soulwing.credo.service.credential.RemoveCredentialService;
 
 /**
  * A bean that supports the Remove Credential interaction.
@@ -47,7 +47,7 @@ public class RemoveCredentialBean implements Serializable {
   static final String CANCEL_OUTCOME_ID = "cancel";
   
   @Inject
-  protected CredentialService credentialService;
+  protected RemoveCredentialService credentialService;
   
   @Inject
   protected Conversation conversation;

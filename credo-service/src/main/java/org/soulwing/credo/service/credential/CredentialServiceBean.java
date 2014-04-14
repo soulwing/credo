@@ -32,8 +32,6 @@ import org.soulwing.credo.Credential;
 import org.soulwing.credo.UserGroup;
 import org.soulwing.credo.repository.CredentialRepository;
 import org.soulwing.credo.repository.UserGroupRepository;
-import org.soulwing.credo.security.OwnerAccessControlException;
-import org.soulwing.credo.service.GroupAccessException;
 import org.soulwing.credo.service.UserContextService;
 
 /**
@@ -58,19 +56,6 @@ public class CredentialServiceBean implements CredentialService {
    * {@inheritDoc}
    */
   @Override
-  public Credential findCredentialById(Long id) 
-      throws NoSuchCredentialException{
-    Credential credential = credentialRepository.findById(id);
-    if (credential == null) {
-      throw new NoSuchCredentialException();
-    }
-    return credential;
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
   public List<Credential> findAllCredentials() {
     List<UserGroup> allGroups = new ArrayList<>();
     List<UserGroup> groups = groupRepository.findByLoginName(
@@ -82,20 +67,4 @@ public class CredentialServiceBean implements CredentialService {
     return credentialRepository.findAllByOwners(allGroups);
   }
 
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public void removeCredential(Long id) throws GroupAccessException {
-    try {
-      Credential credential = credentialRepository.findById(id);
-      if (credential != null) {
-        credentialRepository.remove(credential);
-      }
-    }
-    catch (OwnerAccessControlException ex) {
-      throw new GroupAccessException(ex.getGroupName());
-    }
-  }
-  
 }

@@ -23,7 +23,6 @@ import java.util.List;
 import javax.ejb.Local;
 
 import org.soulwing.credo.Credential;
-import org.soulwing.credo.service.GroupAccessException;
 
 /**
  * A service that provides access to the credentials managed by the 
@@ -35,32 +34,9 @@ import org.soulwing.credo.service.GroupAccessException;
 public interface CredentialService {
 
   /**
-   * Finds a credential using its persistent identifier.
-   * @param id identifier of the subject credential
-   * @return credential
-   * @throws NoSuchCredentialException if no credential exists with the
-   *    given identifier
-   */
-  Credential findCredentialById(Long id) throws NoSuchCredentialException;
-  
-  /**
    * Finds all credentials accessible to the given user.
    * @return list of credentials
    */
   List<Credential> findAllCredentials();
   
-  /**
-   * Removes a credential.
-   * <p>
-   * This method does not throw an exception if the credential to remove no
-   * longer exists.
-   * 
-   * @param id unique identifier of the credential to remove
-   * @param errors errors object that will be updated in the case of an
-   *    error
-   * @throws GroupAccessException if the logged in user is not a member of
-   *    the group that owns the given credential
-   */
-  void removeCredential(Long id) throws GroupAccessException;
-
 }

@@ -40,8 +40,8 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.soulwing.credo.Credential;
 import org.soulwing.credo.service.Errors;
-import org.soulwing.credo.service.credential.CredentialService;
 import org.soulwing.credo.service.credential.NoSuchCredentialException;
+import org.soulwing.credo.service.credential.RemoveCredentialService;
 
 /**
  * Unit tests for {@link RemoveCredentialBean}.
@@ -56,7 +56,7 @@ public class RemoveCredentialBeanTest {
   public final JUnitRuleMockery context = new JUnitRuleMockery();
   
   @Mock
-  private CredentialService credentialService;
+  private RemoveCredentialService credentialService;
   
   @Mock
   private Credential credential;

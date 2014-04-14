@@ -51,8 +51,6 @@ public class CredentialServiceTest {
 
   private static final String LOGIN_NAME = "loginName";
 
-  private static final Long CREDENTIAL_ID = -1L;
-  
   @Rule
   public final JUnitRuleMockery context = new JUnitRuleMockery();
   
@@ -84,27 +82,6 @@ public class CredentialServiceTest {
   }
   
   @Test
-  public void testFindCredentialById() throws Exception {
-    context.checking(new Expectations() { { 
-      oneOf(credentialRepository).findById(with(same(CREDENTIAL_ID)));
-      will(returnValue(credential));
-    } });
-    
-    assertThat(service.findCredentialById(CREDENTIAL_ID), 
-        is(sameInstance(credential)));
-  }
-
-  @Test(expected = NoSuchCredentialException.class)
-  public void testFindCredentialByIdNotFound() throws Exception {
-    context.checking(new Expectations() { { 
-      oneOf(credentialRepository).findById(with(same(CREDENTIAL_ID)));
-      will(returnValue(null));
-    } });
-
-    service.findCredentialById(CREDENTIAL_ID);
-  }
-
-  @Test
   @SuppressWarnings("unchecked")
   public void testFindAllCredentials() throws Exception {
     context.checking(new Expectations() { {
@@ -124,15 +101,4 @@ public class CredentialServiceTest {
     assertThat(credentials.get(0), is(sameInstance(credential)));
   }
   
-  @Test
-  public void testRemoveCredential() throws Exception {
-    context.checking(new Expectations() { {
-      oneOf(credentialRepository).findById(with(CREDENTIAL_ID));
-      will(returnValue(credential));
-      oneOf(credentialRepository).remove(with(credential));
-    } });
-    
-    service.removeCredential(CREDENTIAL_ID);
-  }
-
 }
