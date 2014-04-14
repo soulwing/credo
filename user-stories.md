@@ -1,12 +1,3 @@
-Edit Credential
----------------
-
-A user can edit an existing credential for which she is an owner.
-
-* The name, note, and tags can be edited.
-* The owner group can be changed to another group of which she is a member.
-
-
 Signing Request for New Credential
 ----------------------------------
 

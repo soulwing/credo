@@ -358,6 +358,16 @@ A user can edit an existing signing request for which she is an owner.
 * None of the attributes of the X.509 signing request object can be changed.
 
 
+Edit Credential
+---------------
+
+A user can edit an existing credential for which she is an owner.
+
+* The name, note, and tags can be edited.
+* The owner group can be changed to another group of which she is a member.
+
+
+
 
 
     
