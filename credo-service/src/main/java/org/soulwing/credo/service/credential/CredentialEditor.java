@@ -22,6 +22,8 @@ import java.util.Date;
 
 import javax.security.auth.x500.X500Principal;
 
+import org.soulwing.credo.Password;
+
 
 /**
  * An editor for a credential.
@@ -106,5 +108,17 @@ public interface CredentialEditor {
    * @param tags the tags to set
    */
   void setTags(String[] tags);
+
+  /**
+   * Gets the password to use to gain access to the owning group. 
+   * @return password
+   */
+  Password getPassword();
+
+  /**
+   * Sets the password to use to gain access to the owning group.
+   * @param password the password to set
+   */
+  void setPassword(Password password);
   
 }

@@ -28,6 +28,7 @@ import javax.naming.ldap.LdapName;
 import javax.naming.ldap.Rdn;
 import javax.security.auth.x500.X500Principal;
 
+import org.soulwing.credo.Password;
 import org.soulwing.credo.UserGroup;
 import org.soulwing.credo.service.X500PrincipalUtil;
 import org.soulwing.credo.service.credential.ImportDetails;
@@ -55,6 +56,7 @@ public class ImportDetailsBean implements ImportDetails, Serializable {
   private String owner = UserGroup.SELF_GROUP_NAME;
   private String note;
   private String[] tags;
+  private Password password;
 
   public ImportDetailsBean(PrivateKeyWrapper privateKey,
       CertificateWrapper certificate, 
@@ -195,6 +197,22 @@ public class ImportDetailsBean implements ImportDetails, Serializable {
   @Override
   public void setTags(String[] tags) {
     this.tags = tags;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public Password getPassword() {
+    return password;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public void setPassword(Password password) {
+    this.password = password;
   }
 
 }

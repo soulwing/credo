@@ -18,7 +18,6 @@
  */
 package org.soulwing.credo.service.request;
 
-import org.soulwing.credo.Password;
 import org.soulwing.credo.service.credential.CredentialEditor;
 
 
@@ -50,17 +49,5 @@ public interface CredentialRequestEditor extends CredentialEditor {
    * @param subjectName the subject name to set
    */
   void setSubjectName(String subjectName);
-  
-  /**
-   * Gets the password to use to gain access to the owning group. 
-   * @return password
-   */
-  Password getPassword();
-  
-  /**
-   * Sets the password to use to gain access to the owning group.
-   * @param password the password to set
-   */
-  void setPassword(Password password);
   
 }

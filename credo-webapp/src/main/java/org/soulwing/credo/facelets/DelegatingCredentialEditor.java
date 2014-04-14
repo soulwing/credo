@@ -27,6 +27,7 @@ import javax.faces.event.ValueChangeEvent;
 import javax.inject.Inject;
 import javax.security.auth.x500.X500Principal;
 
+import org.soulwing.credo.Password;
 import org.soulwing.credo.service.GroupAccessException;
 import org.soulwing.credo.service.GroupService;
 import org.soulwing.credo.service.credential.CredentialEditor;
@@ -161,6 +162,22 @@ public class DelegatingCredentialEditor<T extends CredentialEditor>
     delegate.setTags(tags);
   }
   
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public Password getPassword() {
+    return delegate.getPassword();
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public void setPassword(Password password) {
+    delegate.setPassword(password);
+  }
+
   /**
    * Gets the status of the group specified as the credential's owner.
    * @return status
