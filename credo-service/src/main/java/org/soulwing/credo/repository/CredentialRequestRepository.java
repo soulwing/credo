@@ -76,4 +76,11 @@ public interface CredentialRequestRepository {
    */
   List<CredentialRequest> findAllByOwners(Collection<UserGroup> owners);
 
+  /**
+   * Finds all requests in the repository with a given owner.
+   * @param ownerId unique identifier of the owner.
+   * @return list of requests
+   */
+  List<CredentialRequest> findAllByOwnerId(Long ownerId);
+  
 }

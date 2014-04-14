@@ -3,14 +3,14 @@
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/persistence/orm http://xmlns.jcp.org/xml/ns/persistence/orm_2_1.xsd"
   version="2.1">
-  
+
   <named-query name="findAllUserProfiles">
     <query>
       select distinct u from UserProfileEntity u
       order by u.loginName
     </query>
   </named-query>
-  
+
   <named-query name="findUserProfileByLoginName">
     <query>
       select distinct u from UserProfileEntity u
@@ -34,7 +34,7 @@
       and g.name is null
     </query>
   </named-query>
-  
+
   <named-query name="findGroupsByLoginName">
     <query>
       select distinct g from UserGroupMemberEntity gm
@@ -65,7 +65,7 @@
       order by g.name
     </query>
   </named-query>
-  
+
   <named-query name="findAllGroupMembers">
     <query>
       select distinct gm, u from UserGroupMemberEntity gm
@@ -85,7 +85,7 @@
       and g.name = :groupName
     </query>
   </named-query>
-  
+
   <named-query name="findGroupMemberWithGroupNameAndLoginName">
     <query>
       select distinct gm from UserGroupMemberEntity gm
@@ -95,7 +95,7 @@
       and g.name = :groupName
     </query>
   </named-query>
-  
+
   <named-query name="findGroupMemberSelf">
     <query>
       select distinct gm from UserGroupMemberEntity gm
@@ -159,21 +159,21 @@
       order by u.loginName
     </query>
   </named-query>
-  
+
   <named-query name="findAllTags">
     <query>
       select distinct t from TagEntity t
       order by t.text
     </query>
   </named-query>
-  
+
   <named-query name="findTagByText">
     <query>
       select distinct t from TagEntity t
       where t.text = :text
     </query>
   </named-query>
-  
+
   <named-query name="findCredentialById">
     <query>
       select distinct c from CredentialEntity c
@@ -182,9 +182,9 @@
       left outer join fetch c.tags
       left outer join fetch c.certificates
       where c.id = :id
-    </query>  
+    </query>
   </named-query>
-  
+
   <named-query name="findAllCredentialsByLoginName">
     <query>
       select distinct c from CredentialEntity c
@@ -210,7 +210,7 @@
       order by c.name
     </query>
   </named-query>
-  
+
   <named-query name="findAllCredentialsByOwnerId">
     <query>
       select distinct c from CredentialEntity c
@@ -226,7 +226,7 @@
       where r.id = :requestId
     </query>
   </named-query>
-  
+
   <named-query name="findRequestById">
     <query>
       select distinct r from CredentialRequestEntity r
@@ -265,5 +265,13 @@
       order by r.name
     </query>
   </named-query>
-  
+
+  <named-query name="findAllRequestsByOwnerId">
+    <query>
+      select distinct r from CredentialRequestEntity r
+      inner join r.owner g
+      where g.id = :ownerId
+    </query>
+  </named-query>
+
 </entity-mappings>

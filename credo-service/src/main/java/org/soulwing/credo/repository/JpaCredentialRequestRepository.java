@@ -154,5 +154,16 @@ public class JpaCredentialRequestRepository
     }
     return ownerIds;
   }
-  
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public List<CredentialRequest> findAllByOwnerId(Long ownerId) {
+    TypedQuery<CredentialRequest> query = entityManager.createNamedQuery(
+        "findAllRequestsByOwnerId", CredentialRequest.class);
+    query.setParameter("ownerId", ownerId);
+    return query.getResultList();
+  }
+
 }
