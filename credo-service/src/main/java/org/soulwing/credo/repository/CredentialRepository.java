@@ -77,7 +77,7 @@ public interface CredentialRepository {
   List<Credential> findAllByOwners(Collection<UserGroup> owners);
   
   /**
-   * Finds a credential in the repository with a given owner.
+   * Finds all credentials in the repository with a given owner.
    * @param ownerId unique identifier of the owner.
    * @return list of credentials
    */
