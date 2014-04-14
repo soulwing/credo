@@ -18,6 +18,11 @@
  */
 package org.soulwing.credo.service.credential;
 
+import javax.ejb.ConcurrencyManagement;
+import javax.ejb.ConcurrencyManagementType;
+import javax.ejb.Singleton;
+import javax.ejb.TransactionAttribute;
+import javax.ejb.TransactionAttributeType;
 import javax.inject.Inject;
 
 import org.soulwing.credo.Credential;
@@ -30,6 +35,8 @@ import org.soulwing.credo.service.GroupAccessException;
  *
  * @author Carl Harris
  */
+@Singleton
+@ConcurrencyManagement(ConcurrencyManagementType.BEAN)
 public class RemoveCredentialServiceBean implements RemoveCredentialService {
 
   @Inject
@@ -39,6 +46,7 @@ public class RemoveCredentialServiceBean implements RemoveCredentialService {
    * {@inheritDoc}
    */
   @Override
+  @TransactionAttribute(TransactionAttributeType.REQUIRED)
   public Credential findCredentialById(Long id) 
       throws NoSuchCredentialException{
     Credential credential = credentialRepository.findById(id);
@@ -52,6 +60,7 @@ public class RemoveCredentialServiceBean implements RemoveCredentialService {
    * {@inheritDoc}
    */
   @Override
+  @TransactionAttribute(TransactionAttributeType.REQUIRED)
   public void removeCredential(Long id) throws GroupAccessException {
     try {
       Credential credential = credentialRepository.findById(id);
