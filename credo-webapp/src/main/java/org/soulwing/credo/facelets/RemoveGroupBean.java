@@ -26,10 +26,10 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.soulwing.credo.service.Errors;
-import org.soulwing.credo.service.GroupDetail;
-import org.soulwing.credo.service.EditException;
-import org.soulwing.credo.service.GroupService;
-import org.soulwing.credo.service.NoSuchGroupException;
+import org.soulwing.credo.service.group.EditException;
+import org.soulwing.credo.service.group.GroupDetail;
+import org.soulwing.credo.service.group.GroupService;
+import org.soulwing.credo.service.group.NoSuchGroupException;
 
 /**
  * A bean that supports the Remove Group interaction.

@@ -38,13 +38,13 @@ import org.soulwing.credo.UserGroup;
 import org.soulwing.credo.UserGroupMember;
 import org.soulwing.credo.UserProfile;
 import org.soulwing.credo.repository.UserGroupRepository;
-import org.soulwing.credo.service.NoSuchGroupException;
 import org.soulwing.credo.service.ProtectionParameters;
 import org.soulwing.credo.service.UserContextService;
 import org.soulwing.credo.service.crypto.PrivateKeyDecoder;
 import org.soulwing.credo.service.crypto.PrivateKeyEncryptionService;
 import org.soulwing.credo.service.crypto.PrivateKeyWrapper;
 import org.soulwing.credo.service.crypto.SecretKeyWrapper;
+import org.soulwing.credo.service.group.NoSuchGroupException;
 
 /**
  * Unit tests for {@link ConcreteCredentialProtectionService}.

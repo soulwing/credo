@@ -42,7 +42,6 @@ import org.soulwing.credo.UserProfile;
 import org.soulwing.credo.repository.UserGroupRepository;
 import org.soulwing.credo.repository.UserProfileRepository;
 import org.soulwing.credo.service.Errors;
-import org.soulwing.credo.service.EditException;
 import org.soulwing.credo.service.UserContextService;
 import org.soulwing.credo.service.UserDetail;
 import org.soulwing.credo.service.crypto.SecretKeyEncryptionService;

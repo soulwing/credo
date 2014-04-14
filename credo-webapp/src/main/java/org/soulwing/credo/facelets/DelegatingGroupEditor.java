@@ -27,9 +27,9 @@ import javax.inject.Inject;
 
 import org.soulwing.credo.Password;
 import org.soulwing.credo.service.GroupAccessException;
-import org.soulwing.credo.service.GroupEditor;
-import org.soulwing.credo.service.GroupService;
 import org.soulwing.credo.service.UserDetail;
+import org.soulwing.credo.service.group.GroupEditor;
+import org.soulwing.credo.service.group.GroupService;
 
 /**
  * A {@link GroupEditor} that delegates to another.

@@ -31,11 +31,11 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.soulwing.credo.service.Errors;
-import org.soulwing.credo.service.EditException;
-import org.soulwing.credo.service.GroupEditor;
-import org.soulwing.credo.service.GroupService;
-import org.soulwing.credo.service.NoSuchGroupException;
 import org.soulwing.credo.service.PassphraseException;
+import org.soulwing.credo.service.group.EditException;
+import org.soulwing.credo.service.group.GroupEditor;
+import org.soulwing.credo.service.group.GroupService;
+import org.soulwing.credo.service.group.NoSuchGroupException;
 
 /**
  * Unit tests for {@link CreateGroupBean}.
@@ -44,6 +44,8 @@ import org.soulwing.credo.service.PassphraseException;
  */
 public class CreateGroupBeanTest {
 
+  private static final String GROUP_NAME = "someGroup";
+  
   @Rule
   public final JUnitRuleMockery context = new JUnitRuleMockery();
   
@@ -63,6 +65,7 @@ public class CreateGroupBeanTest {
     bean.groupService = groupService;
     bean.errors = errors;
     bean.editor = new DelegatingGroupEditor();
+    bean.passwordEditor = new PasswordFormEditor();
     bean.editor.setDelegate(this.editor);
   }
   
@@ -106,14 +109,18 @@ public class CreateGroupBeanTest {
     bean.save();
   }
 
-  @Test(expected = RuntimeException.class)
+  @Test
   public void testSaveWhenPassphraseException() throws Exception {
     context.checking(new Expectations() { { 
       oneOf(groupService).saveGroup(with(same(editor)), with(same(errors)));
       will(throwException(new PassphraseException()));
+      oneOf(editor).getOwner();
+      will(returnValue(GROUP_NAME));
     } });
     
-    bean.save();
+    assertThat(bean.save(), is(equalTo(CreateGroupBean.PASSWORD_OUTCOME_ID)));
+    assertThat(bean.getPasswordEditor().getGroupName(), 
+        is(equalTo(GROUP_NAME)));
   }
 
   @Test

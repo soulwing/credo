@@ -16,11 +16,16 @@
  * limitations under the License.
  *
  */
-package org.soulwing.credo.service;
+package org.soulwing.credo.service.group;
 
 import java.util.Collection;
 
 import javax.ejb.Local;
+
+import org.soulwing.credo.service.Errors;
+import org.soulwing.credo.service.GroupAccessException;
+import org.soulwing.credo.service.MergeConflictException;
+import org.soulwing.credo.service.PassphraseException;
 
 /**
  * A service that provides for access and manipulation of groups.

@@ -29,8 +29,8 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
 import org.soulwing.credo.UserGroup;
-import org.soulwing.credo.service.GroupDetail;
-import org.soulwing.credo.service.GroupService;
+import org.soulwing.credo.service.group.GroupDetail;
+import org.soulwing.credo.service.group.GroupService;
 
 /**
  * An endpoint that provides a user's group memberships.

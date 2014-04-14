@@ -27,11 +27,11 @@ import javax.inject.Named;
 
 import org.soulwing.credo.service.Errors;
 import org.soulwing.credo.service.GroupAccessException;
-import org.soulwing.credo.service.EditException;
-import org.soulwing.credo.service.GroupService;
 import org.soulwing.credo.service.MergeConflictException;
-import org.soulwing.credo.service.NoSuchGroupException;
 import org.soulwing.credo.service.PassphraseException;
+import org.soulwing.credo.service.group.EditException;
+import org.soulwing.credo.service.group.GroupService;
+import org.soulwing.credo.service.group.NoSuchGroupException;
 
 /**
  * A bean that supports the Edit Group interaction.

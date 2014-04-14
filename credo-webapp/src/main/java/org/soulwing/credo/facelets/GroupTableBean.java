@@ -24,8 +24,8 @@ import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import org.soulwing.credo.service.GroupDetail;
-import org.soulwing.credo.service.GroupService;
+import org.soulwing.credo.service.group.GroupDetail;
+import org.soulwing.credo.service.group.GroupService;
 
 /**
  * A bean that supports a view containing a table of groups.

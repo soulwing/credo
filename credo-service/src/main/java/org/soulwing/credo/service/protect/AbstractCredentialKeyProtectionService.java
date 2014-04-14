@@ -25,7 +25,6 @@ import org.soulwing.credo.Password;
 import org.soulwing.credo.UserGroup;
 import org.soulwing.credo.repository.UserGroupRepository;
 import org.soulwing.credo.service.GroupAccessException;
-import org.soulwing.credo.service.NoSuchGroupException;
 import org.soulwing.credo.service.UserAccessException;
 import org.soulwing.credo.service.UserContextService;
 import org.soulwing.credo.service.crypto.Encoded;
@@ -33,6 +32,7 @@ import org.soulwing.credo.service.crypto.Encoded.Type;
 import org.soulwing.credo.service.crypto.PrivateKeyDecoder;
 import org.soulwing.credo.service.crypto.PrivateKeyEncryptionService;
 import org.soulwing.credo.service.crypto.PrivateKeyWrapper;
+import org.soulwing.credo.service.group.NoSuchGroupException;
 
 /**
  * An abstract base for private key protection services.

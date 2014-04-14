@@ -33,8 +33,6 @@ import org.junit.Test;
 import org.soulwing.credo.UserGroup;
 import org.soulwing.credo.repository.UserGroupRepository;
 import org.soulwing.credo.service.Errors;
-import org.soulwing.credo.service.GroupEditor;
-import org.soulwing.credo.service.GroupService;
 import org.soulwing.credo.service.UserContextService;
 
 /**

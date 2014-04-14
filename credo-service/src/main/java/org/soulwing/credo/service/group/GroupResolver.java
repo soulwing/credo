@@ -21,7 +21,6 @@ package org.soulwing.credo.service.group;
 import org.soulwing.credo.UserGroup;
 import org.soulwing.credo.service.Errors;
 import org.soulwing.credo.service.GroupAccessException;
-import org.soulwing.credo.service.NoSuchGroupException;
 
 /**
  * A service that resolves a persistent group by locating in a repository,

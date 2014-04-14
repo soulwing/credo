@@ -16,7 +16,7 @@
  * limitations under the License.
  *
  */
-package org.soulwing.credo.service;
+package org.soulwing.credo.service.group;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.arrayContaining;
@@ -43,8 +43,18 @@ import org.soulwing.credo.UserProfile;
 import org.soulwing.credo.repository.CredentialRepository;
 import org.soulwing.credo.repository.UserGroupMemberRepository;
 import org.soulwing.credo.repository.UserGroupRepository;
+import org.soulwing.credo.service.Errors;
+import org.soulwing.credo.service.GroupAccessException;
+import org.soulwing.credo.service.MergeConflictException;
+import org.soulwing.credo.service.UserContextService;
+import org.soulwing.credo.service.UserDetail;
+import org.soulwing.credo.service.group.ConcreteGroupService;
 import org.soulwing.credo.service.group.ConfigurableGroupEditor;
+import org.soulwing.credo.service.group.EditException;
+import org.soulwing.credo.service.group.GroupDetail;
+import org.soulwing.credo.service.group.GroupEditor;
 import org.soulwing.credo.service.group.GroupEditorFactory;
+import org.soulwing.credo.service.group.NoSuchGroupException;
 
 /**
  * Unit tests for {@link ConcreteGroupService}.

@@ -16,7 +16,7 @@
  * limitations under the License.
  *
  */
-package org.soulwing.credo.service;
+package org.soulwing.credo.service.group;
 
 import javax.ejb.ApplicationException;
 

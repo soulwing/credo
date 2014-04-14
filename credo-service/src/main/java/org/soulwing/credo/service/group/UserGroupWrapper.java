@@ -16,13 +16,14 @@
  * limitations under the License.
  *
  */
-package org.soulwing.credo.service;
+package org.soulwing.credo.service.group;
 
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 
 import org.soulwing.credo.UserGroup;
+import org.soulwing.credo.service.UserDetail;
 
 /**
  * A {@link GroupDetail} that wraps a {@link UserGroup}. 

@@ -23,13 +23,9 @@ import javax.inject.Inject;
 
 import org.soulwing.credo.UserGroup;
 import org.soulwing.credo.repository.UserGroupRepository;
-import org.soulwing.credo.service.EditException;
 import org.soulwing.credo.service.Errors;
 import org.soulwing.credo.service.GroupAccessException;
-import org.soulwing.credo.service.GroupEditor;
-import org.soulwing.credo.service.GroupService;
 import org.soulwing.credo.service.MergeConflictException;
-import org.soulwing.credo.service.NoSuchGroupException;
 import org.soulwing.credo.service.PassphraseException;
 import org.soulwing.credo.service.UserContextService;
 

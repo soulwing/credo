@@ -28,9 +28,9 @@ import org.soulwing.credo.Password;
 import org.soulwing.credo.service.Errors;
 import org.soulwing.credo.service.FileContentModel;
 import org.soulwing.credo.service.GroupAccessException;
-import org.soulwing.credo.service.NoSuchGroupException;
 import org.soulwing.credo.service.PassphraseException;
 import org.soulwing.credo.service.ProtectionParameters;
+import org.soulwing.credo.service.group.NoSuchGroupException;
 
 /**
  * A service that imports credentials using the contents of uploaded files.

@@ -29,8 +29,8 @@ import javax.security.auth.x500.X500Principal;
 
 import org.soulwing.credo.Password;
 import org.soulwing.credo.service.GroupAccessException;
-import org.soulwing.credo.service.GroupService;
 import org.soulwing.credo.service.credential.CredentialEditor;
+import org.soulwing.credo.service.group.GroupService;
 
 /**
  * A {@link CredentialEditor} that delegates to another.

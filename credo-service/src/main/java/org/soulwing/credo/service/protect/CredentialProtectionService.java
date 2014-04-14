@@ -20,10 +20,10 @@ package org.soulwing.credo.service.protect;
 
 import org.soulwing.credo.Credential;
 import org.soulwing.credo.service.GroupAccessException;
-import org.soulwing.credo.service.NoSuchGroupException;
 import org.soulwing.credo.service.ProtectionParameters;
 import org.soulwing.credo.service.UserAccessException;
 import org.soulwing.credo.service.crypto.PrivateKeyWrapper;
+import org.soulwing.credo.service.group.NoSuchGroupException;
 
 /**
  * A service that provides encryption services for the private key of a 

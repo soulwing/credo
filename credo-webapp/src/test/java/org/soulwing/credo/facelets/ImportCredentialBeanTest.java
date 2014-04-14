@@ -48,11 +48,11 @@ import org.soulwing.credo.Password;
 import org.soulwing.credo.service.Errors;
 import org.soulwing.credo.service.FileContentModel;
 import org.soulwing.credo.service.GroupAccessException;
-import org.soulwing.credo.service.NoSuchGroupException;
 import org.soulwing.credo.service.PassphraseException;
 import org.soulwing.credo.service.credential.ImportDetails;
 import org.soulwing.credo.service.credential.ImportException;
 import org.soulwing.credo.service.credential.ImportService;
+import org.soulwing.credo.service.group.NoSuchGroupException;
 
 /**
  * Unit tests for {@link ImportCredentialBean}.

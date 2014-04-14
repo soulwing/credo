@@ -25,10 +25,10 @@ import org.apache.commons.lang.Validate;
 import org.soulwing.credo.CredentialRequest;
 import org.soulwing.credo.UserGroup;
 import org.soulwing.credo.service.GroupAccessException;
-import org.soulwing.credo.service.NoSuchGroupException;
 import org.soulwing.credo.service.ProtectionParameters;
 import org.soulwing.credo.service.UserAccessException;
 import org.soulwing.credo.service.crypto.PrivateKeyWrapper;
+import org.soulwing.credo.service.group.NoSuchGroupException;
 
 /**
  * A concrete {@link CredentialRequestProtectionService} implementation.

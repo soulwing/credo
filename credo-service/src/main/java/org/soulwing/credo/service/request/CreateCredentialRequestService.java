@@ -26,10 +26,10 @@ import org.soulwing.credo.CredentialRequest;
 import org.soulwing.credo.service.Errors;
 import org.soulwing.credo.service.FileDownloadResponse;
 import org.soulwing.credo.service.GroupAccessException;
-import org.soulwing.credo.service.NoSuchGroupException;
 import org.soulwing.credo.service.PassphraseException;
 import org.soulwing.credo.service.ProtectionParameters;
 import org.soulwing.credo.service.credential.NoSuchCredentialException;
+import org.soulwing.credo.service.group.NoSuchGroupException;
 
 /**
  * A service that provides support for creating {@link CredentialRequest}

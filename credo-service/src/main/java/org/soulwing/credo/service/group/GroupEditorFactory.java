@@ -18,8 +18,6 @@
  */
 package org.soulwing.credo.service.group;
 
-import org.soulwing.credo.service.GroupEditor;
-import org.soulwing.credo.service.NoSuchGroupException;
 
 /**
  * A factory that produces {@link GroupEditor} objects.

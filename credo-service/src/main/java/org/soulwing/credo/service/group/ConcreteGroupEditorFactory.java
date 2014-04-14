@@ -29,8 +29,6 @@ import org.soulwing.credo.UserGroup;
 import org.soulwing.credo.UserGroupMember;
 import org.soulwing.credo.repository.UserGroupMemberRepository;
 import org.soulwing.credo.repository.UserGroupRepository;
-import org.soulwing.credo.service.GroupEditor;
-import org.soulwing.credo.service.NoSuchGroupException;
 import org.soulwing.credo.service.UserProfileService;
 
 /**

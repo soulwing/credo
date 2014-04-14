@@ -30,8 +30,8 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.soulwing.credo.UserGroup;
-import org.soulwing.credo.service.GroupDetail;
-import org.soulwing.credo.service.GroupService;
+import org.soulwing.credo.service.group.GroupDetail;
+import org.soulwing.credo.service.group.GroupService;
 
 /**
  * Unit tests for {@link TagsEndpoint}.

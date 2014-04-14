@@ -16,11 +16,12 @@
  * limitations under the License.
  *
  */
-package org.soulwing.credo.service;
+package org.soulwing.credo.service.group;
 
 import java.util.Collection;
 
 import org.soulwing.credo.Password;
+import org.soulwing.credo.service.UserDetail;
 
 
 /**

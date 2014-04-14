@@ -16,7 +16,7 @@
  * limitations under the License.
  *
  */
-package org.soulwing.credo.service;
+package org.soulwing.credo.service.group;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -40,8 +40,12 @@ import org.soulwing.credo.UserProfile;
 import org.soulwing.credo.repository.CredentialRepository;
 import org.soulwing.credo.repository.UserGroupMemberRepository;
 import org.soulwing.credo.repository.UserGroupRepository;
-import org.soulwing.credo.service.group.ConfigurableGroupEditor;
-import org.soulwing.credo.service.group.GroupEditorFactory;
+import org.soulwing.credo.service.Errors;
+import org.soulwing.credo.service.GroupAccessException;
+import org.soulwing.credo.service.MergeConflictException;
+import org.soulwing.credo.service.PassphraseException;
+import org.soulwing.credo.service.UserContextService;
+import org.soulwing.credo.service.UserProfileWrapper;
 
 /**
  * A concrete {@link GroupService} implementation.

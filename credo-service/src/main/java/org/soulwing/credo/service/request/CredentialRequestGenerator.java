@@ -21,9 +21,9 @@ package org.soulwing.credo.service.request;
 import org.soulwing.credo.CredentialRequest;
 import org.soulwing.credo.service.Errors;
 import org.soulwing.credo.service.GroupAccessException;
-import org.soulwing.credo.service.NoSuchGroupException;
 import org.soulwing.credo.service.ProtectionParameters;
 import org.soulwing.credo.service.UserAccessException;
+import org.soulwing.credo.service.group.NoSuchGroupException;
 
 /**
  * A generator that produces a {@link CredentialRequest} from the contents of

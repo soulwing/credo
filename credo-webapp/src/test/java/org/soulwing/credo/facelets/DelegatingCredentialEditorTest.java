@@ -34,8 +34,8 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.soulwing.credo.facelets.DelegatingCredentialEditor.OwnerStatus;
 import org.soulwing.credo.service.GroupAccessException;
-import org.soulwing.credo.service.GroupService;
 import org.soulwing.credo.service.credential.CredentialEditor;
+import org.soulwing.credo.service.group.GroupService;
 
 /**
  * Unit tests for {@link DelegatingCredentialEditor}.

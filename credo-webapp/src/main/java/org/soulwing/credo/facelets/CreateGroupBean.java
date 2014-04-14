@@ -25,11 +25,11 @@ import javax.inject.Named;
 
 import org.soulwing.credo.service.Errors;
 import org.soulwing.credo.service.GroupAccessException;
-import org.soulwing.credo.service.EditException;
-import org.soulwing.credo.service.GroupService;
 import org.soulwing.credo.service.MergeConflictException;
-import org.soulwing.credo.service.NoSuchGroupException;
 import org.soulwing.credo.service.PassphraseException;
+import org.soulwing.credo.service.group.EditException;
+import org.soulwing.credo.service.group.GroupService;
+import org.soulwing.credo.service.group.NoSuchGroupException;
 
 /**
  * A bean that supports the Create Group interaction.
@@ -44,6 +44,8 @@ public class CreateGroupBean {
   
   static final String CANCEL_OUTCOME_ID = "cancel";
   
+  static final String PASSWORD_OUTCOME_ID = "password";
+  
   @Inject
   protected GroupService groupService;
   
@@ -52,6 +54,9 @@ public class CreateGroupBean {
  
   @Inject
   protected DelegatingGroupEditor editor;
+  
+  @Inject
+  protected PasswordFormEditor passwordEditor;
  
   @PostConstruct
   public void init() {
@@ -66,6 +71,14 @@ public class CreateGroupBean {
     return editor;
   }
   
+  /**
+   * Gets the password form editor.
+   * @return editor
+   */
+  public PasswordFormEditor getPasswordEditor() {
+    return passwordEditor;
+  }
+
   /**
    * Performs the Cancel action.
    * @return outcome ID
@@ -84,7 +97,8 @@ public class CreateGroupBean {
       return SUCCESS_OUTCOME_ID;
     }
     catch (PassphraseException ex) {
-      throw new RuntimeException(ex);
+      passwordEditor.setGroupName(editor.getOwner());
+      return PASSWORD_OUTCOME_ID;
     }
     catch (EditException ex) {
       return null;

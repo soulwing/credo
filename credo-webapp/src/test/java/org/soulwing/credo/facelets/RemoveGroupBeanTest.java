@@ -38,10 +38,10 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.soulwing.credo.service.Errors;
-import org.soulwing.credo.service.GroupDetail;
-import org.soulwing.credo.service.EditException;
-import org.soulwing.credo.service.GroupService;
-import org.soulwing.credo.service.NoSuchGroupException;
+import org.soulwing.credo.service.group.EditException;
+import org.soulwing.credo.service.group.GroupDetail;
+import org.soulwing.credo.service.group.GroupService;
+import org.soulwing.credo.service.group.NoSuchGroupException;
 
 /**
  * Unit tests for {@link RemoveGroupBean}.

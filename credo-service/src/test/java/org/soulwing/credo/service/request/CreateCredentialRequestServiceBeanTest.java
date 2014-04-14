@@ -49,12 +49,12 @@ import org.soulwing.credo.security.OwnerAccessControlException;
 import org.soulwing.credo.service.Errors;
 import org.soulwing.credo.service.FileDownloadResponse;
 import org.soulwing.credo.service.GroupAccessException;
-import org.soulwing.credo.service.NoSuchGroupException;
 import org.soulwing.credo.service.PassphraseException;
 import org.soulwing.credo.service.ProtectionParameters;
 import org.soulwing.credo.service.TagService;
 import org.soulwing.credo.service.UserAccessException;
 import org.soulwing.credo.service.credential.NoSuchCredentialException;
+import org.soulwing.credo.service.group.NoSuchGroupException;
 
 /**
  * Unit tests for {@link CreateCredentialRequestServiceBean}.
@@ -76,9 +76,9 @@ public class CreateCredentialRequestServiceBeanTest {
   private static final long CREDENTIAL_ID = REQUEST_ID;
 
   private static final String NOTE = "note";
-   
+
   private static final String[] TAGS = new String[0];
-  
+
   @Rule
   public final JUnitRuleMockery context = new JUnitRuleMockery();
 
@@ -121,7 +121,8 @@ public class CreateCredentialRequestServiceBeanTest {
   @Mock
   private Set<? extends Tag> tags;
 
-  private CreateCredentialRequestServiceBean service = new CreateCredentialRequestServiceBean();
+  private CreateCredentialRequestServiceBean service =
+      new CreateCredentialRequestServiceBean();
 
   @Before
   public void setUp() throws Exception {
@@ -134,14 +135,16 @@ public class CreateCredentialRequestServiceBeanTest {
 
   @Test
   public void testCreateEditor() throws Exception {
-    context.checking(new Expectations() { { 
-      oneOf(editorFactory).newEditor();
-      will(returnValue(editor));
-    } });
-  
+    context.checking(new Expectations() {
+      {
+        oneOf(editorFactory).newEditor();
+        will(returnValue(editor));
+      }
+    });
+
     assertThat(service.createEditor(), is(sameInstance(editor)));
   }
-  
+
   @Test
   public void testCreateEditorForCredential() throws Exception {
     context.checking(new Expectations() {
@@ -256,12 +259,11 @@ public class CreateCredentialRequestServiceBeanTest {
 
   private Expectations generateExpectations(final Action outcome)
       throws Exception {
-    return new Expectations() {
-      {
-        oneOf(generator).generate(with(same(editor)), with(same(protection)), errors);
+    return new Expectations() { {
+        oneOf(generator).generate(with(same(editor)), with(same(protection)),
+            with(errors));
         will(outcome);
-      }
-    };
+    } };
   }
 
   private Expectations requestExpectations() {

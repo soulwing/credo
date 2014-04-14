@@ -27,7 +27,7 @@ import org.soulwing.credo.UserProfile;
  *
  * @author Carl Harris
  */
-class UserProfileWrapper implements UserDetail, Serializable {
+public class UserProfileWrapper implements UserDetail, Serializable {
 
   private static final long serialVersionUID = -1089401072011563554L;
 
