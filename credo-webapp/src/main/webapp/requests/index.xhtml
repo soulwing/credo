@@ -59,18 +59,6 @@
                  <span class="glyphicon glyphicon-wrench"/></a>
               <ul class="dropdown-menu tools-button">
                 <li>
-                  <h:outputLink value="download">
-                    <f:param name="id" value="#{req.id}"/>
-                    #{messages.downloadButtonLabel}
-                  </h:outputLink>
-                </li>
-                <li>
-                  <h:outputLink value="import">
-                    <f:param name="requestId" value="#{req.id}"/>
-                    #{messages.importButtonLabel}
-                  </h:outputLink>
-                </li>
-                <li>
                   <h:outputLink value="edit">
                     <f:param name="id" value="#{req.id}"/>
                     #{messages.editButtonLabel}
@@ -80,6 +68,19 @@
                   <h:outputLink value="remove">
                     <f:param name="id" value="#{req.id}"/>
                     #{messages.removeButtonLabel}
+                  </h:outputLink>
+                </li>
+                <li class="divider"/>
+                <li>
+                  <h:outputLink value="download">
+                    <f:param name="id" value="#{req.id}"/>
+                    #{messages.downloadButtonLabel}
+                  </h:outputLink>
+                </li>
+                <li>
+                  <h:outputLink value="import">
+                    <f:param name="requestId" value="#{req.id}"/>
+                    #{messages.importButtonLabel}
                   </h:outputLink>
                 </li>
               </ul>
