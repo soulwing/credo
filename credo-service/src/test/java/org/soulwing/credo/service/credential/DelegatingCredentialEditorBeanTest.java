@@ -49,6 +49,7 @@ import org.soulwing.credo.service.MergeConflictException;
 import org.soulwing.credo.service.ProtectionParameters;
 import org.soulwing.credo.service.TagService;
 import org.soulwing.credo.service.crypto.PrivateKeyWrapper;
+import org.soulwing.credo.service.group.GroupResolver;
 import org.soulwing.credo.service.protect.CredentialProtectionService;
 
 /**
@@ -76,6 +77,9 @@ public class DelegatingCredentialEditorBeanTest {
   private CredentialProtectionService protectionService;
   
   @Mock
+  private GroupResolver groupResolver;
+  
+  @Mock
   private TagService tagService;
   
   @Mock
@@ -97,6 +101,7 @@ public class DelegatingCredentialEditorBeanTest {
   public void setUp() throws Exception {
     editor.credentialRepository = credentialRepository;
     editor.protectionService = protectionService;
+    editor.groupResolver = groupResolver;
     editor.tagService = tagService;
     editor.setDelegate(credential);
   }
@@ -153,6 +158,10 @@ public class DelegatingCredentialEditorBeanTest {
       will(returnValue(group));
       allowing(group).getName();
       will(returnValue(GROUP_NAME));
+      oneOf(groupResolver).resolveGroup(
+          with(NEW_GROUP_NAME), with(same(errors)));
+      will(returnValue(group));
+      oneOf(credential).setOwner(group);
       oneOf(protectionService).unprotect(with(same(credential)), with(
          allOf(any(ProtectionParameters.class), 
              hasProperty("groupName", equalTo(GROUP_NAME)))));

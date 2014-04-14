@@ -50,6 +50,7 @@ import org.soulwing.credo.service.ProtectionParameters;
 import org.soulwing.credo.service.TagService;
 import org.soulwing.credo.service.credential.NoSuchCredentialException;
 import org.soulwing.credo.service.crypto.PrivateKeyWrapper;
+import org.soulwing.credo.service.group.GroupResolver;
 import org.soulwing.credo.service.protect.CredentialRequestProtectionService;
 
 /**
@@ -77,6 +78,9 @@ public class DelegatingRequestEditorBeanTest {
   private CredentialRequestProtectionService protectionService;
   
   @Mock
+  private GroupResolver groupResolver;
+  
+  @Mock
   private TagService tagService;
   
   @Mock
@@ -97,6 +101,7 @@ public class DelegatingRequestEditorBeanTest {
   public void setUp() throws Exception {
     editor.requestRepository = requestRepository;
     editor.protectionService = protectionService;
+    editor.groupResolver = groupResolver;
     editor.tagService = tagService;
     editor.setDelegate(request);
   }
@@ -153,6 +158,10 @@ public class DelegatingRequestEditorBeanTest {
       will(returnValue(group));
       allowing(group).getName();
       will(returnValue(GROUP_NAME));
+      oneOf(groupResolver).resolveGroup(
+          with(NEW_GROUP_NAME), with(same(errors)));
+      will(returnValue(group));
+      oneOf(request).setOwner(group);
       oneOf(protectionService).unprotect(with(same(request)), with(
          allOf(any(ProtectionParameters.class), 
              hasProperty("groupName", equalTo(GROUP_NAME)))));

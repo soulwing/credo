@@ -41,6 +41,7 @@ import org.soulwing.credo.service.TagService;
 import org.soulwing.credo.service.UserAccessException;
 import org.soulwing.credo.service.X500PrincipalUtil;
 import org.soulwing.credo.service.crypto.PrivateKeyWrapper;
+import org.soulwing.credo.service.group.GroupResolver;
 import org.soulwing.credo.service.protect.CredentialProtectionService;
 import org.soulwing.credo.service.request.CredentialRequestException;
 import org.soulwing.credo.service.request.DelegatingRequestEditor;
@@ -59,6 +60,9 @@ public class DelegatingCredentialEditorBean
   
   @Inject
   protected CredentialProtectionService protectionService;
+  
+  @Inject
+  protected GroupResolver groupResolver;
   
   @Inject
   protected TagService tagService;
@@ -231,6 +235,7 @@ public class DelegatingCredentialEditorBean
 
     if (owner == null || owner.equals(delegate.getOwner().getName())) return;
     try {
+      delegate.setOwner(groupResolver.resolveGroup(owner, errors));
       PrivateKeyWrapper privateKey = protectionService.unprotect(
           delegate, new ProtectionParametersBean(
               delegate.getOwner().getName()));

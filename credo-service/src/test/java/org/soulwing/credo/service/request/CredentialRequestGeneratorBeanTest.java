@@ -36,6 +36,8 @@ import org.junit.Test;
 import org.soulwing.credo.CredentialRequest;
 import org.soulwing.credo.CredentialRequestBuilder;
 import org.soulwing.credo.CredentialRequestBuilderFactory;
+import org.soulwing.credo.UserGroup;
+import org.soulwing.credo.service.Errors;
 import org.soulwing.credo.service.ProtectionParameters;
 import org.soulwing.credo.service.crypto.CertificationRequestBuilder;
 import org.soulwing.credo.service.crypto.CertificationRequestBuilderFactory;
@@ -45,6 +47,7 @@ import org.soulwing.credo.service.crypto.KeyGeneratorService;
 import org.soulwing.credo.service.crypto.KeyPairWrapper;
 import org.soulwing.credo.service.crypto.PrivateKeyWrapper;
 import org.soulwing.credo.service.crypto.PublicKeyWrapper;
+import org.soulwing.credo.service.group.GroupResolver;
 import org.soulwing.credo.service.protect.CredentialRequestProtectionService;
 
 /**
@@ -54,6 +57,8 @@ import org.soulwing.credo.service.protect.CredentialRequestProtectionService;
  */
 public class CredentialRequestGeneratorBeanTest {
 
+  private static final String GROUP_NAME = "someGroup";
+  
   private static final String ENCODED_CSR = "encodedCertificationRequest";
 
   private static final X500Principal SUBJECT = new X500Principal("cn=Some Subject");
@@ -83,6 +88,9 @@ public class CredentialRequestGeneratorBeanTest {
   private CredentialRequestBuilder requestBuilder;
   
   @Mock
+  private GroupResolver groupResolver;
+  
+  @Mock
   private CredentialRequest request;
 
   @Mock
@@ -100,6 +108,12 @@ public class CredentialRequestGeneratorBeanTest {
   @Mock
   private CertificationRequestWrapper csr;
   
+  @Mock
+  private UserGroup group;
+  
+  @Mock
+  private Errors errors;
+  
   private CredentialRequestGeneratorBean generator =
       new CredentialRequestGeneratorBean();
   
@@ -107,6 +121,7 @@ public class CredentialRequestGeneratorBeanTest {
   public void setUp() throws Exception {
     generator.keyGeneratorService = keyGeneratorService;
     generator.csrBuilderFactory = csrBuilderFactory;
+    generator.groupResolver = groupResolver;
     generator.requestBuilderFactory = requestBuilderFactory;
     generator.protectionService = protectionService;
   }
@@ -117,7 +132,7 @@ public class CredentialRequestGeneratorBeanTest {
     context.checking(csrBuilderExpectations(returnValue(csr)));
     context.checking(signingRequestExpectations());
     context.checking(protectionServiceExpectations(returnValue(null)));    
-    assertThat(generator.generate(editor, protection),
+    assertThat(generator.generate(editor, protection, errors),
         is(sameInstance(request)));
   }
 
@@ -127,7 +142,7 @@ public class CredentialRequestGeneratorBeanTest {
     context.checking(csrBuilderExpectations(
         throwException(new CertificationRequestException("some message"))));
 
-    generator.generate(editor, protection);
+    generator.generate(editor, protection, errors);
   }
   
   private Expectations keyPairExpectations() throws Exception {
@@ -177,6 +192,11 @@ public class CredentialRequestGeneratorBeanTest {
   private Expectations protectionServiceExpectations(
       final Action outcome) throws Exception {
     return new Expectations() { { 
+      oneOf(protection).getGroupName();
+      will(returnValue(GROUP_NAME));
+      oneOf(groupResolver).resolveGroup(with(GROUP_NAME), with(same(errors)));
+      will(returnValue(group));
+      oneOf(request).setOwner(group);
       oneOf(protectionService).protect(
           with(same(request)), 
           with(same(privateKey)), 

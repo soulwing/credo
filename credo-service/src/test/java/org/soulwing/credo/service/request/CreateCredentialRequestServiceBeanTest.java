@@ -258,7 +258,7 @@ public class CreateCredentialRequestServiceBeanTest {
       throws Exception {
     return new Expectations() {
       {
-        oneOf(generator).generate(with(same(editor)), with(same(protection)));
+        oneOf(generator).generate(with(same(editor)), with(same(protection)), errors);
         will(outcome);
       }
     };

@@ -108,7 +108,8 @@ public class CreateCredentialRequestServiceBean implements CreateCredentialReque
       Errors errors) throws NoSuchGroupException, PassphraseException, 
       GroupAccessException, CredentialRequestException {
     try {
-      CredentialRequest request = generator.generate(editor, protection);
+      CredentialRequest request = generator.generate(editor, protection, 
+          errors);
       if (editor.getCredentialId() != null) {
         Credential credential = credentialRepository.findById(
             editor.getCredentialId());

@@ -25,6 +25,7 @@ import javax.inject.Inject;
 
 import org.soulwing.credo.CredentialRequest;
 import org.soulwing.credo.CredentialRequestBuilderFactory;
+import org.soulwing.credo.service.Errors;
 import org.soulwing.credo.service.GroupAccessException;
 import org.soulwing.credo.service.NoSuchGroupException;
 import org.soulwing.credo.service.ProtectionParameters;
@@ -34,6 +35,7 @@ import org.soulwing.credo.service.crypto.CertificationRequestException;
 import org.soulwing.credo.service.crypto.CertificationRequestWrapper;
 import org.soulwing.credo.service.crypto.KeyGeneratorService;
 import org.soulwing.credo.service.crypto.KeyPairWrapper;
+import org.soulwing.credo.service.group.GroupResolver;
 import org.soulwing.credo.service.protect.CredentialRequestProtectionService;
 
 /**
@@ -55,11 +57,14 @@ public class CredentialRequestGeneratorBean
   protected CredentialRequestBuilderFactory requestBuilderFactory;
 
   @Inject
+  protected GroupResolver groupResolver;
+  
+  @Inject
   protected CredentialRequestProtectionService protectionService;
 
   @Override
   public CredentialRequest generate(CredentialRequestEditor editor,
-      ProtectionParameters protection)
+      ProtectionParameters protection, Errors errors)
       throws NoSuchGroupException, GroupAccessException, UserAccessException,
       CredentialRequestException {
     
@@ -76,6 +81,8 @@ public class CredentialRequestGeneratorBean
           .setCertificationRequest(csr.getContent())
           .build();
       
+      request.setOwner(groupResolver.resolveGroup(
+          protection.getGroupName(), errors));
       protectionService.protect(request, keyPair.getPrivate(), protection);
       return request;
     }

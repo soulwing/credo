@@ -19,6 +19,7 @@
 package org.soulwing.credo.service.request;
 
 import org.soulwing.credo.CredentialRequest;
+import org.soulwing.credo.service.Errors;
 import org.soulwing.credo.service.GroupAccessException;
 import org.soulwing.credo.service.NoSuchGroupException;
 import org.soulwing.credo.service.ProtectionParameters;
@@ -37,6 +38,7 @@ public interface CredentialRequestGenerator {
    * @param editor editor the provides the desired properties of the signing
    *    request
    * @param protection protection parameters
+   * @param errors TODO
    * @return signing request
    * @throws NoSuchGroupException if the group specified in {@code protection}
    *    does not exist
@@ -48,7 +50,7 @@ public interface CredentialRequestGenerator {
    *    signing request
    */
   CredentialRequest generate(CredentialRequestEditor editor, 
-      ProtectionParameters protection) 
+      ProtectionParameters protection, Errors errors) 
       throws NoSuchGroupException, GroupAccessException, UserAccessException,
       CredentialRequestException;
 
