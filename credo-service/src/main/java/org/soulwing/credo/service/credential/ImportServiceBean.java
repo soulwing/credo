@@ -38,28 +38,21 @@ import org.soulwing.credo.CredentialCertificateBuilder;
 import org.soulwing.credo.CredentialRequest;
 import org.soulwing.credo.Password;
 import org.soulwing.credo.Tag;
-import org.soulwing.credo.UserGroup;
 import org.soulwing.credo.repository.CredentialRepository;
 import org.soulwing.credo.repository.CredentialRequestRepository;
-import org.soulwing.credo.repository.UserGroupMemberRepository;
-import org.soulwing.credo.repository.UserGroupRepository;
 import org.soulwing.credo.security.OwnerAccessControlException;
-import org.soulwing.credo.service.EditException;
 import org.soulwing.credo.service.Errors;
 import org.soulwing.credo.service.FileContentModel;
 import org.soulwing.credo.service.GroupAccessException;
-import org.soulwing.credo.service.GroupEditor;
-import org.soulwing.credo.service.GroupService;
-import org.soulwing.credo.service.MergeConflictException;
 import org.soulwing.credo.service.NoContentException;
 import org.soulwing.credo.service.NoSuchGroupException;
 import org.soulwing.credo.service.PassphraseException;
 import org.soulwing.credo.service.ProtectionParameters;
 import org.soulwing.credo.service.TagService;
 import org.soulwing.credo.service.UserAccessException;
-import org.soulwing.credo.service.UserContextService;
 import org.soulwing.credo.service.crypto.CertificateWrapper;
 import org.soulwing.credo.service.crypto.PrivateKeyWrapper;
+import org.soulwing.credo.service.group.GroupResolver;
 import org.soulwing.credo.service.importer.CredentialImporter;
 import org.soulwing.credo.service.importer.CredentialImporterFactory;
 import org.soulwing.credo.service.protect.CredentialProtectionService;
@@ -89,19 +82,10 @@ public class ImportServiceBean implements ImportService {
   protected CredentialBuilderFactory credentialBuilderFactory;
   
   @Inject
-  protected UserGroupRepository groupRepository;
-  
-  @Inject
-  protected UserGroupMemberRepository memberRepository;
-  
-  @Inject
   protected TagService tagService;
   
   @Inject
-  protected GroupService groupService;
-  
-  @Inject
-  protected UserContextService userContextService;
+  protected GroupResolver groupResolver;
   
   @Inject
   protected CredentialRequestProtectionService requestProtectionService;
@@ -218,7 +202,8 @@ public class ImportServiceBean implements ImportService {
 
     try {
       Credential credential = createCredential(details);    
-      credential.setOwner(resolveOwner(protection, errors));
+      credential.setOwner(
+          groupResolver.resolveGroup(protection.getGroupName(), errors));
       credentialProtectionService.protect(credential, details.getPrivateKey(), 
           protection);
       return credential;
@@ -237,36 +222,6 @@ public class ImportServiceBean implements ImportService {
           protection.getGroupName());
       throw ex;
     }
-  }
-  
-  private UserGroup resolveOwner(ProtectionParameters protection, 
-      Errors errors) throws NoSuchGroupException, GroupAccessException {
-    UserGroup group = null;
-    try {
-      group = findOwnerGroup(protection);
-    }
-    catch (NoSuchGroupException ex) {
-      GroupEditor editor = groupService.newGroup();
-      editor.setName(protection.getGroupName());
-      try {
-        groupService.saveGroup(editor, errors);
-        group = findOwnerGroup(protection);
-      }
-      catch (EditException|PassphraseException|MergeConflictException oex) {
-        throw new RuntimeException(oex);
-      }
-    }
-    return group;
-  }
-
-  private UserGroup findOwnerGroup(ProtectionParameters protection)
-      throws NoSuchGroupException {
-    UserGroup group = groupRepository.findByGroupName(
-        protection.getGroupName(), userContextService.getLoginName());
-    if (group == null) {
-      throw new NoSuchGroupException();
-    }
-    return group;
   }
   
   private Credential createCredential(ImportDetails details) {

@@ -60,25 +60,18 @@ import org.soulwing.credo.UserGroupMember;
 import org.soulwing.credo.domain.TagEntity;
 import org.soulwing.credo.repository.CredentialRepository;
 import org.soulwing.credo.repository.CredentialRequestRepository;
-import org.soulwing.credo.repository.UserGroupMemberRepository;
-import org.soulwing.credo.repository.UserGroupRepository;
 import org.soulwing.credo.security.OwnerAccessControlException;
 import org.soulwing.credo.service.Errors;
 import org.soulwing.credo.service.FileContentModel;
 import org.soulwing.credo.service.GroupAccessException;
-import org.soulwing.credo.service.GroupEditor;
-import org.soulwing.credo.service.GroupService;
 import org.soulwing.credo.service.NoContentException;
 import org.soulwing.credo.service.PassphraseException;
 import org.soulwing.credo.service.ProtectionParameters;
 import org.soulwing.credo.service.TagService;
 import org.soulwing.credo.service.UserAccessException;
-import org.soulwing.credo.service.UserContextService;
-import org.soulwing.credo.service.credential.ImportServiceBean;
-import org.soulwing.credo.service.credential.ImportDetails;
-import org.soulwing.credo.service.credential.ImportException;
 import org.soulwing.credo.service.crypto.CertificateWrapper;
 import org.soulwing.credo.service.crypto.PrivateKeyWrapper;
+import org.soulwing.credo.service.group.GroupResolver;
 import org.soulwing.credo.service.importer.CredentialImporter;
 import org.soulwing.credo.service.importer.CredentialImporterFactory;
 import org.soulwing.credo.service.protect.CredentialProtectionService;
@@ -187,19 +180,10 @@ public class ImportServiceBeanTest {
   private Tag tag;
   
   @Mock
-  private UserGroupRepository groupRepository;
-  
-  @Mock
-  private UserGroupMemberRepository memberRepository;
-  
-  @Mock
   private TagService tagService;
   
   @Mock
-  private GroupService groupService;
-  
-  @Mock
-  private UserContextService userContextService;
+  private GroupResolver groupResolver;
   
   @Mock
   private CredentialProtectionService credentialProtectionService;
@@ -217,10 +201,7 @@ public class ImportServiceBeanTest {
     importService.requestRepository = requestRepository;
     importService.credentialBuilderFactory = credentialBuilderFactory;
     importService.tagService = tagService;
-    importService.groupRepository = groupRepository;
-    importService.memberRepository = memberRepository;
-    importService.groupService = groupService;
-    importService.userContextService = userContextService;
+    importService.groupResolver = groupResolver;
     importService.requestProtectionService = requestProtectionService;
     importService.credentialProtectionService = credentialProtectionService;
   }
@@ -400,28 +381,17 @@ public class ImportServiceBeanTest {
   public void testProtectCredential() throws Exception {
     context.checking(requestDetailsExpectations());
     context.checking(credentialBuilderExpectations());
-    context.checking(findOwnerGroupExpectations(returnValue(group)));
+    context.checking(resolveOwnerExpectations());
     context.checking(storeOwnerExpectations());
     context.checking(protectionExpectations(returnValue(null)));
     importService.createCredential(details, protection, errors);
   }
-  
-  @Test
-  public void testProtectCredentialWhenGroupNotFound() throws Exception {
-    context.checking(requestDetailsExpectations());
-    context.checking(credentialBuilderExpectations());
-    context.checking(findOwnerGroupExpectations(returnValue(null)));
-    context.checking(createOwnerGroupExpectations());
-    context.checking(storeOwnerExpectations());
-    context.checking(protectionExpectations(returnValue(null)));
-    importService.createCredential(details, protection, errors);
-  }
-  
+    
   @Test(expected = PassphraseException.class)
   public void testProtectCredentialWhenPasswordIncorrect() throws Exception {
     context.checking(requestDetailsExpectations());
     context.checking(credentialBuilderExpectations());
-    context.checking(findOwnerGroupExpectations(returnValue(group)));
+    context.checking(resolveOwnerExpectations());
     context.checking(storeOwnerExpectations());
     context.checking(protectionExpectations(
         throwException(new UserAccessException(new Exception()))));
@@ -433,7 +403,7 @@ public class ImportServiceBeanTest {
   public void testProtectCredentialWhenUserNotInGroup() throws Exception {
     context.checking(requestDetailsExpectations());
     context.checking(credentialBuilderExpectations());
-    context.checking(findOwnerGroupExpectations(returnValue(group)));
+    context.checking(resolveOwnerExpectations());
     context.checking(storeOwnerExpectations());
     context.checking(protectionExpectations(
         throwException(new GroupAccessException(GROUP_NAME))));
@@ -516,28 +486,11 @@ public class ImportServiceBeanTest {
     } };
   }
 
-  private Expectations findOwnerGroupExpectations(final Action outcome)
-      throws Exception {
-    return new Expectations() { { 
-      allowing(protection).getGroupName();
-      will(returnValue(GROUP_NAME));
-      allowing(userContextService).getLoginName();
-      will(returnValue(LOGIN_NAME));
-      oneOf(groupRepository).findByGroupName(with(GROUP_NAME),
-          with(LOGIN_NAME));
-      will(outcome);
-    } };
-  }
-
-  private Expectations createOwnerGroupExpectations() throws Exception {
-    final GroupEditor editor = context.mock(GroupEditor.class);
+  private Expectations resolveOwnerExpectations() throws Exception { 
     return new Expectations() { {
-      oneOf(groupService).newGroup();
-      will(returnValue(editor));
-      oneOf(editor).setName(with(GROUP_NAME));
-      oneOf(groupService).saveGroup(with(same(editor)), with(same(errors)));
-      oneOf(groupRepository).findByGroupName(with(GROUP_NAME),
-          with(LOGIN_NAME));
+      oneOf(protection).getGroupName();
+      will(returnValue(OWNER));
+      oneOf(groupResolver).resolveGroup(with(OWNER), with(same(errors)));
       will(returnValue(group));
     } };
   }
