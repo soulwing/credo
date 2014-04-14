@@ -35,7 +35,7 @@ import org.soulwing.credo.service.request.CredentialRequestException;
 import org.soulwing.credo.service.request.EditCredentialRequestService;
 
 /**
- * A bean that supports the Edit Credential interaction.
+ * A bean that supports the Edit Credential Request interaction.
  *
  * @author Carl Harris
  */
