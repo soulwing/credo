@@ -24,7 +24,7 @@ import javax.faces.convert.Converter;
 import javax.faces.convert.FacesConverter;
 
 /**
- * DESCRIBE THE TYPE HERE.
+ * A converter for a character array.
  *
  * @author Carl Harris
  */
