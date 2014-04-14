@@ -34,7 +34,6 @@ import org.soulwing.credo.service.NoSuchGroupException;
 import org.soulwing.credo.service.PassphraseException;
 import org.soulwing.credo.service.credential.NoSuchCredentialException;
 import org.soulwing.credo.service.request.CreateCredentialRequestService;
-import org.soulwing.credo.service.request.CredentialRequestEditor;
 import org.soulwing.credo.service.request.CredentialRequestException;
 
 /**
@@ -48,7 +47,7 @@ public class CreateCredentialRequestBean implements Serializable {
 
   private static final long serialVersionUID = -9132630420041335985L;
 
-  static final String FAILURE_OUTCOME_ID = "failure";
+  static final String SUBJECT_OUTCOME_ID = "index";
   
   static final String DETAILS_OUTCOME_ID = "details";
   
@@ -60,6 +59,8 @@ public class CreateCredentialRequestBean implements Serializable {
   
   static final String CANCEL_OUTCOME_ID = "cancel";
   
+  static final String FAILURE_OUTCOME_ID = "failure";
+  
   /** conversation timeout (milliseconds) */
   static final long CONVERSATION_TIMEOUT = 1800000;
 
@@ -70,7 +71,7 @@ public class CreateCredentialRequestBean implements Serializable {
   protected CreateCredentialRequestService requestService;
   
   @Inject
-  protected DelegatingCredentialEditor<CredentialRequestEditor> editor;
+  protected DelegatingCredentialRequestEditor editor;
   
   @Inject
   protected PasswordFormEditor passwordEditor;
@@ -106,7 +107,7 @@ public class CreateCredentialRequestBean implements Serializable {
    * Gets the editor for the signing request.
    * @return editor
    */
-  public DelegatingCredentialEditor<CredentialRequestEditor> getEditor() {
+  public DelegatingCredentialRequestEditor getEditor() {
     return editor;
   }
   
@@ -158,9 +159,8 @@ public class CreateCredentialRequestBean implements Serializable {
   public String findCredential() {
     try {
       if (credentialId == null) {
-        // not implemented yet
-        throw new UnsupportedOperationException(
-            "cannot create request for new credential");
+        editor.setDelegate(requestService.createEditor());
+        return SUBJECT_OUTCOME_ID;
       }  
       try {
         editor.setDelegate(

@@ -1,5 +1,5 @@
 /*
- * File created on Mar 20, 2014 
+ * File created on Apr 14, 2014 
  *
  * Copyright (c) 2014 Virginia Polytechnic Institute and State University
  *
@@ -16,40 +16,36 @@
  * limitations under the License.
  *
  */
-package org.soulwing.credo.service.request;
+package org.soulwing.credo.facelets;
 
 import javax.security.auth.x500.X500Principal;
 
-import org.soulwing.credo.service.credential.CredentialEditor;
-
-
+import org.soulwing.credo.service.request.CredentialRequestEditor;
 
 /**
- * An editor for the properties of a credential request.
+ * A {@link CredentialRequestEditor} that delegates to another.
  *
  * @author Carl Harris
  */
-public interface CredentialRequestEditor extends CredentialEditor {
+public class DelegatingCredentialRequestEditor
+    extends DelegatingCredentialEditor<CredentialRequestEditor> {
+
+  private static final long serialVersionUID = 888889590710277211L;
 
   /**
-   * Gets the unique identifier of the the credential this is the basis
-   * for the request.
-   * <p>
-   * @return credential ID or {@code null} if this request is not associated 
-   *    with an existing credential
-   */
-  Long getCredentialId();
-  
-  /**
-   * Gets the subject name for the signing request.
+   * Gets the subject name.
    * @return subject name
    */
-  X500Principal getSubjectName();
+  public X500Principal getSubjectName() {
+    return getDelegate().getSubjectName();
+  }
   
   /**
-   * Sets the subject name for the signing request.
+   * Sets the subject name.
    * @param subjectName the subject name to set
    */
-  void setSubjectName(X500Principal subjectName);
+  public void setSubjectName(X500Principal subjectName) {
+    getDelegate().setSubjectName(subjectName);
+  }
   
 }

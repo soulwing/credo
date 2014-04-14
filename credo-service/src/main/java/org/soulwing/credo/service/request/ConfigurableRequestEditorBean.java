@@ -40,7 +40,7 @@ public class ConfigurableRequestEditorBean
 
   private Long credentialId;
   private String name;
-  private String subjectName;
+  private X500Principal subjectName;
   private String owner;
   private String note;
   private String[] tags;
@@ -67,17 +67,22 @@ public class ConfigurableRequestEditorBean
    */
   @Override
   public X500Principal getSubject() {
-    if (subjectName == null) return null;
-    return new X500Principal(subjectName);
+    return getSubjectName();
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
-  public String getSubjectName() {
+  public X500Principal getSubjectName() {
     return subjectName;
   }
 
+  /**
+   * {@inheritDoc}
+   */
   @Override
-  public void setSubjectName(String subjectName) {
+  public void setSubjectName(X500Principal subjectName) {
     this.subjectName = subjectName;
     this.name = X500PrincipalUtil.getCommonName(subjectName);
   }

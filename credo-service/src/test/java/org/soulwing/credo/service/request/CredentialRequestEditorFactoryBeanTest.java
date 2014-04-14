@@ -27,6 +27,7 @@ import java.util.Collections;
 import java.util.Set;
 
 import javax.enterprise.inject.Instance;
+import javax.security.auth.x500.X500Principal;
 
 import org.jmock.Expectations;
 import org.jmock.auto.Mock;
@@ -50,7 +51,8 @@ public class CredentialRequestEditorFactoryBeanTest {
 
   private static final long CREDENTIAL_ID = -1L;
 
-  private static final String SUBJECT = "subject";
+  private static final X500Principal SUBJECT = 
+      new X500Principal("cn=someSubject");
 
   private static final String OWNER = "owner";
 
@@ -97,13 +99,25 @@ public class CredentialRequestEditorFactoryBeanTest {
     factory.configurableEditors = configurableEditors;
     factory.delegatingEditors = delegatingEditors;
   }
+  
+  @Test
+  public void testNewEditor() throws Exception {
+    context.checking(new Expectations() { { 
+      oneOf(configurableEditors).get();
+      will(returnValue(configurableEditor));
+      oneOf(configurableEditor).setOwner(with(UserGroup.SELF_GROUP_NAME));
+    } });
+    
+    assertThat(factory.newEditor(),
+        is(sameInstance((Object) configurableEditor)));
+  }
 
   @Test
   public void testNewEditorWithCredential() throws Exception {
     context.checking(editorWithCredentialExpectations());
     context.checking(credentialExpectations());
     assertThat(factory.newEditor(credential), 
-        is(sameInstance((CredentialRequestEditor) configurableEditor)));
+        is(sameInstance((Object) configurableEditor)));
   }
   
   private Expectations editorWithCredentialExpectations() throws Exception {
@@ -134,7 +148,7 @@ public class CredentialRequestEditorFactoryBeanTest {
       allowing(credential).getCertificates();
       will(returnValue(Collections.singletonList(certificate)));
       allowing(certificate).getSubject();
-      will(returnValue(SUBJECT));
+      will(returnValue(SUBJECT.toString()));
       allowing(owner).getName();
       will(returnValue(OWNER));
     } };

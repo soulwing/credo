@@ -81,7 +81,7 @@ public class EditCredentialRequestBeanTest {
     bean.requestService = requestService;
     bean.errors = errors;
     bean.conversation = conversation;
-    bean.editor = new DelegatingCredentialEditor<CredentialRequestEditor>();
+    bean.editor = new DelegatingCredentialRequestEditor();
     bean.editor.setDelegate(this.editor);
     bean.passwordEditor = new PasswordFormEditor();
     bean.passwordEditor.setPassword(PASSWORD);

@@ -18,12 +18,15 @@
  */
 package org.soulwing.credo.service.credential;
 
+import javax.ejb.ApplicationException;
+
 /**
  * An exception that is thrown when an error occurs in retrieving or 
  * manipulating a credential.
  *
  * @author Carl Harris
  */
+@ApplicationException(rollback = true)
 public class CredentialException extends Exception {
 
   private static final long serialVersionUID = 3701837532285551494L;

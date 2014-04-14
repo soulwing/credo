@@ -87,16 +87,24 @@ public class CreateCredentialRequestBeanTest {
   public void setUp() throws Exception {
     bean.conversation = conversation;
     bean.requestService = requestService;
-    bean.editor = new DelegatingCredentialEditor<CredentialRequestEditor>();
+    bean.editor = new DelegatingCredentialRequestEditor();
     bean.passwordEditor = new PasswordFormEditor();
     bean.errors = errors;
     bean.facesContext = facesContext;
   }
 
-  @Test(expected = UnsupportedOperationException.class)
+  @Test
   public void testFindCredentialWhenNotSpecified() throws Exception {
+    context.checking(beginConversationExpectations());
+    context.checking(new Expectations() { { 
+      oneOf(requestService).createEditor();
+      will(returnValue(editor));
+    } });
+    
     bean.setCredentialId(null);
-    bean.findCredential();
+    assertThat(bean.findCredential(), 
+        is(equalTo(CreateCredentialRequestBean.SUBJECT_OUTCOME_ID)));
+    assertThat(bean.editor.getDelegate(), is(sameInstance(editor)));
   }
 
   @Test

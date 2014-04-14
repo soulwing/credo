@@ -30,7 +30,6 @@ import org.soulwing.credo.service.GroupAccessException;
 import org.soulwing.credo.service.MergeConflictException;
 import org.soulwing.credo.service.PassphraseException;
 import org.soulwing.credo.service.credential.NoSuchCredentialException;
-import org.soulwing.credo.service.request.CredentialRequestEditor;
 import org.soulwing.credo.service.request.CredentialRequestException;
 import org.soulwing.credo.service.request.EditCredentialRequestService;
 
@@ -60,7 +59,7 @@ public class EditCredentialRequestBean implements Serializable {
   protected EditCredentialRequestService requestService;
   
   @Inject
-  protected DelegatingCredentialEditor<CredentialRequestEditor> editor;
+  protected DelegatingCredentialRequestEditor editor;
   
   @Inject
   protected PasswordFormEditor passwordEditor;
@@ -90,7 +89,7 @@ public class EditCredentialRequestBean implements Serializable {
    * Gets the editor for the group to create.
    * @return editor
    */
-  public DelegatingCredentialEditor getEditor() {
+  public DelegatingCredentialRequestEditor getEditor() {
     return editor;
   }
   

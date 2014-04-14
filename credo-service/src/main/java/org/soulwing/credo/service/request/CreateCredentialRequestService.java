@@ -41,6 +41,12 @@ import org.soulwing.credo.service.credential.NoSuchCredentialException;
 public interface CreateCredentialRequestService {
 
   /**
+   * Creates an editor for a request for a new credential.
+   * @return editor
+   */
+  CredentialRequestEditor createEditor();
+  
+  /**
    * Creates an editor for a request that is based on an existing
    * credential.
    * @param credentialId unique identifier of the subject credential

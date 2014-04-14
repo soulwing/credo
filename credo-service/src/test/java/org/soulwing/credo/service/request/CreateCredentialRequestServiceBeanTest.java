@@ -133,6 +133,16 @@ public class CreateCredentialRequestServiceBeanTest {
   }
 
   @Test
+  public void testCreateEditor() throws Exception {
+    context.checking(new Expectations() { { 
+      oneOf(editorFactory).newEditor();
+      will(returnValue(editor));
+    } });
+  
+    assertThat(service.createEditor(), is(sameInstance(editor)));
+  }
+  
+  @Test
   public void testCreateEditorForCredential() throws Exception {
     context.checking(new Expectations() {
       {

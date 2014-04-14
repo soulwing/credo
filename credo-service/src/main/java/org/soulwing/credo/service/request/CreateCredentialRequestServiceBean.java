@@ -21,9 +21,11 @@ package org.soulwing.credo.service.request;
 import java.io.IOException;
 import java.io.Writer;
 
+import javax.ejb.ConcurrencyManagement;
+import javax.ejb.ConcurrencyManagementType;
+import javax.ejb.Singleton;
 import javax.ejb.TransactionAttribute;
 import javax.ejb.TransactionAttributeType;
-import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
 import org.soulwing.credo.Credential;
@@ -46,7 +48,8 @@ import org.soulwing.credo.service.credential.NoSuchCredentialException;
  *
  * @author Carl Harris
  */
-@ApplicationScoped
+@Singleton
+@ConcurrencyManagement(ConcurrencyManagementType.BEAN)
 public class CreateCredentialRequestServiceBean implements CreateCredentialRequestService {
 
   static final String CONTENT_TYPE = "application/pkcs10";
@@ -74,6 +77,14 @@ public class CreateCredentialRequestServiceBean implements CreateCredentialReque
    * {@inheritDoc}
    */
   @Override
+  public CredentialRequestEditor createEditor() {
+    return editorFactory.newEditor();
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
   @TransactionAttribute(TransactionAttributeType.REQUIRED)
   public CredentialRequestEditor createEditor(Long credentialId, Errors errors)
       throws NoSuchCredentialException {
@@ -91,6 +102,7 @@ public class CreateCredentialRequestServiceBean implements CreateCredentialReque
    * {@inheritDoc}
    */
   @Override
+  @TransactionAttribute(TransactionAttributeType.REQUIRED)
   public CredentialRequest createRequest(
       CredentialRequestEditor editor, ProtectionParameters protection, 
       Errors errors) throws NoSuchGroupException, PassphraseException, 

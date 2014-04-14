@@ -31,6 +31,12 @@ import org.soulwing.credo.service.credential.CredentialEditor;
 public interface CredentialRequestEditorFactory {
 
   /**
+   * Creates an editor for a new credential request.
+   * @return editor
+   */
+  CredentialRequestEditor newEditor();
+  
+  /**
    * Creates an editor for a request based on contents of the given 
    * credential.
    * @param credential basis for the request that will be edited

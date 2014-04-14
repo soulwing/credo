@@ -93,15 +93,15 @@ public class DelegatingRequestEditorBean
    * {@inheritDoc}
    */
   @Override
-  public String getSubjectName() {
-    return delegate.getSubject();
+  public X500Principal getSubjectName() {
+    return new X500Principal(delegate.getSubject());
   }
 
   /**
    * {@inheritDoc}
    */
   @Override
-  public void setSubjectName(String subjectName) {
+  public void setSubjectName(X500Principal subjectName) {
     throw new UnsupportedOperationException(
         "subject name cannot be changed");
   }
@@ -111,7 +111,7 @@ public class DelegatingRequestEditorBean
    */
   @Override
   public X500Principal getSubject() {
-    return new X500Principal(delegate.getSubject());
+    return getSubjectName();
   }
 
   /**

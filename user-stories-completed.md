@@ -367,6 +367,18 @@ A user can edit an existing credential for which she is an owner.
 * The owner group can be changed to another group of which she is a member.
 
 
+Signing Request for New Credential
+----------------------------------
+
+A user can create a signing request for a new credential.
+
+* A subject common name must be specified.
+* A friendly name must be specified; the default value is the subject common
+  name
+* An owner must be specified
+* A description and zero or more tags may be specified
+
+
 
 
 

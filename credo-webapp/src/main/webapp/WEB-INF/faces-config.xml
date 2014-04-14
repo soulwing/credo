@@ -128,6 +128,16 @@
 
   <converter>
     <converter-for-class>
+      javax.security.auth.x500.X500Principal
+    </converter-for-class>
+    <converter-class>
+      org.soulwing.credo.converters.X500PrincipalConverter
+    </converter-class>
+  </converter>
+
+
+  <converter>
+    <converter-for-class>
       org.soulwing.credo.Password
     </converter-for-class>
     <converter-class>

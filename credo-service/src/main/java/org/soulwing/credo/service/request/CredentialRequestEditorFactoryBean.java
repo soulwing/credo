@@ -21,11 +21,13 @@ package org.soulwing.credo.service.request;
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.inject.Instance;
 import javax.inject.Inject;
+import javax.security.auth.x500.X500Principal;
 
 import org.apache.commons.lang.Validate;
 import org.soulwing.credo.Credential;
 import org.soulwing.credo.CredentialCertificate;
 import org.soulwing.credo.CredentialRequest;
+import org.soulwing.credo.UserGroup;
 
 /**
  * A concrete {@link CredentialRequestEditorFactory} implementation.
@@ -46,12 +48,22 @@ public class CredentialRequestEditorFactoryBean
    * {@inheritDoc}
    */
   @Override
+  public CredentialRequestEditor newEditor() {
+    ConfigurableRequestEditor editor = configurableEditors.get();
+    editor.setOwner(UserGroup.SELF_GROUP_NAME);
+    return editor;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
   public CredentialRequestEditor newEditor(Credential credential) {
     Validate.isTrue(!credential.getCertificates().isEmpty());
     CredentialCertificate certificate = credential.getCertificates().get(0);
     ConfigurableRequestEditor editor = configurableEditors.get();
     editor.setCredentialId(credential.getId());
-    editor.setSubjectName(certificate.getSubject());
+    editor.setSubjectName(new X500Principal(certificate.getSubject()));
     editor.setName(credential.getName());
     editor.setOwner(credential.getOwner().getName());
     editor.setNote(credential.getNote());
