@@ -42,14 +42,6 @@ public interface GroupService {
   GroupEditor newGroup();
   
   /**
-   * Finds a group using its unique identifier.
-   * @param id unique identifier of the group to match
-   * @return group detail
-   * @throws NoSuchGroupException if the specified group does not exist
-   */
-  GroupDetail findGroup(Long id) throws NoSuchGroupException;
-  
-  /**
    * Finds the collection of all groups that are accessible to the logged in
    * user.
    * @return collection of groups
@@ -85,18 +77,6 @@ public interface GroupService {
   void saveGroup(GroupEditor editor, Errors errors) 
       throws EditException, NoSuchGroupException, GroupAccessException,
       PassphraseException, MergeConflictException;
-  
-  /**
-   * Removes the group with the given unique identifier.
-   * @param id unique identifier of the group to remove
-   * @param errors errors object that will be updated if the group cannot be
-   *    removed
-   * @throws EditException if the group cannot be removed (i.e because it
-   *    is in use)
-   * @throws NoSuchGroupException if the specified group does not exist
-   */
-  void removeGroup(Long id, Errors errors) 
-      throws EditException, NoSuchGroupException;
   
   /**
    * Tests whether the existing group name exists for the logged-in user.

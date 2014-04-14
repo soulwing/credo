@@ -19,7 +19,6 @@
 package org.soulwing.credo.service.group;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.arrayContaining;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.sameInstance;
@@ -48,13 +47,6 @@ import org.soulwing.credo.service.GroupAccessException;
 import org.soulwing.credo.service.MergeConflictException;
 import org.soulwing.credo.service.UserContextService;
 import org.soulwing.credo.service.UserDetail;
-import org.soulwing.credo.service.group.ConcreteGroupService;
-import org.soulwing.credo.service.group.ConfigurableGroupEditor;
-import org.soulwing.credo.service.group.EditException;
-import org.soulwing.credo.service.group.GroupDetail;
-import org.soulwing.credo.service.group.GroupEditor;
-import org.soulwing.credo.service.group.GroupEditorFactory;
-import org.soulwing.credo.service.group.NoSuchGroupException;
 
 /**
  * Unit tests for {@link ConcreteGroupService}.
@@ -142,42 +134,6 @@ public class ConcreteGroupServiceTest {
     assertThat(service.newGroup(), is(sameInstance((GroupEditor) editor)));
   }
   
-  @Test
-  public void testFindGroupSuccess() throws Exception {
-    context.checking(new Expectations() { {
-      oneOf(userContextService).getLoginName();
-      will(returnValue(LOGIN_NAME1));
-      oneOf(memberRepository).findByGroupIdAndLoginName(with(GROUP_ID1), 
-          with(LOGIN_NAME1));
-      will(returnValue(Collections.singleton(member1)));
-      oneOf(member1).getGroup();
-      will(returnValue(group1));
-      oneOf(member1).getUser();
-      will(returnValue(profile1));
-      allowing(group1).getId();
-      will(returnValue(GROUP_ID1));
-      allowing(group1).getName();
-      will(returnValue(GROUP_NAME1));
-    } });
-    
-    context.checking(resolveInUseExpectations());
-    GroupDetail detail = service.findGroup(GROUP_ID1);
-    assertThat(detail.getId(), is(equalTo(GROUP_ID1)));
-  }
-
-  @Test(expected = NoSuchGroupException.class)
-  public void testFindGroupWhenGroupNotFound() throws Exception {
-    context.checking(new Expectations() { {
-      oneOf(userContextService).getLoginName();
-      will(returnValue(LOGIN_NAME1));
-      oneOf(memberRepository).findByGroupIdAndLoginName(with(GROUP_ID1), 
-          with(LOGIN_NAME1));
-      will(returnValue(Collections.emptySet()));
-    } });
-    
-    service.findGroup(GROUP_ID1);
-  }
-
   @Test
   public void testFindAllGroupsWhenNoDescendants() throws Exception {
     final List<UserGroupMember> members = Arrays.asList(new UserGroupMember[] { 
@@ -318,55 +274,6 @@ public class ConcreteGroupServiceTest {
     service.saveGroup(editor, errors);
   }
   
-  @Test
-  public void testRemoveGroupSuccess() throws Exception {
-    context.checking(new Expectations() { {
-      oneOf(userContextService).getLoginName();
-      will(returnValue(LOGIN_NAME1));
-      oneOf(memberRepository).findByGroupIdAndLoginName(with(GROUP_ID1), 
-          with(LOGIN_NAME1));
-      will(returnValue(Collections.singleton(member1)));
-      oneOf(credentialRepository).findAllByOwnerId(with(GROUP_ID1));
-      will(returnValue(Collections.emptyList()));
-      oneOf(memberRepository).remove(with(same(member1)));
-      oneOf(groupRepository).remove(with(GROUP_ID1));
-    } });
-    
-    service.removeGroup(GROUP_ID1, errors);
-  }
-
-  @Test(expected = NoSuchGroupException.class)
-  public void testRemoveGroupWhenNotFound() throws Exception {
-    context.checking(new Expectations() { {
-      oneOf(userContextService).getLoginName();
-      will(returnValue(LOGIN_NAME1));
-      oneOf(memberRepository).findByGroupIdAndLoginName(with(GROUP_ID1), 
-          with(LOGIN_NAME1));
-      will(returnValue(Collections.emptySet()));
-      oneOf(errors).addError(with("groupNotFound"), 
-          (Object[]) with(arrayContaining(GROUP_ID1)));
-    } });
-    
-    service.removeGroup(GROUP_ID1, errors);
-  }
-
-  @Test(expected = EditException.class)
-  public void testRemoveGroupWhenCredentialsExist() throws Exception {
-    context.checking(new Expectations() { {
-      oneOf(userContextService).getLoginName();
-      will(returnValue(LOGIN_NAME1));
-      oneOf(memberRepository).findByGroupIdAndLoginName(with(GROUP_ID1), 
-          with(LOGIN_NAME1));
-      will(returnValue(Collections.singleton(member1)));
-      oneOf(credentialRepository).findAllByOwnerId(with(GROUP_ID1));
-      will(returnValue(Collections.singletonList(credential)));
-      oneOf(errors).addError(with("groupInUse"), 
-          (Object[]) with(arrayContaining(GROUP_ID1)));
-    } });
-    
-    service.removeGroup(GROUP_ID1, errors);
-  }
-
   private Expectations resolveInUseExpectations() throws Exception {
     return new Expectations() { { 
       allowing(group1).getId();

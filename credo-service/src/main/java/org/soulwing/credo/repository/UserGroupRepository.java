@@ -46,10 +46,9 @@ public interface UserGroupRepository extends UserGroupFactory {
   
   /**
    * Removes a group.
-   * @param id unique identifier for the group to remove
-   * @return {@code true} if a group was removed
+   * @param group the group to remove
    */
-  boolean remove(Long id);
+  void remove(UserGroup group);
   
   /**
    * Finds a group by its unique identifier.

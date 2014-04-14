@@ -79,18 +79,6 @@ public class ConcreteGroupService implements GroupService {
     return editorFactory.newEditor();
   }
 
-  @Override
-  @TransactionAttribute(TransactionAttributeType.REQUIRED)
-  public GroupDetail findGroup(Long id) throws NoSuchGroupException {
-    String loginName = userContextService.getLoginName();
-    Collection<UserGroupMember> members = memberRepository
-        .findByGroupIdAndLoginName(id, loginName);
-    if (members.isEmpty()) {
-      throw new NoSuchGroupException();
-    }
-    return assembleGroupDetails(members).iterator().next();
-  }
-
   /**
    * {@inheritDoc}
    */
@@ -185,29 +173,6 @@ public class ConcreteGroupService implements GroupService {
     ((ConfigurableGroupEditor) editor).save(errors);
   }
 
-  @Override
-  @TransactionAttribute(TransactionAttributeType.REQUIRED)
-  public void removeGroup(Long id, Errors errors) throws EditException,
-      NoSuchGroupException {
-    String loginName = userContextService.getLoginName();
-    Collection<UserGroupMember> members = memberRepository
-        .findByGroupIdAndLoginName(id, loginName);
-    if (members.isEmpty()) {
-      errors.addError("groupNotFound", id);
-      throw new NoSuchGroupException();
-    }
-    if (!credentialRepository.findAllByOwnerId(id).isEmpty()) {
-      errors.addError("groupInUse", id);
-      throw new EditException();
-    }
-    
-    for (UserGroupMember member : members) {
-      memberRepository.remove(member);
-    }
-    
-    groupRepository.remove(id);
-  }
-  
   /**
    * {@inheritDoc}
    */

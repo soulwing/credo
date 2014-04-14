@@ -38,10 +38,11 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.soulwing.credo.service.Errors;
-import org.soulwing.credo.service.group.EditException;
+import org.soulwing.credo.service.GroupAccessException;
 import org.soulwing.credo.service.group.GroupDetail;
-import org.soulwing.credo.service.group.GroupService;
+import org.soulwing.credo.service.group.GroupException;
 import org.soulwing.credo.service.group.NoSuchGroupException;
+import org.soulwing.credo.service.group.RemoveGroupService;
 
 /**
  * Unit tests for {@link RemoveGroupBean}.
@@ -56,7 +57,7 @@ public class RemoveGroupBeanTest {
   public final JUnitRuleMockery context = new JUnitRuleMockery();
   
   @Mock
-  private GroupService groupService;
+  private RemoveGroupService groupService;
   
   @Mock
   private GroupDetail group;
@@ -117,18 +118,18 @@ public class RemoveGroupBeanTest {
   }
 
   @Test
-  public void testRemoveWhenNoSuchGroupException() throws Exception {
+  public void testRemoveWhenGroupException() throws Exception {
     context.checking(removeGroupExpectations(
-        throwException(new NoSuchGroupException())));
+        throwException(new GroupException())));
     context.checking(endConversationExpectations());
     bean.setId(GROUP_ID);
     assertThat(bean.remove(), is(equalTo(RemoveGroupBean.FAILURE_OUTCOME_ID)));
   }
   
   @Test
-  public void testRemoveWhenGroupEditException() throws Exception {
+  public void testRemoveWhenGroupAccesException() throws Exception {
     context.checking(removeGroupExpectations(
-        throwException(new EditException())));
+        throwException(new GroupAccessException("someGroup"))));
     context.checking(endConversationExpectations());
     bean.setId(GROUP_ID);
     assertThat(bean.remove(), is(equalTo(RemoveGroupBean.FAILURE_OUTCOME_ID)));

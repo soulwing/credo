@@ -26,10 +26,11 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.soulwing.credo.service.Errors;
-import org.soulwing.credo.service.group.EditException;
+import org.soulwing.credo.service.GroupAccessException;
 import org.soulwing.credo.service.group.GroupDetail;
-import org.soulwing.credo.service.group.GroupService;
+import org.soulwing.credo.service.group.GroupException;
 import org.soulwing.credo.service.group.NoSuchGroupException;
+import org.soulwing.credo.service.group.RemoveGroupService;
 
 /**
  * A bean that supports the Remove Group interaction.
@@ -47,7 +48,7 @@ public class RemoveGroupBean implements Serializable {
   static final String CANCEL_OUTCOME_ID = "cancel";
   
   @Inject
-  protected GroupService groupService;
+  protected RemoveGroupService groupService;
   
   @Inject
   protected Errors errors;
@@ -122,10 +123,7 @@ public class RemoveGroupBean implements Serializable {
       groupService.removeGroup(id, errors);
       return SUCCESS_OUTCOME_ID;
     }
-    catch (EditException ex) {
-      return FAILURE_OUTCOME_ID;
-    }
-    catch (NoSuchGroupException ex) {
+    catch (GroupException|GroupAccessException ex) {
       return FAILURE_OUTCOME_ID;
     }
     finally {

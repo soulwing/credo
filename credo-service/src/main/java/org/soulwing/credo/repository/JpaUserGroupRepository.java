@@ -20,6 +20,7 @@ package org.soulwing.credo.repository;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.persistence.EntityManager;
@@ -28,6 +29,7 @@ import javax.persistence.PersistenceContext;
 import javax.persistence.TypedQuery;
 
 import org.soulwing.credo.UserGroup;
+import org.soulwing.credo.UserGroupMember;
 import org.soulwing.credo.domain.UserGroupEntity;
 
 /**
@@ -80,13 +82,13 @@ public class JpaUserGroupRepository implements UserGroupRepository {
   }
 
   @Override
-  public boolean remove(Long id) {
-    UserGroupEntity group = entityManager.find(UserGroupEntity.class, id);
-    boolean found = group != null;
-    if (found) {
-      entityManager.remove(group);
+  public void remove(UserGroup group) {
+    Set<? extends UserGroupMember> members = group.getMembers();
+    System.out.println("members = " + members);
+    for (UserGroupMember member : members) {
+      entityManager.remove(member);
     }
-    return found;
+    entityManager.remove(group);
   }
 
   /**

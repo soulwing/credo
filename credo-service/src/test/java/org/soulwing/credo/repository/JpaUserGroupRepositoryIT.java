@@ -106,12 +106,18 @@ public class JpaUserGroupRepositoryIT {
 
   @Test
   public void testRemove() throws Exception {
-    UserGroupEntity group = new UserGroupEntity("someGroup");
-    repository.add(group);
+    UserProfileEntity user = EntityUtil.newUser("someUser");
+    UserGroupEntity group = EntityUtil.newGroup("someGroup");
+    UserGroupMemberEntity member = EntityUtil.newGroupMember(user, group);
+     
+    entityManager.persist(user);
+    entityManager.persist(group);
+    entityManager.persist(member);
     entityManager.flush();
     entityManager.clear();
     
-    assertThat(repository.remove(group.getId()), is(true));
+    UserGroup actual = repository.findById(group.getId());
+    repository.remove(actual);
     entityManager.flush();
     entityManager.clear();
     
