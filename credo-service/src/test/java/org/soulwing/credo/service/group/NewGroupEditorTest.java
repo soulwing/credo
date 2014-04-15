@@ -31,6 +31,8 @@ import org.soulwing.credo.service.crypto.KeyGeneratorService;
 public class NewGroupEditorTest 
     extends AbstractGroupEditorTest<NewGroupEditor> {
 
+  private static final String DESCRIPTION = "some description";
+  
   @Mock
   private KeyGeneratorService keyGeneratorService;
   
@@ -42,13 +44,16 @@ public class NewGroupEditorTest
   @Override
   public void onSetUp(NewGroupEditor editor) throws Exception {
     editor.keyGeneratorService = keyGeneratorService;
+    editor.setName(GROUP_NAME);
+    editor.setDescription(DESCRIPTION);
   }
   
   @Override
   protected Expectations groupExpectations(final Action outcome) {
     return new Expectations() { { 
-      allowing(group).getName();
-      will(returnValue(GROUP_NAME));
+      oneOf(groupRepository).newGroup(with(GROUP_NAME));
+      will(returnValue(group));
+      allowing(group).setDescription(with(DESCRIPTION));
       oneOf(groupRepository).add(group);
     } };
   }

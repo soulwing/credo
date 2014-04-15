@@ -37,7 +37,7 @@ import org.soulwing.credo.service.UserProfileService;
  * @author Carl Harris
  */
 @ApplicationScoped
-public class ConcreteGroupEditorFactory implements GroupEditorFactory {
+public class GroupEditorFactoryBean implements GroupEditorFactory {
 
   @Inject @NewGroup
   protected Instance<ConfigurableGroupEditor> newGroupEditor;
@@ -59,7 +59,7 @@ public class ConcreteGroupEditorFactory implements GroupEditorFactory {
    */
   @Override
   public ConfigurableGroupEditor newEditor() {
-    return configure(newGroupEditor.get(), groupRepository.newGroup(""),
+    return configure(newGroupEditor.get(), null,
         new LinkedHashSet<Long>());
   }
 
@@ -94,10 +94,12 @@ public class ConcreteGroupEditorFactory implements GroupEditorFactory {
   private ConfigurableGroupEditor configure(ConfigurableGroupEditor editor,
       UserGroup group, Set<Long> membership) {
     Long ownerId = profileService.getLoggedInUserProfile().getId();
-    if (group.getId() == null) {
+    if (group == null) {
       membership.add(ownerId);
     }
-    editor.setGroup(group);
+    else {
+      editor.setGroup(group);
+    }
     editor.setUserId(ownerId);
     editor.setUsers(profileService.findAllProfiles());
     editor.setMembership(membership.toArray(new Long[membership.size()]));

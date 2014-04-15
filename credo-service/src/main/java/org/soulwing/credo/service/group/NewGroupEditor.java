@@ -40,6 +40,57 @@ public class NewGroupEditor extends AbstractGroupEditor {
   @Inject
   protected KeyGeneratorService keyGeneratorService;
 
+  private String name;
+  private String description;
+  
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public void setGroup(UserGroup group) {
+    throw new UnsupportedOperationException();
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public Long getId() {
+    return null;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public String getName() {
+    return name;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public void setName(String name) {
+    this.name = name;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public String getDescription() {
+    return description;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public void setDescription(String description) {
+    this.description = description;
+  }
+
   /**
    * {@inheritDoc}
    */
@@ -60,7 +111,9 @@ public class NewGroupEditor extends AbstractGroupEditor {
    * {@inheritDoc}
    */
   @Override
-  protected UserGroup saveGroup(UserGroup group, Errors errors) {
+  protected UserGroup saveGroup(Errors errors) {
+    UserGroup group = groupRepository.newGroup(name);
+    group.setDescription(description);
     groupRepository.add(group);   
     return group;
   }

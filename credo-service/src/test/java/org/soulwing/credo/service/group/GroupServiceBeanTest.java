@@ -40,6 +40,7 @@ import org.soulwing.credo.UserGroup;
 import org.soulwing.credo.UserGroupMember;
 import org.soulwing.credo.UserProfile;
 import org.soulwing.credo.repository.CredentialRepository;
+import org.soulwing.credo.repository.CredentialRequestRepository;
 import org.soulwing.credo.repository.UserGroupMemberRepository;
 import org.soulwing.credo.repository.UserGroupRepository;
 import org.soulwing.credo.service.Errors;
@@ -49,11 +50,11 @@ import org.soulwing.credo.service.UserContextService;
 import org.soulwing.credo.service.UserDetail;
 
 /**
- * Unit tests for {@link ConcreteGroupService}.
+ * Unit tests for {@link GroupServiceBean}.
  *
  * @author Carl Harris
  */
-public class ConcreteGroupServiceTest {
+public class GroupServiceBeanTest {
 
   private static final Long GROUP_ID1 = -1L;
 
@@ -75,6 +76,9 @@ public class ConcreteGroupServiceTest {
   
   @Mock
   private CredentialRepository credentialRepository;
+  
+  @Mock
+  private CredentialRequestRepository requestRepository;
   
   @Mock
   private UserGroupRepository groupRepository;
@@ -113,12 +117,13 @@ public class ConcreteGroupServiceTest {
   private UserProfile profile2;
   
 
-  private ConcreteGroupService service = new ConcreteGroupService();
+  private GroupServiceBean service = new GroupServiceBean();
   
   @Before
   public void setUp() throws Exception {
     service.editorFactory = editorFactory;
     service.credentialRepository = credentialRepository;
+    service.requestRepository = requestRepository;
     service.groupRepository = groupRepository;
     service.memberRepository = memberRepository;
     service.userContextService = userContextService;    
@@ -283,6 +288,14 @@ public class ConcreteGroupServiceTest {
       allowing(group2).getId();
       will(returnValue(GROUP_ID2));
       allowing(credentialRepository).findAllByOwnerId(with(GROUP_ID2));
+      will(returnValue(Collections.emptyList()));
+      allowing(group1).getId();
+      will(returnValue(GROUP_ID1));
+      allowing(requestRepository).findAllByOwnerId(with(GROUP_ID1));
+      will(returnValue(Collections.emptyList()));
+      allowing(group2).getId();
+      will(returnValue(GROUP_ID2));
+      allowing(requestRepository).findAllByOwnerId(with(GROUP_ID2));
       will(returnValue(Collections.emptyList()));
     } };
   }

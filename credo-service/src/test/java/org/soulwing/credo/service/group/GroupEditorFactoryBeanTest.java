@@ -43,11 +43,11 @@ import org.soulwing.credo.service.UserDetail;
 import org.soulwing.credo.service.UserProfileService;
 
 /**
- * Unit tests for {@link ConcreteGroupEditorFactory}.
+ * Unit tests for {@link GroupEditorFactoryBean}.
  *
  * @author Carl Harris
  */
-public class ConcreteGroupEditorFactoryTest {
+public class GroupEditorFactoryBeanTest {
 
   private static final Long OWNER_ID = -1L;
   
@@ -90,8 +90,8 @@ public class ConcreteGroupEditorFactoryTest {
   @Mock
   private Collection<UserDetail> users;
   
-  private ConcreteGroupEditorFactory editorFactory =
-      new ConcreteGroupEditorFactory();
+  private GroupEditorFactoryBean editorFactory =
+      new GroupEditorFactoryBean();
   
   @Before
   public void setUp() throws Exception {
@@ -107,17 +107,12 @@ public class ConcreteGroupEditorFactoryTest {
     context.checking(new Expectations() { { 
       oneOf(newGroupEditor).get();
       will(returnValue(editor));
-      oneOf(groupRepository).newGroup(with(""));
-      will(returnValue(group));
-      oneOf(group).getId();
-      will(returnValue(null));
       oneOf(profileService).findAllProfiles();
       will(returnValue(users));
       oneOf(profileService).getLoggedInUserProfile();
       will(returnValue(profile));
       oneOf(profile).getId();
       will(returnValue(OWNER_ID));
-      oneOf(editor).setGroup(with(same(group)));
       oneOf(editor).setUserId(with(OWNER_ID));
       oneOf(editor).setMembership(with(arrayContaining(OWNER_ID)));
       oneOf(editor).setUsers(with(same(users)));
@@ -133,8 +128,6 @@ public class ConcreteGroupEditorFactoryTest {
       will(returnValue(editor));
       oneOf(groupRepository).findById(with(GROUP_ID));
       will(returnValue(group));
-      oneOf(group).getId();
-      will(returnValue(GROUP_ID));      
       oneOf(group).getName();
       will(returnValue(GROUP_NAME));
       oneOf(memberRepository).findAllMembers(with(GROUP_NAME));

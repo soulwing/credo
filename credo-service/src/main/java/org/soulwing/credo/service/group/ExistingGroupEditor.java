@@ -51,8 +51,64 @@ public class ExistingGroupEditor extends AbstractGroupEditor {
   @Inject
   protected UserGroupMemberRepository memberRepository;
 
+  private UserGroup group;
+
   private final Collection<Long> membersBefore = new ArrayList<>();
   
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public void setGroup(UserGroup group) {
+    this.group = group;
+    if (group != null) {
+      UserGroup owner = group.getOwner();
+      if (owner != null) {
+        setOwner(owner.getName());
+      }
+    }
+  }
+  
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public Long getId() {
+    return group.getId();
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public String getName() {
+    return group.getName();
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public void setName(String name) {
+    group.setName(name);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public String getDescription() {
+    return group.getDescription();
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  public void setDescription(String description) {
+    group.setDescription(description);
+  }
+
   /**
    * {@inheritDoc}
    */
@@ -95,7 +151,7 @@ public class ExistingGroupEditor extends AbstractGroupEditor {
    * {@inheritDoc}
    */
   @Override
-  protected UserGroup saveGroup(UserGroup group, Errors errors) 
+  protected UserGroup saveGroup(Errors errors) 
       throws MergeConflictException, GroupAccessException {
     try {
       return groupRepository.update(group);

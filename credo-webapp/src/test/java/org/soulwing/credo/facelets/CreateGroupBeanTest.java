@@ -24,12 +24,15 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.Matchers.sameInstance;
 
+import javax.enterprise.context.Conversation;
+
 import org.jmock.Expectations;
 import org.jmock.auto.Mock;
 import org.jmock.integration.junit4.JUnitRuleMockery;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.soulwing.credo.Password;
 import org.soulwing.credo.service.Errors;
 import org.soulwing.credo.service.PassphraseException;
 import org.soulwing.credo.service.group.EditException;
@@ -46,6 +49,8 @@ public class CreateGroupBeanTest {
 
   private static final String GROUP_NAME = "someGroup";
   
+  private static final Password PASSWORD = Password.EMPTY;
+  
   @Rule
   public final JUnitRuleMockery context = new JUnitRuleMockery();
   
@@ -56,6 +61,9 @@ public class CreateGroupBeanTest {
   private GroupEditor editor;
   
   @Mock
+  private Conversation conversation;
+  
+  @Mock
   private Errors errors;
   
   private CreateGroupBean bean = new CreateGroupBean();
@@ -64,8 +72,10 @@ public class CreateGroupBeanTest {
   public void setUp() throws Exception {
     bean.groupService = groupService;
     bean.errors = errors;
+    bean.conversation = conversation;
     bean.editor = new DelegatingGroupEditor();
     bean.passwordEditor = new PasswordFormEditor();
+    bean.passwordEditor.setPassword(PASSWORD);
     bean.editor.setDelegate(this.editor);
   }
   
@@ -82,7 +92,9 @@ public class CreateGroupBeanTest {
   
   @Test
   public void testSaveSuccess() throws Exception {
+    context.checking(endConversationExpectations());
     context.checking(new Expectations() { { 
+      oneOf(editor).setPassword(with(PASSWORD));
       oneOf(groupService).saveGroup(with(same(editor)), with(same(errors)));      
     } });
     
@@ -91,7 +103,9 @@ public class CreateGroupBeanTest {
   
   @Test
   public void testSaveWhenGroupEditException() throws Exception {
+    context.checking(beginConversationExpectations());
     context.checking(new Expectations() { { 
+      oneOf(editor).setPassword(with(PASSWORD));
       oneOf(groupService).saveGroup(with(same(editor)), with(same(errors)));
       will(throwException(new EditException()));
     } });
@@ -102,6 +116,7 @@ public class CreateGroupBeanTest {
   @Test(expected = RuntimeException.class)
   public void testSaveWhenNoSuchGroupException() throws Exception {
     context.checking(new Expectations() { { 
+      oneOf(editor).setPassword(with(PASSWORD));
       oneOf(groupService).saveGroup(with(same(editor)), with(same(errors)));
       will(throwException(new NoSuchGroupException()));
     } });
@@ -111,7 +126,9 @@ public class CreateGroupBeanTest {
 
   @Test
   public void testSaveWhenPassphraseException() throws Exception {
+    context.checking(beginConversationExpectations());
     context.checking(new Expectations() { { 
+      oneOf(editor).setPassword(with(PASSWORD));
       oneOf(groupService).saveGroup(with(same(editor)), with(same(errors)));
       will(throwException(new PassphraseException()));
       oneOf(editor).getOwner();
@@ -125,7 +142,25 @@ public class CreateGroupBeanTest {
 
   @Test
   public void testCancel() throws Exception {
+    context.checking(endConversationExpectations());
     assertThat(bean.cancel(), is(equalTo(CreateGroupBean.CANCEL_OUTCOME_ID)));
   }
+
+  private Expectations beginConversationExpectations() {
+    return new Expectations() { { 
+      oneOf(conversation).isTransient();
+      will(returnValue(true));
+      oneOf(conversation).begin();
+    } };
+  }
+
+  private Expectations endConversationExpectations() {
+    return new Expectations() { { 
+      oneOf(conversation).isTransient();
+      will(returnValue(false));
+      oneOf(conversation).end();
+    } };
+  }
+
 
 }

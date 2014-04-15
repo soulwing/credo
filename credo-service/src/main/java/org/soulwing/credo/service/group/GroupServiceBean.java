@@ -38,6 +38,7 @@ import org.soulwing.credo.UserGroup;
 import org.soulwing.credo.UserGroupMember;
 import org.soulwing.credo.UserProfile;
 import org.soulwing.credo.repository.CredentialRepository;
+import org.soulwing.credo.repository.CredentialRequestRepository;
 import org.soulwing.credo.repository.UserGroupMemberRepository;
 import org.soulwing.credo.repository.UserGroupRepository;
 import org.soulwing.credo.service.Errors;
@@ -54,7 +55,7 @@ import org.soulwing.credo.service.UserProfileWrapper;
  */
 @Singleton
 @ConcurrencyManagement(ConcurrencyManagementType.BEAN)
-public class ConcreteGroupService implements GroupService {
+public class GroupServiceBean implements GroupService {
 
   @Inject
   protected GroupEditorFactory editorFactory;
@@ -62,6 +63,9 @@ public class ConcreteGroupService implements GroupService {
   @Inject
   protected CredentialRepository credentialRepository;
 
+  @Inject
+  protected CredentialRequestRepository requestRepository;
+  
   @Inject
   protected UserGroupRepository groupRepository;
   
@@ -94,8 +98,10 @@ public class ConcreteGroupService implements GroupService {
     allDetails.addAll(details);
     
     for (GroupDetail detail : details) {
-      UserGroup group = ((UserGroupWrapper) detail).getDelegate();
+      UserGroupWrapper wrapper = (UserGroupWrapper) detail;
+      UserGroup group = wrapper.getDelegate();
       List<UserGroup> descendants = groupRepository.findDescendants(group);
+      wrapper.setInUse(wrapper.isInUse() || !descendants.isEmpty());
       allDetails.addAll(assembleGroupDetails(descendants));
     }
     
@@ -149,7 +155,8 @@ public class ConcreteGroupService implements GroupService {
   }
   
   private boolean resolveGroupInUse(UserGroup group) {
-    return !credentialRepository.findAllByOwnerId(group.getId()).isEmpty();
+    return !credentialRepository.findAllByOwnerId(group.getId()).isEmpty()
+        || !requestRepository.findAllByOwnerId(group.getId()).isEmpty();
   }
 
   /**

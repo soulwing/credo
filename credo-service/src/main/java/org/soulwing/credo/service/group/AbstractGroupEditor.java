@@ -53,7 +53,6 @@ abstract class AbstractGroupEditor implements ConfigurableGroupEditor,
 
   private static final long serialVersionUID = 1017537361170816221L;
   
-  private UserGroup group;
   private Long userId;
   private String owner;
   private Collection<UserDetail> users;
@@ -76,20 +75,6 @@ abstract class AbstractGroupEditor implements ConfigurableGroupEditor,
    * {@inheritDoc}
    */
   @Override
-  public void setGroup(UserGroup group) {
-    this.group = group;
-    if (group != null) {
-      UserGroup owner = group.getOwner();
-      if (owner != null) {
-        this.owner = owner.getName();
-      }
-    }
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
   public void setUserId(Long id) {
     this.userId = id;
   }
@@ -100,30 +85,6 @@ abstract class AbstractGroupEditor implements ConfigurableGroupEditor,
   @Override
   public void setUsers(Collection<UserDetail> users) {
     this.users = users;
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public Long getId() {
-    return group.getId();
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public String getName() {
-    return group.getName();
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public void setName(String name) {
-    group.setName(name);
   }
 
   /**
@@ -147,22 +108,6 @@ abstract class AbstractGroupEditor implements ConfigurableGroupEditor,
       }
     }
     this.owner = owner;
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public String getDescription() {
-    return group.getDescription();
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public void setDescription(String description) {
-    group.setDescription(description);
   }
 
   /**
@@ -219,8 +164,8 @@ abstract class AbstractGroupEditor implements ConfigurableGroupEditor,
 
     try {
       beforeSave(errors);
-      group = saveGroup(group, errors);
-      UserGroup ownerGroup = resolveOwner(errors);
+      UserGroup group = saveGroup(errors);
+      UserGroup ownerGroup = resolveOwner(group, errors);
   
       if (ownerGroup == null && 
           !membership.contains(userId)) {
@@ -230,9 +175,9 @@ abstract class AbstractGroupEditor implements ConfigurableGroupEditor,
       
       SecretKeyWrapper secretKey = createSecretKey(group, errors);
       if (ownerGroup != null) {
-        setOwnerSecretKey(secretKey, ownerGroup);
+        setOwnerSecretKey(secretKey, group, ownerGroup);
       }
-      addNewMembers(secretKey, errors);
+      addNewMembers(group, secretKey, errors);
       if (errors.hasWarnings() || errors.hasErrors()) {
         throw new EditException();
       }
@@ -245,7 +190,8 @@ abstract class AbstractGroupEditor implements ConfigurableGroupEditor,
   }
 
   private void setOwnerSecretKey(SecretKeyWrapper secretKey,
-      UserGroup ownerGroup) throws PassphraseException, GroupAccessException {
+      UserGroup group, UserGroup ownerGroup) throws PassphraseException, 
+      GroupAccessException {
     try {
       SecretKeyWrapper ownerKey = protectionService.unprotect(
           ownerGroup, password);
@@ -258,7 +204,8 @@ abstract class AbstractGroupEditor implements ConfigurableGroupEditor,
     }
   }
 
-  private void addNewMembers(SecretKeyWrapper secretKey, Errors errors) {
+  private void addNewMembers(UserGroup group, SecretKeyWrapper secretKey, 
+      Errors errors) {
     for (Long userId : membership) {
       if (isNewMember(userId)) {
         UserProfile profile = profileRepository.findById(userId);
@@ -274,7 +221,8 @@ abstract class AbstractGroupEditor implements ConfigurableGroupEditor,
     }
   }
 
-  private UserGroup resolveOwner(Errors errors) throws EditException {
+  private UserGroup resolveOwner(UserGroup group, Errors errors) 
+      throws EditException {
     UserGroup ownerGroup = null;
     if (owner != null) {
       ownerGroup = groupRepository.findByGroupName(owner, null);
@@ -295,7 +243,7 @@ abstract class AbstractGroupEditor implements ConfigurableGroupEditor,
   protected void beforeSave(Errors errors) {    
   }
   
-  protected abstract UserGroup saveGroup(UserGroup group, Errors errors)
+  protected abstract UserGroup saveGroup(Errors errors)
       throws MergeConflictException, GroupAccessException;
   
   protected void afterSave(Errors errors) {    

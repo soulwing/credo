@@ -66,6 +66,11 @@ public class ExistingGroupEditorTest
 
   @Override
   protected void onSetUp(ExistingGroupEditor editor) throws Exception {
+    context.checking(new Expectations() { { 
+      allowing(group).getOwner();
+      will(returnValue(null));
+    } });
+    editor.setGroup(group);
     editor.setPassword(PASSWORD);
     editor.memberRepository = memberRepository;
   }

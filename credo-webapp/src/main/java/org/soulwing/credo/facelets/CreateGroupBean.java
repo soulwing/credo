@@ -18,8 +18,11 @@
  */
 package org.soulwing.credo.facelets;
 
+import java.io.Serializable;
+
 import javax.annotation.PostConstruct;
-import javax.enterprise.context.RequestScoped;
+import javax.enterprise.context.Conversation;
+import javax.enterprise.context.ConversationScoped;
 import javax.inject.Inject;
 import javax.inject.Named;
 
@@ -37,8 +40,10 @@ import org.soulwing.credo.service.group.NoSuchGroupException;
  * @author Carl Harris
  */
 @Named
-@RequestScoped
-public class CreateGroupBean {
+@ConversationScoped
+public class CreateGroupBean implements Serializable {
+
+  private static final long serialVersionUID = 8496000879655564569L;
 
   static final String SUCCESS_OUTCOME_ID = "success";
   
@@ -58,6 +63,10 @@ public class CreateGroupBean {
   @Inject
   protected PasswordFormEditor passwordEditor;
  
+  @Inject
+  protected Conversation conversation;
+  
+  
   @PostConstruct
   public void init() {
     editor.setDelegate(groupService.newGroup());
@@ -84,6 +93,7 @@ public class CreateGroupBean {
    * @return outcome ID
    */
   public String cancel() {
+    endConversation();
     return CANCEL_OUTCOME_ID;
   }
   
@@ -93,17 +103,18 @@ public class CreateGroupBean {
    */
   public String save() {
     try {
+      editor.setPassword(passwordEditor.getPassword());
       groupService.saveGroup(editor.getDelegate(), errors);
+      endConversation();
       return SUCCESS_OUTCOME_ID;
     }
     catch (PassphraseException ex) {
+      beginConversation();
       passwordEditor.setGroupName(editor.getOwner());
       return PASSWORD_OUTCOME_ID;
     }
-    catch (EditException ex) {
-      return null;
-    }
-    catch (GroupAccessException ex) {
+    catch (EditException|GroupAccessException ex) {    
+      beginConversation();
       return null;
     }
     catch (MergeConflictException ex) {
@@ -113,4 +124,16 @@ public class CreateGroupBean {
       throw new RuntimeException(ex);
     }
   }
+  
+  private void beginConversation() {
+    if (!conversation.isTransient()) return;
+    conversation.begin();
+  }
+  
+
+  private void endConversation() {
+    if (conversation.isTransient()) return;
+    conversation.end();
+  }
+
 }

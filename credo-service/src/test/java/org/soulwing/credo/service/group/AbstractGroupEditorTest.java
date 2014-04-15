@@ -117,12 +117,7 @@ public abstract class AbstractGroupEditorTest<T extends AbstractGroupEditor> {
   
   @Before
   public final void setUp() throws Exception {
-    context.checking(new Expectations() { { 
-      oneOf(group).getOwner();
-      will(returnValue(null));
-    } });
     editor = newEditor();
-    editor.setGroup(group);
     editor.setUsers(Collections.singleton(user));
     editor.protectionService = protectionService;
     editor.secretKeyEncryptionService = secretKeyEncryptionService;
