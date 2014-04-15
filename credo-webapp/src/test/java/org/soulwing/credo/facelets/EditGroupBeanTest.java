@@ -43,8 +43,8 @@ import org.soulwing.credo.service.GroupAccessException;
 import org.soulwing.credo.service.MergeConflictException;
 import org.soulwing.credo.service.PassphraseException;
 import org.soulwing.credo.service.group.EditException;
+import org.soulwing.credo.service.group.EditGroupService;
 import org.soulwing.credo.service.group.GroupEditor;
-import org.soulwing.credo.service.group.GroupService;
 import org.soulwing.credo.service.group.NoSuchGroupException;
 
 /**
@@ -62,7 +62,7 @@ public class EditGroupBeanTest {
   public final JUnitRuleMockery context = new JUnitRuleMockery();
   
   @Mock
-  private GroupService groupService;
+  private EditGroupService groupService;
   
   @Mock
   private GroupEditor editor;

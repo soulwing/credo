@@ -30,7 +30,7 @@ import org.soulwing.credo.service.GroupAccessException;
 import org.soulwing.credo.service.MergeConflictException;
 import org.soulwing.credo.service.PassphraseException;
 import org.soulwing.credo.service.group.EditException;
-import org.soulwing.credo.service.group.GroupService;
+import org.soulwing.credo.service.group.EditGroupService;
 import org.soulwing.credo.service.group.NoSuchGroupException;
 
 /**
@@ -56,7 +56,7 @@ public class EditGroupBean implements Serializable {
   protected Conversation conversation;
   
   @Inject
-  protected GroupService groupService;
+  protected EditGroupService groupService;
   
   @Inject
   protected Errors errors;

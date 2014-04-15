@@ -53,7 +53,7 @@ public class GroupResolverBeanTest {
   private UserGroupRepository groupRepository;
   
   @Mock
-  private GroupService groupService;
+  private CreateGroupService groupService;
   
   @Mock
   private UserContextService userContextService;

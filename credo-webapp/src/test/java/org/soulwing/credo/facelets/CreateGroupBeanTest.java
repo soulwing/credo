@@ -35,9 +35,9 @@ import org.junit.Test;
 import org.soulwing.credo.Password;
 import org.soulwing.credo.service.Errors;
 import org.soulwing.credo.service.PassphraseException;
+import org.soulwing.credo.service.group.CreateGroupService;
 import org.soulwing.credo.service.group.EditException;
 import org.soulwing.credo.service.group.GroupEditor;
-import org.soulwing.credo.service.group.GroupService;
 import org.soulwing.credo.service.group.NoSuchGroupException;
 
 /**
@@ -55,7 +55,7 @@ public class CreateGroupBeanTest {
   public final JUnitRuleMockery context = new JUnitRuleMockery();
   
   @Mock
-  private GroupService groupService;
+  private CreateGroupService groupService;
   
   @Mock
   private GroupEditor editor;

@@ -30,8 +30,8 @@ import org.soulwing.credo.service.Errors;
 import org.soulwing.credo.service.GroupAccessException;
 import org.soulwing.credo.service.MergeConflictException;
 import org.soulwing.credo.service.PassphraseException;
+import org.soulwing.credo.service.group.CreateGroupService;
 import org.soulwing.credo.service.group.EditException;
-import org.soulwing.credo.service.group.GroupService;
 import org.soulwing.credo.service.group.NoSuchGroupException;
 
 /**
@@ -52,7 +52,7 @@ public class CreateGroupBean implements Serializable {
   static final String PASSWORD_OUTCOME_ID = "password";
   
   @Inject
-  protected GroupService groupService;
+  protected CreateGroupService groupService;
   
   @Inject
   protected Errors errors;

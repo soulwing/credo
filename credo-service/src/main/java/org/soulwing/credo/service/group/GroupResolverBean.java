@@ -38,7 +38,7 @@ import org.soulwing.credo.service.UserContextService;
 public class GroupResolverBean implements GroupResolver {
 
   @Inject
-  protected GroupService groupService;
+  protected CreateGroupService groupService;
   
   @Inject
   protected UserGroupRepository groupRepository;

@@ -21,7 +21,6 @@ package org.soulwing.credo.service.group;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.sameInstance;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -43,9 +42,7 @@ import org.soulwing.credo.repository.CredentialRepository;
 import org.soulwing.credo.repository.CredentialRequestRepository;
 import org.soulwing.credo.repository.UserGroupMemberRepository;
 import org.soulwing.credo.repository.UserGroupRepository;
-import org.soulwing.credo.service.Errors;
 import org.soulwing.credo.service.GroupAccessException;
-import org.soulwing.credo.service.MergeConflictException;
 import org.soulwing.credo.service.UserContextService;
 import org.soulwing.credo.service.UserDetail;
 
@@ -72,9 +69,6 @@ public class GroupServiceBeanTest {
   public final JUnitRuleMockery context = new JUnitRuleMockery();
   
   @Mock
-  private GroupEditorFactory editorFactory;
-  
-  @Mock
   private CredentialRepository credentialRepository;
   
   @Mock
@@ -88,12 +82,6 @@ public class GroupServiceBeanTest {
   
   @Mock
   private UserContextService userContextService;
-  
-  @Mock
-  private ConfigurableGroupEditor editor;
-  
-  @Mock
-  private Errors errors;
   
   @Mock
   private Credential credential;
@@ -121,22 +109,11 @@ public class GroupServiceBeanTest {
   
   @Before
   public void setUp() throws Exception {
-    service.editorFactory = editorFactory;
     service.credentialRepository = credentialRepository;
     service.requestRepository = requestRepository;
     service.groupRepository = groupRepository;
     service.memberRepository = memberRepository;
     service.userContextService = userContextService;    
-  }
-  
-  @Test
-  public void testNewGroup() throws Exception {
-    context.checking(new Expectations() { { 
-      oneOf(editorFactory).newEditor();
-      will(returnValue(editor));
-    } });
-    
-    assertThat(service.newGroup(), is(sameInstance((GroupEditor) editor)));
   }
   
   @Test
@@ -237,46 +214,6 @@ public class GroupServiceBeanTest {
     assertThat(j.hasNext(), is(false));
     
     assertThat(i.hasNext(), is(false));
-  }
-  
-  @Test
-  public void editGroup() throws Exception {
-    context.checking(new Expectations() { { 
-      oneOf(editorFactory).newEditor(with(GROUP_ID1));
-      will(returnValue(editor));
-    } });
-    
-    assertThat(service.editGroup(GROUP_ID1), is(sameInstance((GroupEditor) editor)));
-  }
-  
-
-  @Test
-  public void testSaveGroup() throws Exception {
-    context.checking(new Expectations() { { 
-      oneOf(editor).save(with(same(errors)));
-    } });
-    
-    service.saveGroup(editor, errors);
-  }
-
-  @Test(expected = GroupAccessException.class)
-  public void testSaveGroupWhenGroupAccessDenied() throws Exception {
-    context.checking(new Expectations() { { 
-      oneOf(editor).save(with(same(errors)));
-      will(throwException(new GroupAccessException(GROUP_NAME1)));
-    } });
-    
-    service.saveGroup(editor, errors);
-  }
-  
-  @Test(expected = MergeConflictException.class)
-  public void testSaveGroupWhenMergeConflictException() throws Exception {
-    context.checking(new Expectations() { { 
-      oneOf(editor).save(with(same(errors)));
-      will(throwException(new MergeConflictException()));
-    } });
-    
-    service.saveGroup(editor, errors);
   }
   
   private Expectations resolveInUseExpectations() throws Exception {

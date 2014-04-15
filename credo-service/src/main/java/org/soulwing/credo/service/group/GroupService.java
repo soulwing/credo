@@ -22,10 +22,7 @@ import java.util.Collection;
 
 import javax.ejb.Local;
 
-import org.soulwing.credo.service.Errors;
 import org.soulwing.credo.service.GroupAccessException;
-import org.soulwing.credo.service.MergeConflictException;
-import org.soulwing.credo.service.PassphraseException;
 
 /**
  * A service that provides for access and manipulation of groups.
@@ -36,47 +33,11 @@ import org.soulwing.credo.service.PassphraseException;
 public interface GroupService {
 
   /**
-   * Creates a new group.
-   * @return editor for the new group
-   */
-  GroupEditor newGroup();
-  
-  /**
    * Finds the collection of all groups that are accessible to the logged in
    * user.
    * @return collection of groups
    */
   Collection<GroupDetail> findAllGroups();
-  
-  /**
-   * Creates an editor for the given group.
-   * @param id unique identifier for the group
-   * @return editor instance
-   * @throws NoSuchGroupException if the specified group does not exist
-   *    (or is not visible to logged in user)
-   */
-  GroupEditor editGroup(Long id) throws NoSuchGroupException;
-  
-  /**
-   * Applies the changes in the given editor to the group it represents, 
-   * effectively making the requested changes persistent.
-   * @param editor the editor to apply
-   * @param errors an errors object that will be updated if the edits cannot
-   *    be successfully applied
-   * @throws EditException if a recoverable error occurs in applying
-   *    the editor to the target group
-   * @throws NoSuchGroupException if an existing was removed after the
-   *    editor was created
-   * @throws PassphraseException if a password is required and was not
-   *    provided or was incorrect
-   * @throws GroupAccessException if the logged in user is not a member
-   *    of the edited group
-   * @throws MergeConflictException if the persistent state of the group
-   *    has changed since the editor was created
-   */
-  void saveGroup(GroupEditor editor, Errors errors) 
-      throws EditException, NoSuchGroupException, GroupAccessException,
-      PassphraseException, MergeConflictException;
   
   /**
    * Tests whether the existing group name exists for the logged-in user.

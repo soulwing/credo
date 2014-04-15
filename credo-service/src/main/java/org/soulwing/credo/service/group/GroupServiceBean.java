@@ -33,7 +33,6 @@ import javax.ejb.TransactionAttribute;
 import javax.ejb.TransactionAttributeType;
 import javax.inject.Inject;
 
-import org.apache.commons.lang.Validate;
 import org.soulwing.credo.UserGroup;
 import org.soulwing.credo.UserGroupMember;
 import org.soulwing.credo.UserProfile;
@@ -41,10 +40,7 @@ import org.soulwing.credo.repository.CredentialRepository;
 import org.soulwing.credo.repository.CredentialRequestRepository;
 import org.soulwing.credo.repository.UserGroupMemberRepository;
 import org.soulwing.credo.repository.UserGroupRepository;
-import org.soulwing.credo.service.Errors;
 import org.soulwing.credo.service.GroupAccessException;
-import org.soulwing.credo.service.MergeConflictException;
-import org.soulwing.credo.service.PassphraseException;
 import org.soulwing.credo.service.UserContextService;
 import org.soulwing.credo.service.UserProfileWrapper;
 
@@ -57,9 +53,6 @@ import org.soulwing.credo.service.UserProfileWrapper;
 @ConcurrencyManagement(ConcurrencyManagementType.BEAN)
 public class GroupServiceBean implements GroupService {
 
-  @Inject
-  protected GroupEditorFactory editorFactory;
-  
   @Inject
   protected CredentialRepository credentialRepository;
 
@@ -75,14 +68,6 @@ public class GroupServiceBean implements GroupService {
   @Inject
   protected UserContextService userContextService;
   
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  public GroupEditor newGroup() {
-    return editorFactory.newEditor();
-  }
-
   /**
    * {@inheritDoc}
    */
@@ -157,27 +142,6 @@ public class GroupServiceBean implements GroupService {
   private boolean resolveGroupInUse(UserGroup group) {
     return !credentialRepository.findAllByOwnerId(group.getId()).isEmpty()
         || !requestRepository.findAllByOwnerId(group.getId()).isEmpty();
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  @TransactionAttribute(TransactionAttributeType.REQUIRED)
-  public GroupEditor editGroup(Long id) throws NoSuchGroupException {
-    return editorFactory.newEditor(id);
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  @Override
-  @TransactionAttribute(TransactionAttributeType.REQUIRED)
-  public void saveGroup(GroupEditor editor, Errors errors)
-      throws EditException, NoSuchGroupException, GroupAccessException,
-          PassphraseException, MergeConflictException {
-    Validate.isTrue(editor instanceof ConfigurableGroupEditor);
-    ((ConfigurableGroupEditor) editor).save(errors);
   }
 
   /**
