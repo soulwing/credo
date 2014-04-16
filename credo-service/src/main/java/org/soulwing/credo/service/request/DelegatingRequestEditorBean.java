@@ -258,10 +258,11 @@ public class DelegatingRequestEditorBean
 
     if (owner == null || owner.equals(delegate.getOwner().getName())) return;
     try {
-      delegate.setOwner(groupResolver.resolveGroup(owner, errors));
       PrivateKeyWrapper privateKey = protectionService.unprotect(
           delegate, new ProtectionParametersBean(
               delegate.getOwner().getName()));
+
+      delegate.setOwner(groupResolver.resolveGroup(owner, errors));
       protectionService.protect(delegate, privateKey, 
           new ProtectionParametersBean(owner));
     }
