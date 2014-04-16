@@ -73,7 +73,8 @@ public class PemArchiveExporter
       PrivateKeyWrapper privateKey) throws IOException, PassphraseException, 
       ExportException {
     
-    if (request.getExportPassphrase() != null) {
+    if (request.getExportPassphrase() != null 
+        && !request.getExportPassphrase().isEmpty()) {
       privateKey = pkcs8EncryptionService.encrypt(privateKey, 
           request.getExportPassphrase());
     }
