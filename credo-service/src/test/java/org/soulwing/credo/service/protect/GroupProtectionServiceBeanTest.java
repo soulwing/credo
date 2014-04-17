@@ -96,6 +96,9 @@ public class GroupProtectionServiceBeanTest {
   private UserContextService userContextService;
   
   @Mock
+  private PrivateKeyHolder privateKeyHolder;
+  
+  @Mock
   private UserGroup group;
   
   @Mock
@@ -140,6 +143,7 @@ public class GroupProtectionServiceBeanTest {
     service.memberBuilderFactory = memberBuilderFactory;
     service.memberRepository = memberRepository;
     service.userContextService = userContextService;
+    service.privateKeyHolder = privateKeyHolder;
   }
   
   @Test
@@ -231,6 +235,8 @@ public class GroupProtectionServiceBeanTest {
   private Expectations privateKeyExpectations(final Action outcome) {
     final String encodedPrivateKey = ENCODED_SECRET_KEY;
     return new Expectations() { {
+      oneOf(privateKeyHolder).getPrivateKey();
+      will(returnValue(null));
       oneOf(member).getUser();
       will(returnValue(profile));
       oneOf(profile).getPrivateKey();
@@ -238,8 +244,9 @@ public class GroupProtectionServiceBeanTest {
       oneOf(pkcs8Decoder).decode(with(same(encodedPrivateKey)));
       will(returnValue(privateKeyWrapper));
       oneOf(privateKeyWrapper).setProtectionParameter(with(same(PASSWORD)));
-      oneOf(privateKeyWrapper).derive();
+      oneOf(privateKeyWrapper).derive();      
       will(outcome);
+      allowing(privateKeyHolder).setPrivateKey(with(privateKey));
     } };
   }
   
