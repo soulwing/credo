@@ -18,12 +18,15 @@
  */
 package org.soulwing.credo.service;
 
+import javax.ejb.ApplicationException;
+
 /**
  * An exception thrown when attempting to update a persistent object whose
  * state indicates that a prior update was made and has not been merged.
  *
  * @author Carl Harris
  */
+@ApplicationException(rollback = true)
 public class MergeConflictException extends Exception {
 
   private static final long serialVersionUID = 6519834371877669924L;

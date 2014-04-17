@@ -18,12 +18,15 @@
  */
 package org.soulwing.credo.service;
 
+import javax.ejb.ApplicationException;
+
 /**
  * An exception thrown when access to a group is not allowed (e.g. because
  * the logged in user is not a member of the group).
  *
  * @author Carl Harris
  */
+@ApplicationException(rollback = true)
 public class GroupAccessException extends Exception {
 
   private static final long serialVersionUID = -6443606842556968462L;
