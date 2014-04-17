@@ -238,23 +238,6 @@ public class ImportSignedCertificateBean implements Serializable {
   }
   
   /**
-   * Action that is fired after the upload form is submitted.
-   * @return outcome ID
-   */
-  public String password1() {
-    try {
-      // make sure uploaded content is held in the conversation
-      fileUploadEditor.fileList();
-      
-      passwordEditor.setGroupName(request.getOwner().getName());
-      return ImportSignedCertificateBean.PASSWORD1_OUTCOME_ID;
-    }
-    catch (IOException ex) {
-      throw new RuntimeException(ex);
-    }
-  }
-
-  /**
    * Action that is fired when first password form is submitted.
    * @return outcome ID
    */
@@ -269,7 +252,16 @@ public class ImportSignedCertificateBean implements Serializable {
       return RESTART_OUTCOME_ID;
     }
     catch (PassphraseException ex) {
-      return null;
+      try {
+        // make sure uploaded content is held in the conversation
+        fileUploadEditor.fileList();
+        
+        passwordEditor.setGroupName(request.getOwner().getName());
+        return PASSWORD1_OUTCOME_ID;
+      }
+      catch (IOException iex) {
+        throw new RuntimeException(ex);
+      }
     }
     catch (GroupAccessException ex) {
       return FAILURE_OUTCOME_ID;
@@ -277,15 +269,6 @@ public class ImportSignedCertificateBean implements Serializable {
     catch (IOException ex) {
       throw new RuntimeException(ex);
     }
-  }
-
-  /**
-   * Action that is fired after the details form is submitted.
-   * @return outcome ID
-   */
-  public String password2() {
-    passwordEditor.setGroupName(editor.getOwner());
-    return ImportSignedCertificateBean.PASSWORD2_OUTCOME_ID;
   }
 
   /**
@@ -305,7 +288,8 @@ public class ImportSignedCertificateBean implements Serializable {
       return DETAILS_OUTCOME_ID;
     }
     catch (PassphraseException ex) {
-      return null;
+      passwordEditor.setGroupName(editor.getOwner());
+      return PASSWORD2_OUTCOME_ID;
     }
   }
 

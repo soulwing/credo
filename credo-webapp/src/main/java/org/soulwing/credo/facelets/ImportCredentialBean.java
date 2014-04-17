@@ -199,16 +199,6 @@ public class ImportCredentialBean implements Serializable {
   }
 
   /**
-   * Action that is fired when the form containing the credential details
-   * is submitted.
-   * @return outcome ID
-   */
-  public String password() {
-    passwordEditor.setGroupName(editor.getOwner());
-    return ImportCredentialBean.PASSWORD_OUTCOME_ID;
-  }
-  
-  /**
    * Action that is fired when the password form is submitted.
    * @return outcome ID
    */
@@ -225,7 +215,8 @@ public class ImportCredentialBean implements Serializable {
       return DETAILS_OUTCOME_ID;
     }
     catch (PassphraseException ex) {
-      return null;
+      passwordEditor.setGroupName(editor.getOwner());
+      return ImportCredentialBean.PASSWORD_OUTCOME_ID;
     }
   }
 

@@ -191,7 +191,8 @@ public class ExportCredentialBeanTest {
       will(throwException(new PassphraseException()));
     } });
         bean.setExportRequest(request);
-    assertThat(bean.prepareDownload(), is(nullValue()));
+    assertThat(bean.prepareDownload(), 
+        is(equalTo(ExportCredentialBean.PASSWORD_OUTCOME_ID)));
   }
 
   @Test

@@ -264,11 +264,18 @@ public class ImportSignedCertificateBeanTest {
           with(same(bean.getPasswordEditor())),
           with(same(errors)));
       will(throwException(new PassphraseException()));
+      oneOf(request).getOwner();
+      will(returnValue(group));
+      oneOf(group).getName();
+      will(returnValue(GROUP_NAME));
     } });
     
     bean.setRequest(request);
     bean.getFileUploadEditor().setFile0(file);
-    assertThat(bean.prepare(), is(nullValue()));
+    assertThat(bean.prepare(), 
+        is(equalTo(ImportSignedCertificateBean.PASSWORD1_OUTCOME_ID)));
+    assertThat(bean.getPasswordEditor().getGroupName(), 
+        is(equalTo(GROUP_NAME)));
   }
 
 
@@ -405,9 +412,16 @@ public class ImportSignedCertificateBeanTest {
   public void testProtectPasswordIncorrect() throws Exception {
     context.checking(protectionExpectations(
         throwException(new PassphraseException())));
+    context.checking(new Expectations() { {
+      oneOf(details).getOwner();
+      will(returnValue(GROUP_NAME));
+    } });
     bean.setDetails(details);
     bean.setCredential(credential);
-    assertThat(bean.protect(), is(nullValue()));        
+    assertThat(bean.protect(), 
+        is(equalTo(ImportSignedCertificateBean.PASSWORD2_OUTCOME_ID)));        
+    assertThat(bean.getPasswordEditor().getGroupName(),
+        is(equalTo(GROUP_NAME)));
   }
 
   @Test
@@ -417,7 +431,7 @@ public class ImportSignedCertificateBeanTest {
     bean.setDetails(details);
     bean.setCredential(credential);
     assertThat(bean.protect(), 
-        is(equalTo(ImportSignedCertificateBean.DETAILS_OUTCOME_ID)));     
+        is(equalTo(ImportSignedCertificateBean.DETAILS_OUTCOME_ID)));
   }
 
   @Test

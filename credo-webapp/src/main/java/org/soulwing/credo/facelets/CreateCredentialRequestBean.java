@@ -181,19 +181,6 @@ public class CreateCredentialRequestBean implements Serializable {
   /**
    * An action that is fired when the details view is submitted.
    * <p>
-   * This method copies the owner property from the request editor to 
-   * the password form editor and directs the user to the password entry view.
-   * 
-   * @return outcome ID
-   */
-  public String password() {
-    passwordEditor.setGroupName(editor.getOwner());
-    return PASSWORD_OUTCOME_ID;
-  }
-  
-  /**
-   * An action that is fired when the details view is submitted.
-   * <p>
    * This method creates and protects the actual signing request using the
    * contents of the editor.
    * @return outcome ID
@@ -205,6 +192,7 @@ public class CreateCredentialRequestBean implements Serializable {
       return CONFIRM_OUTCOME_ID;      
     }
     catch (PassphraseException ex) {
+      passwordEditor.setGroupName(editor.getOwner());
       return PASSWORD_OUTCOME_ID;
     }
     catch (GroupAccessException|NoSuchGroupException ex) {

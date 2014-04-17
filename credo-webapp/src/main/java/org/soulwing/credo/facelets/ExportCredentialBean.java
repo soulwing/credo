@@ -57,6 +57,7 @@ public class ExportCredentialBean implements Serializable {
 
   private static final long serialVersionUID = 7577397736072518836L;
 
+  static final String PASSWORD_OUTCOME_ID = "password";
   static final String CANCEL_OUTCOME_ID = "cancel";
   static final String PREPARED_OUTCOME_ID = "prepared";
   static final String FAILURE_OUTCOME_ID = "failure";
@@ -441,7 +442,7 @@ public class ExportCredentialBean implements Serializable {
       return PREPARED_OUTCOME_ID;
     }
     catch (PassphraseException ex) {
-      return null;
+      return PASSWORD_OUTCOME_ID;
     }
     catch (GroupAccessException ex) {
       return FAILURE_OUTCOME_ID;

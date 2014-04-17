@@ -61,6 +61,8 @@ import org.soulwing.credo.service.group.NoSuchGroupException;
  */
 public class ImportCredentialBeanTest {
 
+  private static final String GROUP_NAME = "someGroup";
+
   private static final Password PASSPHRASE = Password.EMPTY;
   
   @Rule
@@ -234,7 +236,7 @@ public class ImportCredentialBeanTest {
     context.checking(new Expectations() { { 
       oneOf(importService).saveCredential(with(same(credential)), 
           with(false), with(same(errors)));
-      will(throwException(new GroupAccessException("someGroup")));
+      will(throwException(new GroupAccessException(GROUP_NAME)));
     } });
     
     bean.setCredential(credential);
@@ -276,15 +278,22 @@ public class ImportCredentialBeanTest {
   public void testProtectPasswordIncorrect() throws Exception {
     context.checking(protectionExpectations(
         throwException(new PassphraseException())));
+    context.checking(new Expectations() { { 
+      oneOf(details).getOwner();
+      will(returnValue(GROUP_NAME));
+    } });
     bean.setDetails(details);
     bean.setCredential(credential);
-    assertThat(bean.protect(), is(nullValue()));        
+    assertThat(bean.protect(), 
+        is(equalTo(ImportCredentialBean.PASSWORD_OUTCOME_ID)));
+    assertThat(bean.getPasswordEditor().getGroupName(),
+        is(equalTo(GROUP_NAME)));
   }
 
   @Test
   public void testProtectAccessDenied() throws Exception {
     context.checking(protectionExpectations(
-        throwException(new GroupAccessException("someGroup"))));
+        throwException(new GroupAccessException(GROUP_NAME))));
     bean.setDetails(details);
     bean.setCredential(credential);
     assertThat(bean.protect(), 

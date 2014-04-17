@@ -138,20 +138,6 @@ public class CreateCredentialRequestBeanTest {
   }
   
   @Test
-  public void testPasswordAction() throws Exception {
-    context.checking(new Expectations() { { 
-      oneOf(editor).getOwner();
-      will(returnValue(GROUP_NAME));
-    } });
-    
-    bean.getEditor().setDelegate(editor);
-    assertThat(bean.password(), 
-        is(equalTo(CreateCredentialRequestBean.PASSWORD_OUTCOME_ID)));
-    assertThat(bean.getPasswordEditor().getGroupName(),
-        is(equalTo(GROUP_NAME)));
-  }
-
-  @Test
   public void testPrepareWhenNoSuchGroupException() throws Exception {
     context.checking(createSigningRequestExpectations(
         throwException(new NoSuchGroupException())));
@@ -165,6 +151,10 @@ public class CreateCredentialRequestBeanTest {
     context.checking(createSigningRequestExpectations(
         throwException(new PassphraseException())));
     bean.getEditor().setDelegate(editor);
+    context.checking(new Expectations() { { 
+      oneOf(editor).getOwner();
+      will(returnValue(GROUP_NAME));
+    } });
     assertThat(bean.prepare(), 
         is(equalTo(CreateCredentialRequestBean.PASSWORD_OUTCOME_ID)));
   }
