@@ -31,8 +31,8 @@ import org.jmock.integration.junit4.JUnitRuleMockery;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.soulwing.credo.Credential;
 import org.soulwing.credo.CredentialKey;
-import org.soulwing.credo.CredentialRequest;
 import org.soulwing.credo.Password;
 import org.soulwing.credo.UserGroup;
 import org.soulwing.credo.UserGroupMember;
@@ -47,13 +47,13 @@ import org.soulwing.credo.service.crypto.SecretKeyWrapper;
 import org.soulwing.credo.service.group.NoSuchGroupException;
 
 /**
- * Unit tests for {@link ConcreteRequestProtectionService}.
+ * Unit tests for {@link CredentialProtectionServiceBean}.
  *
  * @author Carl Harris
  */
-public class ConcreteCredentialRequestProtectionServiceTest {
+public class CredentialProtectionServiceBeanTest {
 
-  private static final long REQUEST_ID = -1L;
+  private static final long CREDENTIAL_ID = -1L;
 
   @Rule
   public final JUnitRuleMockery context = new JUnitRuleMockery();
@@ -80,7 +80,7 @@ public class ConcreteCredentialRequestProtectionServiceTest {
   private PrivateKeyEncryptionService privateKeyEncryptionService;
   
   @Mock
-  private CredentialRequest request;
+  private Credential credential;
 
   @Mock
   private ProtectionParameters protection;
@@ -112,8 +112,8 @@ public class ConcreteCredentialRequestProtectionServiceTest {
   @Mock
   private PrivateKeyWrapper credentialPrivateKey;
   
-  private ConcreteCredentialRequestProtectionService service = 
-      new ConcreteCredentialRequestProtectionService();
+  private CredentialProtectionServiceBean service = 
+      new CredentialProtectionServiceBean();
   
   @Before
   public void setUp() throws Exception {
@@ -129,13 +129,13 @@ public class ConcreteCredentialRequestProtectionServiceTest {
     context.checking(groupExpectations(returnValue(group)));
     context.checking(groupUnprotectExpectations());
     context.checking(wrapCredentialPrivateKeyExpectations());
-    service.protect(request, credentialPrivateKey, protection);
+    service.protect(credential, credentialPrivateKey, protection);
   }
   
   @Test(expected = NoSuchGroupException.class)
   public void testProtectWhenGroupDoesNotExist() throws Exception {
     context.checking(groupExpectations(returnValue(null)));
-    service.protect(request, credentialPrivateKey, protection);
+    service.protect(credential, credentialPrivateKey, protection);
   }
   
   @Test
@@ -144,14 +144,14 @@ public class ConcreteCredentialRequestProtectionServiceTest {
     context.checking(groupUnprotectExpectations());
     context.checking(checkOwnershipExpectations(returnValue(group)));
     context.checking(unwrapCredentialPrivateKeyExpectations());
-    service.unprotect(request, protection);
+    service.unprotect(credential, protection);
   }
   
   @Test(expected = RuntimeException.class)
   public void testUnprotectWhenNotSameOwnerGroup() throws Exception {
     context.checking(groupExpectations(returnValue(group)));
     context.checking(checkOwnershipExpectations(returnValue(otherGroup)));
-    service.unprotect(request, protection);
+    service.unprotect(credential, protection);
   }
   
   private Expectations groupExpectations(final Action outcome) {
@@ -163,8 +163,8 @@ public class ConcreteCredentialRequestProtectionServiceTest {
       oneOf(groupRepository).findByGroupName(
           with(same(GROUP_NAME)), with(same(LOGIN_NAME)));
       will(outcome);
-      allowing(request).getId();
-      will(returnValue(REQUEST_ID));
+      allowing(credential).getId();
+      will(returnValue(CREDENTIAL_ID));
     } };    
   }
   
@@ -184,9 +184,9 @@ public class ConcreteCredentialRequestProtectionServiceTest {
     return new Expectations() { { 
       allowing(groupMember).getGroup();
       will(returnValue(group));
-      oneOf(request).getOwner();
+      oneOf(credential).getOwner();
       will(outcome);
-      allowing(request).getName();
+      allowing(credential).getName();
       will(returnValue("some credential name"));
     } };
   }
@@ -194,7 +194,7 @@ public class ConcreteCredentialRequestProtectionServiceTest {
   private Expectations unwrapCredentialPrivateKeyExpectations() { 
     final String encodedPrivateKey = new String();
     return new Expectations() { { 
-      oneOf(request).getPrivateKey();
+      oneOf(credential).getPrivateKey();
       will(returnValue(credentialKey));
       allowing(credentialKey).getContent();
       will(returnValue(encodedPrivateKey));
@@ -215,8 +215,8 @@ public class ConcreteCredentialRequestProtectionServiceTest {
       will(returnValue(credentialPrivateKey));
       oneOf(credentialPrivateKey).getContent();
       will(returnValue(encodedPrivateKey));
-      oneOf(request).setOwner(with(same(group)));
-      oneOf(request).getPrivateKey();
+      oneOf(credential).setOwner(with(same(group)));
+      oneOf(credential).getPrivateKey();
       will(returnValue(credentialKey));
       oneOf(credentialKey).setContent(with(same(encodedPrivateKey)));
     } };

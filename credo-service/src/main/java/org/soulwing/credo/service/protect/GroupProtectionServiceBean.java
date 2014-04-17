@@ -49,7 +49,7 @@ import org.soulwing.credo.service.crypto.WrappedWith;
  * @author Carl Harris
  */
 @ApplicationScoped
-public class ConcreteGroupProtectionService
+public class GroupProtectionServiceBean
     implements GroupProtectionService {
 
   @Inject
@@ -72,6 +72,9 @@ public class ConcreteGroupProtectionService
   
   @Inject
   protected UserContextService userContextService;
+  
+  @Inject
+  protected PrivateKeyHolder privateKeyHolder;
   
   /**
    * {@inheritDoc}
@@ -140,17 +143,23 @@ public class ConcreteGroupProtectionService
   private PrivateKey unwrapPrivateKey(UserGroupMember member,
       Password password) throws UserAccessException {
     
-    PrivateKeyWrapper encryptedPrivateKey = pkcs8Decoder.decode(
-        member.getUser().getPrivateKey());
-    
-    encryptedPrivateKey.setProtectionParameter(password);
-    
-    try {
-      return encryptedPrivateKey.derive();
+    PrivateKey privateKey = privateKeyHolder.getPrivateKey();
+    if (privateKey == null) {
+      PrivateKeyWrapper encryptedPrivateKey = pkcs8Decoder.decode(
+          member.getUser().getPrivateKey());
+      
+      encryptedPrivateKey.setProtectionParameter(password);
+      
+      try {
+        privateKey = encryptedPrivateKey.derive();
+        privateKeyHolder.setPrivateKey(privateKey);
+      }
+      catch (IncorrectPassphraseException ex) {
+        throw new UserAccessException(ex);
+      }
     }
-    catch (IncorrectPassphraseException ex) {
-      throw new UserAccessException(ex);
-    }
+    
+    return privateKey;
 
   }
 

@@ -1,5 +1,5 @@
 /*
- * File created on Mar 21, 2014 
+ * File created on Mar 5, 2014 
  *
  * Copyright (c) 2014 Virginia Polytechnic Institute and State University
  *
@@ -22,7 +22,7 @@ import javax.crypto.SecretKey;
 import javax.enterprise.context.ApplicationScoped;
 
 import org.apache.commons.lang.Validate;
-import org.soulwing.credo.CredentialRequest;
+import org.soulwing.credo.Credential;
 import org.soulwing.credo.UserGroup;
 import org.soulwing.credo.service.GroupAccessException;
 import org.soulwing.credo.service.ProtectionParameters;
@@ -31,27 +31,27 @@ import org.soulwing.credo.service.crypto.PrivateKeyWrapper;
 import org.soulwing.credo.service.group.NoSuchGroupException;
 
 /**
- * A concrete {@link CredentialRequestProtectionService} implementation.
+ * A concrete {@link CredentialProtectionService} implementation.
  *
  * @author Carl Harris
  */
 @ApplicationScoped
-public class ConcreteCredentialRequestProtectionService
+public class CredentialProtectionServiceBean
     extends AbstractCredentialKeyProtectionService
-    implements CredentialRequestProtectionService {
+    implements CredentialProtectionService {
 
   /**
    * {@inheritDoc}
    */
   @Override
-  public void protect(CredentialRequest request,
-      PrivateKeyWrapper privateKey, ProtectionParameters protection)
-      throws GroupAccessException, UserAccessException, NoSuchGroupException {
-
+  public void protect(Credential credential, PrivateKeyWrapper privateKey,
+      ProtectionParameters protection) throws UserAccessException,
+      GroupAccessException, NoSuchGroupException {
+    
     UserGroup group = findGroup(protection.getGroupName());
     SecretKey secretKey = getGroupSecretKey(group, protection.getPassword());
-    request.setOwner(group);
-    request.getPrivateKey().setContent(
+    credential.setOwner(group);
+    credential.getPrivateKey().setContent(
         wrapPrivateKey(privateKey, secretKey).getContent());
   }
 
@@ -59,23 +59,24 @@ public class ConcreteCredentialRequestProtectionService
    * {@inheritDoc}
    */
   @Override
-  public PrivateKeyWrapper unprotect(CredentialRequest request,
+  public PrivateKeyWrapper unprotect(Credential credential,
       ProtectionParameters protection) throws UserAccessException,
       GroupAccessException {
     
     try {
       UserGroup group = findGroup(protection.getGroupName());
-      Validate.isTrue(group.equals(request.getOwner()), 
-          protection.getGroupName() + " is not the owner of request " 
-              + request.getId());
-      
-      SecretKey secretKey = getGroupSecretKey(group, protection.getPassword());  
-      return unwrapPrivateKey(request.getPrivateKey().getContent(), 
+      Validate.isTrue(group.equals(credential.getOwner()), 
+          protection.getGroupName() + " is not the owner of credential " 
+              + credential.getId());
+  
+      SecretKey secretKey = getGroupSecretKey(group, protection.getPassword());
+  
+      return unwrapPrivateKey(credential.getPrivateKey().getContent(), 
           secretKey);
     }
     catch (NoSuchGroupException ex) {
       throw new RuntimeException(ex);
     }
   }
-
+  
 }

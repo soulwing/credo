@@ -57,11 +57,11 @@ import org.soulwing.credo.service.crypto.SecretKeyEncryptionService;
 import org.soulwing.credo.service.crypto.SecretKeyWrapper;
 
 /**
- * Unit tests for {@link ConcreteGroupProtectionServiceTest}.
+ * Unit tests for {@link GroupProtectionServiceBeanTest}.
  *
  * @author Carl Harris
  */
-public class ConcreteGroupProtectionServiceTest {
+public class GroupProtectionServiceBeanTest {
 
   private static final String ENCODED_SECRET_KEY = new String();
 
@@ -128,8 +128,8 @@ public class ConcreteGroupProtectionServiceTest {
   @Mock
   private SecretKey secretKey;
 
-  private ConcreteGroupProtectionService service = 
-      new ConcreteGroupProtectionService();
+  private GroupProtectionServiceBean service = 
+      new GroupProtectionServiceBean();
   
   @Before
   public void setUp() throws Exception {
