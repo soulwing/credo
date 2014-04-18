@@ -115,9 +115,6 @@ public class ExistingGroupEditor extends AbstractGroupEditor {
   @Override
   protected SecretKeyWrapper createSecretKey(UserGroup group, Errors errors) 
       throws PassphraseException, GroupAccessException {
-    if (getPassword() == null) {
-      throw new PassphraseException();
-    }
     try {
       return protectionService.unprotect(group, getPassword());
     }
