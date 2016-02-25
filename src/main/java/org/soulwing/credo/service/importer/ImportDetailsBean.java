@@ -23,9 +23,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import javax.naming.NamingException;
-import javax.naming.ldap.LdapName;
-import javax.naming.ldap.Rdn;
 import javax.security.auth.x500.X500Principal;
 
 import org.soulwing.credo.Password;
@@ -98,7 +95,7 @@ public class ImportDetailsBean implements ImportDetails, Serializable {
 
   @Override
   public String getSubjectCommonName() {
-    return getCommonName(subject);
+    return X500PrincipalUtil.getCommonName(subject);
   }
 
   /**
@@ -111,22 +108,7 @@ public class ImportDetailsBean implements ImportDetails, Serializable {
 
   @Override
   public String getIssuerCommonName() {
-    return getCommonName(issuer);
-  }
-
-  private static String getCommonName(String name) {
-    try {
-      LdapName ldapName = new LdapName(name);
-      for (Rdn rdn : ldapName.getRdns()) {
-        if (rdn.getType().equalsIgnoreCase("cn")) {
-          return rdn.getValue().toString();
-        }
-      }
-      return name;
-    }
-    catch (NamingException ex) {
-      return name;
-    }
+    return X500PrincipalUtil.getCommonName(issuer);
   }
 
   /**
