@@ -2,14 +2,15 @@ Subject Name for New Credential Request
 ---------------------------------------
 
 A user can specify X.509 name components for the subject name when creating
-a signing request for a new credential.
+a signing request for a new credential.  Specifying the full subject name in
+X.500 syntax is difficult and error prone.
 
 
 Extensions for Signing Request
 ------------------------------
 
 When creating a signing request a user can specify X.509 extensions to 
-include in the request
+include in the request.
 
 * Constraints that can be specified must include
     * Basic Constraint (is the request for a CA certificate?)
