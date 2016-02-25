@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="war" name="credo:war">
+    <output-path>$PROJECT_DIR$/target</output-path>
+    <root id="archive" name="credo-1.0.0-SNAPSHOT.war">
+      <element id="artifact" artifact-name="credo:war exploded" />
+    </root>
+  </artifact>
+</component>
