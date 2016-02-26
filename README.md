@@ -167,6 +167,8 @@ member's public key. This effectively puts a copy of the key for the "lock box"
 (which contains the credential we're trying to protect) into each group member's 
 "safe".
 
+![Figure N: Credential Protection] (docs/images/credential-protection.png)
+
 Suppose Annie is a member an access group assigned to a stored credential. She 
 can use her password to decrypt her private key; she knows the combination to
 her "safe". Her (decrypted) private key can then be used to decrypt her copy 
