@@ -156,6 +156,8 @@ her password, she is the only one who can open her "safe"; she can use her
 password to decrypt her private key, which can in turn decrypt articles that
 were encrypted using her public key.
 
+![Figure N: User Profile] (docs/images/user-profile.png)
+
 In Credo, a group of people can share access to a credential. When the private 
 key for a credential is stored, a symmetric key is used to encrypt the private 
 key. This is analogous to putting the credential's private key into a lock box. 
