@@ -149,14 +149,18 @@ article(s).
 When Annie logs into Credo for the first time, Credo generates an asymmetric 
 key pair exclusively for her use. Credo asks her to provide a password that will 
 be used to encrypt her private key. Credo doesn't store her password; only 
-Annie knows the password she selected. Her asymmetric key pair plays the role of 
-the combination safe in our analogy. Articles can be placed into her "safe" by 
-encrypting them using her public key. Since Annie is the only person who knows
-her password, she is the only one who can open her "safe"; she can use her 
-password to decrypt her private key, which can in turn decrypt articles that
-were encrypted using her public key.
+Annie knows the password she selected. However, Credo does store a one-way
+hash of Annie's password. It uses this hash to more easily validate a password
+provided as input.
 
 ![Figure N: User Profile] (docs/images/user-profile.png)
+
+Annie's asymmetric key pair plays the role of the combination safe in our 
+analogy. Articles can be placed into her "safe" by encrypting them using her 
+public key. Since Annie is the only person who knows her password, she is the 
+only one who can open her "safe"; she can use her password to decrypt her 
+private key, which can in turn decrypt articles that were encrypted using her 
+public key.
 
 In Credo, a group of people can share access to a credential. When the private 
 key for a credential is stored, a symmetric key is used to encrypt the private 
