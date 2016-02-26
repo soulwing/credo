@@ -79,9 +79,9 @@ understand how and why this works, it's helpful to consider an analogy.
 Suppose the private key for a credential is just a simple physical key like 
 those that are used to open a door lock. If that were the case, we could put the 
 key inside of a lock box that is secured by another key. But then how do we 
-secure the key for the lock box containing the private key for our credential? 
-We could put the key for our lock box in another lock box, with yet another key, 
-but that's got to end somewhere in order to be useful. 
+secure the key for the lock box? We could put the key for our lock box in 
+another lock box, with yet another key, but that's got to end somewhere in order 
+to be useful. 
 
 What if we instead put the private key for our credential into a safe with a 
 combination lock? If we gave the combination to Annie, she could open the safe 
