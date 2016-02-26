@@ -194,6 +194,8 @@ specify an existing group as the group's _owner_. The owner group is the parent
 of the group. We'll discuss what this implies shortly, but for now it is 
 important to know that a group can have a owner, but it isn't required.
 
+![Figure N: Group with no Owner] (docs/images/root-group.png)
+
 Credo allows any member of a group with no owner to add or remove members from
 the group. In order to add members, Credo needs to be able to make copies of
 the group's symmetric key and encrypt each copy with the public key of a
