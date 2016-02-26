@@ -199,7 +199,7 @@ specify an existing group as the group's _owner_. The owner group is the parent
 of the group. We'll discuss what this implies shortly, but for now it is 
 important to know that a group can have a owner, but it isn't required.
 
-![Figure N: Group with no Owner] (docs/images/root-group.png)
+![Figure N: Group with no Owner] (docs/images/group.png)
 
 Credo allows any member of a group with no owner to add or remove members from
 the group. In order to add members, Credo needs to be able to make copies of
@@ -241,6 +241,8 @@ recursively down the group hierarchy; if Annie is a member of any ancestor
 group of a group that owns a credential she wants to access, starting with 
 the group in which she is a member, Credo can successively decrypt each of the 
 group keys in the path to the target group.
+
+![Figure N: Group with Owner] (docs/images/group-hierarchy.png)
 
 When a group has an owner, Credo allows the group to be edited or deleted only
 by a member of the owner group (or one of its ancestors). Only a group in which
