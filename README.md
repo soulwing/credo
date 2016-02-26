@@ -138,14 +138,14 @@ Credo uses cryptographic techniques to achieve the same outcomes described in
 our analogy, without the need for physical keys and safes.
 
 An asymmetric key pair whose private key is encrypted using a password can 
-function like the combination safe in our analogy. A article can be put into the 
+function like the combination safe in our analogy. An article can be put into the 
 "safe" by encrypting it using the public key; this is analogous to dropping 
 something into the safe by means of a drawer or slot (without actually opening 
 the safe). A person who knows the password that was used to encrypt the private 
 key can use the password to "open" the safe; the password is used to decrypt the 
 private key, and the private key is then used to recover (decrypt) the original 
 article(s). 
-    
+
 When Annie logs into Credo for the first time, Credo generates an asymmetric 
 key pair exclusively for her use. Credo asks her to provide a password that will 
 be used to encrypt her private key. Credo doesn't store her password; only 
