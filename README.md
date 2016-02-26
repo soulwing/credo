@@ -169,13 +169,16 @@ member's public key. This effectively puts a copy of the key for the "lock box"
 
 ![Figure N: Credential Protection] (docs/images/credential-protection.png)
 
-Suppose Annie is a member an access group assigned to a stored credential. She 
+Suppose Claire is a member an access group assigned to a stored credential. She 
 can use her password to decrypt her private key; she knows the combination to
 her "safe". Her (decrypted) private key can then be used to decrypt her copy 
 of the symmetric key that was used to encrypt the credential's private key; 
 she can retrieve the "lock box key" from her "safe". The (decrypted) symmetric 
 key can then be used to decrypt the private key for the stored credential; she 
 can unlock the "lock box" to retrieve the credential's private key.
+
+![Figure N: Credential Access] (docs/images/credential-access.png)
+
 
 ### Applying Groups to Securely Manage Access
 
