@@ -242,11 +242,27 @@ assigned as the owner of a group the user is creating or editing.
 Wildfly Setup Notes
 -------------------
 
+* Users need to have the `org.soulwing.credo.user` role
+* Put the PostgreSQL driver jar (`postgresql-9.4-1201-jdbc41.jar`) into 
+  Wildfly's deployment directory 
+* Create a PostgreSQL database for Credo.  It should be named `credo`.  A user
+  named `credo` should be granted full privileges on the database. You can 
+  assign any password to the database user. 
+* Use the Wildfly CLI to create the datasource that Credo will use to access the
+  database.  See the example CLI command below. 
+  - specify the correct database password
+  - if the PostgreSQL database doesn't run on the same host as the Wildfly
+    container, specify the appropriate hostname in the JDBC URL
+  - if your PostgreSQL cluster listens on a port other than the default, be sure
+    to specify the appropriate port in the JDBC URL; it goes after the hostname, 
+    delimited by a colon (:) character
+  - if you used a different version of the JDBC driver, specify the appropriate
+    driver name
+    
 ```
 /subsystem=datasources/data-source=credo:add(
-  jndi-name=java:/jdbc/datasources/credo, 
-  use-ccm=false, 
+  jndi-name=java:/jdbc/datasources/credo, use-ccm=false, 
   connection-url=jdbc:postgresql://localhost/credo,
-  driver-name=postgresql-9.4-1201-jdbc41.jar, user-name=credo, 
-  password=credo)
-```
+  driver-name=postgresql-9.4-1201-jdbc41.jar, 
+  user-name=credo, password=PASSWORD_HERE)
+``` 
