@@ -154,44 +154,45 @@ function like the combination safe in our analogy. An article can be put into th
 "safe" by encrypting it using the public key; this is analogous to dropping 
 something into the safe by means of a drawer or slot (without actually opening 
 the safe). A person who knows the password that was used to encrypt the private 
-key can use the password to "open" the safe; the password is used to decrypt the 
-private key, and the private key is then used to recover (decrypt) the original 
-article(s). 
+key knows the combination to "open" the safe; the password is used to decrypt 
+the private key, and the private key is then used to retrieve (decrypt) the 
+original article(s). 
 
 When Annie logs into Credo for the first time, Credo generates an asymmetric 
 key pair exclusively for her use. Credo asks her to provide a password that will 
 be used to encrypt her private key. Credo doesn't store her password; only 
 Annie knows the password she selected. However, Credo does store a one-way
-hash of Annie's password. It uses this hash to more easily validate a password
-provided as input.
+hash of Annie's password. It uses this hash, later, to validate that she has
+entered the correct password whenever it is needed to decrypt her private key.
 
 ![Figure N: User Profile] (docs/images/user-profile.png)
 
 Annie's asymmetric key pair plays the role of the combination safe in our 
-analogy. Articles can be placed into her "safe" by encrypting them using her 
-public key. Since Annie is the only person who knows her password, she is the 
-only one who can open her "safe"; she can use her password to decrypt her 
+analogy. Articles can be encrypted using her public key -- _placing them inside
+her safe_. Annie is the only person who knows her password -- _she is the 
+only one who can open her safe_. She can use her password to decrypt her 
 private key, which can in turn decrypt articles that were encrypted using her 
-public key.
+public key -- _she can use the combination to open the safe and retrieve 
+the articles that are stored inside_.
 
 In Credo, a group of people can share access to a credential. When the private 
 key for a credential is stored, a symmetric key is used to encrypt the private 
 key. This is analogous to putting the credential's private key into a lock box. 
-Credo makes a copy of the symmetric key (the key for the "lock box") for each 
+Credo makes a copy of the symmetric key (the key for the _lock box_) for each 
 member of the access group, and then encrypts this key using the corresponding
-member's public key. This effectively puts a copy of the key for the "lock box" 
+member's public key. This effectively puts a copy of the key for the _lock box_ 
 (which contains the credential we're trying to protect) into each group member's 
-"safe".
+_safe_.
 
 ![Figure N: Credential Protection] (docs/images/credential-protection.png)
 
 Suppose Claire is a member an access group assigned to a stored credential. She 
-can use her password to decrypt her private key; she knows the combination to
-her "safe". Her (decrypted) private key can then be used to decrypt her copy 
-of the symmetric key that was used to encrypt the credential's private key; 
-she can retrieve the "lock box key" from her "safe". The (decrypted) symmetric 
-key can then be used to decrypt the private key for the stored credential; she 
-can unlock the "lock box" to retrieve the credential's private key.
+can use her password to decrypt her private key -- _she knows the combination to
+her safe_. Her (decrypted) private key can then be used to decrypt her copy 
+of the symmetric key that was used to encrypt the credential's private key --
+_she can retrieve the lock box key from her safe_. The (decrypted) symmetric 
+key can then be used to decrypt the private key for the stored credential -- 
+_she can unlock the lock box to retrieve the credential's private key_.
 
 ![Figure N: Credential Access] (docs/images/credential-access.png)
 
@@ -240,7 +241,7 @@ The concept of a group owner allows groups to be organized in a hierarchy. This
 allows membership in a group to be inherited, which is a desirable feature in a 
 group-based access control mechanism.
 
-As previously discussed, a group's symmetric key can be recovered only by 
+As previously discussed, a group's symmetric key can be decrypted only by 
 members of the group. Since Credo does not store an unencrypted copy of the
 group's symmetric key, how can members of a parent (or other ancestor) group
 gain access to the group's symmetric key in order to in turn gain access to
