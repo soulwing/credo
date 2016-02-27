@@ -256,21 +256,22 @@ for any sequence of ancestor groups, starting with a member of an ancestor
 group, Credo can decrypt the secret keys of each successive descendant
 group, all the way down to the group that owns a credential of interest.
 
-The presence of a group owner, also allows group membership to be managed and 
-controlled by members of the group owner, rather than allowing the members of 
-the group itself to manage the membership, as is the case for an owner-less group.
-When a group has an owner, Credo allows the group to be edited or deleted only 
-by a member of the owner group (or one of its ancestors). 
+The presence of a group owner also allows group membership to be managed and 
+controlled by members of the group owner. As previously discussed, the members
+of an owner-less group are allowed to manage the group's membership. When a 
+group has an owner, Credo allows the group to be edited or deleted only by a 
+member of the owner group (or one of its ancestors). 
 
 When creating or editing a group, the user may assign the owner group.  Only 
 a group in which the user is a member (directly or indirectly through the 
 hierarchy) an be assigned as the owner of a group.
 
-### Implicit `self` Group
+### User's Implicit `self` Group
 
 When Credo creates a profile for a user, it automatically creates a group 
 that contains the user as its one and only member.  This group has no owner
-group, and its membership cannot be edited.
+group, and its membership cannot be edited. This group is designated as `self`
+in the application. Each user has her own `self` group.
 
 A user can assign ownership of a credential to `self` in order to restrict 
 access such that no other Credo user has access to the credential. This is
