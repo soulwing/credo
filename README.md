@@ -280,7 +280,7 @@ hierarchy) an be assigned as the owner of a group.
 
 When Credo creates a profile for a user, it automatically creates a group 
 that contains the user as its one and only member.  This group has no owner
-group, and its membership cannot be edited. This group is designated as `self`
+group, and its membership cannot be changed. This group is designated as `self`
 in the application. Each user has her own `self` group.
 
 A user can assign ownership of a credential to `self` in order to restrict 
