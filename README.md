@@ -181,7 +181,7 @@ she can retrieve the "lock box key" from her "safe". The (decrypted) symmetric
 key can then be used to decrypt the private key for the stored credential; she 
 can unlock the "lock box" to retrieve the credential's private key.
 
-![Figure N: Credential Access] (docs/images/credential-access.eps)
+![Figure N: Credential Access] (docs/images/credential-access.png)
 
 
 ### Applying Groups to Securely Manage Access
