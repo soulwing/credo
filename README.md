@@ -76,42 +76,51 @@ is designed to prevent unauthorized access to stored credentials by anyone else.
 It uses strong cryptographic techniques to achieve this end. In order to 
 understand how and why this works, it's helpful to consider an analogy.
 
-Suppose the private key for a credential is just a simple physical key like 
-those that are used to open a door lock. If that were the case, we could put the 
-key inside of a lock box that is secured by another key. But then how do we 
-secure the key for the lock box? We could put the key for our lock box in 
-another lock box, with yet another key, but that's got to end somewhere in order 
-to be useful. 
+Suppose that the private key for our credential were just a simple document on
+paper, like the title of ownership for an automobile. If that were the case, we 
+could put the document inside of a lock box that is secured by another key. But 
+then how do we secure the key for the lock box? We could put the key for our 
+lock box in another lock box, with yet another key, but that's got to end 
+somewhere in order to be useful. 
 
-What if we instead put the private key for our credential into a safe with a 
+![Figure: Lock Box] (docs/images/lock-box.png)
+
+What if we instead put the document for our credential into a safe with a 
 combination lock? If we gave the combination to Annie, she could open the safe 
 to retrieve the private key. We could also give the combination to Brandon and 
 Claire, and any one of them could open the safe to retrieve the private key for 
 our credential.
 
+![Figure: Combination Safe] (docs/images/combination-safe.png)
+
 But what if Brandon leaves our company to go work for someone else? Then we'll
 need to change the combination of the safe so that he no longer has access to
-the private key(s) stored in the safe. That's not too bad if there's only two
-other people who need to know the new combination, but it's much worse if there
-is more than one safe (each containing different private keys) and different 
-groups of people who know the combination of each safe. We need a better way.
+the credential document(s) stored in the safe. That's not too bad if there's 
+only two other people who need to know the new combination, but it's much worse 
+if there is more than one safe (each containing different documents) and 
+different groups of people who know the combination of each safe. We need a 
+better way.
 
-Let's go back to the idea of putting our private key into a simple lock box
-with a physical key. What if we made a copy of the lock box key and put it into
-a safe to which only Annie knows the combination? We could similarly make copies
-of the lock box key and lock them in separate safes for which only Brandon and
-Claire, respectively, know the corresponding combination. 
+Let's go back to the idea of putting our credential document into a simple lock 
+box with a physical key. What if we made a copy of the lock box key and put it 
+into a safe to which only Annie knows the combination? We could similarly make 
+copies of the lock box key and lock them in separate safes for which only 
+Brandon and Claire, respectively, know the corresponding combinations. 
 
-In order to get access to the private key, Annie would use the combination she
-knows to open her safe, retrieve the key for the lock box, and then open the 
-lock box to retrieve the private key. If Brandon leaves the company, we simply 
-need to ensure that he no longer has access to his safe in order to prevent him 
-from accessing the private key for our credential.
+![Figure: Lock Box and Combination Safes] (docs/images/lock-box-and-combination-safe.png)
+
+In order to get access to the credential document, Annie would use the 
+combination she knows to open her safe, retrieve the key for the lock box, and 
+then open the lock box to retrieve the document. If Brandon leaves the company, 
+we simply need to ensure that he no longer has access to his safe in order to 
+prevent him from accessing our credential document(s).
 
 Note that the idea of a safe per person also nicely supports having multiple
-lock boxes each containing a private key for a different credential. In Claire's 
-safe, we can put copies of the keys for all of the lock boxes containing private 
-keys she needs to access.
+lock boxes each containing a document for a different credential. In Claire's 
+safe, we can put copies of the keys for all of the lock boxes containing 
+documents she needs to access.
+
+![Figure: Multiple Keys in One Safe] (docs/images/multiple-keys.png)
 
 If we're clever enough, we could make it possible to put a lock box key into 
 Claire's safe without needing to know the safe's combination. With physical keys 
