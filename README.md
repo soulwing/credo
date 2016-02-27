@@ -181,7 +181,7 @@ she can retrieve the "lock box key" from her "safe". The (decrypted) symmetric
 key can then be used to decrypt the private key for the stored credential; she 
 can unlock the "lock box" to retrieve the credential's private key.
 
-![Figure N: Credential Access] (docs/images/credential-access.png)
+![Figure N: Credential Access] (docs/images/credential-access.eps)
 
 
 ### Applying Groups to Securely Manage Access
@@ -225,35 +225,58 @@ symmetric key.
 ### Group Hierarchy
 
 The concept of a group owner allows groups to be organized in a hierarchy. This 
-also allows membership in a group to be inherited, which is generally a 
-desirable feature in a group-based access control mechanism.  The presence of
-a group owner, also allows group membership to be managed and controlled
-by members of the group owner, rather than allowing the members of the group 
-itself to manage the membership, as is the case for an owner-less group.
+allows membership in a group to be inherited, which is a desirable feature in a 
+group-based access control mechanism.
 
 As previously discussed, a group's symmetric key can be recovered only by 
-members of the group. Since Credo does not store a unencrypted copy of the
+members of the group. Since Credo does not store an unencrypted copy of the
 group's symmetric key, how can members of a parent (or other ancestor) group
 gain access to the group's symmetric key in order to in turn gain access to
 credentials owned by the group?
 
 Credo solves this problem by making another copy of a group's symmetric key and
-encrypting it using the symmetric key of the owner group.  A member of the owner
-group can decrypt owner group's symmetric key, and the owner group's key can 
-then be used to decrypt the symmetric key for owned group. And this works 
-recursively down the group hierarchy; if Annie is a member of any ancestor
-group of a group that owns a credential she wants to access, starting with 
-the group in which she is a member, Credo can successively decrypt each of the 
-group keys in the path to the target group.
+encrypting it using the symmetric key of the owner group.   
 
 ![Figure N: Group with Owner] (docs/images/group-hierarchy.png)
 
-When a group has an owner, Credo allows the group to be edited or deleted only
-by a member of the owner group (or one of its ancestors). Only a group in which
-the user is a member (directly or indirectly through the hierarchy) an be 
-assigned as the owner of a group the user is creating or editing.
+A member of the owner group can decrypt owner group's symmetric key, and the 
+owner group's key can then be used to decrypt the symmetric key for owned group.
+Suppose we have a credential that is owned by group `my-app-admins` whose
+owner group is `my-root`.  If Annie is a member of `my-root`, Credo
+can use her private key to decrypt the secret key for `my-root`. It can then 
+use the secret key for `my-root` to decrypt the secret key for `my-app-admins`.
+The secret key for `my-app-admins` can then be used to decrypt the key for the
+stored credential.
 
-  
+![Figure N: Hierarchical Credential Access] (docs/images/hierarchical-access.png)
+
+In the third step, Credo uses the secret key for an owner group to decrypt
+the key for a group.  This step can be repeated as many times as necessary; 
+for any sequence of ancestor groups, starting with a member of an ancestor 
+group, Credo can decrypt the secret keys of each successive descendant
+group, all the way down to the group that owns a credential of interest.
+
+The presence of a group owner, also allows group membership to be managed and 
+controlled by members of the group owner, rather than allowing the members of 
+the group itself to manage the membership, as is the case for an owner-less group.
+When a group has an owner, Credo allows the group to be edited or deleted only 
+by a member of the owner group (or one of its ancestors). 
+
+When creating or editing a group, the user may assign the owner group.  Only 
+a group in which the user is a member (directly or indirectly through the 
+hierarchy) an be assigned as the owner of a group.
+
+### Implicit `self` Group
+
+When Credo creates a profile for a user, it automatically creates a group 
+that contains the user as its one and only member.  This group has no owner
+group, and its membership cannot be edited.
+
+A user can assign ownership of a credential to `self` in order to restrict 
+access such that no other Credo user has access to the credential. This is
+useful for personal credentials.
+
+
 Wildfly Setup Notes
 -------------------
 
