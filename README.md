@@ -87,8 +87,8 @@ somewhere in order to be useful.
 
 What if we instead put the document for our credential into a safe with a 
 combination lock? If we gave the combination to Annie, she could open the safe 
-to retrieve the private key. We could also give the combination to Brandon and 
-Claire, and any one of them could open the safe to retrieve the private key for 
+to retrieve the document. We could also give the combination to Brandon and 
+Claire, and any one of them could open the safe to retrieve the document for
 our credential.
 
 ![Figure: Combination Safe] (docs/images/combination-safe.png)
@@ -107,7 +107,7 @@ into a safe to which only Annie knows the combination? We could similarly make
 copies of the lock box key and lock them in separate safes for which only 
 Brandon and Claire, respectively, know the corresponding combinations. 
 
-![Figure: Lock Box and Combination Safes] (docs/images/lock-box-and-combination-safe.png)
+![Figure: Lock Box and Combination Safes] (docs/images/lock-box-and-safe.png)
 
 In order to get access to the credential document, Annie would use the 
 combination she knows to open her safe, retrieve the key for the lock box, and 
