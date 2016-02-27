@@ -59,10 +59,13 @@ to identify some entity; a person, a service or server, etc.  A credential is
 actually a _named asymmetric key pair_. The public key portion of the key pair
 is signed by a certification authority; the authority certifies that the key 
 pair represents (or belongs to) a given entity; a person, a service or server, 
-etc.
+etc. In practice, a credential consists of a private key, a certificate which
+identifies the subject entity (person, service, etc.) and contains the
+corresponding public key, and a chain of certificates that validate the identity
+of the certificate authority that issued our credential's certificate.
 
-The private key portion of a credential must be protected, since anyone or 
-anything that can demonstrate that it controls the private key is assumed to
+The private key portion of a credential must be protected, since anyone (or 
+anything) that can demonstrate that she controls the private key is assumed to
 be the entity represented by the credential. If Mallory has the private key for 
 a credential representing Annie, Mallory can pretend to be Annie in any
 context in which Annie's credential is accepted as a representation of Annie
@@ -248,8 +251,6 @@ encrypting it using the symmetric key of the owner group.
 
 ![Figure N: Group with Owner] (docs/images/group-hierarchy.png)
 
-A member of the owner group can decrypt owner group's symmetric key, and the 
-owner group's key can then be used to decrypt the symmetric key for owned group.
 Suppose we have a credential that is owned by group `my-app-admins` whose
 owner group is `my-root`.  If Annie is a member of `my-root`, Credo
 can use her private key to decrypt the secret key for `my-root`. It can then 
@@ -260,7 +261,7 @@ stored credential.
 ![Figure N: Hierarchical Credential Access] (docs/images/hierarchical-access.png)
 
 In the third step, Credo uses the secret key for an owner group to decrypt
-the key for a group.  This step can be repeated as many times as necessary; 
+the key for a group.  This step can be repeated as many times as necessary --
 for any sequence of ancestor groups, starting with a member of an ancestor 
 group, Credo can decrypt the secret keys of each successive descendant
 group, all the way down to the group that owns a credential of interest.
